@@ -1,0 +1,1258 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:44 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "a0ebccb0-0f59-40df-b873-a2d8a07d24c2",
+                        "aa547f14-fe10-4d4d-a3de-de9f862655e2",
+                        "c1b0a1db-561d-4189-b991-437b8395586f"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 7AD9DA69A9D242BC8826087FBEE23E60 Ref B: BL2AA2010205037 Ref C: 2026-10-22T12:13:43Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "4374"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev/providers/Microsoft.KeyVault/vaults/c7n-ml-mv-kv-kcm-d1c9",
+                                "name": "c7n-ml-mv-kv-kcm-d1c9",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "eastus",
+                                "tags": {},
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-09-01T16:36:14.121Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-09-01T16:36:14.121Z"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "00000000-0000-4000-8000-000000000001",
+                                            "permissions": {
+                                                "keys": [
+                                                    "all"
+                                                ],
+                                                "secrets": [
+                                                    "all"
+                                                ],
+                                                "certificates": [
+                                                    "all"
+                                                ],
+                                                "storage": []
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 7,
+                                    "enableRbacAuthorization": false,
+                                    "vaultUri": "https://c7n-ml-mv-kv-kcm-d1c9.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1nculsl5b5flbc",
+                                "name": "cckeyvault1nculsl5b5flbc",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "Standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "defaultAction": "Deny",
+                                        "ipRules": [
+                                            {
+                                                "value": "0.0.0.0/2"
+                                            },
+                                            {
+                                                "value": "64.0.0.0/3"
+                                            },
+                                            {
+                                                "value": "96.0.0.0/4"
+                                            },
+                                            {
+                                                "value": "112.0.0.0/5"
+                                            },
+                                            {
+                                                "value": "120.0.0.0/6"
+                                            },
+                                            {
+                                                "value": "124.0.0.0/7"
+                                            },
+                                            {
+                                                "value": "126.0.0.0/8"
+                                            },
+                                            {
+                                                "value": "128.0.0.0/1"
+                                            }
+                                        ],
+                                        "virtualNetworkRules": []
+                                    },
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "00000000-0000-4000-8000-000000000002",
+                                            "permissions": {
+                                                "keys": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "secrets": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "certificates": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "ManageContacts",
+                                                    "ManageIssuers",
+                                                    "GetIssuers",
+                                                    "ListIssuers",
+                                                    "SetIssuers",
+                                                    "DeleteIssuers"
+                                                ],
+                                                "storage": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "regeneratekey"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "enableRbacAuthorization": false,
+                                    "vaultUri": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aml-delete-test-0812095033/providers/Microsoft.KeyVault/vaults/amldeletkeyvault5540f7e4",
+                                "name": "amldeletkeyvault5540f7e4",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "westus",
+                                "tags": {
+                                    "createdByToolkit": "cli-v2-1.34.1"
+                                },
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-08-12T14:02:39.896Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-08-12T14:02:39.896Z"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "00000000-0000-4000-8000-000000000003",
+                                            "permissions": {
+                                                "keys": [
+                                                    "all"
+                                                ],
+                                                "secrets": [
+                                                    "all"
+                                                ],
+                                                "certificates": [
+                                                    "all"
+                                                ],
+                                                "storage": []
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 90,
+                                    "enableRbacAuthorization": true,
+                                    "vaultUri": "https://amldeletkeyvault5540f7e4.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&%24skiptoken=5ZNNi9swEIb%2fiyg9xbGtxCEJhOJt0nRbWwHH3%2fgiWdrU668gyYnXIf%2b98ran3go97FIQ0owYJN535rmBhvXSKZpSgPUN7OyjHxzBGvyQ8izWul7jBp9YzRo5xUPH2TRva110ROS8OMuibYRuLhZPC2u50BjGRJvTnGiYrZYaJCxfWdAghC70M28vBWVc6G6R81a0T3L6nb2EuKukfhl38QmfC%2b2iStSrG2hASzPUMj9%2bEKX6qi1Zs6H7cKBfVjKJUIsjq3Kivkrib52KGycKO1pXLwRaMo0sw4nTKm%2fQWeXLBCIjjZFBop7T53yOhh1EW3uGhsc5Om02YAKOh8D%2f%2bnmHfM923q0D6ELiB5PuA5nA3sxnnnKgf07Gc%2bZJspfQ3Zb9wS8t10%2fmyLevSnm0e9M9TyJTOJFXkX1opEfztY%2bOb89d%2f%2fF68IOrO6DlWJPuQ5HGHk%2fjCiZxKOg2MNH2oUYwMMB9AjCv7dOJsxOWjPrjOKkxtz1XOTAi4GJeMq6ubtlvCjKwzv4zDjIwyf4g4d268PcsvKr%2fRcMbVv0veMjAHdx%2fAg%3d%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&$skiptoken=5ZNNi9swEIb/iyg9xbGtxCEJhOJt0nRbWwHH3/giWdrU668gyYnXIf%2B98ran3go97FIQ0owYJN535rmBhvXSKZpSgPUN7OyjHxzBGvyQ8izWul7jBp9YzRo5xUPH2TRva110ROS8OMuibYRuLhZPC2u50BjGRJvTnGiYrZYaJCxfWdAghC70M28vBWVc6G6R81a0T3L6nb2EuKukfhl38QmfC%2B2iStSrG2hASzPUMj9%2BEKX6qi1Zs6H7cKBfVjKJUIsjq3Kivkrib52KGycKO1pXLwRaMo0sw4nTKm/QWeXLBCIjjZFBop7T53yOhh1EW3uGhsc5Om02YAKOh8D/%2BnmHfM923q0D6ELiB5PuA5nA3sxnnnKgf07Gc%2BZJspfQ3Zb9wS8t10/myLevSnm0e9M9TyJTOJFXkX1opEfztY%2BOb89d//F68IOrO6DlWJPuQ5HGHk/jCiZxKOg2MNH2oUYwMMB9AjCv7dOJsxOWjPrjOKkxtz1XOTAi4GJeMq6ubtlvCjKwzv4zDjIwyf4g4d268PcsvKr/RcMbVv0veMjAHdx/Ag%3D%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "1c1c6db5-bed5-4d34-97e2-7233136ab9bd",
+                        "7b0fef1a-11a9-48d3-a4d0-e163b567e6c3",
+                        "eb32e8f2-5c80-430f-844d-43441a26812f"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 360A095B42204C329AD2577A323204E4 Ref B: BL2AA2011002062 Ref C: 2026-10-22T12:13:44Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "1620"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.KeyVault/vaults/cctestmlws254523190822",
+                                "name": "cctestmlws254523190822",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-09-30T19:24:20.922Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-09-30T19:24:20.922Z"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "00000000-0000-4000-8000-000000000004",
+                                            "permissions": {
+                                                "keys": [
+                                                    "all"
+                                                ],
+                                                "secrets": [
+                                                    "all"
+                                                ],
+                                                "certificates": [
+                                                    "all"
+                                                ],
+                                                "storage": []
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "enableRbacAuthorization": false,
+                                    "vaultUri": "https://cctestmlws254523190822.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&%24skiptoken=5ZDdToNAEIXfZWO8km7BQixJY9AqjfKTtrRAw83CbhGBXbK7YG3Td3erFya%2bgslkMjk5M2fynQAlB%2blVtBbAPoF1uIkWj09BtHK8zRrY4E3KTtgQtoiikrSEyhE69pyMCtZC0eei4FUnK0YF1C1rb5l3lkYQyrUJLnINkemdZuSkmJrGOM%2bxBTvOhgoTLqBfFZwJtpejV%2fK5RX0j4XDp4h51lTYoi7o6M8aGqY1V6ddXolZRrCZ0ht3tET9PZRoHDMVm48WHJk1eejVTL9aHnbsVXrJrChp0uTGROHmo02TV7N3g%2fXvX1QW6TSf%2bfPkRzpd6GKW6HzkzcL755RHSBWuwoqJExFunLDkpkSQ4uvyg2DgrH%2fz4fcRrwpV0yv4gzICd%2fTOIGTiD8xc%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&$skiptoken=5ZDdToNAEIXfZWO8km7BQixJY9AqjfKTtrRAw83CbhGBXbK7YG3Td3erFya%2BgslkMjk5M2fynQAlB%2BlVtBbAPoF1uIkWj09BtHK8zRrY4E3KTtgQtoiikrSEyhE69pyMCtZC0eei4FUnK0YF1C1rb5l3lkYQyrUJLnINkemdZuSkmJrGOM%2BxBTvOhgoTLqBfFZwJtpejV/K5RX0j4XDp4h51lTYoi7o6M8aGqY1V6ddXolZRrCZ0ht3tET9PZRoHDMVm48WHJk1eejVTL9aHnbsVXrJrChp0uTGROHmo02TV7N3g/XvX1QW6TSf%2BfPkRzpd6GKW6HzkzcL755RHSBWuwoqJExFunLDkpkSQ4uvyg2DgrH/z4fcRrwpV0yv4gzICd/TOIGTiD8xc%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "faeade34-22b9-4a50-9322-dd6fc92538d3"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1C50D3068BF349B88FA97533BF87EE84 Ref B: YQ1AA2090601040 Ref C: 2026-10-22T12:13:45Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://c7n-ml-mv-kv-kcm-d1c9.vault.azure.net/keys?api-version=2025-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.microsoftonline.com/00000000-0000-0000-0000-000000000003\", resource=\"https://vault.azure.net\""
+                    ],
+                    "content-length": [
+                        "108"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Unauthorized",
+                            "message": "AKV10000: Request is missing a Bearer, PoP, or MTLS_POP token."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://c7n-ml-mv-kv-kcm-d1c9.vault.azure.net/keys?api-version=2025-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 403,
+                    "message": "Forbidden"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:46 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "453"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Forbidden",
+                            "message": "The user, group or application 'appid=04b07795-8ddb-461a-bbee-02f9e1bf7b46;oid=00000000-0000-4000-8000-000000000005;numgroups=1;iss=https://sts.windows.net/00000000-0000-0000-0000-000000000003/' does not have keys list permission on key vault 'c7n-ml-mv-kv-kcm-d1c9;location=eastus'. For help resolving this issue, please see https://go.microsoft.com/fwlink/?linkid=2125287",
+                            "innererror": {
+                                "code": "AccessDenied"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys?api-version=2025-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:46 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.microsoftonline.com/00000000-0000-0000-0000-000000000003\", resource=\"https://vault.azure.net\""
+                    ],
+                    "content-length": [
+                        "108"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Unauthorized",
+                            "message": "AKV10000: Request is missing a Bearer, PoP, or MTLS_POP token."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys?api-version=2025-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:47 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1054"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kid": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys/cctest1",
+                                "attributes": {
+                                    "enabled": true,
+                                    "key_size": 2048,
+                                    "nbf": 1792628524,
+                                    "exp": 1824165124,
+                                    "created": 1792629124,
+                                    "updated": 1792629124,
+                                    "recoveryLevel": "Purgeable",
+                                    "recoverableDays": 0,
+                                    "hsmPlatform": "0"
+                                },
+                                "managed": true
+                            },
+                            {
+                                "kid": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys/cctest2",
+                                "attributes": {
+                                    "enabled": true,
+                                    "key_size": 2048,
+                                    "nbf": 1792628531,
+                                    "exp": 1824165131,
+                                    "created": 1792629131,
+                                    "updated": 1792629131,
+                                    "recoveryLevel": "Purgeable",
+                                    "recoverableDays": 0,
+                                    "hsmPlatform": "0"
+                                },
+                                "managed": true
+                            },
+                            {
+                                "kid": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys/cctestec",
+                                "attributes": {
+                                    "enabled": true,
+                                    "created": 1792629122,
+                                    "updated": 1792629122,
+                                    "recoveryLevel": "Purgeable",
+                                    "recoverableDays": 0,
+                                    "exportable": false,
+                                    "hsmPlatform": "0"
+                                }
+                            },
+                            {
+                                "kid": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys/cctestrsa",
+                                "attributes": {
+                                    "enabled": true,
+                                    "key_size": 2048,
+                                    "created": 1792629121,
+                                    "updated": 1792629121,
+                                    "recoveryLevel": "Purgeable",
+                                    "recoverableDays": 0,
+                                    "exportable": false,
+                                    "hsmPlatform": "0"
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://amldeletkeyvault5540f7e4.vault.azure.net/keys?api-version=2025-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:47 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.microsoftonline.com/00000000-0000-0000-0000-000000000003\", resource=\"https://vault.azure.net\""
+                    ],
+                    "content-length": [
+                        "108"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Unauthorized",
+                            "message": "AKV10000: Request is missing a Bearer, PoP, or MTLS_POP token."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://amldeletkeyvault5540f7e4.vault.azure.net/keys?api-version=2025-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 403,
+                    "message": "Forbidden"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:49 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "768"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Forbidden",
+                            "message": "Caller is not authorized to perform action on resource.\r\nIf role assignments, deny assignments or role definitions were changed recently, please observe propagation time.\r\nCaller: appid=04b07795-8ddb-461a-bbee-02f9e1bf7b46;oid=00000000-0000-4000-8000-000000000005;iss=https://sts.windows.net/00000000-0000-0000-0000-000000000003/\r\nAction: 'Microsoft.KeyVault/vaults/keys/read'\r\nResource: '/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/aml-delete-test-0812095033/providers/microsoft.keyvault/vaults/amldeletkeyvault5540f7e4'\r\nAssignment: (not found)\r\nDenyAssignmentId: null\r\nDecisionReason: null \r\nVault: amldeletkeyvault5540f7e4;location=westus\r\n",
+                            "innererror": {
+                                "code": "ForbiddenByRbac"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cctestmlws254523190822.vault.azure.net/keys?api-version=2025-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:50 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.microsoftonline.com/00000000-0000-0000-0000-000000000003\", resource=\"https://vault.azure.net\""
+                    ],
+                    "content-length": [
+                        "108"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Unauthorized",
+                            "message": "AKV10000: Request is missing a Bearer, PoP, or MTLS_POP token."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cctestmlws254523190822.vault.azure.net/keys?api-version=2025-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 403,
+                    "message": "Forbidden"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:50 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "462"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Forbidden",
+                            "message": "The user, group or application 'appid=04b07795-8ddb-461a-bbee-02f9e1bf7b46;oid=00000000-0000-4000-8000-000000000005;numgroups=1;iss=https://sts.windows.net/00000000-0000-0000-0000-000000000003/' does not have keys list permission on key vault 'cctestmlws254523190822;location=southcentralus'. For help resolving this issue, please see https://go.microsoft.com/fwlink/?linkid=2125287",
+                            "innererror": {
+                                "code": "AccessDenied"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:51 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "6adfa5e9-9e1e-4236-9eab-a3ccd7d9939e",
+                        "1d8df17d-82fb-419f-b0e5-57b49d66e087",
+                        "d74a3b70-c3f9-471d-a876-476ab2674f40"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: C0DB268F82F044A39F015E8A2BC34095 Ref B: YQ1AA2090602060 Ref C: 2026-10-22T12:13:51Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "4374"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-dev/providers/Microsoft.KeyVault/vaults/c7n-ml-mv-kv-kcm-d1c9",
+                                "name": "c7n-ml-mv-kv-kcm-d1c9",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "eastus",
+                                "tags": {},
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-09-01T16:36:14.121Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-09-01T16:36:14.121Z"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "00000000-0000-4000-8000-000000000001",
+                                            "permissions": {
+                                                "keys": [
+                                                    "all"
+                                                ],
+                                                "secrets": [
+                                                    "all"
+                                                ],
+                                                "certificates": [
+                                                    "all"
+                                                ],
+                                                "storage": []
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 7,
+                                    "enableRbacAuthorization": false,
+                                    "vaultUri": "https://c7n-ml-mv-kv-kcm-d1c9.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1nculsl5b5flbc",
+                                "name": "cckeyvault1nculsl5b5flbc",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "Standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "defaultAction": "Deny",
+                                        "ipRules": [
+                                            {
+                                                "value": "0.0.0.0/2"
+                                            },
+                                            {
+                                                "value": "64.0.0.0/3"
+                                            },
+                                            {
+                                                "value": "96.0.0.0/4"
+                                            },
+                                            {
+                                                "value": "112.0.0.0/5"
+                                            },
+                                            {
+                                                "value": "120.0.0.0/6"
+                                            },
+                                            {
+                                                "value": "124.0.0.0/7"
+                                            },
+                                            {
+                                                "value": "126.0.0.0/8"
+                                            },
+                                            {
+                                                "value": "128.0.0.0/1"
+                                            }
+                                        ],
+                                        "virtualNetworkRules": []
+                                    },
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "00000000-0000-4000-8000-000000000002",
+                                            "permissions": {
+                                                "keys": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "secrets": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "certificates": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "ManageContacts",
+                                                    "ManageIssuers",
+                                                    "GetIssuers",
+                                                    "ListIssuers",
+                                                    "SetIssuers",
+                                                    "DeleteIssuers"
+                                                ],
+                                                "storage": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "regeneratekey"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "enableRbacAuthorization": false,
+                                    "vaultUri": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aml-delete-test-0812095033/providers/Microsoft.KeyVault/vaults/amldeletkeyvault5540f7e4",
+                                "name": "amldeletkeyvault5540f7e4",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "westus",
+                                "tags": {
+                                    "createdByToolkit": "cli-v2-1.34.1"
+                                },
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-08-12T14:02:39.896Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-08-12T14:02:39.896Z"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "00000000-0000-4000-8000-000000000003",
+                                            "permissions": {
+                                                "keys": [
+                                                    "all"
+                                                ],
+                                                "secrets": [
+                                                    "all"
+                                                ],
+                                                "certificates": [
+                                                    "all"
+                                                ],
+                                                "storage": []
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 90,
+                                    "enableRbacAuthorization": true,
+                                    "vaultUri": "https://amldeletkeyvault5540f7e4.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&%24skiptoken=5ZNNi9swEIb%2fiyg9xbGtxCEJhOJt0nRbWwHH3%2fgiWdrU668gyYnXIf%2b98ran3go97FIQ0owYJN535rmBhvXSKZpSgPUN7OyjHxzBGvyQ8izWul7jBp9YzRo5xUPH2TRva110ROS8OMuibYRuLhZPC2u50BjGRJvTnGiYrZYaJCxfWdAghC70M28vBWVc6G6R81a0T3L6nb2EuKukfhl38QmfC%2b2iStSrG2hASzPUMj9%2bEKX6qi1Zs6H7cKBfVjKJUIsjq3Kivkrib52KGycKO1pXLwRaMo0sw4nTKm%2fQWeXLBCIjjZFBop7T53yOhh1EW3uGhsc5Om02YAKOh8D%2f%2bnmHfM923q0D6ELiB5PuA5nA3sxnnnKgf07Gc%2bZJspfQ3Zb9wS8t10%2fmyLevSnm0e9M9TyJTOJFXkX1opEfztY%2bOb89d%2f%2fF68IOrO6DlWJPuQ5HGHk%2fjCiZxKOg2MNH2oUYwMMB9AjCv7dOJsxOWjPrjOKkxtz1XOTAi4GJeMq6ubtlvCjKwzv4zDjIwyf4g4d268PcsvKr%2fRcMbVv0veMjAHdx%2fAg%3d%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&$skiptoken=5ZNNi9swEIb/iyg9xbGtxCEJhOJt0nRbWwHH3/giWdrU668gyYnXIf%2B98ran3go97FIQ0owYJN535rmBhvXSKZpSgPUN7OyjHxzBGvyQ8izWul7jBp9YzRo5xUPH2TRva110ROS8OMuibYRuLhZPC2u50BjGRJvTnGiYrZYaJCxfWdAghC70M28vBWVc6G6R81a0T3L6nb2EuKukfhl38QmfC%2B2iStSrG2hASzPUMj9%2BEKX6qi1Zs6H7cKBfVjKJUIsjq3Kivkrib52KGycKO1pXLwRaMo0sw4nTKm/QWeXLBCIjjZFBop7T53yOhh1EW3uGhsc5Om02YAKOh8D/%2BnmHfM923q0D6ELiB5PuA5nA3sxnnnKgf07Gc%2BZJspfQ3Zb9wS8t10/myLevSnm0e9M9TyJTOJFXkX1opEfztY%2BOb89d//F68IOrO6DlWJPuQ5HGHk/jCiZxKOg2MNH2oUYwMMB9AjCv7dOJsxOWjPrjOKkxtz1XOTAi4GJeMq6ubtlvCjKwzv4zDjIwyf4g4d268PcsvKr/RcMbVv0veMjAHdx/Ag%3D%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:52 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "eca05e5d-dd36-4bd3-8820-c125b0c9ccfc",
+                        "d14ff87e-f8e2-4b17-9648-0d1ee7fb191b",
+                        "3f3cd35b-dd20-4533-a743-f55d7338557d"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 2C22F26C61BE48DCAF0828B8103B3CDF Ref B: IAD011092218054 Ref C: 2026-10-22T12:13:52Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "1620"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.KeyVault/vaults/cctestmlws254523190822",
+                                "name": "cctestmlws254523190822",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-09-30T19:24:20.922Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-09-30T19:24:20.922Z"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "00000000-0000-4000-8000-000000000004",
+                                            "permissions": {
+                                                "keys": [
+                                                    "all"
+                                                ],
+                                                "secrets": [
+                                                    "all"
+                                                ],
+                                                "certificates": [
+                                                    "all"
+                                                ],
+                                                "storage": []
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "enableRbacAuthorization": false,
+                                    "vaultUri": "https://cctestmlws254523190822.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&%24skiptoken=5ZDdToNAEIXfZWO8km7BQixJY9AqjfKTtrRAw83CbhGBXbK7YG3Td3erFya%2bgslkMjk5M2fynQAlB%2blVtBbAPoF1uIkWj09BtHK8zRrY4E3KTtgQtoiikrSEyhE69pyMCtZC0eei4FUnK0YF1C1rb5l3lkYQyrUJLnINkemdZuSkmJrGOM%2bxBTvOhgoTLqBfFZwJtpejV%2fK5RX0j4XDp4h51lTYoi7o6M8aGqY1V6ddXolZRrCZ0ht3tET9PZRoHDMVm48WHJk1eejVTL9aHnbsVXrJrChp0uTGROHmo02TV7N3g%2fXvX1QW6TSf%2bfPkRzpd6GKW6HzkzcL755RHSBWuwoqJExFunLDkpkSQ4uvyg2DgrH%2fz4fcRrwpV0yv4gzICd%2fTOIGTiD8xc%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&$skiptoken=5ZDdToNAEIXfZWO8km7BQixJY9AqjfKTtrRAw83CbhGBXbK7YG3Td3erFya%2BgslkMjk5M2fynQAlB%2BlVtBbAPoF1uIkWj09BtHK8zRrY4E3KTtgQtoiikrSEyhE69pyMCtZC0eei4FUnK0YF1C1rb5l3lkYQyrUJLnINkemdZuSkmJrGOM%2BxBTvOhgoTLqBfFZwJtpejV/K5RX0j4XDp4h51lTYoi7o6M8aGqY1V6ddXolZRrCZ0ht3tET9PZRoHDMVm48WHJk1eejVTL9aHnbsVXrJrChp0uTGROHmo02TV7N3g/XvX1QW6TSf%2BfPkRzpd6GKW6HzkzcL755RHSBWuwoqJExFunLDkpkSQ4uvyg2DgrH/z4fcRrwpV0yv4gzICd/TOIGTiD8xc%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:53 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "ced44c57-1dbc-4a4a-ba41-d8bf6ec21a1c"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: CCA2BB472E0C4A559C14EDE0463C8919 Ref B: YQ1AA2090602025 Ref C: 2026-10-22T12:13:53Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PATCH",
+                "uri": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys/cctestrsa/?api-version=2025-07-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:53 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "746"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "key": {
+                            "kid": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys/cctestrsa/7efda697c46d4351a4ac2a307df463a3",
+                            "kty": "RSA",
+                            "key_ops": [
+                                "encrypt",
+                                "decrypt",
+                                "sign",
+                                "verify",
+                                "wrapKey",
+                                "unwrapKey"
+                            ],
+                            "n": "zBlUSin9Wqgc_5txn19aQ7thuO7L-jvwzj8zL3xmhok69yDTY3v7UxgxHulizgzbSSUvg58t5Anu3lJUfT26Oywbwk_IX5OHXHsTysdTUPrhKKPqx4nEDgKSWYRWj3FuQ5jFnlNwIgz484qpLex3QCSmT5yEY6UklL9O6vgdR_M5QCrVrfSUzrmopQnFSiz6UVlW5d6IDL_w_pMtv_N3D75UmFZrSVf5CGpdPvQwaau-467sSMZXP967dX5gABc3sbNWhrU4ytkgCB7qvMquVHxQp_-JcxD1_DITZRy44-CszrpXrpyx6_jyaBpUHhNJPe27x0_qigOoPH-_xep5EQ",
+                            "e": "AQAB"
+                        },
+                        "attributes": {
+                            "enabled": true,
+                            "key_size": 2048,
+                            "exp": 1800489599,
+                            "created": 1792629121,
+                            "updated": 1792671234,
+                            "recoveryLevel": "Purgeable",
+                            "recoverableDays": 0,
+                            "exportable": false,
+                            "hsmPlatform": "0"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys/cctestrsa/?api-version=2025-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 22 Oct 2026 12:13:54 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "746"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "key": {
+                            "kid": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/keys/cctestrsa/7efda697c46d4351a4ac2a307df463a3",
+                            "kty": "RSA",
+                            "key_ops": [
+                                "encrypt",
+                                "decrypt",
+                                "sign",
+                                "verify",
+                                "wrapKey",
+                                "unwrapKey"
+                            ],
+                            "n": "zBlUSin9Wqgc_5txn19aQ7thuO7L-jvwzj8zL3xmhok69yDTY3v7UxgxHulizgzbSSUvg58t5Anu3lJUfT26Oywbwk_IX5OHXHsTysdTUPrhKKPqx4nEDgKSWYRWj3FuQ5jFnlNwIgz484qpLex3QCSmT5yEY6UklL9O6vgdR_M5QCrVrfSUzrmopQnFSiz6UVlW5d6IDL_w_pMtv_N3D75UmFZrSVf5CGpdPvQwaau-467sSMZXP967dX5gABc3sbNWhrU4ytkgCB7qvMquVHxQp_-JcxD1_DITZRy44-CszrpXrpyx6_jyaBpUHhNJPe27x0_qigOoPH-_xep5EQ",
+                            "e": "AQAB"
+                        },
+                        "attributes": {
+                            "enabled": true,
+                            "key_size": 2048,
+                            "exp": 1800489599,
+                            "created": 1792629121,
+                            "updated": 1792671234,
+                            "recoveryLevel": "Purgeable",
+                            "recoverableDays": 0,
+                            "exportable": false,
+                            "hsmPlatform": "0"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
