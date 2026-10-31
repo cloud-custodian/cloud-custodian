@@ -1,0 +1,49 @@
+provider "google" {
+  # Keep the provider's goog-terraform-provisioned label off, so the only
+  # labels present are the ones under test.
+  add_terraform_attribution_label = false
+}
+
+resource "random_id" "suffix" {
+  byte_length = 2
+}
+
+# Positive: removal with a surviving label, the case that silently no-op'd
+# when removed keys were omitted from a merge-patch body.
+resource "google_storage_bucket" "partial" {
+  name                        = "c7n-remove-labels-partial-${random_id.suffix.hex}"
+  location                    = "US"
+  force_destroy               = true
+  uniform_bucket_level_access = true
+
+  labels = {
+    c7n_keep     = "yes"
+    c7n_remove_a = "a"
+    c7n_remove_b = "b"
+  }
+}
+
+# Positive: every label removed.
+resource "google_storage_bucket" "full" {
+  name                        = "c7n-remove-labels-full-${random_id.suffix.hex}"
+  location                    = "US"
+  force_destroy               = true
+  uniform_bucket_level_access = true
+
+  labels = {
+    c7n_remove_a = "a"
+    c7n_remove_b = "b"
+  }
+}
+
+# Negative: none of the removed keys are present, labels must be untouched.
+resource "google_storage_bucket" "absent" {
+  name                        = "c7n-remove-labels-absent-${random_id.suffix.hex}"
+  location                    = "US"
+  force_destroy               = true
+  uniform_bucket_level_access = true
+
+  labels = {
+    c7n_keep = "yes"
+  }
+}

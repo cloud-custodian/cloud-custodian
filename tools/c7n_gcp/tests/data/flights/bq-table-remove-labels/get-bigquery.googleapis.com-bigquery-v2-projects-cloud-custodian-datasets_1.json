@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "etag": "FuMVR6gSspytT5pEF2bRfQ==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 25 Sep 2026 15:56:15 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "445",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets?filter=labels.c7n_test%3Abq_table_remove_labels&alt=json"
+  },
+  "body": {
+    "kind": "bigquery#datasetList",
+    "etag": "FuMVR6gSspytT5pEF2bRfQ==",
+    "datasets": [
+      {
+        "kind": "bigquery#dataset",
+        "id": "cloud-custodian:c7n_remove_labels_tables_13eb",
+        "datasetReference": {
+          "datasetId": "c7n_remove_labels_tables_13eb",
+          "projectId": "cloud-custodian"
+        },
+        "labels": {
+          "c7n_test": "bq_table_remove_labels"
+        },
+        "location": "US",
+        "type": "DEFAULT"
+      }
+    ]
+  }
+}

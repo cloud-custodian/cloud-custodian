@@ -6,6 +6,7 @@ from dateutil import tz as tzutil
 
 from googleapiclient.errors import HttpError
 
+from c7n.exceptions import PolicyExecutionError
 from c7n.utils import type_schema
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import Time
@@ -30,6 +31,9 @@ class BaseLabelAction(MethodAction):
 
         # Default the permission name to the operation name
         return model.labels_op
+
+    def get_permissions(self):
+        return super().get_permissions() + tuple(self.manager.get_model().labels_permissions)
 
     def get_labels_to_add(self, resource):
         return None
@@ -57,15 +61,99 @@ class BaseLabelAction(MethodAction):
         return super().get_client(session, model)
 
     def get_resource_params(self, model, resource):
-        current_labels = self._get_current_labels(resource)
-        new_labels = self.get_labels_to_add(resource)
-        remove_labels = self.get_labels_to_delete(resource)
-        all_labels = self._merge_labels(current_labels, new_labels, remove_labels)
+        _, labels, _ = self.resolve_labels(resource)
+        if model.labels_merge_patch:
+            # Null every label being removed, not just those the resource was
+            # listed with, so one added since listing is removed too. Nulling
+            # an absent label changes nothing.
+            remove = self.get_labels_to_delete(resource) or ()
+            labels = dict(labels, **{k: None for k in remove})
+        return model.get_label_params(resource, labels)
 
-        return model.get_label_params(resource, all_labels)
+    def resolve_labels(self, resource):
+        """Return the resource's current labels, its labels once this action
+        applies, and the labels being removed that it currently has.
+        """
+        current = self._get_current_labels(resource)
+        remove = self.get_labels_to_delete(resource) or ()
+        labels = self._merge_labels(current, self.get_labels_to_add(resource), remove)
+        return current, labels, [k for k in remove if k in current]
 
     def _get_current_labels(self, resource):
         return resource.get('labels', {})
+
+    def process_resource_set(self, client, model, resources):
+        # Skip resources the action leaves as they are, rather than send a
+        # write that changes nothing.
+        resources = [r for r in resources if self.changes_labels(r)]
+        if not model.labels_clear_to_remove:
+            return super().process_resource_set(client, model, resources)
+        # Each removal waits on its clear, so one slow or failing resource
+        # mustn't hold back the rest. Report the failure once all are tried.
+        errors = {}
+        for resource in resources:
+            try:
+                self.process_clear_to_remove(client, model, resource)
+            except (HttpError, TimeoutError) as e:
+                self.log.error(
+                    "policy:%s action:%s failed to relabel %s: %s",
+                    self.manager.ctx.policy.name, self.type, resource.get(model.name), e)
+                errors[resource.get(model.name)] = e
+        if len(errors) == 1:
+            raise next(iter(errors.values()))
+        if errors:
+            raise PolicyExecutionError(
+                "policy:%s action:%s failed to relabel %d resources: %s" % (
+                    self.manager.ctx.policy.name, self.type, len(errors),
+                    ", ".join(map(str, errors)))) from list(errors.values())[-1]
+
+    def changes_labels(self, resource):
+        current, labels, _ = self.resolve_labels(resource)
+        return labels != current
+
+    def process_clear_to_remove(self, client, model, resource):
+        if self.resolve_labels(resource)[2]:
+            # Clearing wipes every label, so work from the labels the resource
+            # has now rather than when it was listed.
+            fresh = model.refresh(client, resource)
+            resource = dict(resource, labels=fresh.get('labels', {}))
+        current, labels, removed = self.resolve_labels(resource)
+        if labels == current:
+            return
+        if not removed:
+            self.invoke_api(client, model.labels_op, model.get_label_params(resource, labels))
+            return
+
+        cleared = self.invoke_api(client, model.labels_op, model.get_label_params(
+            resource, {k: None for k in current}))
+        if not labels:
+            return
+        try:
+            # The set must not race the clear, or it can be wiped by it.
+            if wait := getattr(model, 'wait_for_label_op', None):
+                wait(self.manager.session_factory, resource, cleared)
+            self.invoke_api(client, model.labels_op, model.get_label_params(resource, labels))
+        except (HttpError, TimeoutError):
+            self.restore_labels(client, model, resource, current)
+            raise
+
+    def restore_labels(self, client, model, resource, labels):
+        """Best-effort restore of labels cleared ahead of a set that failed.
+
+        The resource is left unlabelled otherwise, and a re-run can't recover
+        the labels since there are none left to work from.
+        """
+        name = resource.get(model.name)
+        try:
+            self.invoke_api(client, model.labels_op, model.get_label_params(resource, labels))
+        except HttpError:
+            self.log.error(
+                "policy:%s action:%s cleared labels on %s and failed to restore %s",
+                self.manager.ctx.policy.name, self.type, name, labels)
+        else:
+            self.log.warning(
+                "policy:%s action:%s failed to set labels on %s, restored %s",
+                self.manager.ctx.policy.name, self.type, name, labels)
 
     def handle_resource_error(self, client, model, resource, op_name, params, error):
         if 'fingerprint' not in error.reason or not model.refresh:
