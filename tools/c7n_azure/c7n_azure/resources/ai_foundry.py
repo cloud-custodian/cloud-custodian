@@ -1,12 +1,15 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
+
 import requests
 
 from azure.mgmt.cognitiveservices.models import ConnectionPropertiesV2
 from azure.mgmt.resource.resources.models import GenericResource
 from msrestazure.tools import parse_resource_id
 
+from c7n import exceptions
 from c7n.utils import type_schema
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
@@ -84,6 +87,178 @@ class CognitiveService(ArmResourceManager):
             'sku.name'
         )
         resource_type = 'Microsoft.CognitiveServices/accounts'
+
+
+@CognitiveService.action_registry.register('update')
+class CognitiveServiceUpdateAction(AzureBaseAction):
+    """Update account settings on supported Cognitive Services kinds.
+
+    Each property's schema lists its verified account kinds in ``kinds``.
+    Incompatible property/kind combinations fail before any accounts are updated.
+    Kind support reflects tested configurations, not every available SKU.
+
+    :example:
+
+    Disable local authentication on Cognitive Services accounts:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cognitive-services-disable-local-auth
+            resource: azure.cognitiveservice
+            filters:
+              - kind: CognitiveServices
+              - type: value
+                key: properties.disableLocalAuth
+                op: ne
+                value: true
+            actions:
+              - type: update
+                properties:
+                  disableLocalAuth: true
+    """
+
+    _common_kinds = [
+        'AIServices',
+        'CognitiveServices',
+        'ComputerVision',
+        'ContentModerator',
+        'ContentSafety',
+        'CustomVision.Prediction',
+        'CustomVision.Training',
+        'Face',
+        'FormRecognizer',
+        'ImmersiveReader',
+        'OpenAI',
+        'QnAMaker.v2',
+        'SpeechServices',
+        'TextAnalytics',
+        'TextTranslation',
+    ]
+
+    # TODO: Test other writable fields before exposing them: migrationToken,
+    # customSubDomainName, encryption, userOwnedStorage, amlWorkspace, restore,
+    # locations, raiMonitorConfig, networkInjections, allowProjectManagement,
+    # defaultProject, associatedProjects, networkAcls.virtualNetworkRules,
+    # and the remaining apiProperties fields.
+    schema = type_schema(
+        'update',
+        required=['properties'],
+        properties={
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'disableLocalAuth': {'type': 'boolean', 'kinds': _common_kinds},
+                'publicNetworkAccess': {
+                    'enum': ['Enabled', 'Disabled'],
+                    'kinds': _common_kinds,
+                },
+                'dynamicThrottlingEnabled': {
+                    'type': 'boolean',
+                    'kinds': [
+                        'AIServices',
+                        'CognitiveServices',
+                        'ComputerVision',
+                        'ContentModerator',
+                        'CustomVision.Prediction',
+                        'FormRecognizer',
+                        'ImmersiveReader',
+                        'QnAMaker.v2',
+                        'TextAnalytics',
+                    ],
+                },
+                'restrictOutboundNetworkAccess': {
+                    'type': 'boolean',
+                    'kinds': _common_kinds,
+                },
+                'allowedFqdnList': {
+                    'type': 'array',
+                    'items': {'type': 'string'},
+                    'kinds': _common_kinds,
+                },
+                'networkAcls': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'properties': {
+                        'defaultAction': {
+                            'enum': ['Allow', 'Deny'],
+                            'kinds': _common_kinds,
+                        },
+                        'ipRules': {
+                            'type': 'array',
+                            'items': {
+                                'type': 'object',
+                                'required': ['value'],
+                                'additionalProperties': False,
+                                'properties': {'value': {'type': 'string'}},
+                            },
+                            'kinds': _common_kinds,
+                        },
+                        'bypass': {
+                            'enum': ['None', 'AzureServices'],
+                            'kinds': [
+                                'AIServices',
+                                'CognitiveServices',
+                                'OpenAI',
+                                'TextAnalytics',
+                            ],
+                        },
+                    },
+                },
+                'apiProperties': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'properties': {
+                        'statisticsEnabled': {
+                            'type': 'boolean',
+                            'kinds': ['CognitiveServices', 'OpenAI'],
+                        },
+                    },
+                },
+            },
+        },
+    )
+
+    def process(self, resources: list[dict], event: dict | None = None) -> list:
+        definitions = self.schema['properties']['properties']['properties']
+        requested = []
+        for name, value in self.data['properties'].items():
+            definition = definitions[name]
+            if 'kinds' in definition:
+                requested.append((name, definition['kinds']))
+            else:
+                requested.extend(
+                    (f'{name}.{key}', definition['properties'][key]['kinds'])
+                    for key in value
+                )
+        for resource in resources:
+            for name, kinds in requested:
+                if resource['kind'] not in kinds:
+                    raise exceptions.PolicyExecutionError(
+                        f"Cannot set {name} on kind {resource['kind']} "
+                        f"for account {resource['id']}",
+                    )
+        return super().process(resources, event)
+
+    def _prepare_processing(self) -> None:
+        self.client = self.manager.get_client(
+            'azure.mgmt.resource.ResourceManagementClient',
+        )
+
+    def _process_resource(self, resource: dict) -> str:
+        properties = copy.deepcopy(self.data['properties'])
+        for name in ('networkAcls', 'apiProperties'):
+            if name in properties:
+                current = copy.deepcopy(resource.get('properties', {}).get(name) or {})
+                current.update(properties[name])
+                properties[name] = current
+        api_version = self.session.resource_api_version(resource['id'])
+        self.client.resources.begin_update_by_id(
+            resource['id'],
+            api_version,
+            GenericResource(properties=properties),
+        ).result()
+        return 'updated'
 
 
 @resources.register('ai-foundry-project')
