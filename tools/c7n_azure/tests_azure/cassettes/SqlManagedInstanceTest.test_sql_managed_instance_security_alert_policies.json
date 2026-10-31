@@ -1,0 +1,77 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/managedInstances?api-version=2020-02-02-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Tue, 21 Sep 2021 15:42:15 GMT"
+                    ],
+                    "content-length": [
+                        "1264"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": {
+                                    "principalId": "185f2516-c869-4aae-b485-40cb4190b515",
+                                    "type": "SystemAssigned",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "sku": {
+                                    "name": "GP_Gen5",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 4
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "fullyQualifiedDomainName": "vvtestmisql.6fb8019adb20.database.windows.net",
+                                    "administratorLogin": "vvadmin",
+                                    "subnetId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/virtualNetworks/vnet-vvtestmisql/subnets/ManagedInstance",
+                                    "state": "Ready",
+                                    "licenseType": "LicenseIncluded",
+                                    "vCores": 4,
+                                    "storageSizeInGB": 32,
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "dnsZone": "6fb8019adb20",
+                                    "publicDataEndpointEnabled": false,
+                                    "proxyOverride": "Proxy",
+                                    "timezoneId": "UTC",
+                                    "maintenanceConfigurationId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
+                                    "privateEndpointConnections": [],
+                                    "minimalTlsVersion": "1.2",
+                                    "storageAccountType": "LRS",
+                                    "zoneRedundant": false
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Sql/managedInstances/vvtestmisql",
+                                "name": "vvtestmisql",
+                                "type": "Microsoft.Sql/managedInstances"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
