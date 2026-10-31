@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "GlobalNetworks": [
+            {
+                "GlobalNetworkId": "global-network-077b7e4d1b5d9989c",
+                "GlobalNetworkArn": "arn:aws:networkmanager::644160558196:global-network/global-network-077b7e4d1b5d9989c",
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 9,
+                    "day": 3,
+                    "hour": 20,
+                    "minute": 53,
+                    "second": 48,
+                    "microsecond": 0
+                },
+                "State": "AVAILABLE",
+                "Tags": [
+                    {
+                        "Key": "deleteme",
+                        "Value": "delete"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test"
+                    }
+                ]
+            }
+        ]
+    }
+}
