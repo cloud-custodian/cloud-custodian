@@ -60,8 +60,17 @@ def get_processor(mailer_config, logger):
     return processor
 
 
+def html_autoescape(template_name):
+    # Template names carry a .j2 suffix and html templates are named
+    # <name>.html.j2, matching the convention used to pick the mime subtype
+    # in get_mimetext_message.
+    if not template_name:
+        return False
+    return template_name.rsplit(".j2", 1)[0].endswith(("html", "htm"))
+
+
 def get_jinja_env(template_folders):
-    env = jinja2.Environment(trim_blocks=True, autoescape=False)  # nosec nosemgrep
+    env = jinja2.Environment(trim_blocks=True, autoescape=html_autoescape)  # nosec nosemgrep
     env.filters["yaml_safe"] = functools.partial(yaml.safe_dump, default_flow_style=False)
     env.filters["date_time_format"] = date_time_format
     env.filters["get_date_time_delta"] = get_date_time_delta
