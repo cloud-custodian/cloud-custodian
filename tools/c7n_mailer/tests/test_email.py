@@ -3,6 +3,7 @@
 
 import boto3
 import copy
+import json
 import os
 import unittest
 
@@ -20,7 +21,12 @@ from common import (
 )
 from mock import patch, call, MagicMock
 
-from c7n_mailer.utils_email import is_email, priority_header_is_valid, get_mimetext_message
+from c7n_mailer.utils_email import (
+    get_bcc_addrs,
+    get_mimetext_message,
+    is_email,
+    priority_header_is_valid,
+)
 
 # note principalId is very org/domain specific for federated?, it would be good to get
 # confirmation from capone on this event / test.
@@ -321,6 +327,106 @@ class EmailTest(unittest.TestCase):
         )
         self.assertEqual(email["Cc"], "hello@example.com, cc@example.com")
 
+    def test_bcc_email_functionality(self):
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_4)
+        sqs_msg["action"]["bcc"] = ["audit@example.com", "cc@example.com", "not-an-email"]
+        email = get_mimetext_message(
+            self.email_delivery.config,
+            self.email_delivery.logger,
+            sqs_msg,
+            sqs_msg["resources"],
+            ["audit@example.com", "cc@example.com", "hello@example.com"],
+        )
+        # cc@example.com is also a cc address, so it stays visible
+        self.assertEqual(email["To"], "cc@example.com, hello@example.com")
+        self.assertEqual(email["Cc"], "hello@example.com, cc@example.com")
+        self.assertIsNone(email["Bcc"])
+        self.assertNotIn("audit@example.com", email.as_string())
+
+    def test_bcc_addrs_compare_mailboxes(self):
+        action = {
+            "to": ["Audit <audit@example.com>"],
+            "cc": ["cc@example.com"],
+            "bcc": ["audit@example.com", "CC <cc@example.com>", "hidden@example.com"],
+        }
+        self.assertEqual(get_bcc_addrs(action), ["hidden@example.com"])
+
+    def test_bcc_only_email_has_no_to_header(self):
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
+        sqs_msg["action"]["bcc"] = ["audit@example.com"]
+        email = get_mimetext_message(
+            self.email_delivery.config,
+            self.email_delivery.logger,
+            sqs_msg,
+            sqs_msg["resources"],
+            ["audit@example.com"],
+        )
+        self.assertIsNone(email["To"])
+        self.assertNotIn("audit@example.com", email.as_string())
+
+    def test_bcc_added_to_every_email(self):
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
+        sqs_msg["action"]["bcc"] = ["audit@example.com"]
+        emails_to_mimetext_map = self.email_delivery.get_emails_to_mimetext_map(sqs_msg)
+        self.assertTrue(emails_to_mimetext_map)
+        for emails in emails_to_mimetext_map:
+            self.assertIn("audit@example.com", emails)
+        # slack://owners uses the resources map, so it doesn't message bcc addresses
+        for emails in self.email_delivery.get_emails_to_resources_map(sqs_msg):
+            self.assertNotIn("audit@example.com", emails)
+
+    def test_bcc_groups_with_the_same_recipients_share_an_email(self):
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
+        sqs_msg["action"]["bcc"] = ["audit@example.com"]
+        first, second = {"id": "first"}, {"id": "second"}
+        groups = {
+            ("owner@example.com",): [first],
+            ("audit@example.com", "owner@example.com"): [second],
+        }
+        get_groups = patch.object(
+            self.email_delivery, "get_emails_to_resources_map", return_value=groups
+        )
+        with get_groups, patch("c7n_mailer.email_delivery.get_mimetext_message") as get_message:
+            emails_to_mimetext_map = self.email_delivery.get_emails_to_mimetext_map(sqs_msg)
+
+        # Both groups go to the same mailboxes, so neither overwrites the other
+        self.assertEqual(list(emails_to_mimetext_map), [("audit@example.com", "owner@example.com")])
+        get_message.assert_called_once()
+        self.assertEqual(get_message.call_args[0][3], [first, second])
+
+    def test_bcc_not_in_template_context(self):
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
+        sqs_msg["action"]["bcc"] = ["audit@example.com"]
+        sqs_msg["policy"]["actions"][1]["bcc"] = ["audit@example.com"]
+        with patch("c7n_mailer.utils_email.get_rendered_jinja", return_value="") as render:
+            get_mimetext_message(
+                self.email_delivery.config,
+                self.email_delivery.logger,
+                sqs_msg,
+                sqs_msg["resources"],
+                ["bill_lumberg@initech.com"],
+            )
+        rendered_message = render.call_args[0][1]
+        self.assertNotIn("audit@example.com", json.dumps(rendered_message))
+        # the caller's message is left as it was
+        self.assertEqual(sqs_msg["action"]["bcc"], ["audit@example.com"])
+
+    def test_ses_send_raw_email_bcc(self):
+        config = copy.deepcopy(MAILER_CONFIG)
+        del config["smtp_server"]
+        delivery = MockEmailDelivery(config, self.aws_session, MagicMock())
+
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
+        sqs_msg["action"]["bcc"] = ["audit@example.com"]
+        with patch("botocore.client.BaseClient._make_api_call") as mock_send:
+            delivery.send_c7n_email(sqs_msg)
+            mock_send.assert_called_once()
+            operation, params = mock_send.call_args[0]
+            self.assertEqual(operation, "SendRawEmail")
+            self.assertIn("audit@example.com", params["Destinations"])
+            self.assertIn("bill_lumberg@initech.com", params["Destinations"])
+            self.assertNotIn("audit@example.com", params["RawMessage"]["Data"])
+
     def test_sendgrid(self):
         config = copy.deepcopy(MAILER_CONFIG)
         logger_mock = MagicMock()
@@ -381,6 +487,37 @@ class EmailTest(unittest.TestCase):
                 '{"message": {"subject": "core-services-dev AWS EBS Volumes'
                 ' will be DELETED in 15 DAYS!"'
             )
+
+    def test_graph_bcc_recipients(self):
+        config = copy.deepcopy(MAILER_CONFIG)
+        del config["smtp_server"]
+        config.update(
+            {
+                "graph_sendmail_endpoint": "my_graph_sendmail_endpoint",
+                "graph_token_endpoint": "my_graph_token_endpoint",
+                "graph_client_id": "graph_client_id",
+                "graph_client_secret": "graph_client_secret",
+            }
+        )
+        delivery = MockEmailDelivery(config, self.aws_session, MagicMock())
+
+        sqs_msg = copy.deepcopy(SQS_MESSAGE_1)
+        sqs_msg["action"]["bcc"] = ["Audit <audit@example.com>"]
+        sqs_msg["action"]["to"].append("Bill <bill@example.com>")
+        with patch("requests.post") as req:
+            with patch("c7n_mailer.utils.kms_decrypt") as mock_decrypt:
+                mock_decrypt.return_value = "xyz"
+                delivery.send_c7n_email(sqs_msg)
+            message = json.loads(req.call_args_list[1][1]["data"])["message"]
+
+        to = [r["emailAddress"] for r in message["toRecipients"]]
+        self.assertIn({"address": "bill_lumberg@initech.com"}, to)
+        # Graph takes the bare address, with the display name in its own field
+        self.assertIn({"address": "bill@example.com", "name": "Bill"}, to)
+        self.assertEqual(
+            message["bccRecipients"],
+            [{"emailAddress": {"address": "audit@example.com", "name": "Audit"}}],
+        )
 
     def test_ses_send_raw_email(self):
         config = copy.deepcopy(MAILER_CONFIG)

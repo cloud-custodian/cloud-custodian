@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+from email.utils import parseaddr
+
 import sendgrid
 from python_http_client import exceptions
 from sendgrid.helpers.mail import Content, Email, Header, Mail, To
@@ -35,7 +37,9 @@ class SendGridDelivery:
     # are sent, while only ever sending emails to the respective parties.
     def get_emails_to_resources_map(self, queue_message):
         email_to_addrs_to_resources_map = {}
-        targets = queue_message["action"].get("to", [])
+        # SendGrid sends one email per address, so bcc addresses stay hidden from the others.
+        # This path doesn't send to cc, so an address in cc as well still gets the bcc copy.
+        targets = queue_message["action"].get("to", []) + queue_message["action"].get("bcc", [])
 
         for resource in queue_message["resources"]:
             # this is the list of emails that will be sent for this resource
@@ -50,7 +54,11 @@ class SendGridDelivery:
                 elif is_email(target):
                     resource_emails.append(target)
 
-            resource_emails = tuple(sorted(set(resource_emails)))
+            # One email per mailbox, even when to and bcc spell an address differently
+            mailboxes = {}
+            for email in resource_emails:
+                mailboxes.setdefault(parseaddr(email)[1], email)
+            resource_emails = tuple(sorted(set(mailboxes.values())))
 
             if resource_emails:
                 email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(resource)

@@ -500,6 +500,20 @@ The optional `owner_absent_contact` list specifies email addresses to notify onl
 the `resource-owner` special option was unable to find any matching owner contact
 tags.
 
+The optional `cc` and `bcc` lists add email addresses to every email the policy
+sends. `cc` addresses are shown in the `Cc` header. `bcc` addresses receive the
+email but don't appear in its headers or in the rendered template, so recipients
+can't see them. An address listed in `to` or `cc` as well as `bcc` is treated as
+visible. `bcc` works with SES, SMTP, SendGrid and Microsoft Graph delivery.
+
+```yaml
+      - type: notify
+        to:
+          - resource-owner
+        bcc:
+          - audit@example.com
+```
+
 In addition, you may choose to use a custom tag instead of the default `OwnerContact`.  In order to configure this, the mailer.yaml must be modified to include the contact_tags and the custom tag.  The `resource-owner` will now email the custom tag instead of `OwnerContact`.
 
 ```yaml
@@ -518,6 +532,8 @@ For reference purposes, the JSON Schema of the `notify` action:
     "type": {"enum": ["notify"]},
     "to": {"type": "array", "items": {"type": "string"}},
     "owner_absent_contact": {"type": "array", "items": {"type": "string"}},
+    "cc": {"type": "array", "items": {"type": "string"}},
+    "bcc": {"type": "array", "items": {"type": "string"}},
     "subject": {"type": "string"},
     "priority_header": {"type": "string"},
     "template": {"type": "string"},
