@@ -1,0 +1,38 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Oct 2026 19:45:03 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "686",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/tuningJobs/7729237860439556096?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/tuningJobs/7729237860439556096",
+    "tunedModelDisplayName": "c7n-test-tuning-job-default-7dbe-filters",
+    "baseModel": "gemini-2.5-flash-lite",
+    "supervisedTuningSpec": {
+      "trainingDatasetUri": "gs://c7n-vertex-tune-7dbe/train.jsonl",
+      "hyperParameters": {
+        "epochCount": "1"
+      },
+      "exportLastCheckpointOnly": true
+    },
+    "state": "JOB_STATE_RUNNING",
+    "createTime": "2026-10-01T19:44:53.091540Z",
+    "startTime": "2026-10-01T19:44:53.158891Z",
+    "updateTime": "2026-10-01T19:44:54.232473Z",
+    "labels": {
+      "owner": "c7n-test",
+      "dataset-id": "c7n-addition",
+      "data-classification": "confidential"
+    }
+  }
+}

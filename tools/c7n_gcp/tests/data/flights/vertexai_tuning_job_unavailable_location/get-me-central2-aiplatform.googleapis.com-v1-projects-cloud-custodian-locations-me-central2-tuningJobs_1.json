@@ -1,0 +1,48 @@
+{
+  "headers": {
+    "vary": "Origin, X-Origin, Referer",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Thu, 01 Oct 2026 20:45:57 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "403",
+    "content-length": "969",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "error": {
+      "code": 403,
+      "message": "Permission denied on 'locations/me-central2' (or it may not exist).",
+      "status": "PERMISSION_DENIED",
+      "details": [
+        {
+          "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+          "reason": "LOCATION_POLICY_VIOLATED",
+          "domain": "googleapis.com",
+          "metadata": {
+            "consumer": "projects/stkl-kody-mullins",
+            "service": "",
+            "location": "me-central2"
+          }
+        },
+        {
+          "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+          "locale": "en-US",
+          "message": "Permission denied on 'locations/me-central2' (or it may not exist)."
+        },
+        {
+          "@type": "type.googleapis.com/google.rpc.Help",
+          "links": [
+            {
+              "description": "Access to the region is unavailable. Please contact our sales team at https://cloud.google.com/contact for further assistance."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
