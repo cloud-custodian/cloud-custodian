@@ -65,6 +65,42 @@ class CloudWatchEvents:
             'ids': 'requestParameters.tableName',
             'source': 'dynamodb.amazonaws.com'},
 
+        'CreateDistribution': {
+            'ids': 'responseElements.distribution.id',
+            'source': 'cloudfront.amazonaws.com'},
+
+        'CreateRepository': {
+            'ids': 'responseElements.repositoryMetadata.repositoryName',
+            'source': 'codecommit.amazonaws.com'},
+
+        'CreatePipeline': {
+            'ids': 'responseElements.pipeline.name',
+            'source': 'codepipeline.amazonaws.com'},
+
+        'AllocateAddress': {
+            'ids': 'responseElements.publicIp',
+            'source': 'ec2.amazonaws.com'},
+
+        'CreateImage': {
+            'ids': 'responseElements.imageId',
+            'source': 'ec2.amazonaws.com'},
+
+        'CreateSecurityGroup': {
+            'ids': 'responseElements.groupId',
+            'source': 'ec2.amazonaws.com'},
+
+        'CreateNetworkInterface': {
+            'ids': 'responseElements.networkInterface.networkInterfaceId',
+            'source': 'ec2.amazonaws.com'},
+
+        'CreateInternetGateway': {
+            'ids': 'responseElements.internetGateway.internetGatewayId',
+            'source': 'ec2.amazonaws.com'},
+
+        'CreateNatGateway': {
+            'ids': 'responseElements.natGateway.natGatewayId',
+            'source': 'ec2.amazonaws.com'},
+
         'CreateFunction': {
             'event': 'CreateFunction20150331',
             'source': 'lambda.amazonaws.com',
