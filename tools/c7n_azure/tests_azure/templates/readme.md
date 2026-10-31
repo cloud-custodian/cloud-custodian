@@ -36,3 +36,5 @@ If you deploy `cognitive-service-deployment`, provisioning creates an OpenAI acc
 - `AZURE_OPENAI_SKU_NAME` (default: `GlobalStandard`) — must be a SKU the chosen model/version actually supports; check with `az cognitiveservices account list-models --resource-group <rg> --name <account> -o json` (the `skus` field per model) if changing the model.
 
 If a soft-deleted Cognitive Services account with the target name already exists, provisioning will purge it automatically before redeploying.
+
+If you deploy `effective-access`, provisioning purges a soft-deleted `cctest-eff-access` account before it deploys, and cleanup purges the account after it deletes the resource group. The template creates two managed identities and two role assignments, so the signed-in identity needs permission to write role assignments at the test resource group scope. Role assignment recordings capture the object IDs of every principal with access at or above the resource, so scrub unrelated IDs from a new cassette before you commit it.

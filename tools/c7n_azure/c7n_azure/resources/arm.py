@@ -11,6 +11,7 @@ from c7n_azure.actions.diagnostic_settings import SetDiagnosticSettingsAction
 from c7n_azure.actions.lock import LockAction
 from c7n_azure.actions.tagging import (AutoTagDate)
 from c7n_azure.actions.tagging import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction
+from c7n_azure.effective_access import EffectiveAccess
 from c7n_azure.filters import (CostFilter, MetricFilter, TagActionFilter,
                                DiagnosticSettingsFilter, PolicyCompliantFilter, ResourceLockFilter,
                                AzureOffHour, AzureOnHour)
@@ -143,6 +144,7 @@ class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
         resource_class.filter_registry.register('metric', MetricFilter)
         resource_class.filter_registry.register('policy-compliant', PolicyCompliantFilter)
         resource_class.filter_registry.register('resource-lock', ResourceLockFilter)
+        resource_class.filter_registry.register('effective-access', EffectiveAccess)
         resource_class.action_registry.register('lock', LockAction)
         resource_class.filter_registry.register('offhour', AzureOffHour)
         resource_class.filter_registry.register('onhour', AzureOnHour)
