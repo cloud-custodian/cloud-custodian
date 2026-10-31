@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Rules": [
+            {
+                "ID": "covered",
+                "Status": "Enabled",
+                "Filter": {
+                    "Prefix": "evaluations/covered-job/id-a/"
+                },
+                "Expiration": {
+                    "Days": 90
+                }
+            }
+        ]
+    }
+}
