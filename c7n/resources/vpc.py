@@ -699,23 +699,39 @@ class DescribeSubnets(query.DescribeSource):
             except ClientError as e:
                 if e.response['Error']['Code'] != 'InvalidSubnetID.NotFound':
                     raise
-                sid = extract_subnet_id(e)
-                if sid:
-                    resource_ids.remove(sid)
-                else:
+
+                original_count = len(resource_ids)
+                missing_subnet_ids = extract_subnet_ids(e)
+
+                for sid in missing_subnet_ids:
+                    self.manager.log.warning(
+                        "Subnet ID '%s' not found, skipping", sid)
+
+                missing_set = set(missing_subnet_ids)
+                resource_ids = [rid for rid in resource_ids if rid not in missing_set]
+
+                if len(resource_ids) == original_count:
+                    error_str = str(e)
+                    for rid in list(resource_ids):
+                        if rid in error_str:
+                            self.manager.log.warning(
+                                "Malformed subnet ID '%s' not found, skipping", rid)
+                            resource_ids.remove(rid)
+                            break
+
+                if len(resource_ids) == original_count:
+                    self.manager.log.warning(
+                        "InvalidSubnetID.NotFound error: unable to \
+                         identify subnet ID from error: %s", str(e))
                     return []
 
+        return []
 
-RE_ERROR_SUBNET_ID = re.compile("'(?P<subnet_id>subnet-.*?)'")
 
-
-def extract_subnet_id(state_error):
-    "Extract an subnet id from an error"
-    subnet_id = None
-    match = RE_ERROR_SUBNET_ID.search(str(state_error))
-    if match:
-        subnet_id = match.groupdict().get('subnet_id')
-    return subnet_id
+def extract_subnet_ids(state_error):
+    error_str = str(state_error)
+    subnet_ids = re.compile("'(subnet-[a-f0-9]+)'").findall(error_str)
+    return subnet_ids
 
 
 @resources.register('subnet')
