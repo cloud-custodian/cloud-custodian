@@ -1,0 +1,102 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "flowArn": "arn:aws:appflow:us-east-1:644160558196:flow/399-appflow-green",
+        "description": "399-appflow-green",
+        "flowName": "399-appflow-green",
+        "kmsArn": "arn:aws:kms:us-east-1:644160558196:key/6c8904f2-00b9-4479-8c7d-551a5c60eb1b",
+        "flowStatus": "Active",
+        "sourceFlowConfig": {
+            "connectorType": "S3",
+            "sourceConnectorProperties": {
+                "S3": {
+                    "bucketName": "399-bucket-green",
+                    "bucketPrefix": "source"
+                }
+            }
+        },
+        "destinationFlowConfigList": [
+            {
+                "connectorType": "S3",
+                "destinationConnectorProperties": {
+                    "S3": {
+                        "bucketName": "399-bucket-green",
+                        "bucketPrefix": "destination",
+                        "s3OutputFormatConfig": {
+                            "fileType": "JSON",
+                            "prefixConfig": {},
+                            "aggregationConfig": {
+                                "aggregationType": "None"
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "triggerConfig": {
+            "triggerType": "OnDemand",
+            "triggerProperties": {}
+        },
+        "tasks": [
+            {
+                "sourceFields": [
+                    "title1",
+                    "title2"
+                ],
+                "connectorOperator": {
+                    "S3": "PROJECTION"
+                },
+                "taskType": "Filter",
+                "taskProperties": {}
+            },
+            {
+                "sourceFields": [
+                    "title1"
+                ],
+                "connectorOperator": {
+                    "S3": "NO_OP"
+                },
+                "destinationField": "title1",
+                "taskType": "Map",
+                "taskProperties": {}
+            },
+            {
+                "sourceFields": [
+                    "title2"
+                ],
+                "connectorOperator": {
+                    "S3": "NO_OP"
+                },
+                "destinationField": "title2",
+                "taskType": "Map",
+                "taskProperties": {}
+            }
+        ],
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2022,
+            "month": 1,
+            "day": 11,
+            "hour": 11,
+            "minute": 35,
+            "second": 3,
+            "microsecond": 676000
+        },
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2022,
+            "month": 1,
+            "day": 11,
+            "hour": 11,
+            "minute": 35,
+            "second": 3,
+            "microsecond": 676000
+        },
+        "createdBy": "arn:aws:iam::644160558196:user/Anna_Shcherbak",
+        "lastUpdatedBy": "arn:aws:iam::644160558196:user/Anna_Shcherbak",
+        "tags": {
+            "CustodiaRule": "epam-aws-399-appflow_encryption_enabled"
+        }
+    }
+}
