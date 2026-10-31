@@ -510,12 +510,14 @@ class EmailTest(unittest.TestCase):
                 delivery.send_c7n_email(sqs_msg)
             message = json.loads(req.call_args_list[1][1]["data"])["message"]
 
-        to = [r["emailAddress"]["address"] for r in message["toRecipients"]]
-        bcc = [r["emailAddress"]["address"] for r in message["bccRecipients"]]
-        self.assertIn("bill_lumberg@initech.com", to)
-        # an address with a display name is compared by its address part
-        self.assertIn("Bill <bill@example.com>", to)
-        self.assertEqual(bcc, ["Audit <audit@example.com>"])
+        to = [r["emailAddress"] for r in message["toRecipients"]]
+        self.assertIn({"address": "bill_lumberg@initech.com"}, to)
+        # Graph takes the bare address, with the display name in its own field
+        self.assertIn({"address": "bill@example.com", "name": "Bill"}, to)
+        self.assertEqual(
+            message["bccRecipients"],
+            [{"emailAddress": {"address": "audit@example.com", "name": "Audit"}}],
+        )
 
     def test_ses_send_raw_email(self):
         config = copy.deepcopy(MAILER_CONFIG)
