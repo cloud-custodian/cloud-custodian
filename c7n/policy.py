@@ -336,6 +336,11 @@ class PullMode(PolicyExecutionMode):
                 raise
 
             rt = time.time() - s
+
+            if self.policy.data.get('match_trace') and resources:
+                from c7n.filters.tracer import attach_traces
+                attach_traces(self.policy.resource_manager.filters, resources)
+
             self.policy.log.info(
                 "policy:%s resource:%s region:%s count:%d time:%0.2f",
                 self.policy.name,
