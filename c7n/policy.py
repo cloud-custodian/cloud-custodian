@@ -577,6 +577,18 @@ class LambdaMode(ServerlessExecutionMode):
             self.policy.log.info(
                 "Provisioning policy lambda: %s region: %s", self.policy.name,
                 self.policy.options.region)
+
+            if (self.policy.ctx.tracer and
+                    self.policy.ctx.tracer.type == 'xray'):
+                if ('packages' not in self.policy.data['mode'] and
+                    'layers' not in self.policy.data['mode']):
+                    self.policy.data['mode']['packages'] = [
+                        'aws_xray_sdk', 'jsonpickle', 'wrapt']
+                else:
+                    self.policy.log.debug(
+                        "policy:%s specifies packages or layers, not adding xray sdk",
+                        self.policy.name)
+                self.policy.data['mode']['tracing_config'] = {'Mode': 'Active'}
             try:
                 manager = mu.LambdaManager(self.policy.session_factory)
             except ClientError:
