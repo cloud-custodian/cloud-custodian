@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueryRuntimeStatistics": {
+            "Timeline": {
+                "QueryQueueTimeInMillis": 100,
+                "ServicePreProcessingTimeInMillis": 88,
+                "QueryPlanningTimeInMillis": 39,
+                "EngineExecutionTimeInMillis": 189058,
+                "ServiceProcessingTimeInMillis": 26,
+                "TotalExecutionTimeInMillis": 189272
+            },
+            "Rows": {
+                "InputRows": 6613156,
+                "InputBytes": 5999025396,
+                "OutputBytes": 5999025396,
+                "OutputRows": 6613156
+            },
+            "OutputStage": {
+                "StageId": 0,
+                "State": "FINISHED",
+                "OutputBytes": 5999025396,
+                "OutputRows": 6613156,
+                "InputBytes": 5999025396,
+                "InputRows": 6613156,
+                "ExecutionTime": 6356400,
+                "QueryStagePlan": {
+                    "Name": "Output",
+                    "Identifier": "{\"columnNames\":\"[sku, offertermcode, ratecode, termtype, pricedescription, startingrange, endingrange, unit, priceperunit, currency, relatedto, leasecontractlength, purchaseoption, offeringclass, product family, servicecode, location, location type, instance type, current generation, instance family, vcpu, physical processor, clock speed, memory, storage, network performance, processor architecture, storage media, volume type, max volume size, max iops/volume, max iops burst performance, max throughput/volume, provisioned, tenancy, ebs optimized, operating system, license model, group, group description, transfer type, from location, from location type, to location, to location type, usagetype, operation, availabilityzone, capacitystatus, classicnetworkingsupport, dedicated ebs throughput, ecu, elastic graphics type, enhanced networking supported, from region code, gpu, gpu memory, instance, instance capacity - 10xlarge, instance capacity - 12xlarge, instance capacity - 16xlarge, instance capacity - 18xlarge, instance capacity - 24xlarge, instance capacity - 2xlarge, instance capacity - 32xlarge, instance capacity - 4xlarge, instance capacity - 8xlarge, instance capacity - 9xlarge, instance capacity - large, instance capacity - medium, instance capacity - metal, instance capacity - xlarge, instancesku, intel avx2 available, intel avx available, intel turbo available, marketoption, normalization size factor, physical cores, pre installed s/w, processor features, product type, region code, resource type, servicename, snapshotarchivefeetype, to region code, volume api name, vpcnetworkingsupport, partition_0]\"}",
+                    "Children": [
+                        {
+                            "Name": "TableScan",
+                            "Identifier": "{\"table\":\"awsdatacatalog:c7n-athena-test:c7n_amazonec2\"}",
+                            "Children": []
+                        }
+                    ]
+                },
+                "SubStages": []
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
