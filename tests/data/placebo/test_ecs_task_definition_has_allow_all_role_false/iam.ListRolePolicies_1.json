@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "PolicyNames": [
+            "my_inline_policy1"
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}
