@@ -1,0 +1,118 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ContainerRegistry/registries?api-version=2025-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 24 Jul 2025 01:49:55 GMT"
+                    ],
+                    "api-supported-versions": [
+                        "2025-04-01"
+                    ],
+                    "content-length": [
+                        "1531"
+                    ],
+                    "x-ms-original-request-ids": [
+                        ""
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A001DBADEC0044698B821BE09B00F640 Ref B: YTO221090814017 Ref C: 2025-07-24T01:49:55Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Premium",
+                                    "tier": "Premium"
+                                },
+                                "type": "Microsoft.ContainerRegistry/registries",
+                                "identity": {
+                                    "principalId": "4b718092-46fe-45d5-8fb7-8830184ab04e",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "type": "systemAssigned"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/rg-npr-infra-devops/providers/Microsoft.ContainerRegistry/registries/nprinfradevopseastus",
+                                "name": "nprinfradevopseastus",
+                                "location": "eastus",
+                                "tags": {},
+                                "systemData": {
+                                    "createdBy": "57def653-a20e-4d19-acd9-2d195afd39c4",
+                                    "createdByType": "Application",
+                                    "createdAt": "2024-10-31T20:22:23.6397132+00:00",
+                                    "lastModifiedBy": "57def653-a20e-4d19-acd9-2d195afd39c4",
+                                    "lastModifiedByType": "Application",
+                                    "lastModifiedAt": "2025-07-17T18:31:02.2895931+00:00"
+                                },
+                                "properties": {
+                                    "loginServer": "nprinfradevopseastus.azurecr.io",
+                                    "creationDate": "2024-10-31T20:22:23.6397132Z",
+                                    "provisioningState": "Succeeded",
+                                    "adminUserEnabled": true,
+                                    "networkRuleSet": {
+                                        "defaultAction": "Allow",
+                                        "ipRules": []
+                                    },
+                                    "policies": {
+                                        "quarantinePolicy": {
+                                            "status": "disabled"
+                                        },
+                                        "trustPolicy": {
+                                            "type": "Notary",
+                                            "status": "disabled"
+                                        },
+                                        "retentionPolicy": {
+                                            "days": 7,
+                                            "lastUpdatedTime": "2024-10-31T20:22:31.6050959+00:00",
+                                            "status": "disabled"
+                                        },
+                                        "exportPolicy": {
+                                            "status": "enabled"
+                                        },
+                                        "azureADAuthenticationAsArmPolicy": {
+                                            "status": "enabled"
+                                        }
+                                    },
+                                    "encryption": {
+                                        "status": "disabled"
+                                    },
+                                    "dataEndpointEnabled": false,
+                                    "dataEndpointHostNames": [],
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "networkRuleBypassOptions": "AzureServices",
+                                    "zoneRedundancy": "Disabled",
+                                    "anonymousPullEnabled": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
