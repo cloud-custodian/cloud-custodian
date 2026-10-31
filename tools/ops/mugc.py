@@ -44,10 +44,14 @@ def region_gc(options, region, policy_config, policies):
 
     remove = []
     pattern = re.compile(options.policy_regex)
+    group_names = set(mu.group_policies(
+        [p for p in policies
+         if p.execution_mode == 'cloudtrail' and p.data['mode'].get('group')
+         and ('region' not in p.data or p.data['region'] == region)]))
     for f in funcs:
         if not pattern.match(f['FunctionName']):
             continue
-        match = False
+        match = f['FunctionName'] in group_names
         for p in policies:
             if f['FunctionName'].endswith(p.name):
                 if 'region' not in p.data or p.data['region'] == region:
