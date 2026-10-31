@@ -60,6 +60,16 @@ class RelatedResourceFilter(ValueFilter):
         manager_class = getattr(module, class_name)
         return manager_class(self.manager.ctx, {})
 
+    def set_match_resource_value(self, resource):
+        self.data['value'] = self.get_resource_value(
+            self.data['key'], resource)
+        # ValueFilter caches the comparison value on first use, so reset the
+        # cache to compare each resource against its own value rather than
+        # against the first resource's.
+        self.v = None
+        if hasattr(self, 'content_initialized'):
+            del self.content_initialized
+
     def process_resource(self, resource, related):
         related_ids = self.get_related_ids([resource])
         model = self.manager.get_model()
@@ -67,8 +77,7 @@ class RelatedResourceFilter(ValueFilter):
         found = []
 
         if self.data.get('match-resource') is True:
-            self.data['value'] = self.get_resource_value(
-                self.data['key'], resource)
+            self.set_match_resource_value(resource)
 
         if self.data.get('value_type') == 'resource_count':
             count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
@@ -149,8 +158,7 @@ class RelatedResourceByIdFilter(RelatedResourceFilter):
         found = []
 
         if self.data.get('match-resource') is True:
-            self.data['value'] = self.get_resource_value(
-                self.data['key'], resource)
+            self.set_match_resource_value(resource)
 
         if self.data.get('value_type') == 'resource_count':
             count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
