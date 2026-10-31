@@ -146,6 +146,43 @@ class MachineLearningWorkspaceResourceLockFilterTest(BaseTest):
         self.assertEqual('mlwsp165red', resources[0]['name'])
 
 
+class MachineLearningOnlineDeploymentTest(BaseTest):
+
+    def test_machine_learning_online_deployment_schema_validate(self):
+        with self.sign_out_patch():
+            policy = self.load_policy({
+                'name': 'machine-learning-online-deployments',
+                'resource': 'azure.machine-learning-online-deployment',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'properties.model',
+                    'value': 'azureml:model-a:12',
+                }],
+            }, validate=True)
+
+        assert policy
+
+    @arm_template('machine-learning-online-deployment.json')
+    @cassette_name('machine-learning-online-deployment-query')
+    def test_machine_learning_online_deployment_query(self):
+        policy = self.load_policy({
+            'name': 'machine-learning-online-deployment-query',
+            'resource': 'azure.machine-learning-online-deployment',
+            'filters': [{
+                'type': 'value',
+                'key': 'name',
+                'value': 'blue',
+            }],
+        })
+
+        resources = policy.run()
+
+        assert len(resources) == 1
+        assert resources[0]['name'] == 'blue'
+        assert resources[0]['properties']['model']
+        assert '/onlineEndpoints/cctest-ml-' in resources[0]['c7n:parent-id']
+
+
 class MachineLearningDataContainerTest(BaseTest):
 
     def test_machine_learning_data_container_schema_validate(self):

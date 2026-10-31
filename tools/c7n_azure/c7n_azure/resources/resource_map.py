@@ -74,6 +74,7 @@ ResourceMap = {
     "azure.machine-learning-environment-version": "c7n_azure.resources.machine_learning_environment_version.MachineLearningEnvironmentVersion", # noqa
     "azure.machine-learning-job": "c7n_azure.resources.machine_learning_job.MachineLearningJob",
     "azure.machine-learning-model-version": "c7n_azure.resources.machine_learning_model_version.MachineLearningModelVersion", # noqa
+    "azure.machine-learning-online-deployment": "c7n_azure.resources.machine_learning.MachineLearningOnlineDeployment", # noqa
     "azure.machine-learning-online-endpoint": "c7n_azure.resources.machine_learning_online_endpoint.MachineLearningOnlineEndpoint", # noqa
     "azure.machine-learning-schedule": "c7n_azure.resources.machine_learning_schedule.MachineLearningSchedule", # noqa
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
