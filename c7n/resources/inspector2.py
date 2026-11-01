@@ -85,3 +85,10 @@ class Inspector2Finding(query.QueryResourceManager):
     source_mapping = {
         "describe": DescribeInspector2Finding,
     }
+
+    def get_cache_key(self, query):
+        # The policy's query is merged into the request by the source, so it
+        # has to be part of the key or policies would share cached findings.
+        key = super().get_cache_key(query)
+        key['policy-query'] = self.data.get('query')
+        return key
