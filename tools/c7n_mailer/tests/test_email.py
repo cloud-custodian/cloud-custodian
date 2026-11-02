@@ -320,6 +320,18 @@ class EmailTest(unittest.TestCase):
             "Using org_domain to reconstruct email addresses from contact_tags values"
         )
 
+    def test_get_resource_owner_emails_from_resource_org_domain_colon_separated(self):
+        config = copy.deepcopy(MAILER_CONFIG)
+        config["org_domain"] = "test.com"
+        del config["ldap_uri"]
+        config["contact_tags"] = ["OwnerContact"]
+
+        self.email_delivery = MockEmailDelivery(config, self.aws_session, MagicMock())
+        resource = {"Tags": [{"Key": "OwnerContact", "Value": "milton@initech.com:peter"}]}
+        emails = self.email_delivery.get_resource_owner_emails_from_resource(SQS_MESSAGE_1, resource)
+
+        assert emails == ["milton@initech.com", "peter@test.com"]
+
     def test_cc_email_functionality(self):
         email = get_mimetext_message(
             self.email_delivery.config,
