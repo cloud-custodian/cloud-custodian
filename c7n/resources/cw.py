@@ -480,6 +480,24 @@ class LastWriteDays(Filter):
 
 @LogGroup.filter_registry.register('cross-account')
 class LogCrossAccountFilter(CrossAccountAccessFilter):
+    """Find log groups with subscription filters that deliver to accounts that are not in
+    the allowed accounts.
+
+    Only the ``whitelist`` and ``whitelist_from`` options are supported.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: log-group-cross-account
+            resource: aws.log-group
+            filters:
+              - type: cross-account
+                whitelist:
+                  - "123456789012"
+    """
+
     schema = type_schema(
         'cross-account',
         # white list accounts

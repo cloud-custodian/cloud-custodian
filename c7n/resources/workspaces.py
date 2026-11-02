@@ -171,6 +171,23 @@ class WorkspaceImage(QueryResourceManager):
 
 @WorkspaceImage.filter_registry.register('cross-account')
 class WorkspaceImageCrossAccount(CrossAccountAccessFilter):
+    """Find WorkSpaces images that are shared with accounts that are not in the allowed
+    accounts.
+
+    Only the ``whitelist`` and ``whitelist_from`` options are supported.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: workspace-image-cross-account
+            resource: aws.workspaces-image
+            filters:
+              - type: cross-account
+                whitelist:
+                  - "123456789012"
+    """
 
     schema = type_schema(
         'cross-account',

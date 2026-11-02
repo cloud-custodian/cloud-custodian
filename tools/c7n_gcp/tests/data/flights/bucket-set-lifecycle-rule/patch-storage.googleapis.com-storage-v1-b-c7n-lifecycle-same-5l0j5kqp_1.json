@@ -1,0 +1,38 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "etag": "CAI=",
+    "date": "Mon, 12 Oct 2026 15:11:40 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "pragma": "no-cache",
+    "x-goog-gcs-base-ts": "1a130ab6227",
+    "content-length": "319",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "status": "200"
+  },
+  "body": {
+    "lifecycle": {
+      "rule": [
+        {
+          "action": {
+            "type": "Delete"
+          },
+          "condition": {
+            "age": 90
+          }
+        },
+        {
+          "action": {
+            "type": "Delete"
+          },
+          "condition": {
+            "daysSinceNoncurrentTime": 7
+          }
+        }
+      ]
+    }
+  }
+}

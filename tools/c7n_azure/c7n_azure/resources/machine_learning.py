@@ -1,3 +1,6 @@
+import logging
+
+from azure.core.exceptions import ResourceNotFoundError
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
@@ -6,6 +9,38 @@ from c7n.filters import ListItemFilter
 from c7n_azure.utils import ResourceIdParser
 from azure.mgmt.machinelearningservices.models import (ComputeInstanceProperties,
                                                        AmlComputeProperties)
+
+log = logging.getLogger('custodian.azure.machine_learning')
+
+
+class MachineLearningWorkspaceChildMixin:
+    """Skip workspaces that cannot have their children enumerated.
+
+    ``workspaces.list_by_subscription`` keeps returning soft-deleted
+    workspaces (``provisioningState: Deleting``) after their resource group
+    is gone, and every child request against them fails. Skip those
+    workspaces, and any other workspace that disappears mid-run, rather than
+    failing the whole policy.
+
+    Subclasses that need custom enumeration override
+    ``enumerate_workspace_children`` instead of ``enumerate_resources``.
+    """
+
+    def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
+        if parent_resource.get('properties', {}).get('provisioningState') == 'Deleting':
+            log.warning('Skipping Machine Learning workspace %s: workspace is being deleted',
+                        parent_resource['id'])
+            return []
+        try:
+            return self.enumerate_workspace_children(
+                parent_resource, type_info, vault_url=vault_url, **params)
+        except ResourceNotFoundError as e:
+            log.warning('Skipping Machine Learning workspace %s: %s', parent_resource['id'], e)
+            return []
+
+    def enumerate_workspace_children(self, parent_resource, type_info, vault_url=None, **params):
+        return super().enumerate_resources(
+            parent_resource, type_info, vault_url=vault_url, **params)
 
 
 @resources.register('machine-learning-workspace')
@@ -58,7 +93,7 @@ class ComputeInstancesFilter(ListItemFilter):
 
 
 @resources.register('machine-learning-data-container')
-class MachineLearningDataContainer(ChildArmResourceManager):
+class MachineLearningDataContainer(MachineLearningWorkspaceChildMixin, ChildArmResourceManager):
     """Machine Learning Data Container Resource
 
     :example:
