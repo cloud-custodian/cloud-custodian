@@ -317,6 +317,7 @@ and here is a description of the options:
 
 | Required? | Key                         | Type    | Notes                                                                                                                                                                                              |
 |:---------:|:----------------------------|:--------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|           | `account_emails`            | object  | map of account id to the address or list of addresses that `account-emails` sends to                                                                                                               |
 |           | `cache_engine`              | string  | cache engine; either sqlite or redis                                                                                                                                                               |
 |           | `cross_accounts`            | object  | account to assume back into for sending to SNS topics                                                                                                                                              |
 |           | `debug`                     | boolean | debug on/off                                                                                                                                                                                       |
