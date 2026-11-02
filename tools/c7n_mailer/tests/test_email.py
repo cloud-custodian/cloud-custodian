@@ -328,7 +328,9 @@ class EmailTest(unittest.TestCase):
 
         self.email_delivery = MockEmailDelivery(config, self.aws_session, MagicMock())
         resource = {"Tags": [{"Key": "OwnerContact", "Value": "milton@initech.com:peter"}]}
-        emails = self.email_delivery.get_resource_owner_emails_from_resource(SQS_MESSAGE_1, resource)
+        emails = self.email_delivery.get_resource_owner_emails_from_resource(
+            SQS_MESSAGE_1, resource
+        )
 
         assert emails == ["milton@initech.com", "peter@test.com"]
 
