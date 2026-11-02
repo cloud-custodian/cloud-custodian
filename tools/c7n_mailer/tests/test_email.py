@@ -408,6 +408,25 @@ class EmailTest(unittest.TestCase):
             patched.assert_called()
             self.assertEqual(delivery.config["ldap_bind_password"], "a password")
 
+    def test_get_account_emails(self):
+        delivery = EmailDelivery(
+            {
+                "account_emails": {
+                    "111111111111": "milton@initech.com",
+                    "222222222222": ["bill@initech.com", "peter@initech.com"],
+                }
+            },
+            self.aws_session,
+            MagicMock(),
+        )
+        for account_id, expected in (
+            ("111111111111", ["milton@initech.com"]),
+            ("222222222222", ["bill@initech.com", "peter@initech.com"]),
+            ("333333333333", []),
+        ):
+            sqs_message = {"account_id": account_id, "action": {"to": ["account-emails"]}}
+            self.assertEqual(delivery.get_account_emails(sqs_message), expected)
+
     def test_get_valid_emails_from_list_gcp(self):
         delivery = EmailDelivery(
             {"ldap_uri": "foo", "email_base_url": "example.com"}, self.aws_session, MagicMock()
