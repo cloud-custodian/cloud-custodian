@@ -1,0 +1,121 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions?api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 14:46:36 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "778"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F6B7396601F0410AB9DF3AFE05EE9EE4 Ref B: CHI261140504034 Ref C: 2026-11-02T14:46:35Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "roleName": "cctest-roledefinition-delete-assigned",
+                                    "type": "CustomRole",
+                                    "description": "Cloud Custodian test fixture",
+                                    "assignableScopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "permissions": [
+                                        {
+                                            "actions": [
+                                                "Microsoft.Resources/subscriptions/resourceGroups/read"
+                                            ],
+                                            "notActions": []
+                                        }
+                                    ],
+                                    "createdOn": "2026-11-02T14:45:00.8985378Z",
+                                    "updatedOn": "2026-11-02T14:45:00.8985378Z",
+                                    "createdBy": "00000000-0000-0000-0000-000000000002",
+                                    "updatedBy": "00000000-0000-0000-0000-000000000002"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000011",
+                                "type": "Microsoft.Authorization/roleDefinitions",
+                                "name": "00000000-0000-0000-0000-000000000011"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000011?api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 400,
+                    "message": "Bad Request"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 14:46:37 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "225"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 2B2D798B9F2446D295DADA28AF61E11D Ref B: CHI261140511060 Ref C: 2026-11-02T14:46:37Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
+                        "2999"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "199"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "RoleDefinitionHasAssignments",
+                            "message": "There are existing role assignments referencing role 00000000-0000-0000-0000-000000000011. The role assignments must be deleted before the role can be deleted."
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

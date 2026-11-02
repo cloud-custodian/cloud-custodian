@@ -4,6 +4,7 @@
 import logging
 import re
 
+from azure.core.exceptions import HttpResponseError
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.query import sources
@@ -399,3 +400,70 @@ class DeleteAssignmentAction(AzureBaseAction):
     def _process_resource(self, resource):
         self.client.role_assignments.delete(
             resource['properties']['scope'], resource['name'])
+
+
+@RoleDefinition.action_registry.register('delete')
+class DeleteRoleDefinitionAction(AzureBaseAction):
+    """Delete custom role definitions.
+
+    Built-in roles can't be deleted, so they are skipped with a warning.
+
+    The role is deleted at the scope in its ``id``. Deleting it removes it from
+    every scope in ``properties.assignableScopes``, so the caller needs
+    ``Microsoft.Authorization/roleDefinitions/write`` on all of them, as Owner
+    and User Access Administrator have.
+
+    A role that still has assignments fails with Azure's ``RoleDefinitionHasAssignments``
+    error. Remove active assignments first with the ``delete`` action on
+    ``azure.roleassignment`` and its ``role`` filter. Eligible assignments must be
+    removed in Privileged Identity Management.
+
+    :example:
+
+    Delete custom roles that grant every action.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-custom-roles-granting-all-actions
+            resource: azure.roledefinition
+            filters:
+              - type: value
+                key: properties.type
+                value: CustomRole
+              - type: value
+                key: properties.permissions[].actions[]
+                value: "*"
+                op: contains
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+
+    def process(self, resources, event=None):
+        resources = self.filter_resources(resources, 'properties.type', ('CustomRole',))
+        return super().process(resources, event)
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        try:
+            self.client.role_definitions.delete(
+                self.get_scope(resource['id']), resource['name'])
+        except HttpResponseError as error:
+            # A role that's already gone is answered with 204, which this SDK rejects.
+            if error.response is None or error.response.status_code != 204:
+                raise
+            return "role '%s' already deleted" % resource['properties']['roleName']
+        return "deleted role '%s'" % resource['properties']['roleName']
+
+    @staticmethod
+    def get_scope(role_id):
+        match = re.match(
+            r"^(.+)\/providers\/Microsoft\.Authorization\/roleDefinitions\/[^\/]+$",
+            role_id, flags=re.IGNORECASE)
+        if not match:
+            raise ValueError("Unexpected role definition id '%s'" % role_id)
+        return match.group(1)

@@ -1,0 +1,73 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions?api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 14:46:33 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "618"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: CDD337A4CBA544C2AFE60BC35ABBCC4B Ref B: CH1AA2020610035 Ref C: 2026-11-02T14:46:34Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "roleName": "Reader",
+                                    "type": "BuiltInRole",
+                                    "description": "View all resources, but does not allow you to make any changes.",
+                                    "assignableScopes": [
+                                        "/"
+                                    ],
+                                    "permissions": [
+                                        {
+                                            "actions": [
+                                                "*/read"
+                                            ],
+                                            "notActions": []
+                                        }
+                                    ],
+                                    "createdOn": "2015-02-02T21:55:09.8806423Z",
+                                    "updatedOn": "2021-11-11T20:13:47.8628684Z",
+                                    "createdBy": null,
+                                    "updatedBy": null
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7",
+                                "type": "Microsoft.Authorization/roleDefinitions",
+                                "name": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
