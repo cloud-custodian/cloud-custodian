@@ -6,7 +6,7 @@ import unittest
 import redis
 
 from common import get_ldap_lookup, PETER, BILL
-from c7n_mailer.ldap_lookup import have_sqlite, Redis
+from c7n_mailer.ldap_lookup import have_sqlite, LdapLookup, Redis
 
 SKIP_REASON = "Azure Pipelines still broken"
 
@@ -120,4 +120,13 @@ class RedisConnectionTest(unittest.TestCase):
         self.assertEqual(
             (kwargs["host"], kwargs["port"], kwargs["db"]), ("redis.example.com", 6380, 2)
         )
+        self.assertEqual(conn.connection_pool.connection_class, redis.SSLConnection)
+
+    def test_ldap_lookup_passes_redis_url(self):
+        # LdapLookup's own get_redis_connection, which the other tests replace with a mock.
+        lookup = LdapLookup.__new__(LdapLookup)
+        conn = lookup.get_redis_connection(
+            "ignored", 6379, redis_url="rediss://redis.example.com:6380/0"
+        ).connection
+        self.assertEqual(conn.connection_pool.connection_kwargs["host"], "redis.example.com")
         self.assertEqual(conn.connection_pool.connection_class, redis.SSLConnection)
