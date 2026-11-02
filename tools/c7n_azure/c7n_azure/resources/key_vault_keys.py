@@ -10,6 +10,7 @@ from c7n.filters import Filter
 from c7n.utils import type_schema
 
 from c7n_azure import constants
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
 from c7n_azure.resources.key_vault import KeyVaultPropertiesUpdateAction
