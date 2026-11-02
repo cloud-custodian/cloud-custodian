@@ -410,7 +410,7 @@ class DeleteRoleDefinitionAction(AzureBaseAction):
 
     The role is deleted at the scope in its ``id``. Deleting it removes it from
     every scope in ``properties.assignableScopes``, so the caller needs
-    ``Microsoft.Authorization/roleDefinitions/write`` on all of them, as Owner
+    ``Microsoft.Authorization/roleDefinitions/delete`` on all of them, as Owner
     and User Access Administrator have.
 
     A role that still has assignments fails with Azure's ``RoleDefinitionHasAssignments``

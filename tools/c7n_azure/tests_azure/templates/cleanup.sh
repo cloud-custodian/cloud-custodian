@@ -59,7 +59,7 @@ delete_resource() {
             fi
             az role definition delete --name "$role_name" --scope "$scope" || return 1
         fi
-        az deployment sub delete --name cctest-$filenameNoExtension --output None
+        az deployment sub delete --name "cctest-$filenameNoExtension" --output None || return 1
     elif [[ "$fileName" == "cognitive-service-deployment.json" ]]; then
         account_name="${AZURE_OPENAI_ACCOUNT_NAME}"
         if [[ -z "${account_name}" ]]; then
