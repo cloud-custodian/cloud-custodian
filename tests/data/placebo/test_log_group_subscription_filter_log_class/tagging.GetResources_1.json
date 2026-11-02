@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/datasync",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "policy-testing"
+                    },
+                    {
+                        "Key": "cleanup_exclude",
+                        "Value": "True"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:/ecs/policy-testing",
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "ecs-prod"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/ecs-prod/3edd5da0-0840-11f1-8bf8-0ea73ae56e41"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "LogGroup"
+                    },
+                    {
+                        "Key": "Application",
+                        "Value": "policy-testing"
+                    },
+                    {
+                        "Key": "cleanup_exclude",
+                        "Value": "True"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-east-1:644160558196:log-group:testing-log-group",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "ASVENTERPRISECLOUDCONTROL"
+                    },
+                    {
+                        "Key": "OwnerContact",
+                        "Value": "e@mail.com"
+                    },
+                    {
+                        "Key": "cleanup_exclude",
+                        "Value": "True"
+                    },
+                    {
+                        "Key": "BA",
+                        "Value": "ASVENTERPRISECLOUDCONTROL"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,331 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/codebuild/spot-build-ecs-prod",
+                "creationTime": 1770826424114,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-build-ecs-prod:*",
+                "storedBytes": 2215901,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-build-ecs-prod",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/codebuild/spot-deploy-infra-prod",
+                "creationTime": 1770759193821,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-deploy-infra-prod:*",
+                "storedBytes": 2993186,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-deploy-infra-prod",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/codebuild/spot-deploy-lambda-prod",
+                "creationTime": 1770826423996,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-deploy-lambda-prod:*",
+                "storedBytes": 1394425,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-deploy-lambda-prod",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/codebuild/spot-integration-tests-prod",
+                "creationTime": 1772802596657,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-integration-tests-prod:*",
+                "storedBytes": 629119,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-integration-tests-prod",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/codebuild/spot-performance-tests-prod",
+                "creationTime": 1774373589132,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-performance-tests-prod:*",
+                "storedBytes": 469234,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-performance-tests-prod",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/codebuild/spot-unit-tests-prod",
+                "creationTime": 1770828479849,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-unit-tests-prod:*",
+                "storedBytes": 1506968,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/spot-unit-tests-prod",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/codebuild/xacc-cleanup-prod",
+                "creationTime": 1776353388558,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/xacc-cleanup-prod:*",
+                "storedBytes": 1327080226,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/codebuild/xacc-cleanup-prod",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/datasync",
+                "creationTime": 1765565348857,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/datasync:*",
+                "storedBytes": 7876065,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/datasync",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/ecs/containerinsights/ecs-cluster-custodian/performance",
+                "creationTime": 1762267694388,
+                "retentionInDays": 1,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/ecs/containerinsights/ecs-cluster-custodian/performance:*",
+                "storedBytes": 5627109,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/ecs/containerinsights/ecs-cluster-custodian/performance",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/ipat-transfer-external-prod",
+                "creationTime": 1782759350956,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/ipat-transfer-external-prod:*",
+                "storedBytes": 5656052,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/ipat-transfer-external-prod",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/ipat-transfer-lambda",
+                "creationTime": 1784745889000,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/ipat-transfer-lambda:*",
+                "storedBytes": 11388,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/ipat-transfer-lambda",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/mu-077t4n-enterprise-rdshft-tagging-existing-unmark",
+                "creationTime": 1793651786507,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-077t4n-enterprise-rdshft-tagging-existing-unmark:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-077t4n-enterprise-rdshft-tagging-existing-unmark",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/mu-0bm8je-enterprise-rdshft-tagging-existing-notify",
+                "creationTime": 1793651050282,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-0bm8je-enterprise-rdshft-tagging-existing-notify:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-0bm8je-enterprise-rdshft-tagging-existing-notify",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/mu-1o8ekc-enterprise-rdshftsbntgrp-tagging-existing-notify",
+                "creationTime": 1793652302852,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-1o8ekc-enterprise-rdshftsbntgrp-tagging-existing-notify:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-1o8ekc-enterprise-rdshftsbntgrp-tagging-existing-notify",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/mu-4b3xhp-enterprise-rdshft-tagging-existing-notify",
+                "creationTime": 1793648697836,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-4b3xhp-enterprise-rdshft-tagging-existing-notify:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-4b3xhp-enterprise-rdshft-tagging-existing-notify",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/mu-pj6mn0-enterprise-rdshft-tagging-existing-unmark",
+                "creationTime": 1793649044703,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-pj6mn0-enterprise-rdshft-tagging-existing-unmark:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-pj6mn0-enterprise-rdshft-tagging-existing-unmark",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/mu-rlbgvz-enterprise-rdshft-tagging-existing-notify-mark",
+                "creationTime": 1793651428355,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-rlbgvz-enterprise-rdshft-tagging-existing-notify-mark:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/mu-rlbgvz-enterprise-rdshft-tagging-existing-notify-mark",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/spot-mock-coverage-function",
+                "creationTime": 1784132845102,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-mock-coverage-function:*",
+                "storedBytes": 3550029,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-mock-coverage-function",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/spot-mock-function",
+                "creationTime": 1770139610515,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-mock-function:*",
+                "storedBytes": 246227,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-mock-function",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/spot-mock-test-function",
+                "creationTime": 1784132835696,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-mock-test-function:*",
+                "storedBytes": 15991049,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-mock-test-function",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/spot-resolve-mock-tests",
+                "creationTime": 1770834526714,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-resolve-mock-tests:*",
+                "storedBytes": 2155356,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-resolve-mock-tests",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/spot-resolve-tests",
+                "creationTime": 1769440867330,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-resolve-tests:*",
+                "storedBytes": 3290255,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-resolve-tests",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/aws/lambda/spot-start-datasync",
+                "creationTime": 1792681034610,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-start-datasync:*",
+                "storedBytes": 1475471,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/spot-start-datasync",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/ecs/policy-testing",
+                "creationTime": 1770920754883,
+                "retentionInDays": 14,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/ecs/policy-testing:*",
+                "storedBytes": 103592335,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/ecs/policy-testing",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "/vpc-flow-logs",
+                "creationTime": 1789648317874,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/vpc-flow-logs:*",
+                "storedBytes": 6827184214,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/vpc-flow-logs",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "RDSOSMetrics",
+                "creationTime": 1771941999064,
+                "retentionInDays": 30,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:RDSOSMetrics:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:RDSOSMetrics",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "c7n-log-class-infrequent",
+                "creationTime": 1793652432799,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-infrequent:*",
+                "storedBytes": 0,
+                "logGroupClass": "INFREQUENT_ACCESS",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-infrequent",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "c7n-log-class-standard",
+                "creationTime": 1793652431900,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-standard:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-standard",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "testing-log-group",
+                "creationTime": 1762530469630,
+                "retentionInDays": 1,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:testing-log-group:*",
+                "storedBytes": 40207,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:testing-log-group",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

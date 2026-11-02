@@ -478,6 +478,10 @@ class LastWriteDays(Filter):
         return self.date_threshold > last_write
 
 
+def _supports_subscription_filters(group):
+    return group.get("logGroupClass", "STANDARD") == "STANDARD"
+
+
 @LogGroup.filter_registry.register('cross-account')
 class LogCrossAccountFilter(CrossAccountAccessFilter):
     """Find log groups with subscription filters that deliver to accounts that are not in
@@ -528,6 +532,8 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
     def process_resource_set(self, client, accounts, resources):
         results = []
         for r in resources:
+            if not _supports_subscription_filters(r):
+                continue
             found = False
             filters = self.manager.retry(
                 client.describe_subscription_filters,
@@ -569,6 +575,8 @@ class LogSubscriptionFilter(ValueFilter):
         client = local_session(self.manager.session_factory).client('logs')
         results = []
         for r in resources:
+            if not _supports_subscription_filters(r):
+                continue
             filters = self.manager.retry(
                 client.describe_subscription_filters,
                 logGroupName=r['logGroupName']).get('subscriptionFilters', ())
