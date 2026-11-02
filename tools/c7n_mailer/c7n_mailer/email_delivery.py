@@ -242,8 +242,13 @@ class EmailDelivery:
                 delivery.send_message(emails_to_mimetext_map)
             # use aws ses normally.
             else:
+                params = {}
+                if self.config.get("ses_configuration_set"):
+                    params["ConfigurationSetName"] = self.config["ses_configuration_set"]
                 for emails, mimetext_msg in emails_to_mimetext_map.items():
-                    self.aws_ses.send_raw_email(RawMessage={"Data": mimetext_msg.as_string()})
+                    self.aws_ses.send_raw_email(
+                        RawMessage={"Data": mimetext_msg.as_string()}, **params
+                    )
         except Exception as error:
             self.logger.error(
                 "policy:%s account:%s sending to:%s \n\n error: %s\n\n mailer.yml: %s"
