@@ -83,6 +83,7 @@ class CognitiveServiceLocationUsageUnitTest(BaseTest):
 class CognitiveServiceLocationUsageTest(BaseTest):
     recording_resource_group = 'test_cognitive-service-location-usage'
 
+    # The cassette's usages responses are trimmed to the rows this test asserts on.
     @arm_template('cognitive-service-location-usage.json')
     def test_location_usage_rows(self) -> None:
         policy = self.load_policy(
