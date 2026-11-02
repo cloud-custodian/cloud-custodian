@@ -47,11 +47,17 @@ delete_resource() {
         # assignments can't be deleted, so remove those first.
         scope="/subscriptions/$(az account show --query id --output tsv)"
         role_name="cctest-$filenameNoExtension"
-        if [[ -n $(az role definition list --name $role_name --scope $scope --query "[].name" --output tsv) ]]; then
-            if [[ -n $(az role assignment list --role $role_name --scope $scope --query "[].id" --output tsv) ]]; then
-                az role assignment delete --role $role_name --scope $scope
+        if ! role_definition_names=$(az role definition list --name "$role_name" --scope "$scope" --query "[].name" --output tsv); then
+            return 1
+        fi
+        if [[ -n "$role_definition_names" ]]; then
+            if ! assignments=$(az role assignment list --role "$role_name" --scope "$scope" --query "[].id" --output tsv); then
+                return 1
             fi
-            az role definition delete --name $role_name --scope $scope
+            if [[ -n "$assignments" ]]; then
+                az role assignment delete --role "$role_name" --scope "$scope" || return 1
+            fi
+            az role definition delete --name "$role_name" --scope "$scope" || return 1
         fi
         az deployment sub delete --name cctest-$filenameNoExtension --output None
     elif [[ "$fileName" == "cognitive-service-deployment.json" ]]; then

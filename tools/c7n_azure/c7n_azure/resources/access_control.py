@@ -445,6 +445,23 @@ class DeleteRoleDefinitionAction(AzureBaseAction):
         resources = self.filter_resources(resources, 'properties.type', ('CustomRole',))
         return super().process(resources, event)
 
+    def _process_resources(self, resources, event):
+        # The base class logs and swallows errors outside pytest, so a role left in
+        # place would leave the run looking successful. Delete the rest, then raise.
+        self._prepare_processing()
+        failures = []
+        for resource in resources:
+            try:
+                self._log_modified_resource(resource, self._process_resource(resource))
+            except Exception as e:
+                self.log.error(
+                    "Deleting role '%s' failed: %s",
+                    resource['properties']['roleName'], e,
+                    exc_info=True, extra=self._get_action_log_metadata(resource))
+                failures.append(e)
+        if failures:
+            raise failures[0]
+
     def _prepare_processing(self):
         self.client = self.manager.get_client()
 

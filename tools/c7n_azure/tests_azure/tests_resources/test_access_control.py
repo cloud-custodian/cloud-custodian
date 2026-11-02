@@ -242,3 +242,42 @@ class AccessControlTest(BaseTest):
         self.assertEqual(
             action._process_resource(role),
             "role 'cctest-roledefinition-delete' already deleted")
+
+    @arm_template('roledefinition-delete.json')
+    @arm_template('roledefinition-delete-assigned.json')
+    @strict_cassette('roledefinition-delete-continues')
+    def test_delete_role_definition_continues_after_failure(self):
+        p = self.load_policy({
+            'name': 'test-delete-role-definitions',
+            'resource': 'azure.roledefinition',
+            'filters': [
+                {'type': 'value',
+                 'key': 'properties.roleName',
+                 'op': 'in',
+                 'value': ['cctest-roledefinition-delete',
+                           'cctest-roledefinition-delete-assigned']}],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        }, validate=True)
+        # The assigned role fails, so put it first to show the other is still deleted
+        resources = sorted(
+            p.resource_manager.resources(),
+            key=lambda r: r['properties']['roleName'], reverse=True)
+        self.assertEqual(
+            [r['properties']['roleName'] for r in resources],
+            ['cctest-roledefinition-delete-assigned', 'cctest-roledefinition-delete'])
+
+        with self.assertRaises(HttpResponseError) as e:
+            p.resource_manager.actions[0].process(resources)
+        self.assertEqual(e.exception.error.code, 'RoleDefinitionHasAssignments')
+
+        self.sleep_in_live_mode(30)
+        client = p.resource_manager.get_client()
+        scope = '/subscriptions/%s' % self.session.get_subscription_id()
+        deleted = client.role_definitions.list(
+            scope, filter="roleName eq 'cctest-roledefinition-delete'")
+        assigned = client.role_definitions.list(
+            scope, filter="roleName eq 'cctest-roledefinition-delete-assigned'")
+        self.assertEqual(list(deleted), [])
+        self.assertEqual(len(list(assigned)), 1)
