@@ -37,7 +37,9 @@ class TestSlackDelivery(unittest.TestCase):
 
     @patch("c7n_mailer.slack_delivery.Redis")
     def test_cache_uses_redis_url(self, redis_mock):
-        config = dict(self.config, cache_engine="redis", redis_url="rediss://redis.example.com:6380/0")
+        config = dict(
+            self.config, cache_engine="redis", redis_url="rediss://redis.example.com:6380/0"
+        )
         SlackDelivery(config, self.logger, self.email_delivery)
         redis_mock.assert_called_once_with(
             redis_host=None,
