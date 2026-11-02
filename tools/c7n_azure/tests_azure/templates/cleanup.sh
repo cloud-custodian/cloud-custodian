@@ -57,6 +57,8 @@ delete_resource() {
         dbid=$(az sql db list --ids $sqlid --query [0].id --output tsv)
         az lock delete --ids "${dbid}/providers/Microsoft.Authorization/locks/dblock"
         sleep 10s
+    elif [[ "$fileName" == "keyvault-secret.json" ]]; then
+        vault_name=$(az keyvault list --resource-group $rgName --query [0].name --output tsv)
     fi
 
     # Deleting the resource group only soft-deletes ML workspaces, which then
@@ -90,6 +92,14 @@ delete_resource() {
     fi
 
     az group delete --name $rgName --yes --output None
+
+    # Purge the soft-deleted vault so the fixed vault name can be re-provisioned.
+    if [[ "$fileName" == "keyvault-secret.json" ]] && [[ -n "${vault_name}" ]]; then
+        az keyvault purge --name $vault_name --output None || {
+            echo "Failed to purge soft-deleted Key Vault '${vault_name}'; the name stays reserved until it is purged."
+            exit 1
+        }
+    fi
 
     echo "Delete for $filenameNoExtension complete"
 }
