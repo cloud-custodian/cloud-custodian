@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+from unittest.mock import MagicMock, patch
 
 import redis
 
@@ -122,11 +123,11 @@ class RedisConnectionTest(unittest.TestCase):
         )
         self.assertEqual(conn.connection_pool.connection_class, redis.SSLConnection)
 
-    def test_ldap_lookup_passes_redis_url(self):
-        # LdapLookup's own get_redis_connection, which the other tests replace with a mock.
-        lookup = LdapLookup.__new__(LdapLookup)
-        conn = lookup.get_redis_connection(
-            "ignored", 6379, redis_url="rediss://redis.example.com:6380/0"
-        ).connection
+    def test_ldap_lookup_uses_redis_url_from_config(self):
+        # Only the LDAP connection is replaced, so the config is read by LdapLookup itself.
+        config = {"cache_engine": "redis", "redis_url": "rediss://redis.example.com:6380/0"}
+        with patch.object(LdapLookup, "get_connection", return_value=MagicMock()):
+            lookup = LdapLookup(config, MagicMock())
+        conn = lookup.caching.connection
         self.assertEqual(conn.connection_pool.connection_kwargs["host"], "redis.example.com")
         self.assertEqual(conn.connection_pool.connection_class, redis.SSLConnection)
