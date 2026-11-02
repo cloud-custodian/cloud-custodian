@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import logging
 
 from azure.cosmosdb.table import TableService
@@ -701,6 +702,77 @@ class StorageSettingsUtilities:
             return getattr(client, 'set_service_properties')(analytics_logging=logging_settings)
         return getattr(client, 'set_{}_service_properties'
                        .format(storage_type))(logging=logging_settings)
+
+
+@Storage.action_registry.register('update')
+class StorageUpdateAction(AzureBaseAction):
+    """Update scalar storage account settings.
+
+    :example:
+
+    Default to Microsoft Entra authorization in the Azure portal for accounts
+    where the setting is absent or false:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-default-to-entra-authorization
+            resource: azure.storage
+            filters:
+              - or:
+                  - properties.defaultToOAuthAuthentication: absent
+                  - properties.defaultToOAuthAuthentication: false
+            actions:
+              - type: update
+                properties:
+                  defaultToOAuthAuthentication: true
+
+    Property names follow the Azure REST API. Only supplied properties are
+    updated. Setting ``allowedCopyScope`` to ``null`` clears that restriction.
+    Changing the portal default does not disable Shared Key authorization.
+
+    Enabling ``isSftpEnabled`` requires hierarchical namespace to be enabled
+    on the account and incurs SFTP charges while enabled.
+    """
+
+    schema = type_schema(
+        'update',
+        required=['properties'],
+        properties={
+            'type': 'object',
+            'minProperties': 1,
+            'additionalProperties': False,
+            # TODO: Support mutable encryption properties after live API verification.
+            'properties': {
+                'defaultToOAuthAuthentication': {'type': 'boolean'},
+                'supportsHttpsTrafficOnly': {'type': 'boolean'},
+                'allowBlobPublicAccess': {'type': 'boolean'},
+                'allowSharedKeyAccess': {'type': 'boolean'},
+                'allowCrossTenantReplication': {'type': 'boolean'},
+                'isLocalUserEnabled': {'type': 'boolean'},
+                'isSftpEnabled': {'type': 'boolean'},
+                'minimumTlsVersion': {'enum': ['TLS1_0', 'TLS1_1', 'TLS1_2']},
+                'publicNetworkAccess': {
+                    'enum': ['Enabled', 'Disabled', 'SecuredByPerimeter'],
+                },
+                'accessTier': {'enum': ['Hot', 'Cool', 'Cold']},
+                'allowedCopyScope': {'enum': ['AAD', 'PrivateLink', None]},
+            },
+        },
+    )
+    permissions = ('Microsoft.Storage/storageAccounts/write',)
+
+    def _prepare_processing(self) -> None:
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource: dict) -> None:
+        # SDK model serialization drops explicit nulls, so send the validated JSON.
+        body = json.dumps({'properties': self.data['properties']}).encode()
+        self.client.storage_accounts.update(
+            resource['resourceGroup'],
+            resource['name'],
+            body,
+        )
 
 
 @Storage.action_registry.register('require-secure-transfer')
