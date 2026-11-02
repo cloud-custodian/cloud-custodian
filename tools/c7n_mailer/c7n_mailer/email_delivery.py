@@ -60,8 +60,8 @@ class EmailDelivery:
                 email = email.strip()
                 if not email:
                     continue
-                if is_email(target):
-                    emails.append(target)
+                if is_email(email):
+                    emails.append(email)
                 # gcp doesn't support the '@' character in their label values so we
                 # allow users to specify an email_base_url to append to the end of their
                 # owner contact tags
