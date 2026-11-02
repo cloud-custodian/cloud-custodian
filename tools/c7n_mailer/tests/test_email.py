@@ -115,6 +115,15 @@ class EmailTest(unittest.TestCase):
         valid_emails = self.email_delivery.get_valid_emails_from_list(list_1)
         self.assertEqual(valid_emails, ["michael_bolton@initech.com", "bill@initech.com"])
 
+    def test_get_valid_emails_from_list_splits_owner_contacts(self):
+        # A resource-owner tag can hold several addresses separated by colons.
+        valid_emails = self.email_delivery.get_valid_emails_from_list(
+            ["milton@initech.com:bill@initech.com", "lsdk:peter@initech.com"]
+        )
+        self.assertEqual(
+            valid_emails, ["milton@initech.com", "bill@initech.com", "peter@initech.com"]
+        )
+
     def test_event_owner_ldap_flow(self):
         targets = ["event-owner"]
         michael_bolton_email = self.email_delivery.get_event_owner_email(targets, CLOUDTRAIL_EVENT)
