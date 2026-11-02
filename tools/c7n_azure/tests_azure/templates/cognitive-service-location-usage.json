@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "eastusAccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'eus')]",
+        "eastus2AccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'eus2')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2025-06-01",
+            "name": "[variables('eastusAccountName')]",
+            "location": "eastus",
+            "kind": "OpenAI",
+            "sku": {
+                "name": "S0"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2025-06-01",
+            "name": "[variables('eastus2AccountName')]",
+            "location": "eastus2",
+            "kind": "OpenAI",
+            "sku": {
+                "name": "S0"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts/deployments",
+            "apiVersion": "2025-06-01",
+            "name": "[format('{0}/{1}', variables('eastus2AccountName'), 'cctest-gpt-5-4-nano')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', variables('eastus2AccountName'))]"
+            ],
+            "sku": {
+                "name": "GlobalStandard",
+                "capacity": 1
+            },
+            "properties": {
+                "model": {
+                    "format": "OpenAI",
+                    "name": "gpt-5.4-nano",
+                    "version": "2026-03-17"
+                }
+            }
+        }
+    ]
+}
