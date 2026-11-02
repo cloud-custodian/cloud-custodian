@@ -7,15 +7,16 @@
         }
     },
     "variables": {
-        "eastusAccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'eus')]",
-        "eastus2AccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'eus2')]"
+        "westusAccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'wus')]",
+        "westus3AccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'wus3')]",
+        "globalAccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'glb')]"
     },
     "resources": [
         {
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2025-06-01",
-            "name": "[variables('eastusAccountName')]",
-            "location": "eastus",
+            "name": "[variables('westusAccountName')]",
+            "location": "westus",
             "kind": "OpenAI",
             "sku": {
                 "name": "S0"
@@ -25,8 +26,8 @@
         {
             "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2025-06-01",
-            "name": "[variables('eastus2AccountName')]",
-            "location": "eastus2",
+            "name": "[variables('westus3AccountName')]",
+            "location": "westus3",
             "kind": "OpenAI",
             "sku": {
                 "name": "S0"
@@ -34,23 +35,15 @@
             "properties": {}
         },
         {
-            "type": "Microsoft.CognitiveServices/accounts/deployments",
+            "type": "Microsoft.CognitiveServices/accounts",
             "apiVersion": "2025-06-01",
-            "name": "[format('{0}/{1}', variables('eastus2AccountName'), 'cctest-gpt-5-4-nano')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.CognitiveServices/accounts', variables('eastus2AccountName'))]"
-            ],
+            "name": "[variables('globalAccountName')]",
+            "location": "global",
+            "kind": "TextTranslation",
             "sku": {
-                "name": "GlobalStandard",
-                "capacity": 1
+                "name": "S1"
             },
-            "properties": {
-                "model": {
-                    "format": "OpenAI",
-                    "name": "gpt-5.4-nano",
-                    "version": "2026-03-17"
-                }
-            }
+            "properties": {}
         }
     ]
 }

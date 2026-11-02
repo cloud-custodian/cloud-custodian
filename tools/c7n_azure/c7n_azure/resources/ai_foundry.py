@@ -1,8 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from collections.abc import Iterator
-
 import requests
 
 from azure.mgmt.cognitiveservices.models import ConnectionPropertiesV2
@@ -168,11 +166,19 @@ class CognitiveServiceUsage(ChildResourceManager):
         return values
 
 
+# Not the SDK's usages.list: scopeId and scopeType are only returned from
+# api-version 2026-03-01, and the SDK's Usage model (13.7.0, 14.1.0) has no
+# fields for them, so serializing it would drop them.
 class CognitiveServiceLocationUsageSource(DescribeSource):
 
     def get_resources(self, query: list[dict] | None) -> list[dict]:
         accounts = self.manager.get_resource_manager('azure.cognitiveservice').resources()
-        locations = sorted({account['location'] for account in accounts})
+        # The global location labels some Global quota rows Classic, so query it
+        # last and keep the row a region returns.
+        locations = sorted(
+            {account['location'] for account in accounts},
+            key=lambda location: (location == 'global', location),
+        )
         session = self.manager.get_session()
         base_url = (
             f'{session.cloud_endpoints.endpoints.resource_manager.rstrip("/")}'
@@ -182,24 +188,20 @@ class CognitiveServiceLocationUsageSource(DescribeSource):
         rows = {}
         with utils.requests_session(session, max_retries=3) as http:
             for location in locations:
-                for usage in self.list_usages(http, f'{base_url}/{location}/usages'):
-                    # Global and DataZone quota is shared by every location in its
-                    # scope, so each of those locations returns the same row.
-                    key = (usage.get('scopeId') or location, usage['name']['value'])
-                    if key not in rows:
-                        usage['c7n:location'] = location
-                        rows[key] = usage
+                url = f'{base_url}/{location}/usages'
+                query = {'api-version': self.manager.resource_type.api_version}
+                while url:
+                    response = http.get(url, params=query, timeout=30)
+                    response.raise_for_status()
+                    payload = response.json()
+                    for usage in payload['value']:
+                        key = (usage.get('scopeId') or location, usage['name']['value'])
+                        if key not in rows:
+                            usage['c7n:location'] = location
+                            rows[key] = usage
+                    url = payload.get('nextLink')
+                    query = None
         return list(rows.values())
-
-    def list_usages(self, http: requests.Session, url: str) -> Iterator[dict]:
-        query = {'api-version': self.manager.resource_type.api_version}
-        while url:
-            response = http.get(url, params=query, timeout=30)
-            response.raise_for_status()
-            payload = response.json()
-            yield from payload['value']
-            url = payload.get('nextLink')
-            query = None
 
 
 @resources.register('cognitiveservice-location-usage')
@@ -213,7 +215,8 @@ class CognitiveServiceLocationUsage(QueryResourceManager):
 
     Global and DataZone quota rows are shared by every location in their
     scope and are returned once. Each row's ``c7n:location`` is the first
-    location, in alphabetical order, that returned it.
+    location, in alphabetical order with ``global`` last, that returned it,
+    and its ``id`` names that location.
 
     :example:
 
@@ -237,6 +240,8 @@ class CognitiveServiceLocationUsage(QueryResourceManager):
 
     class resource_type(QueryResourceManager.resource_type):
         doc_groups = ['AI + Machine Learning']
+        service = 'azure.mgmt.cognitiveservices'
+        client = 'CognitiveServicesManagementClient'
         api_version = '2026-03-01'
         name = 'name.value'
         default_report_fields = (
@@ -244,6 +249,7 @@ class CognitiveServiceLocationUsage(QueryResourceManager):
             'currentValue',
             'limit',
             'scopeType',
+            'scopeId',
             '"c7n:location"',
         )
 
