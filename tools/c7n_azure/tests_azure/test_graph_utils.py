@@ -39,19 +39,13 @@ class TestGraphSource(BaseTest):
         mock_manager.get_graph_resources.assert_called_once()
 
     def test_get_resources_exception_handling(self):
-        """Test GraphSource exception handling in get_resources"""
+        """GraphSource lets errors propagate instead of reporting an empty tenant"""
         mock_manager = Mock()
         mock_manager.get_graph_resources.side_effect = Exception("Graph API error")
 
         source = GraphSource(mock_manager)
-        with patch('c7n_azure.graph_utils.log') as mock_log:
-            resources = source.get_resources()
-
-        # Should return empty list on error
-        self.assertEqual(resources, [])
-        mock_log.error.assert_called_once_with(
-            "Error retrieving resources via Graph API: Graph API error"
-        )
+        with self.assertRaisesRegex(Exception, "Graph API error"):
+            source.get_resources()
 
 
 class TestGetRequiredPermissions(BaseTest):
@@ -1173,3 +1167,62 @@ class TestMakeBatchedGraphRequest(BaseTest):
         self.assertEqual(result[0]['status'], 200)
         self.assertEqual(result[1]['status'], 404)
         self.assertEqual(result[2]['status'], 200)
+
+
+class TestGraphAbsoluteUrls(BaseTest):
+    """Absolute URLs (such as @odata.nextLink) must stay on Microsoft Graph hosts."""
+
+    def _manager_and_session(self):
+        policy = self.load_policy({
+            'name': 'test-graph-absolute-url',
+            'resource': 'azure.entraid-user'
+        })
+        session = Mock()
+        session.credentials.get_token.return_value = Mock(token='fake-token')
+        return policy.resource_manager, session
+
+    def test_graph_service_root_hosts_are_followed(self):
+        for host in ['graph.microsoft.com', 'graph.microsoft.us',
+                     'dod-graph.microsoft.us', 'microsoftgraph.chinacloudapi.cn']:
+            url = f'https://{host}/v1.0/users?$skiptoken=abc'
+            manager, session = self._manager_and_session()
+            response = Mock()
+            response.json.return_value = {'value': []}
+            with patch.object(manager, 'get_client', return_value=session):
+                with patch('c7n_azure.graph_utils.requests.get',
+                           return_value=response) as get:
+                    self.assertEqual(manager.make_graph_request(url), {'value': []})
+            self.assertEqual(get.call_args[0][0], url)
+
+    def test_other_hosts_are_refused_before_a_token_is_requested(self):
+        for url in [
+            'https://example.com/v1.0/users?$skiptoken=abc',
+            'https://graph.microsoft.com.example.net/v1.0/users',
+            'https://evilgraph.microsoft.com/v1.0/users',
+            'http://graph.microsoft.com/v1.0/users',
+            'https://user@graph.microsoft.com/v1.0/users',
+            'https://graph.microsoft.com:8443/v1.0/users',
+        ]:
+            manager, session = self._manager_and_session()
+            with patch.object(manager, 'get_client', return_value=session):
+                with patch('c7n_azure.graph_utils.requests.get') as get:
+                    with self.assertRaises(ValueError):
+                        manager.make_graph_request(url)
+            get.assert_not_called()
+            session.credentials.get_token.assert_not_called()
+
+    def test_next_link_to_another_host_stops_pagination(self):
+        manager, session = self._manager_and_session()
+        first = Mock()
+        first.json.return_value = {
+            'value': [{'id': '1'}],
+            '@odata.nextLink': 'https://example.com/v1.0/users?$skiptoken=abc',
+        }
+        with patch.object(manager, 'get_client', return_value=session):
+            second = Mock()
+            second.json.return_value = {'value': [{'id': '2'}]}
+            with patch('c7n_azure.graph_utils.requests.get',
+                       side_effect=[first, second]) as get:
+                with self.assertRaises(ValueError):
+                    manager.list_graph_collection('users')
+        self.assertEqual(get.call_count, 1)

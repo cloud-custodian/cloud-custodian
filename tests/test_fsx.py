@@ -1147,6 +1147,84 @@ class TestFSx(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-vpcs']), 1)
 
+    def test_fsx_security_group_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_network_location_sg")
+        p = self.load_policy({
+            "name": "fsx_security_group_filter",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "security-group",
+                "key": "tag:Env",
+                "value": "Staging"
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-0bc98cbfb6b356896")
+        self.assertEqual(
+            resources[0]["c7n:matched-security-groups"],
+            ["sg-0stag00000000000b"])
+
+    def test_fsx_security_group_filter_multiple_enis(self):
+        # an ontap file system carries more than one eni, all of which
+        # have to resolve back to the same file system.
+        session_factory = self.replay_flight_data("test_fsx_network_location_sg")
+        p = self.load_policy({
+            "name": "fsx_security_group_filter_multi_eni",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "security-group",
+                "key": "GroupName",
+                "value": "fsx-prod"
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-0e3e2a9e1f5ff7a13")
+        # both of the file system's enis carry the same group, and it
+        # resolves once rather than twice
+        self.assertEqual(
+            resources[0]["c7n:matched-security-groups"], ["sg-0prod00000000000a"])
+
+    def test_fsx_network_location_sg_mismatch(self):
+        session_factory = self.replay_flight_data("test_fsx_network_location_sg")
+        p = self.load_policy({
+            "name": "fsx_network_location_sg",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "network-location",
+                "compare": ["resource", "security-group"],
+                "key": "tag:Env"
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        # the ontap file system's tag matches its security group, the
+        # windows one (Dev) does not match its group (Staging).
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-0bc98cbfb6b356896")
+        self.assertEqual(
+            resources[0]["c7n:NetworkLocation"],
+            [{"reason": "ResourceLocationMismatch",
+              "resource": "Dev",
+              "security-groups": {"sg-0stag00000000000b": "Staging"}},
+             {"reason": "SecurityGroupMismatch",
+              "resource": "Dev",
+              "security-groups": {"sg-0stag00000000000b": "Staging"}}])
+
+    def test_fsx_network_location_permissions(self):
+        p = self.load_policy({
+            "name": "fsx_network_location_permissions",
+            "resource": "aws.fsx",
+            "filters": [{
+                "type": "network-location",
+                "compare": ["resource", "security-group"],
+                "key": "tag:Env"
+            }]
+        })
+        # security groups come off the file system's enis, which the base
+        # network-location filter doesn't account for.
+        self.assertIn("ec2:DescribeNetworkInterfaces", p.get_permissions())
+
     def test_fsx_metrics_filter(self):
         session_factory = self.replay_flight_data('test_fsx_metrics_filter')
         p = self.load_policy(
@@ -1372,3 +1450,45 @@ class TestFSxBackup(BaseTest):
         self.assertEqual(len(resources), 3)
         for r in resources:
             self.assertEqual(len(r['c7n:matched-kms-key']), 1)
+
+
+class TestFSxStorageVirtualMachine(BaseTest):
+
+    def test_svm_query(self):
+        session_factory = self.replay_flight_data("test_fsx_svm_query")
+        p = self.load_policy({
+            "name": "fsx_svm_query",
+            "resource": "aws.fsx-storage-virtual-machine",
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(
+            sorted(r["StorageVirtualMachineId"] for r in resources),
+            ["svm-05b1f4f80089ba22d", "svm-097e3d446a223c732"])
+
+
+class TestFSxStorageVirtualMachineTags(BaseTest):
+
+    def test_svm_tag_and_remove_tag(self):
+        session_factory = self.replay_flight_data("test_fsx_svm_tag")
+        p = self.load_policy({
+            "name": "fsx_svm_tag",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"tag:Env": "absent"}],
+            "actions": [{"type": "tag", "key": "Env", "value": "Prod"}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            "name": "fsx_svm_remove_tag",
+            "resource": "aws.fsx-storage-virtual-machine",
+            "filters": [{"tag:Env": "Prod"}],
+            "actions": [{"type": "remove-tag", "tags": ["Env"]}],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        tags = session_factory().client('resourcegroupstaggingapi').get_resources(
+            ResourceARNList=[resources[0]['ResourceARN']]
+        )['ResourceTagMappingList'][0]['Tags']
+        self.assertEqual([t['Key'] for t in tags], ['Name'])
