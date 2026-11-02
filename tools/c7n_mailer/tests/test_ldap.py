@@ -3,8 +3,10 @@
 
 import unittest
 
+import redis
+
 from common import get_ldap_lookup, PETER, BILL
-from c7n_mailer.ldap_lookup import have_sqlite
+from c7n_mailer.ldap_lookup import have_sqlite, Redis
 
 SKIP_REASON = "Azure Pipelines still broken"
 
@@ -103,3 +105,19 @@ class MailerLdapTest(unittest.TestCase):
         self.ldap_lookup.connection = None
         to_addr = self.ldap_lookup.get_email_to_addrs_from_uid("doesnotexist", manager=True)
         self.assertEqual(to_addr, [])
+
+
+class RedisConnectionTest(unittest.TestCase):
+    def test_host_and_port(self):
+        conn = Redis(redis_host="redis.example.com", redis_port=6380).connection
+        kwargs = conn.connection_pool.connection_kwargs
+        self.assertEqual((kwargs["host"], kwargs["port"]), ("redis.example.com", 6380))
+        self.assertNotEqual(conn.connection_pool.connection_class, redis.SSLConnection)
+
+    def test_url_with_tls(self):
+        conn = Redis(redis_host="ignored", redis_url="rediss://redis.example.com:6380/2").connection
+        kwargs = conn.connection_pool.connection_kwargs
+        self.assertEqual(
+            (kwargs["host"], kwargs["port"], kwargs["db"]), ("redis.example.com", 6380, 2)
+        )
+        self.assertEqual(conn.connection_pool.connection_class, redis.SSLConnection)
