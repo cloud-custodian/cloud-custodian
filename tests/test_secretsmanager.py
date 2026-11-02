@@ -109,6 +109,36 @@ class TestSecretsManager(BaseTest):
         final_tags = client.describe_secret(SecretId="c7n-test-key").get("Tags")
         self.assertFalse(final_tags)
 
+    def test_secrets_manager_tag_sends_only_new_tags(self):
+        # TagResource is additive, so existing tags must not be re-sent: doing so
+        # puts unrelated keys in aws:TagKeys and breaks tag-key-scoped IAM grants.
+        p = self.load_policy(
+            {
+                "name": "secrets-manager-tag-new-only",
+                "resource": "secrets-manager",
+                "actions": [{"type": "tag", "key": "acme_owner", "value": "sec"}],
+            },
+            validate=False,
+        )
+        action = p.resource_manager.actions[0]
+        client = MagicMock()
+        resources = [
+            {
+                "ARN": "arn:aws:secretsmanager:us-east-1:123456789012:secret:app-AbCdEf",
+                "Tags": [
+                    {"Key": "app", "Value": "billing"},
+                    {"Key": "aws:cloudformation:stack-name", "Value": "app-stack"},
+                ],
+            }
+        ]
+        action.process_resource_set(
+            client, resources, [{"Key": "acme_owner", "Value": "sec"}]
+        )
+        client.tag_resource.assert_called_once_with(
+            SecretId=resources[0]["ARN"],
+            Tags=[{"Key": "acme_owner", "Value": "sec"}],
+        )
+
     def test_mark_secret_for_op(self):
         self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
         session = self.replay_flight_data("test_secrets_manager_mark_for_op")
