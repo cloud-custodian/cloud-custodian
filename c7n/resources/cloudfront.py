@@ -412,6 +412,7 @@ class MismatchS3Origin(Filter):
         for r in resources:
             r['c7n:mismatched-s3-origin'] = []
             for x in r['Origins']['Items']:
+                target_bucket = None
                 if 'S3OriginConfig' in x:
                     bucket_match = self.s3_prefix.match(x['DomainName'])
                     if bucket_match:
