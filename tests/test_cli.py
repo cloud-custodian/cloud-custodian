@@ -549,6 +549,39 @@ class RunTest(CliTest):
             ]
         )
 
+    def run_lambda_groups(self, errored=()):
+        from c7n import mu, policy
+
+        grouped, provisioned = [], []
+
+        def publish(manager):
+            grouped.extend(p.name for members in manager.groups.values() for p in members)
+            return list(errored)
+
+        self.patch(mu.PolicyLambdaGroupManager, "publish", publish)
+        self.patch(
+            policy.LambdaMode, "provision",
+            lambda mode: provisioned.append(mode.policy.name))
+
+        mode = {"type": "cloudtrail", "role": "custodian", "events": ["RunInstances"]}
+        yaml_file = self.write_policy_file({"policies": [
+            {"name": "ec2-a", "resource": "ec2", "mode": dict(mode, group=True)},
+            {"name": "ec2-b", "resource": "ec2", "mode": dict(mode, group=True)},
+            {"name": "ec2-c", "resource": "ec2", "mode": mode}]})
+        argv = ["custodian", "run", "-s", self.get_temp_dir(), yaml_file]
+        if errored:
+            self.run_and_expect_failure(argv, 2)
+        else:
+            self.run_and_expect_success(argv)
+        return sorted(grouped), provisioned
+
+    def test_lambda_groups(self):
+        self.assertEqual(self.run_lambda_groups(), (["ec2-a", "ec2-b"], ["ec2-c"]))
+
+    def test_lambda_groups_error(self):
+        self.assertEqual(
+            self.run_lambda_groups(errored=["ec2-a"]), (["ec2-a", "ec2-b"], ["ec2-c"]))
+
     def test_vars_file(self):
         session_factory = self.replay_flight_data(
             "test_ec2_state_transition_age_filter"
