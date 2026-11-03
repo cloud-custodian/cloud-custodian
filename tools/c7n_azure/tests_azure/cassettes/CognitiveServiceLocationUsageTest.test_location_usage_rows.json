@@ -1,0 +1,1196 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "3510"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: EDGE000000000 Ref C: 2026-11-02T21:06:18Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 21:06:18 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "00000000-0000-0000-0000-000000000001",
+                        "00000000-0000-0000-0000-000000000002",
+                        "00000000-0000-0000-0000-000000000003"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-location-usage/providers/Microsoft.CognitiveServices/accounts/cctestlocusage509223813757glb",
+                                "name": "cctestlocusage509223813757glb",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"68075c54-0000-0100-0000-6ae8fb0c0000\"",
+                                "location": "global",
+                                "sku": {
+                                    "name": "S1"
+                                },
+                                "kind": "TextTranslation",
+                                "properties": {
+                                    "endpoint": "https://api.cognitive.microsofttranslator.com/",
+                                    "internalId": "00000000000000000000000000000001",
+                                    "dateCreated": "2026-11-02T21:05:14.9563456Z",
+                                    "callRateLimit": {
+                                        "rules": [
+                                            {
+                                                "key": "documentTranslation.post",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "translator/text/batch/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "documentTranslation.get",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "translator/text/batch/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "documentTranslation.default",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "translator/text/batch/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textTranslation",
+                                                "renewalPeriod": 1,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "translator/text/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "singledocumentTranslation.default",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "translator/document:translate",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "batchDocumentTranslation.post",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "translator/document/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "batchDocumentTranslation.get",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "translator/document/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "batchDocumentTranslation.default",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "translator/document/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "token",
+                                                "renewalPeriod": 1,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "sts/v1.0/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "container.billing",
+                                                "renewalPeriod": 10,
+                                                "count": 500,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "billing/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "default",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "isMigrated": false,
+                                    "allowProjectManagement": false,
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "capabilities": [
+                                        {
+                                            "name": "VirtualNetworks"
+                                        },
+                                        {
+                                            "name": "EnabledApimVnet",
+                                            "value": "true"
+                                        },
+                                        {
+                                            "name": "NetworkSecurityPerimeter"
+                                        },
+                                        {
+                                            "name": "CustomerManagedKey"
+                                        }
+                                    ],
+                                    "endpoints": {
+                                        "TextTranslation-Global": "https://api.cognitive.microsofttranslator.com/",
+                                        "TextTranslation": "https://api.cognitive.microsoft.com/",
+                                        "DocumentTranslation": "https://api.cognitive.microsoft.com/",
+                                        "Token": "https://api.cognitive.microsoft.com/",
+                                        "Container": "https://api.cognitive.microsoft.com/",
+                                        "CustomTranslator": "https://api.cognitive.microsoft.com/"
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-11-02T21:05:14.5943612Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-11-02T21:05:14.5943612Z"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=cctestpage2"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=cctestpage2",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "10793"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: EDGE000000000 Ref C: 2026-11-02T21:06:19Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 21:06:19 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "00000000-0000-0000-0000-000000000004",
+                        "00000000-0000-0000-0000-000000000005"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-location-usage/providers/Microsoft.CognitiveServices/accounts/cctestlocusage509223813757wus",
+                                "name": "cctestlocusage509223813757wus",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"4f010754-0000-0700-0000-6ae8fb2b0000\"",
+                                "location": "westus",
+                                "sku": {
+                                    "name": "S0"
+                                },
+                                "kind": "OpenAI",
+                                "properties": {
+                                    "endpoint": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                    "internalId": "00000000000000000000000000000002",
+                                    "dateCreated": "2026-11-02T21:05:15.1404072Z",
+                                    "apiProperties": {},
+                                    "callRateLimit": {
+                                        "rules": [
+                                            {
+                                                "key": "openai.dalle.post",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "dalle/*",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/images/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.dalle.other",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "dalle/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/operations/images/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.assistants.list",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/assistants",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.threads.list",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/threads",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.vectorstores.list",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/vector_stores",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.vectorstores.post",
+                                                "renewalPeriod": 1,
+                                                "count": 60,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/vector_stores",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/vector_stores/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.assistants.default",
+                                                "renewalPeriod": 60,
+                                                "count": 6000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/assistants",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/assistants/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/threads",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/threads/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/vector_stores",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/vector_stores/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.responses.default",
+                                                "renewalPeriod": 1,
+                                                "count": 100000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/responses",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/responses/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.batches.post",
+                                                "renewalPeriod": 60,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/batches",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/batches",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.batches.get",
+                                                "renewalPeriod": 60,
+                                                "count": 500,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/batches/*",
+                                                        "method": "GET"
+                                                    },
+                                                    {
+                                                        "path": "openai/batches/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.batches.list",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/batches",
+                                                        "method": "GET"
+                                                    },
+                                                    {
+                                                        "path": "openai/batches",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.moderations.post",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/moderations",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/v1/moderations/exp/m4",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/v1/moderations/exp/safeberry",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/v1/safeberry/moderations",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "default",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "isMigrated": false,
+                                    "allowProjectManagement": false,
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "capabilities": [
+                                        {
+                                            "name": "VirtualNetworks"
+                                        },
+                                        {
+                                            "name": "CustomerManagedKey"
+                                        },
+                                        {
+                                            "name": "EnabledApimVnet",
+                                            "value": "true"
+                                        },
+                                        {
+                                            "name": "useEndpointRateLimiter",
+                                            "value": "Enabled"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneCount",
+                                            "value": "500"
+                                        },
+                                        {
+                                            "name": "MaxRunningFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "MaxUserFileCount",
+                                            "value": "100"
+                                        },
+                                        {
+                                            "name": "MaxTrainingFileSize",
+                                            "value": "512000000"
+                                        },
+                                        {
+                                            "name": "MaxUserFileImportDurationInHours",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneJobDurationInHours",
+                                            "value": "720"
+                                        },
+                                        {
+                                            "name": "MaxEvaluationRunDurationInHours",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningEvaluationCount",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningGlobalStandardFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "TrustedServices",
+                                            "value": "Microsoft.CognitiveServices,Microsoft.MachineLearningServices,Microsoft.Search,Microsoft.VideoIndexer"
+                                        },
+                                        {
+                                            "name": "NetworkSecurityPerimeter"
+                                        },
+                                        {
+                                            "name": "RaiMonitor"
+                                        },
+                                        {
+                                            "name": "quotaRefundsEnabled",
+                                            "value": "false"
+                                        }
+                                    ],
+                                    "endpoints": {
+                                        "OpenAI Language Model Instance API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "OpenAI Dall-E API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "OpenAI Sora API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "OpenAI Moderations API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "OpenAI Whisper API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "OpenAI Model Scaleset API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "OpenAI Realtime API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "Token Service API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "Azure OpenAI Legacy API - Latest moniker": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "OpenAI Response API on Websocket": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "OpenAI Realtime Translation WebSocket API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/",
+                                        "OpenAI Realtime Live WebSocket API": "https://cctestlocusage509223813757wus-00002.openai.azure.com/"
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-11-02T21:05:14.5517355Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-11-02T21:05:14.5517355Z"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-location-usage/providers/Microsoft.CognitiveServices/accounts/cctestlocusage509223813757wus3",
+                                "name": "cctestlocusage509223813757wus3",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"2901552d-0000-4d00-0000-6ae8fb300000\"",
+                                "location": "westus3",
+                                "sku": {
+                                    "name": "S0"
+                                },
+                                "kind": "OpenAI",
+                                "properties": {
+                                    "endpoint": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                    "internalId": "00000000000000000000000000000003",
+                                    "dateCreated": "2026-11-02T21:05:14.8282984Z",
+                                    "apiProperties": {},
+                                    "callRateLimit": {
+                                        "rules": [
+                                            {
+                                                "key": "openai.dalle.post",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "dalle/*",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/images/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.dalle.other",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "dalle/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/operations/images/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.assistants.list",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/assistants",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.threads.list",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/threads",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.vectorstores.list",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/vector_stores",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.vectorstores.post",
+                                                "renewalPeriod": 1,
+                                                "count": 60,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/vector_stores",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/vector_stores/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.assistants.default",
+                                                "renewalPeriod": 60,
+                                                "count": 6000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/assistants",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/assistants/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/threads",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/threads/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/vector_stores",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/vector_stores/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.responses.default",
+                                                "renewalPeriod": 1,
+                                                "count": 100000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/responses",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "openai/responses/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.batches.post",
+                                                "renewalPeriod": 60,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/batches",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/batches",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.batches.get",
+                                                "renewalPeriod": 60,
+                                                "count": 500,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/batches/*",
+                                                        "method": "GET"
+                                                    },
+                                                    {
+                                                        "path": "openai/batches/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.batches.list",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/batches",
+                                                        "method": "GET"
+                                                    },
+                                                    {
+                                                        "path": "openai/batches",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai.moderations.post",
+                                                "renewalPeriod": 60,
+                                                "count": 120,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/v1/moderations",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/v1/moderations/exp/m4",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/v1/moderations/exp/safeberry",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "openai/v1/safeberry/moderations",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "openai",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "openai/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "default",
+                                                "renewalPeriod": 1,
+                                                "count": 30,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "isMigrated": false,
+                                    "allowProjectManagement": false,
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "capabilities": [
+                                        {
+                                            "name": "VirtualNetworks"
+                                        },
+                                        {
+                                            "name": "CustomerManagedKey"
+                                        },
+                                        {
+                                            "name": "EnabledApimVnet",
+                                            "value": "true"
+                                        },
+                                        {
+                                            "name": "useEndpointRateLimiter",
+                                            "value": "Enabled"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneCount",
+                                            "value": "500"
+                                        },
+                                        {
+                                            "name": "MaxRunningFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "MaxUserFileCount",
+                                            "value": "100"
+                                        },
+                                        {
+                                            "name": "MaxTrainingFileSize",
+                                            "value": "512000000"
+                                        },
+                                        {
+                                            "name": "MaxUserFileImportDurationInHours",
+                                            "value": "1"
+                                        },
+                                        {
+                                            "name": "MaxFineTuneJobDurationInHours",
+                                            "value": "720"
+                                        },
+                                        {
+                                            "name": "MaxEvaluationRunDurationInHours",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningEvaluationCount",
+                                            "value": "5"
+                                        },
+                                        {
+                                            "name": "MaxRunningGlobalStandardFineTuneCount",
+                                            "value": "3"
+                                        },
+                                        {
+                                            "name": "TrustedServices",
+                                            "value": "Microsoft.CognitiveServices,Microsoft.MachineLearningServices,Microsoft.Search,Microsoft.VideoIndexer"
+                                        },
+                                        {
+                                            "name": "NetworkSecurityPerimeter"
+                                        },
+                                        {
+                                            "name": "RaiMonitor"
+                                        },
+                                        {
+                                            "name": "quotaRefundsEnabled",
+                                            "value": "false"
+                                        }
+                                    ],
+                                    "endpoints": {
+                                        "OpenAI Language Model Instance API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "OpenAI Dall-E API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "OpenAI Sora API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "OpenAI Moderations API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "OpenAI Whisper API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "OpenAI Model Scaleset API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "OpenAI Realtime API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "Token Service API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "Azure OpenAI Legacy API - Latest moniker": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "OpenAI Response API on Websocket": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "OpenAI Realtime Translation WebSocket API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/",
+                                        "OpenAI Realtime Live WebSocket API": "https://cctestlocusage509223813757wus3-00003.openai.azure.com/"
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-11-02T21:05:14.5384169Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-11-02T21:05:14.5384169Z"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus/usages?api-version=2026-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "115874"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: EDGE000000000 Ref C: 2026-11-02T21:06:20Z"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "296"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 21:06:20 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus/usages/OpenAI.ProvisionedManaged",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "OpenAI.ProvisionedManaged",
+                                    "localizedValue": "Provisioned Managed Throughput Unit"
+                                },
+                                "currentValue": 0,
+                                "limit": 50,
+                                "unit": "Count",
+                                "scopeType": "Classic",
+                                "scopeId": "westus"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus/usages/OpenAI.GlobalProvisionedManaged",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "OpenAI.GlobalProvisionedManaged",
+                                    "localizedValue": "Global Provisioned Managed Throughput Unit"
+                                },
+                                "currentValue": 0,
+                                "limit": 100,
+                                "unit": "Count",
+                                "scopeType": "Global",
+                                "scopeId": "global"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus/usages/OpenAI.DataZoneProvisionedManaged",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "OpenAI.DataZoneProvisionedManaged",
+                                    "localizedValue": "Data Zone Provisioned Managed Throughput Unit"
+                                },
+                                "currentValue": 0,
+                                "limit": 50,
+                                "unit": "Count",
+                                "scopeType": "DataZone",
+                                "scopeId": "us"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus/usages/AccountCount",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "AccountCount",
+                                    "localizedValue": "Maximum Resources per Region"
+                                },
+                                "currentValue": 1,
+                                "limit": 200,
+                                "unit": "Count"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus3/usages?api-version=2026-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "122852"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: EDGE000000000 Ref C: 2026-11-02T21:06:21Z"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "216"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 21:06:21 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus3/usages/OpenAI.ProvisionedManaged",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "OpenAI.ProvisionedManaged",
+                                    "localizedValue": "Provisioned Managed Throughput Unit"
+                                },
+                                "currentValue": 0,
+                                "limit": 50,
+                                "unit": "Count",
+                                "scopeType": "Classic",
+                                "scopeId": "westus3"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus3/usages/OpenAI.GlobalProvisionedManaged",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "OpenAI.GlobalProvisionedManaged",
+                                    "localizedValue": "Global Provisioned Managed Throughput Unit"
+                                },
+                                "currentValue": 0,
+                                "limit": 100,
+                                "unit": "Count",
+                                "scopeType": "Global",
+                                "scopeId": "global"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus3/usages/OpenAI.DataZoneProvisionedManaged",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "OpenAI.DataZoneProvisionedManaged",
+                                    "localizedValue": "Data Zone Provisioned Managed Throughput Unit"
+                                },
+                                "currentValue": 0,
+                                "limit": 50,
+                                "unit": "Count",
+                                "scopeType": "DataZone",
+                                "scopeId": "us"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/westus3/usages/AccountCount",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "AccountCount",
+                                    "localizedValue": "Maximum Resources per Region"
+                                },
+                                "currentValue": 1,
+                                "limit": 200,
+                                "unit": "Count"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/global/usages?api-version=2026-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "27891"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: EDGE000000000 Ref C: 2026-11-02T21:06:22Z"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "213"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 21:06:22 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/global/usages/OpenAI.GlobalProvisionedManaged",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "OpenAI.GlobalProvisionedManaged",
+                                    "localizedValue": "Global Provisioned Managed Throughput Unit"
+                                },
+                                "currentValue": 0,
+                                "limit": 100,
+                                "unit": "Count",
+                                "scopeType": "Classic",
+                                "scopeId": "global"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/locations/global/usages/AccountCount",
+                                "type": "Microsoft.CognitiveServices/locations/usages",
+                                "name": {
+                                    "value": "AccountCount",
+                                    "localizedValue": "Maximum Resources per Region"
+                                },
+                                "currentValue": 1,
+                                "limit": 200,
+                                "unit": "Count"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
