@@ -6,6 +6,7 @@ from collections import Counter
 from types import SimpleNamespace
 from unittest import mock
 
+import pytest
 import requests
 
 import c7n.policy
@@ -66,17 +67,15 @@ class CognitiveServiceLocationUsageUnitTest(BaseTest):
             mock.patch('requests.Session.get', side_effect=responses) as get,
         ):
             rows = manager.source.get_resources(None)
-        self.assertEqual(
-            [r['name']['value'] for r in rows], ['AccountCount', 'OpenAI.ProvisionedManaged']
-        )
-        self.assertEqual(get.call_args_list[0].kwargs['params'], {'api-version': '2026-03-01'})
-        self.assertEqual(get.call_args_list[1].args[0], next_url)
-        self.assertIsNone(get.call_args_list[1].kwargs['params'])
+        assert [r['name']['value'] for r in rows] == ['AccountCount', 'OpenAI.ProvisionedManaged']
+        assert get.call_args_list[0].kwargs['params'] == {'api-version': '2026-03-01'}
+        assert get.call_args_list[1].args[0] == next_url
+        assert get.call_args_list[1].kwargs['params'] is None
 
     def test_arm_actions_are_not_available(self) -> None:
         self.load_usage_policy()
         for action in ('delete', 'tag', 'lock'):
-            with self.subTest(action=action), self.assertRaises(PolicyValidationError):
+            with self.subTest(action=action), pytest.raises(PolicyValidationError):
                 self.load_usage_policy(actions=[{'type': action}])
 
 
@@ -98,16 +97,15 @@ class CognitiveServiceLocationUsageTest(BaseTest):
             (row.get('scopeType'), row['name']['value']) for row in rows
         )
         # Shared quota is listed once, regional quota once per location.
-        self.assertEqual(names[('DataZone', 'OpenAI.DataZoneProvisionedManaged')], 1)
-        self.assertEqual(names[('Classic', 'OpenAI.ProvisionedManaged')], 2)
-        self.assertEqual(
-            sorted(row['c7n:location'] for row in rows if row['name']['value'] == 'AccountCount'),
-            ['global', 'westus', 'westus3'],
-        )
+        assert names[('DataZone', 'OpenAI.DataZoneProvisionedManaged')] == 1
+        assert names[('Classic', 'OpenAI.ProvisionedManaged')] == 2
+        assert sorted(
+            row['c7n:location'] for row in rows if row['name']['value'] == 'AccountCount'
+        ) == ['global', 'westus', 'westus3']
         # The global location returns this row as Classic; the regions' Global row wins.
-        self.assertEqual(names[('Global', 'OpenAI.GlobalProvisionedManaged')], 1)
-        self.assertEqual(names[('Classic', 'OpenAI.GlobalProvisionedManaged')], 0)
+        assert names[('Global', 'OpenAI.GlobalProvisionedManaged')] == 1
+        assert names[('Classic', 'OpenAI.GlobalProvisionedManaged')] == 0
         global_row = next(
             row for row in rows if row['name']['value'] == 'OpenAI.GlobalProvisionedManaged'
         )
-        self.assertEqual(global_row['c7n:location'], 'westus')
+        assert global_row['c7n:location'] == 'westus'

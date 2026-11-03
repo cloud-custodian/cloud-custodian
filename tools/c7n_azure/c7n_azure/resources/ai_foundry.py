@@ -189,9 +189,9 @@ class CognitiveServiceLocationUsageSource(DescribeSource):
         with utils.requests_session(session, max_retries=3) as http:
             for location in locations:
                 url = f'{base_url}/{location}/usages'
-                query = {'api-version': self.manager.resource_type.api_version}
+                params = {'api-version': self.manager.resource_type.api_version}
                 while url:
-                    response = http.get(url, params=query, timeout=30)
+                    response = http.get(url, params=params, timeout=30)
                     response.raise_for_status()
                     payload = response.json()
                     for usage in payload['value']:
@@ -200,7 +200,7 @@ class CognitiveServiceLocationUsageSource(DescribeSource):
                             usage['c7n:location'] = location
                             rows[key] = usage
                     url = payload.get('nextLink')
-                    query = None
+                    params = None
         return list(rows.values())
 
 
