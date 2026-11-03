@@ -1,0 +1,29 @@
+name: "Plumber"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  Plumber:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # ratchet:actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
+      - name: Plumber Score
+        uses: getplumber/plumber@d3536bae4727b9290d9e69ee25c4350ddbcd91cd # ratchet:getplumber/plumber@v0.6.0
+        with:
+          min-points: 85
+          score-push: true
+          # the code scanning upload needs a write token, which pull requests from forks do not get
+          upload-sarif: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}

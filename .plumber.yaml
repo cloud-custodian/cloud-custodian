@@ -1,0 +1,16 @@
+# Plumber overlay: inherits the built-in defaults, only the deltas are listed.
+extends: plumber:default
+version: "2.0"
+
+github:
+  controls:
+    githubActionMustComeFromAuthorizedSources:
+      # keep the curated list of well-known publishers and add the one small
+      # action these workflows already use for Slack notifications (pinned by SHA)
+      includePlumberDefaults: true
+      trustedGithubActions:
+        - ravsamhq/notify-slack-action
+    branchMustBeProtected:
+      # main is the only live branch, release/0.8 is frozen history from 2023
+      namePatterns:
+        - main
