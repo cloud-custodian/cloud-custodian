@@ -7,14 +7,15 @@
                 "Name": "test-zone--use1-az4--x-s3",
                 "CreationDate": {
                     "__class__": "datetime",
-                    "year": 2023,
-                    "month": 12,
-                    "day": 4,
-                    "hour": 16,
-                    "minute": 6,
-                    "second": 8,
-                    "microsecond": 871000
-                }
+                    "year": 2026,
+                    "month": 8,
+                    "day": 27,
+                    "hour": 17,
+                    "minute": 57,
+                    "second": 21,
+                    "microsecond": 545000
+                },
+                "BucketArn": "arn:aws:s3express:us-east-1:644160558196:bucket/test-zone--use1-az4--x-s3"
             }
         ]
     }

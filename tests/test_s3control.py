@@ -1,9 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
+from unittest import mock
 from botocore.exceptions import ClientError
+from .zpill import ACCOUNT_ID
 import pytest
 from pytest_terraform import terraform
+from c7n.resources import s3control
 from .common import (
     BaseTest
 )
@@ -37,6 +40,25 @@ def test_s3_access_point(test, s3_access_point):
         client.get_access_point(
             AccountId=p.options['account_id'], Name=resources[0]['Name']
         )
+
+
+def test_s3_directory_access_point_filter(test):
+    access_point_name = 'c7n-test-cross-account-ap--use1-az4--xa-s3'
+    session_factory = test.replay_flight_data(
+        'test_s3_directory_access_point_filter')
+
+    p = test.load_policy(
+        {
+            'name': 's3-directory-access-point',
+            'resource': 'aws.s3-directory-access-point',
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['Name'] == access_point_name
 
 
 class TestStorageLens(BaseTest):
@@ -167,3 +189,47 @@ class TestMultiRegionAccessPoint(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+def test_s3_directory_access_point_cross_account(test):
+    access_point_name = 'c7n-test-cross-account-ap--use1-az4--xa-s3'
+    session_factory = test.replay_flight_data(
+        'test_s3_directory_access_point_cross_account')
+
+    p = test.load_policy(
+        {
+            'name': 's3-directory-access-point-cross-account',
+            'resource': 'aws.s3-directory-access-point',
+            'filters': [
+                {'type': 'cross-account'},
+            ],
+        },
+        config={'account_id': ACCOUNT_ID},
+        session_factory=session_factory,
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['Name'] == access_point_name
+    assert 'CrossAccountViolations' in resources[0]
+
+
+def test_s3_directory_access_point_cross_account_access_denied(test):
+    p = test.load_policy(
+        {
+            'name': 's3-directory-access-point-cross-account-denied',
+            'resource': 'aws.s3-directory-access-point',
+            'filters': [{'type': 'cross-account'}],
+        },
+        config={'account_id': ACCOUNT_ID},
+    )
+    f = p.resource_manager.filters[0]
+    client = mock.MagicMock()
+    client.get_access_point_policy.side_effect = ClientError(
+        {'Error': {'Code': 'AccessDenied', 'Message': 'not authorized'}},
+        'GetAccessPointPolicy')
+    resource = {'Name': 'c7n-test-denied-ap--use1-az4--xa-s3'}
+    with mock.patch.object(s3control, 'local_session') as ls:
+        ls.return_value.client.return_value = client
+        resources = f.process([resource])
+    assert resources == []
+    assert resource['c7n:DeniedMethods'] == ['get_access_point_policy']
