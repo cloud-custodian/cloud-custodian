@@ -94,6 +94,25 @@ class ArmResourceTest(BaseTest):
 
         self.assertEqual(get_mock.call_count, 1)
 
+    @patch('requests.get')
+    def test_arm_rest_get_token_scope(self, get_mock):
+        # The China cloud endpoint has no trailing slash
+        cases = [
+            ('https://management.azure.com/', 'https://management.azure.com/.default'),
+            ('https://management.chinacloudapi.cn', 'https://management.chinacloudapi.cn/.default'),
+        ]
+        get_mock.return_value = self._mock_response(200, payload={'value': []})
+        for endpoint, expected in cases:
+            manager = GenericArmResource(self.test_context, {})
+            session = MagicMock()
+            session.cloud_endpoints.endpoints.resource_manager = endpoint
+            session.credentials.get_token.return_value = SimpleNamespace(token='token')
+            manager.get_session = MagicMock(return_value=session)
+
+            manager._arm_rest_get('https://first-page')
+
+            session.credentials.get_token.assert_called_once_with(expected)
+
     @arm_template('vm.json')
     @cassette_name('common')
     def test_find_by_name(self):
