@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Rules": [
+            {
+                "ID": "unrelated",
+                "Status": "Enabled",
+                "Filter": {
+                    "Prefix": "other/"
+                },
+                "Expiration": {
+                    "Days": 5
+                }
+            }
+        ]
+    }
+}
