@@ -3,7 +3,7 @@
 from copy import deepcopy
 from c7n.ctx import ExecutionContext
 from c7n.filters import Filter
-from c7n.filters.core import trim_runtime
+from c7n.filters.core import ANNOTATION_KEY, trim_runtime
 from c7n.resources.ec2 import EC2
 from c7n.tags import Tag
 from .common import BaseTest, instance, Bag
@@ -136,6 +136,38 @@ class TestEC2Manager(BaseTest):
                 {"Values": ["CMDBEnvironment", "Owner"], "Name": "tag-key"},
             ]
         })
+
+    def test_filter_resources_does_not_mutate_input(self):
+        ec2 = self.load_policy({
+            'name': 'xyz', 'resource': 'aws.ec2',
+            'filters': [{"State.Name": "running"}]}).resource_manager
+        shared = [instance(State={'Name': 'running'})]
+        original = deepcopy(shared)
+        result = ec2.filter_resources(shared)
+        self.assertEqual(len(result), 1)
+        self.assertIn(ANNOTATION_KEY, result[0])
+        self.assertNotIn(ANNOTATION_KEY, shared[0])
+        self.assertEqual(shared, original)
+
+    def test_filter_resources_list_item_skips_copy(self):
+        """Nested list-item filtering must not deepcopy list elements."""
+        ec2 = self.load_policy({
+            'name': 'xyz', 'resource': 'aws.ec2',
+            'filters': [{
+                'type': 'list-item',
+                'key': 'Tags',
+                'attrs': [{'Key': 'Owner'}],
+            }],
+        }).resource_manager
+        resource = instance(Tags=[
+            {'Key': 'Owner', 'Value': 'team-a'},
+            {'Key': 'Env', 'Value': 'dev'},
+        ])
+        original_tags = deepcopy(resource['Tags'])
+        result = ec2.filter_resources([resource])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(resource['Tags'], original_tags)
+        self.assertNotIn('c7n:_id', result[0]['Tags'][0])
 
     def test_filters(self):
         ec2 = self.load_policy({
