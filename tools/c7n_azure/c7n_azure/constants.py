@@ -55,6 +55,13 @@ ENV_KEYVAULT_SECRET_ID = 'AZURE_KEYVAULT_SECRET'  # nosec
 
 ENV_CLIENT_CERTIFICATE_PATH = 'AZURE_CLIENT_CERTIFICATE_PATH'
 ENV_CLIENT_CERTIFICATE_PASSWORD = 'AZURE_CLIENT_CERTIFICATE_PASSWORD'  # nosec
+# PEM certificate contents, for environments where the certificate cannot be
+# written to disk. Used instead of ENV_CLIENT_CERTIFICATE_PATH.
+ENV_CLIENT_CERTIFICATE_DATA = 'AZURE_CLIENT_CERTIFICATE_DATA'
+# Send the full certificate chain (x5c) in the client assertion so Entra ID can
+# authenticate by certificate subject name and issuer rather than by thumbprint.
+# Required by tenants that trust an issuer instead of registering each public key.
+ENV_CLIENT_SEND_CERTIFICATE_CHAIN = 'AZURE_CLIENT_SEND_CERTIFICATE_CHAIN'
 
 ENV_ACCESS_TOKEN = 'AZURE_ACCESS_TOKEN'  # nosec
 
