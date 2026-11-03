@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Oct 2026 19:43:49 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "481",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/tuningJobs/2995954652073164800",
+    "tunedModelDisplayName": "c7n-test-tuning-job-default-7dbe-cancel",
+    "baseModel": "gemini-2.5-flash-lite",
+    "supervisedTuningSpec": {
+      "trainingDatasetUri": "gs://c7n-vertex-tune-7dbe/train.jsonl",
+      "hyperParameters": {
+        "epochCount": "1"
+      }
+    },
+    "state": "JOB_STATE_PENDING",
+    "createTime": "2026-10-01T19:43:49.878165Z",
+    "updateTime": "2026-10-01T19:43:49.878165Z"
+  }
+}
