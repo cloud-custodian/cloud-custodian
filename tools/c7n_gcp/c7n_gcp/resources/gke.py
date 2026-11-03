@@ -277,7 +277,7 @@ class Delete(MethodAction):
                   - type: value
                     key: name
                     op: regex
-                    value: '^(test-|demo-)*'
+                    value: '^(test-|demo-)'
                 actions:
                   - type: delete
     """
@@ -292,3 +292,53 @@ class Delete(MethodAction):
                         project,
                         resource_info['location'],
                         resource_info['name'])}
+
+
+@KubernetesClusterNodePool.action_registry.register('delete')
+class NodepoolDeleteAction(MethodAction):
+    """Action to delete GKE nodepools
+
+    It is recommended to use a filter to avoid unwanted deletion of GKE nodepools
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-delete-testing-gke-nodepools
+                resource: gcp.gke-nodepool
+                filters:
+                  - type: value
+                    key: name
+                    op: regex
+                    value: '^(test-|demo-)'
+                actions:
+                  - type: delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('container.clusters.update',)
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.source.query.session_factory).get_default_project()
+        # Extract location and cluster name from the nodepool selfLink
+        # selfLink format: projects/{project}/zones/{zone}/clusters/{cluster}/nodePools/{nodepool}
+        project_param_re = re.compile(
+            '.*?/projects/([^/]+)/(?:zones|locations)/([^/]+)/clusters/([^/]+)/nodePools/([^/]+)'
+        )
+        match = re.match(project_param_re, resource['selfLink'])
+        if match:
+            _, location, cluster_name, nodepool_name = match.groups()
+        else:
+            # Fallback: try to extract from parent info
+            parent_info = self.manager._get_parent_resource_info(resource)
+            location = parent_info['location']
+            cluster_name = parent_info['cluster_name']
+            nodepool_name = resource['name']
+
+        return {
+            'name': 'projects/{}/locations/{}/clusters/{}/nodePools/{}'.format(
+                project, location, cluster_name, nodepool_name
+            )
+        }
