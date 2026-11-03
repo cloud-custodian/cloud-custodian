@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200",
+    "content-location": "https://bigtableadmin.googleapis.com/v2/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/instances/c7n-bigtable-instance",
+        "displayName": "Custodian Bigtable",
+        "state": "READY",
+        "type": "PRODUCTION"
+      }
+    ]
+  }
+}
