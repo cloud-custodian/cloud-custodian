@@ -1,6 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import logging
+
+from azure.mgmt.security.models import (
+    NotificationsSourceAlert,
+    NotificationsSourceAttackPath,
+    SecurityContactPropertiesNotificationsByRole,
+)
+
+from c7n.exceptions import PolicyValidationError
+from c7n.utils import type_schema
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta, TypeInfo
 
@@ -189,6 +200,172 @@ class DefenderSecurityContact(QueryResourceManager, metaclass=QueryMeta):
         def extra_args(cls, resource_manager):
             # fix for https://github.com/Azure/azure-sdk-for-python/issues/35996
             return {'api_version': '2023-12-01-preview'}
+
+
+@DefenderSecurityContact.action_registry.register('set-security-contact')
+class SetSecurityContactAction(AzureBaseAction):
+    """Update a Microsoft Defender for Cloud security contact.
+
+    The underlying API replaces the whole security contact, so the current
+    contact is read first and only the properties given in the action are
+    changed. ``notifications-sources``, when given, replaces the existing
+    list of sources.
+
+    :example:
+
+    Set the notification email on security contacts that have none.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-defender-contact-email-remediate
+            resource: azure.defender-contact
+            filters:
+              - type: value
+                key: properties.emails
+                value: empty
+            actions:
+              - type: set-security-contact
+                emails:
+                  - security@example.com
+                is-enabled: true
+                notifications-by-role:
+                  state: "On"
+                  roles:
+                    - Owner
+                notifications-sources:
+                  - source-type: Alert
+                    minimal-severity: High
+    """
+
+    schema = type_schema(
+        'set-security-contact',
+        **{
+            'emails': {
+                'oneOf': [
+                    {'type': 'string', 'minLength': 1},
+                    {
+                        'type': 'array',
+                        'items': {'type': 'string', 'minLength': 1},
+                        'minItems': 1,
+                    },
+                ]
+            },
+            'phone': {'type': 'string'},
+            'is-enabled': {'type': 'boolean'},
+            'notifications-by-role': {
+                'type': 'object',
+                'additionalProperties': False,
+                'minProperties': 1,
+                'properties': {
+                    'state': {'type': 'string', 'enum': ['On', 'Off']},
+                    'roles': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'string',
+                            'enum': ['AccountAdmin', 'ServiceAdmin', 'Owner', 'Contributor'],
+                        },
+                    },
+                },
+            },
+            'notifications-sources': {
+                'type': 'array',
+                'minItems': 1,
+                'items': {
+                    'oneOf': [
+                        {
+                            'type': 'object',
+                            'additionalProperties': False,
+                            'required': ['source-type', 'minimal-severity'],
+                            'properties': {
+                                'source-type': {'enum': ['Alert']},
+                                'minimal-severity': {
+                                    'type': 'string',
+                                    'enum': ['High', 'Medium', 'Low'],
+                                },
+                            },
+                        },
+                        {
+                            'type': 'object',
+                            'additionalProperties': False,
+                            'required': ['source-type', 'minimal-risk-level'],
+                            'properties': {
+                                'source-type': {'enum': ['AttackPath']},
+                                'minimal-risk-level': {
+                                    'type': 'string',
+                                    'enum': ['Critical', 'High', 'Medium', 'Low'],
+                                },
+                            },
+                        },
+                    ]
+                },
+            },
+        }
+    )
+
+    settable = ('emails', 'phone', 'is-enabled', 'notifications-by-role', 'notifications-sources')
+
+    log = logging.getLogger('custodian.azure.defender.SetSecurityContactAction')
+
+    def validate(self):
+        if not any(k in self.data for k in self.settable):
+            raise PolicyValidationError(
+                f"set-security-contact requires at least one of: {', '.join(self.settable)}"
+            )
+        return self
+
+    def _process_resources(self, resources, event):
+        # The base class logs and swallows errors outside pytest, so a failed write
+        # would leave the run looking successful. Set the rest, then raise.
+        self._prepare_processing()
+        failures = []
+        for resource in resources:
+            try:
+                self._log_modified_resource(resource, self._process_resource(resource))
+            except Exception as e:
+                self.log.error(
+                    "Setting security contact '%s' failed: %s",
+                    resource.get('name'), e,
+                    exc_info=True, extra=self._get_action_log_metadata(resource))
+                failures.append(e)
+        if failures:
+            raise failures[0]
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        contact = self.client.security_contacts.get(resource['name'])
+
+        if 'emails' in self.data:
+            emails = self.data['emails']
+            contact.emails = emails if isinstance(emails, str) else ';'.join(emails)
+        if 'phone' in self.data:
+            contact.phone = self.data['phone']
+        if 'is-enabled' in self.data:
+            contact.is_enabled = self.data['is-enabled']
+        if 'notifications-by-role' in self.data:
+            by_role = self.data['notifications-by-role']
+            current = (
+                contact.notifications_by_role or SecurityContactPropertiesNotificationsByRole()
+            )
+            if 'state' in by_role:
+                current.state = by_role['state']
+            if 'roles' in by_role:
+                current.roles = by_role['roles']
+            contact.notifications_by_role = current
+        if 'notifications-sources' in self.data:
+            contact.notifications_sources = [
+                self._build_source(s) for s in self.data['notifications-sources']
+            ]
+
+        self.client.security_contacts.create(resource['name'], contact)
+
+    @staticmethod
+    def _build_source(source):
+        if source['source-type'] == 'Alert':
+            return NotificationsSourceAlert(minimal_severity=source['minimal-severity'])
+        return NotificationsSourceAttackPath(minimal_risk_level=source['minimal-risk-level'])
 
 
 @resources.register("defender-jit-policy")
