@@ -1,0 +1,104 @@
+{
+    "status_code": 200,
+    "data": {
+        "CacheClusters": [
+            {
+                "CacheClusterId": "c7n-nl-ec1",
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:",
+                "CacheNodeType": "cache.t4g.micro",
+                "Engine": "redis",
+                "EngineVersion": "7.1.0",
+                "CacheClusterStatus": "available",
+                "NumCacheNodes": 1,
+                "PreferredAvailabilityZone": "us-east-1d",
+                "CacheClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 7,
+                    "hour": 23,
+                    "minute": 54,
+                    "second": 49,
+                    "microsecond": 661000
+                },
+                "PreferredMaintenanceWindow": "wed:09:00-wed:10:00",
+                "PendingModifiedValues": {},
+                "CacheSecurityGroups": [],
+                "CacheParameterGroup": {
+                    "CacheParameterGroupName": "default.redis7",
+                    "ParameterApplyStatus": "in-sync",
+                    "CacheNodeIdsToReboot": []
+                },
+                "CacheSubnetGroupName": "c7n-nl-csg",
+                "AutoMinorVersionUpgrade": true,
+                "SecurityGroups": [
+                    {
+                        "SecurityGroupId": "sg-0e39ada22191178b0",
+                        "Status": "active"
+                    },
+                    {
+                        "SecurityGroupId": "sg-0744b361de5bd9cf1",
+                        "Status": "active"
+                    }
+                ],
+                "SnapshotRetentionLimit": 0,
+                "SnapshotWindow": "06:30-07:30",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": false,
+                "AtRestEncryptionEnabled": false,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:c7n-nl-ec1",
+                "ReplicationGroupLogDeliveryEnabled": false,
+                "LogDeliveryConfigurations": [],
+                "NetworkType": "ipv4",
+                "IpDiscovery": "ipv4"
+            },
+            {
+                "CacheClusterId": "c7n-nl-ec2",
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:",
+                "CacheNodeType": "cache.t4g.micro",
+                "Engine": "redis",
+                "EngineVersion": "7.1.0",
+                "CacheClusterStatus": "available",
+                "NumCacheNodes": 1,
+                "PreferredAvailabilityZone": "us-east-1d",
+                "CacheClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 7,
+                    "hour": 23,
+                    "minute": 54,
+                    "second": 48,
+                    "microsecond": 204000
+                },
+                "PreferredMaintenanceWindow": "mon:08:30-mon:09:30",
+                "PendingModifiedValues": {},
+                "CacheSecurityGroups": [],
+                "CacheParameterGroup": {
+                    "CacheParameterGroupName": "default.redis7",
+                    "ParameterApplyStatus": "in-sync",
+                    "CacheNodeIdsToReboot": []
+                },
+                "CacheSubnetGroupName": "c7n-nl-csg",
+                "AutoMinorVersionUpgrade": true,
+                "SecurityGroups": [
+                    {
+                        "SecurityGroupId": "sg-0744b361de5bd9cf1",
+                        "Status": "active"
+                    }
+                ],
+                "SnapshotRetentionLimit": 0,
+                "SnapshotWindow": "05:00-06:00",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": false,
+                "AtRestEncryptionEnabled": false,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:c7n-nl-ec2",
+                "ReplicationGroupLogDeliveryEnabled": false,
+                "LogDeliveryConfigurations": [],
+                "NetworkType": "ipv4",
+                "IpDiscovery": "ipv4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

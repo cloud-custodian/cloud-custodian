@@ -122,8 +122,17 @@ class SubnetFilter(net_filters.SubnetFilter):
     """
 
     RelatedIdsExpression = ""
+    groups = None
+
+    def get_subnet_groups(self):
+        return {
+            r['CacheSubnetGroupName']: r for r in
+            self.manager.get_resource_manager(
+                'cache-subnet-group').resources()}
 
     def get_related_ids(self, resources):
+        if self.groups is None:
+            self.groups = self.get_subnet_groups()
         group_ids = set()
         for r in resources:
             group_ids.update(
@@ -132,10 +141,7 @@ class SubnetFilter(net_filters.SubnetFilter):
         return group_ids
 
     def process(self, resources, event=None):
-        self.groups = {
-            r['CacheSubnetGroupName']: r for r in
-            self.manager.get_resource_manager(
-                'cache-subnet-group').resources()}
+        self.groups = self.get_subnet_groups()
         return super(SubnetFilter, self).process(resources, event)
 
 

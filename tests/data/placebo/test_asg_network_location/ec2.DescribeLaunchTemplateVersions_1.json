@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-00fd2c26f2fbca86e",
+                "LaunchTemplateName": "c7n-nl-lt-1",
+                "VersionNumber": 1,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 7,
+                    "hour": 23,
+                    "minute": 51,
+                    "second": 44,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/omar",
+                "DefaultVersion": true,
+                "LaunchTemplateData": {
+                    "ImageId": "ami-07a5b367e8dc8bd92",
+                    "InstanceType": "t3.micro",
+                    "SecurityGroupIds": [
+                        "sg-0e39ada22191178b0",
+                        "sg-0744b361de5bd9cf1"
+                    ]
+                },
+                "Operator": {
+                    "Managed": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
