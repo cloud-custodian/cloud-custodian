@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "securityPolicySummaries": [
+            {
+                "type": "network",
+                "name": "existing-policy",
+                "policyVersion": "MTY4MzY0NTI4NjI4N18x",
+                "createdDate": 1683645286287,
+                "lastModifiedDate": 1683645286287
+            },
+            {
+                "type": "network",
+                "name": "deleted-policy",
+                "policyVersion": "MTY4MzY0NTI4NjI4N18x",
+                "createdDate": 1683645286287,
+                "lastModifiedDate": 1683645286287
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
