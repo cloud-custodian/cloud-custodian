@@ -1,0 +1,55 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 03 Nov 2026 21:33:48 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=376",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1428",
+    "-content-encoding": "gzip",
+    "content-location": "https://vectorsearch.googleapis.com/v1/projects/cloud-custodian/locations/-/collections?alt=json"
+  },
+  "body": {
+    "collections": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/collections/c7n-active",
+        "createTime": "2026-11-03T21:32:29.017316465Z",
+        "updateTime": "2026-11-03T21:32:33.037136424Z",
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "env": "c7n"
+        },
+        "vectorSchema": {
+          "emb": {
+            "denseVector": {
+              "dimensions": 3
+            }
+          }
+        },
+        "displayName": "c7n active collection"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/collections/c7n-unused",
+        "createTime": "2026-11-03T21:32:29.026308299Z",
+        "updateTime": "2026-11-03T21:32:32.873435812Z",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "vectorSchema": {
+          "emb": {
+            "denseVector": {
+              "dimensions": 3
+            }
+          }
+        },
+        "displayName": "c7n unused collection"
+      }
+    ]
+  }
+}

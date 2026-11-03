@@ -86,6 +86,7 @@ def test_gcp_resource_metadata_asset_type():
         'workspace-user',  # not a GCP resource (no asset inventory type)
         'vertex-ai-evaluation-run',  # No asset inventory type yet
         'vertex-ai-metadata-store-artifact',  # Not tracked by asset inventory
+        'vector-search-collection',  # No vectorsearch asset types yet
     ))
     missing = set()
     for k, v in GoogleCloud.resources.items():
