@@ -535,11 +535,11 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
             if not _supports_subscription_filters(r):
                 continue
             found = False
-            filters = (self.manager.retry(
+            response = self.manager.retry(
                 client.describe_subscription_filters,
                 logGroupName=r['logGroupName'],
-                ignore_err_codes=('ResourceNotFoundException',)) or {}).get(
-                    'subscriptionFilters', ())
+                ignore_err_codes=('ResourceNotFoundException',)) or {}
+            filters = response.get('subscriptionFilters', ())
             for f in filters:
                 if 'destinationArn' not in f:
                     continue
@@ -579,11 +579,11 @@ class LogSubscriptionFilter(ValueFilter):
         for r in resources:
             if not _supports_subscription_filters(r):
                 continue
-            filters = (self.manager.retry(
+            response = self.manager.retry(
                 client.describe_subscription_filters,
                 logGroupName=r['logGroupName'],
-                ignore_err_codes=('ResourceNotFoundException',)) or {}).get(
-                    'subscriptionFilters', ())
+                ignore_err_codes=('ResourceNotFoundException',)) or {}
+            filters = response.get('subscriptionFilters', ())
             if not any(filters):
                 continue
             for f in filters:
