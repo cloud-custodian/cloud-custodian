@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "endpoints": [
+            {
+                "endpointArn": "arn:aws:lambda:us-east-1:644160558196:web-function/scoped-api/endpoint/a",
+                "endpointName": "a",
+                "description": "",
+                "endpointType": "HomeRegion",
+                "domainName": "a.scoped-api.lambda.us-east-1.on.aws",
+                "authType": "IamAuth",
+                "autoDeploymentMode": "LatestRevision",
+                "state": "Active",
+                "updateStatus": "Successful",
+                "createdAt": "2026-10-01T12:00:00.000Z",
+                "updatedAt": "2026-10-01T12:00:00.000Z"
+            },
+            {
+                "endpointArn": "arn:aws:lambda:us-east-1:644160558196:web-function/scoped-api/endpoint/b",
+                "endpointName": "b",
+                "description": "",
+                "endpointType": "HomeRegion",
+                "domainName": "b.scoped-api.lambda.us-east-1.on.aws",
+                "authType": "IamAuth",
+                "autoDeploymentMode": "LatestRevision",
+                "state": "Active",
+                "updateStatus": "Successful",
+                "createdAt": "2026-10-01T12:00:00.000Z",
+                "updatedAt": "2026-10-01T12:00:00.000Z"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
