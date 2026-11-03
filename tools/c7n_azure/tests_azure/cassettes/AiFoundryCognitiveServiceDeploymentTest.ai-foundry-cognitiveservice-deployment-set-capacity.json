@@ -1,0 +1,205 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2024-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Oct 2026 00:00:00 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "2048"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy",
+                                "name": "cctestcogdeploy",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"2700bf4d-0000-0100-0000-69bd99e10000\"",
+                                "location": "eastus",
+                                "sku": {
+                                    "name": "S0"
+                                },
+                                "kind": "OpenAI",
+                                "properties": {
+                                    "endpoint": "https://cctestcogdeploy.openai.azure.com/",
+                                    "provisioningState": "Succeeded",
+                                    "customSubDomainName": "cctestcogdeploy",
+                                    "publicNetworkAccess": "Enabled",
+                                    "capabilities": [],
+                                    "endpoints": {
+                                        "OpenAI Language Model Instance API": "https://cctestcogdeploy.openai.azure.com/"
+                                    }
+                                },
+                                "systemData": {
+                                    "createdBy": "kcm0790@gmail.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-03-20T18:42:05.1384444Z",
+                                    "lastModifiedBy": "kcm0790@gmail.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-03-20T19:02:24.0347693Z"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments?api-version=2024-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Oct 2026 00:00:00 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "1024"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments/cctest-gpt4o-ptu",
+                                "type": "Microsoft.CognitiveServices/accounts/deployments",
+                                "name": "cctest-gpt4o-ptu",
+                                "sku": {
+                                    "name": "ProvisionedManaged",
+                                    "capacity": 50
+                                },
+                                "properties": {
+                                    "model": {
+                                        "format": "OpenAI",
+                                        "name": "gpt-4o",
+                                        "version": "2024-11-20"
+                                    },
+                                    "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+                                    "currentCapacity": 50,
+                                    "provisioningState": "Succeeded",
+                                    "rateLimits": []
+                                },
+                                "systemData": {
+                                    "createdBy": "kcm0790@gmail.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-03-20T18:42:05.1384444Z",
+                                    "lastModifiedBy": "kcm0790@gmail.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-03-20T19:02:24.0347693Z"
+                                },
+                                "etag": "\"aabb1234-5678-abcd-ef01-234567890abc\""
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PATCH",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments/cctest-gpt4o-ptu?api-version=2024-10-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Oct 2026 00:00:00 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "512"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
+                    "x-ms-operation-identifier": [
+                        "tenantId=d0353a14-7287-437b-a609-2ae66308ff96,objectId=55930176-0a87-4f7a-a039-6825cd33ab38/eastus/abcdef01-2345-6789-abcd-ef0123456789"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-deployment/providers/Microsoft.CognitiveServices/accounts/cctestcogdeploy/deployments/cctest-gpt4o-ptu",
+                        "type": "Microsoft.CognitiveServices/accounts/deployments",
+                        "name": "cctest-gpt4o-ptu",
+                        "sku": {
+                            "name": "ProvisionedManaged",
+                            "capacity": 0
+                        },
+                        "properties": {
+                            "model": {
+                                "format": "OpenAI",
+                                "name": "gpt-4o",
+                                "version": "2024-11-20"
+                            },
+                            "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+                            "currentCapacity": 0,
+                            "provisioningState": "Succeeded",
+                            "rateLimits": []
+                        },
+                        "systemData": {
+                            "createdBy": "kcm0790@gmail.com",
+                            "createdByType": "User",
+                            "createdAt": "2026-03-20T18:42:05.1384444Z",
+                            "lastModifiedBy": "kcm0790@gmail.com",
+                            "lastModifiedByType": "User",
+                            "lastModifiedAt": "2026-03-20T19:02:24.0347693Z"
+                        },
+                        "etag": "\"aabb1234-5678-abcd-ef01-234567890abc\""
+                    }
+                }
+            }
+        }
+    ]
+}

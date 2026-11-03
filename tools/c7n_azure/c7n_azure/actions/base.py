@@ -5,7 +5,6 @@ Actions to perform on Azure resources
 """
 import abc
 import logging
-import sys
 
 from c7n_azure import constants
 from c7n_azure.utils import ThreadHelper
@@ -63,15 +62,13 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
 
     def _process_resources(self, resources, event):
         self._prepare_processing()
+        processing_errors = []
 
         for r in resources:
             try:
                 result = self._process_resource(r)
                 self._log_modified_resource(r, result)
             except Exception as e:
-                # only executes during test runs
-                if "pytest" in sys.modules:
-                    raise e
                 if isinstance(e, CloudError):
                     self.log.error("{0} failed for '{1}'. {2}".format(
                         self.type, r['name'], e.message),
@@ -80,6 +77,10 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
                     self.log.exception("{0} failed for '{1}'.".format(
                         self.type, r['name']),
                         extra=self._get_action_log_metadata(r))
+                processing_errors.append(e)
+
+        if processing_errors:
+            raise processing_errors[0]
 
     def _prepare_processing(self):
         pass
@@ -94,15 +95,13 @@ class AzureEventAction(EventAction, AzureBaseAction, metaclass=abc.ABCMeta):
 
     def _process_resources(self, resources, event):
         self._prepare_processing()
+        processing_errors = []
 
         for r in resources:
             try:
                 result = self._process_resource(r, event)
                 self._log_modified_resource(r, result)
             except Exception as e:
-                # only executes during test runs
-                if "pytest" in sys.modules:
-                    raise e
                 if isinstance(e, CloudError):
                     self.log.error("{0} failed for '{1}'. {2}".format(
                         self.type, r['name'], e.message),
@@ -111,6 +110,10 @@ class AzureEventAction(EventAction, AzureBaseAction, metaclass=abc.ABCMeta):
                     self.log.exception("{0} failed for '{1}'.".format(
                         self.type, r['name']),
                         extra=self._get_action_log_metadata(r))
+                processing_errors.append(e)
+
+        if processing_errors:
+            raise processing_errors[0]
 
     @abc.abstractmethod
     def _process_resource(self, resource, event):
