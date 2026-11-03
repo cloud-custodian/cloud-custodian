@@ -2733,3 +2733,42 @@ def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_stor
     resources = policy.run()
     assert len(resources) == 1
     assert resources[0]['displayName'] == 'c7n-test-artifact-unlabeled'
+
+
+@pytest.mark.parametrize(
+    'action_name, eligible',
+    [
+        ('delete', ['SUCCEEDED', 'FAILED', 'CANCELLED']),
+        ('cancel', ['QUEUED', 'PENDING', 'RUNNING', 'PAUSED']),
+    ],
+)
+def test_vertexai_pipeline_job_action_states(test, action_name, eligible):
+    policy = test.load_policy(
+        {
+            'name': 'pipeline-job-action-states',
+            'resource': 'gcp.vertex-ai-pipeline-job',
+            'actions': [action_name],
+        },
+    )
+    states = [
+        'UNSPECIFIED',
+        'QUEUED',
+        'PENDING',
+        'RUNNING',
+        'PAUSED',
+        'CANCELLING',
+        'SUCCEEDED',
+        'FAILED',
+        'CANCELLED',
+    ]
+    jobs = [
+        {'name': state, 'state': f'PIPELINE_STATE_{state}'}
+        for state in states
+    ]
+    jobs.append({'name': 'custom-job', 'state': 'JOB_STATE_RUNNING'})
+    action = policy.resource_manager.actions[0]
+    assert [job['name'] for job in action.filter_resources(jobs)] == eligible
+    assert policy.get_permissions() == {
+        'aiplatform.pipelineJobs.list',
+        f'aiplatform.pipelineJobs.{action_name}',
+    }

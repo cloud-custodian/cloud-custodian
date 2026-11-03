@@ -1,0 +1,106 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "pipeline_root": {
+            "value": "gs://c7n-pipeline-33eccd5d/pipelines",
+            "type": "string"
+        },
+        "service_account": {
+            "value": "123456789012-compute@developer.gserviceaccount.com",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "google_project": {
+            "current": {
+                "auto_create_network": null,
+                "billing_account": "0189B3-1C2257-05D123",
+                "deletion_policy": "PREVENT",
+                "effective_labels": {},
+                "folder_id": "",
+                "id": "projects/cloud-custodian",
+                "labels": {},
+                "name": "cloud-custodian",
+                "number": "123456789012",
+                "org_id": "728386023487",
+                "project_id": "cloud-custodian",
+                "tags": null,
+                "terraform_labels": {}
+            }
+        },
+        "google_storage_bucket": {
+            "pipeline": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-pipeline-33eccd5d",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-pipeline-33eccd5d",
+                "project": "cloud-custodian",
+                "project_number": 123456789012,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-pipeline-33eccd5d",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-10-14T18:34:44.467Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-10-14T18:34:44.467Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": false,
+                "updated": "2026-10-14T18:34:44.467Z",
+                "url": "gs://c7n-pipeline-33eccd5d",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "google_storage_bucket_iam_member": {
+            "pipeline": {
+                "bucket": "b/c7n-pipeline-33eccd5d",
+                "condition": [],
+                "etag": "CAI=",
+                "id": "b/c7n-pipeline-33eccd5d/roles/storage.objectUser/serviceAccount:123456789012-compute@developer.gserviceaccount.com",
+                "member": "serviceAccount:123456789012-compute@developer.gserviceaccount.com",
+                "role": "roles/storage.objectUser",
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "M+zNXQ==",
+                "b64_url": "M-zNXQ",
+                "byte_length": 4,
+                "dec": "871157085",
+                "hex": "33eccd5d",
+                "id": "M-zNXQ",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
