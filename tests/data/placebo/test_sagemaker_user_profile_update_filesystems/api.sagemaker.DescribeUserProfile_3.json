@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-1lndajqoikmx",
+        "UserProfileArn": "arn:aws:sagemaker:us-west-2:644160558196:user-profile/d-1lndajqoikmx/c7n-filesystems-superb-tiger",
+        "UserProfileName": "c7n-filesystems-superb-tiger",
+        "HomeEfsFileSystemUid": "200005",
+        "Status": "Updating",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 6,
+            "minute": 57,
+            "second": 0,
+            "microsecond": 367000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 6,
+            "minute": 56,
+            "second": 55,
+            "microsecond": 118000
+        },
+        "UserSettings": {
+            "ExecutionRole": "arn:aws:iam::644160558196:role/c7n-profile-fs-superb-tiger",
+            "CustomFileSystemConfigs": [],
+            "AutoMountHomeEFS": "DefaultAsDomain"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-msjtvfwmgld1",
+        "UserProfileArn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-settings-proud-tahr",
+        "UserProfileName": "c7n-settings-proud-tahr",
+        "HomeEfsFileSystemUid": "200005",
+        "Status": "InService",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 31,
+            "second": 22,
+            "microsecond": 675000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 30,
+            "second": 9,
+            "microsecond": 139000
+        },
+        "UserSettings": {
+            "ExecutionRole": "arn:aws:iam::644160558196:role/c7n-profile-updated-proud-tahr",
+            "SecurityGroups": [
+                "sg-0e5f64e06df76375a"
+            ],
+            "SharingSettings": {
+                "NotebookOutputOption": "Disabled",
+                "S3OutputPath": "s3://c7n-profile-sharing-936a1c4268be9e94c4b29aa09b/notebooks/",
+                "S3KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/fe11a702-da1b-4b8d-84b9-9a4d8ce7e1f9"
+            },
+            "SpaceStorageSettings": {
+                "DefaultEbsStorageSettings": {
+                    "DefaultEbsVolumeSizeInGb": 10,
+                    "MaximumEbsVolumeSizeInGb": 30
+                }
+            },
+            "DefaultLandingUri": "app:JupyterServer:",
+            "StudioWebPortal": "DISABLED",
+            "CustomFileSystemConfigs": [],
+            "StudioWebPortalSettings": {
+                "HiddenMlTools": [],
+                "HiddenAppTypes": [],
+                "HiddenInstanceTypes": [],
+                "HiddenSageMakerImageVersionAliases": [],
+                "ExecutionRoleSessionNameMode": "STATIC"
+            },
+            "AutoMountHomeEFS": "Enabled"
+        },
+        "ResponseMetadata": {}
+    }
+}

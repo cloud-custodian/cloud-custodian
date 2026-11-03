@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-msjtvfwmgld1",
+        "UserProfileArn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-apps-proud-tahr",
+        "UserProfileName": "c7n-apps-proud-tahr",
+        "HomeEfsFileSystemUid": "200020",
+        "Status": "Updating",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 32,
+            "second": 11,
+            "microsecond": 729000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 30,
+            "second": 14,
+            "microsecond": 659000
+        },
+        "UserSettings": {
+            "ExecutionRole": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+            "CustomFileSystemConfigs": [],
+            "AutoMountHomeEFS": "DefaultAsDomain"
+        },
+        "ResponseMetadata": {}
+    }
+}

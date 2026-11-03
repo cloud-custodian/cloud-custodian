@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-msjtvfwmgld1",
+        "UserProfileArn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-rstudio-proud-tahr",
+        "UserProfileName": "c7n-rstudio-proud-tahr",
+        "HomeEfsFileSystemUid": "200015",
+        "Status": "InService",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 30,
+            "second": 18,
+            "microsecond": 502000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 30,
+            "second": 14,
+            "microsecond": 601000
+        },
+        "UserSettings": {
+            "ExecutionRole": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+            "RStudioServerProAppSettings": {
+                "AccessStatus": "DISABLED"
+            },
+            "CustomFileSystemConfigs": [],
+            "AutoMountHomeEFS": "DefaultAsDomain"
+        },
+        "ResponseMetadata": {}
+    }
+}
