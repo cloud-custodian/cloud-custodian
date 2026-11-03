@@ -154,6 +154,34 @@ class LogGroupTest(BaseTest):
         self.assertEqual([r["logGroupName"] for r in resources], ["c7n-log-class-standard"])
         self.assertEqual(looked_up, ["c7n-log-class-standard"])
 
+    def test_cross_account_skips_deleted_log_group(self):
+        factory = self.replay_flight_data("test_log_group_cross_account_deleted_group")
+        p = self.load_policy(
+            {
+                "name": "cross-log-deleted",
+                "resource": "log-group",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=factory,
+            config={"account_id": "123456789012"},
+        )
+        resources = p.run()
+        self.assertEqual([r["logGroupName"] for r in resources], ["c7n-log-class-standard"])
+        self.assertEqual(resources[0]["c7n:CrossAccountViolations"], ["644160558196"])
+
+    def test_subscription_filter_skips_deleted_log_group(self):
+        factory = self.replay_flight_data("test_log_group_subscription_filter_deleted_group")
+        p = self.load_policy(
+            {
+                "name": "subscription-filter-deleted",
+                "resource": "log-group",
+                "filters": [{"type": "subscription-filter"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual([r["logGroupName"] for r in resources], ["c7n-log-class-standard"])
+
     def test_kms_filter(self):
         session_factory = self.replay_flight_data('test_log_group_kms_filter')
         kms = session_factory().client('kms')
