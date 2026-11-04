@@ -38,6 +38,135 @@ class UserPool(BaseTest):
         self.assertEqual(len(remainder), 1)
         self.assertNotEqual(remainder[0]["Name"], "test-delete-user-pool")
 
+    def test_user_pool_app_client_implicit_grant(self):
+        factory = self.replay_flight_data("test_cognito_user_pool_app_client")
+        p = self.load_policy(
+            {
+                "name": "user-pool-client-implicit-grant",
+                "resource": "user-pool",
+                "filters": [
+                    {
+                        "type": "app-client",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "AllowedOAuthFlows",
+                                "value": "implicit",
+                                "op": "contains",
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual([r["Name"] for r in resources], ["c7n-app-client-noncompliant"])
+        self.assertEqual(
+            [c["ClientName"] for c in resources[0]["c7n:MatchedAppClients"]],
+            ["c7n-implicit-password-client"],
+        )
+        for app_client in resources[0]["c7n:AppClients"]:
+            self.assertNotIn("ClientSecret", app_client)
+            self.assertIn("c7n:HasClientSecret", app_client)
+
+    def test_user_pool_app_client_password_auth_without_secret(self):
+        factory = self.replay_flight_data("test_cognito_user_pool_app_client")
+        p = self.load_policy(
+            {
+                "name": "user-pool-client-password-auth-without-secret",
+                "resource": "user-pool",
+                "filters": [
+                    {
+                        "type": "app-client",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "ExplicitAuthFlows",
+                                "value": "ALLOW_USER_PASSWORD_AUTH",
+                                "op": "contains",
+                            },
+                            {
+                                "type": "value",
+                                "key": '"c7n:HasClientSecret"',
+                                "value": False,
+                            },
+                        ],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual([r["Name"] for r in resources], ["c7n-app-client-noncompliant"])
+        self.assertEqual(
+            [c["ClientName"] for c in resources[0]["c7n:MatchedAppClients"]],
+            ["c7n-implicit-password-client"],
+        )
+
+    def test_user_pool_identity_provider_social(self):
+        factory = self.replay_flight_data("test_cognito_user_pool_identity_provider")
+        p = self.load_policy(
+            {
+                "name": "user-pool-social-identity-providers",
+                "resource": "user-pool",
+                "filters": [
+                    {
+                        "type": "identity-provider",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "ProviderType",
+                                "op": "in",
+                                "value": [
+                                    "Google",
+                                    "Facebook",
+                                    "LoginWithAmazon",
+                                    "SignInWithApple",
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual([r["Name"] for r in resources], ["c7n-idp-noncompliant"])
+        self.assertEqual(
+            [i["ProviderType"] for i in resources[0]["c7n:MatchedIdentityProviders"]],
+            ["Google"],
+        )
+        for provider in resources[0]["c7n:IdentityProviders"]:
+            self.assertNotIn("client_secret", provider.get("ProviderDetails", {}))
+            self.assertNotIn("private_key", provider.get("ProviderDetails", {}))
+
+    def test_user_pool_log_delivery_missing_auth_events(self):
+        factory = self.replay_flight_data("test_cognito_user_pool_log_delivery")
+        p = self.load_policy(
+            {
+                "name": "user-pool-auth-events-not-in-cloudwatch",
+                "resource": "user-pool",
+                "filters": [
+                    {
+                        "type": "log-delivery",
+                        "count": 0,
+                        "attrs": [
+                            {"EventSource": "userAuthEvents"},
+                            {
+                                "type": "value",
+                                "key": "CloudWatchLogsConfiguration.LogGroupArn",
+                                "value": "present",
+                            },
+                        ],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual([r["Name"] for r in resources], ["c7n-log-delivery-noncompliant"])
+
 
 class IdentityPool(BaseTest):
 

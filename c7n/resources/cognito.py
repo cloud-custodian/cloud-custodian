@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.filters import WafV2FilterBase
+from c7n.filters.core import ListItemFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
@@ -126,6 +127,195 @@ class WafV2Filter(WafV2FilterBase):
             'COGNITO_USER_POOL',
             resource['Arn']
         )
+
+
+@CognitoUserPool.filter_registry.register('app-client')
+class UserPoolAppClientFilter(ListItemFilter):
+    """Filter Cognito user pools by the configuration of their app clients
+
+    Attributes are matched against the output of DescribeUserPoolClient.
+    The client secret is never retained; ``c7n:HasClientSecret`` indicates
+    whether the app client has one.
+
+    :example:
+
+    Find user pools with app clients that allow the OAuth implicit grant:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: user-pool-client-implicit-grant
+                resource: aws.user-pool
+                filters:
+                  - type: app-client
+                    attrs:
+                      - type: value
+                        key: AllowedOAuthFlows
+                        value: implicit
+                        op: contains
+
+    Find user pools with app clients that allow password auth without a
+    client secret:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: user-pool-client-password-auth-without-secret
+                resource: aws.user-pool
+                filters:
+                  - type: app-client
+                    attrs:
+                      - type: value
+                        key: ExplicitAuthFlows
+                        value: ALLOW_USER_PASSWORD_AUTH
+                        op: contains
+                      - type: value
+                        key: '"c7n:HasClientSecret"'
+                        value: false
+    """
+    schema = type_schema(
+        'app-client',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = (
+        'cognito-idp:ListUserPoolClients',
+        'cognito-idp:DescribeUserPoolClient',
+    )
+    annotate_items = True
+    item_annotation_key = 'c7n:MatchedAppClients'
+
+    def get_item_values(self, resource):
+        if 'c7n:AppClients' in resource:
+            return resource['c7n:AppClients']
+        client = local_session(self.manager.session_factory).client('cognito-idp')
+        summaries = client.get_paginator('list_user_pool_clients').paginate(
+            UserPoolId=resource['Id'], MaxResults=60
+        ).build_full_result().get('UserPoolClients', [])
+        app_clients = []
+        for summary in summaries:
+            try:
+                app_client = client.describe_user_pool_client(
+                    UserPoolId=resource['Id'], ClientId=summary['ClientId']
+                )['UserPoolClient']
+            except client.exceptions.ResourceNotFoundException:
+                continue
+            app_client['c7n:HasClientSecret'] = bool(
+                app_client.pop('ClientSecret', None))
+            app_clients.append(app_client)
+        resource['c7n:AppClients'] = app_clients
+        return app_clients
+
+
+@CognitoUserPool.filter_registry.register('identity-provider')
+class UserPoolIdentityProviderFilter(ListItemFilter):
+    """Filter Cognito user pools by their federated identity providers
+
+    Attributes are matched against the output of DescribeIdentityProvider.
+    Credential values in ``ProviderDetails`` (``client_secret``,
+    ``private_key``) are never retained.
+
+    :example:
+
+    Find user pools federated with social identity providers:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: user-pool-social-identity-providers
+                resource: aws.user-pool
+                filters:
+                  - type: identity-provider
+                    attrs:
+                      - type: value
+                        key: ProviderType
+                        op: in
+                        value:
+                          - Google
+                          - Facebook
+                          - LoginWithAmazon
+                          - SignInWithApple
+    """
+    schema = type_schema(
+        'identity-provider',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = (
+        'cognito-idp:ListIdentityProviders',
+        'cognito-idp:DescribeIdentityProvider',
+    )
+    annotate_items = True
+    item_annotation_key = 'c7n:MatchedIdentityProviders'
+    secret_provider_details = ('client_secret', 'private_key')
+
+    def get_item_values(self, resource):
+        if 'c7n:IdentityProviders' in resource:
+            return resource['c7n:IdentityProviders']
+        client = local_session(self.manager.session_factory).client('cognito-idp')
+        summaries = client.get_paginator('list_identity_providers').paginate(
+            UserPoolId=resource['Id'], MaxResults=60
+        ).build_full_result().get('Providers', [])
+        providers = []
+        for summary in summaries:
+            try:
+                provider = client.describe_identity_provider(
+                    UserPoolId=resource['Id'], ProviderName=summary['ProviderName']
+                )['IdentityProvider']
+            except client.exceptions.ResourceNotFoundException:
+                continue
+            details = provider.get('ProviderDetails', {})
+            for key in self.secret_provider_details:
+                details.pop(key, None)
+            providers.append(provider)
+        resource['c7n:IdentityProviders'] = providers
+        return providers
+
+
+@CognitoUserPool.filter_registry.register('log-delivery')
+class UserPoolLogDeliveryFilter(ListItemFilter):
+    """Filter Cognito user pools by their log delivery configuration
+
+    Attributes are matched against each entry of ``LogConfigurations``
+    from GetLogDeliveryConfiguration.
+
+    :example:
+
+    Find user pools that do not export user auth events to CloudWatch Logs:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: user-pool-auth-events-not-in-cloudwatch
+                resource: aws.user-pool
+                filters:
+                  - type: log-delivery
+                    count: 0
+                    attrs:
+                      - EventSource: userAuthEvents
+                      - type: value
+                        key: CloudWatchLogsConfiguration.LogGroupArn
+                        value: present
+    """
+    schema = type_schema(
+        'log-delivery',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('cognito-idp:GetLogDeliveryConfiguration',)
+    annotate_items = True
+    item_annotation_key = 'c7n:MatchedLogConfigurations'
+
+    def get_item_values(self, resource):
+        if 'c7n:LogConfigurations' not in resource:
+            client = local_session(self.manager.session_factory).client('cognito-idp')
+            response = client.get_log_delivery_configuration(UserPoolId=resource['Id'])
+            resource['c7n:LogConfigurations'] = response.get(
+                'LogDeliveryConfiguration', {}).get('LogConfigurations', [])
+        return resource['c7n:LogConfigurations']
 
 
 @CognitoUserPool.action_registry.register('delete')

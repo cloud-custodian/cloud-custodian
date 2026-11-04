@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "LogDeliveryConfiguration": {
+            "UserPoolId": "us-east-1_iJ1yC08RP",
+            "LogConfigurations": [
+                {
+                    "LogLevel": "INFO",
+                    "EventSource": "userAuthEvents",
+                    "CloudWatchLogsConfiguration": {
+                        "LogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/vendedlogs/cognito/c7n-log-delivery-compliant"
+                    }
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

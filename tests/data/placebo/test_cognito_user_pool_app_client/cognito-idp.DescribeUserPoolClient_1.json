@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserPoolClient": {
+            "UserPoolId": "us-east-1_6DcUjs62w",
+            "ClientName": "c7n-compliant-client",
+            "ClientId": "4eer6dkhaafmrmkac3ohaeeqv3",
+            "ClientSecret": "hbn2c2ggcksjuhdkr6k2dbfuomoddmdoc0ao9ih9id6o4b72hpn",
+            "LastModifiedDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 4,
+                "hour": 15,
+                "minute": 59,
+                "second": 51,
+                "microsecond": 252000
+            },
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 4,
+                "hour": 15,
+                "minute": 59,
+                "second": 51,
+                "microsecond": 252000
+            },
+            "RefreshTokenValidity": 30,
+            "TokenValidityUnits": {},
+            "ExplicitAuthFlows": [
+                "ALLOW_REFRESH_TOKEN_AUTH",
+                "ALLOW_USER_PASSWORD_AUTH"
+            ],
+            "SupportedIdentityProviders": [
+                "COGNITO"
+            ],
+            "CallbackURLs": [
+                "https://example.com/callback"
+            ],
+            "AllowedOAuthFlows": [
+                "code"
+            ],
+            "AllowedOAuthScopes": [
+                "openid"
+            ],
+            "AllowedOAuthFlowsUserPoolClient": true,
+            "PreventUserExistenceErrors": "ENABLED",
+            "EnableTokenRevocation": true,
+            "EnablePropagateAdditionalUserContextData": false,
+            "AuthSessionValidity": 3
+        },
+        "ResponseMetadata": {}
+    }
+}

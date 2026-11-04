@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "LogDeliveryConfiguration": {
+            "UserPoolId": "us-east-1_CYIbNmI7Y",
+            "LogConfigurations": []
+        },
+        "ResponseMetadata": {}
+    }
+}
