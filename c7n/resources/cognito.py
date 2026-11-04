@@ -185,10 +185,11 @@ class UserPoolAppClientFilter(ListItemFilter):
     )
     annotate_items = True
     item_annotation_key = 'c7n:MatchedAppClients'
+    cache_key = 'c7n:AppClients'
 
     def get_item_values(self, resource):
-        if 'c7n:AppClients' in resource:
-            return resource['c7n:AppClients']
+        if self.cache_key in resource:
+            return resource[self.cache_key]
         client = local_session(self.manager.session_factory).client('cognito-idp')
         summaries = client.get_paginator('list_user_pool_clients').paginate(
             UserPoolId=resource['Id'], MaxResults=60
@@ -204,7 +205,7 @@ class UserPoolAppClientFilter(ListItemFilter):
             app_client['c7n:HasClientSecret'] = bool(
                 app_client.pop('ClientSecret', None))
             app_clients.append(app_client)
-        resource['c7n:AppClients'] = app_clients
+        resource[self.cache_key] = app_clients
         return app_clients
 
 
@@ -249,11 +250,12 @@ class UserPoolIdentityProviderFilter(ListItemFilter):
     )
     annotate_items = True
     item_annotation_key = 'c7n:MatchedIdentityProviders'
+    cache_key = 'c7n:IdentityProviders'
     secret_provider_details = ('client_secret', 'private_key')
 
     def get_item_values(self, resource):
-        if 'c7n:IdentityProviders' in resource:
-            return resource['c7n:IdentityProviders']
+        if self.cache_key in resource:
+            return resource[self.cache_key]
         client = local_session(self.manager.session_factory).client('cognito-idp')
         summaries = client.get_paginator('list_identity_providers').paginate(
             UserPoolId=resource['Id'], MaxResults=60
@@ -270,7 +272,7 @@ class UserPoolIdentityProviderFilter(ListItemFilter):
             for key in self.secret_provider_details:
                 details.pop(key, None)
             providers.append(provider)
-        resource['c7n:IdentityProviders'] = providers
+        resource[self.cache_key] = providers
         return providers
 
 
@@ -308,14 +310,15 @@ class UserPoolLogDeliveryFilter(ListItemFilter):
     permissions = ('cognito-idp:GetLogDeliveryConfiguration',)
     annotate_items = True
     item_annotation_key = 'c7n:MatchedLogConfigurations'
+    cache_key = 'c7n:LogConfigurations'
 
     def get_item_values(self, resource):
-        if 'c7n:LogConfigurations' not in resource:
+        if self.cache_key not in resource:
             client = local_session(self.manager.session_factory).client('cognito-idp')
             response = client.get_log_delivery_configuration(UserPoolId=resource['Id'])
-            resource['c7n:LogConfigurations'] = response.get(
+            resource[self.cache_key] = response.get(
                 'LogDeliveryConfiguration', {}).get('LogConfigurations', [])
-        return resource['c7n:LogConfigurations']
+        return resource[self.cache_key]
 
 
 @CognitoUserPool.action_registry.register('delete')
