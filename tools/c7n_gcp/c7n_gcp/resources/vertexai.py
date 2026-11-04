@@ -683,6 +683,61 @@ class VertexAIEndpointDelete(VertexAIMethodAction):
         return {'name': resource['name']}
 
 
+@resources.register('vertex-ai-index-endpoint')
+class VertexAIIndexEndpoint(VertexAIQueryManager):
+    """GCP Vertex AI Vector Search Index Endpoint Resource
+
+    Index endpoints serve Vector Search indexes. Each deployed index runs
+    dedicated replicas, billed whether or not the index receives queries.
+
+    https://docs.cloud.google.com/gemini-enterprise-agent-platform/reference/rest/v1/projects.locations.indexEndpoints
+
+    Metrics match per endpoint, so an endpoint serving one busy and one idle
+    index counts as busy.
+
+    :example:
+
+    Find index endpoints with a deployed index and no queries in 7 days:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-index-endpoint-idle
+            resource: gcp.vertex-ai-index-endpoint
+            filters:
+              - type: value
+                key: deployedIndexes
+                value: not-null
+              - type: metrics
+                name: aiplatform.googleapis.com/matching_engine/query/request_count
+                aligner: ALIGN_SUM
+                reducer: REDUCE_SUM
+                group-by-fields:
+                  - resource.labels.index_endpoint_id
+                days: 7
+                op: lte
+                value: 0
+                missing-value: 0
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.indexEndpoints'
+        enum_spec = ('list', 'indexEndpoints[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'deployedIndexes[].id', 'createTime', 'updateTime'
+        ]
+        asset_type = 'aiplatform.googleapis.com/IndexEndpoint'
+        permissions = ('aiplatform.indexEndpoints.list',)
+        urn_component = 'index-endpoint'
+        metric_key = 'resource.labels.index_endpoint_id'
+        supported_metric_keys = ('resource.labels.index_endpoint_id',)
+
+        @classmethod
+        def get_metric_resource_name(cls, resource, metric_key=None):
+            # Index endpoint metrics are keyed by the terminal endpoint id.
+            return resource['name'].split('/')[-1]
+
+
 @resources.register('vertex-ai-dataset')
 class VertexAIDataset(VertexAIQueryManager):
     """GCP Vertex AI Dataset Resource
