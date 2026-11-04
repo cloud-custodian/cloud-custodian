@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 04 Nov 2026 19:02:04 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=107",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "235",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudresourcemanager.googleapis.com/v2/folders?parent=folders%2F111111111111&alt=json"
+  },
+  "body": {
+    "folders": [
+      {
+        "name": "folders/333333333333",
+        "parent": "folders/111111111111",
+        "displayName": "c7n-folder-audit",
+        "lifecycleState": "ACTIVE",
+        "createTime": "2026-11-04T19:01:30.319Z"
+      }
+    ]
+  }
+}
