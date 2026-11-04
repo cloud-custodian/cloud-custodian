@@ -12,8 +12,10 @@ class VectorSearchCollection(QueryResourceManager):
 
     https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search-2/reference/rest/v1/projects.locations.collections
 
-    Metrics match on the collection id. Index metrics like ``index/replicas``
-    report an empty collection id, so use the ``index`` filter instead.
+    Metrics match on the collection id, which is only unique within a location,
+    so same-named collections in different locations share metrics. Index
+    metrics like ``index/replicas`` report an empty collection id, so use the
+    ``index`` filter instead.
 
     :example:
 

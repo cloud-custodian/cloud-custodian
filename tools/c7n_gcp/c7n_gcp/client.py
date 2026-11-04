@@ -134,6 +134,9 @@ def _create_service_api(credentials, service_name, version, developer_key=None,
             client options to configure the API endpoint. Used for services that
             require location-specific hostnames (e.g., Vertex AI).
 
+    If the library has no discovery document for the API, a vendored copy in
+    VENDORED_DISCOVERY_DIR is used.
+
     Returns:
         object: A Resource object with methods for interacting with the service.
     """

@@ -9,16 +9,13 @@ from pytest_terraform import terraform
 
 from c7n.filters.core import FilterValidationError
 
-# Leftover collections from an earlier recording run were trimmed from the
-# flight data.
-
 # Requests sent per read method while recording.
 READS = {'search': 3, 'query': 2, 'batch_search': 1, 'aggregate': 4}
 # What Cloud Monitoring reports: a batch search also counts as a search.
 READ_COUNTS = {**READS, 'search': READS['search'] + READS['batch_search']}
 
 
-def read_metric(read):
+def _read_metric(read):
     return f'vectorsearch.googleapis.com/{read}/request_count'
 
 
@@ -32,6 +29,7 @@ def test_vector_search_collection_query(test, vector_search_collection):
         session_factory=factory,
     )
     # One call across all locations returns both.
+    # Leftover collections from an earlier recording were trimmed from this listing.
     collections = sorted(policy.run(), key=lambda r: r['name'])
     assert [r['name'] for r in collections] == [busy, idle]
     assert collections[0]['labels']['env'] == 'c7n'
@@ -54,7 +52,7 @@ def test_vector_search_collection_get(test, vector_search_collection):
     assert collection['displayName'] == 'c7n active collection'
 
 
-def read_until_counted(project_id, collection, timeout=600, interval=15):
+def _read_until_counted(project_id, collection, timeout=600, interval=15):
     """Send READS to a collection and wait until Cloud Monitoring counts them.
 
     Recording only. It uses its own session, so these calls aren't recorded.
@@ -86,7 +84,7 @@ def read_until_counted(project_id, collection, timeout=600, interval=15):
 
     def counted(read):
         params = {
-            'filter': (f'metric.type = "{read_metric(read)}" AND '
+            'filter': (f'metric.type = "{_read_metric(read)}" AND '
                        f'resource.labels.collection = "{collection_id}"'),
             'interval.startTime': start.isoformat(),
             'interval.endTime': datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
@@ -120,7 +118,7 @@ def test_vector_search_collection_read_metrics(test, vector_search_collection):
     idle = vector_search_collection.outputs['idle_name']['value']
     factory = test.replay_flight_data('vector-search-collection-metrics')
     if test.recording:
-        read_until_counted(test.project_id, busy)
+        _read_until_counted(test.project_id, busy)
 
     def run(op, **extra):
         return test.load_policy(
@@ -129,7 +127,7 @@ def test_vector_search_collection_read_metrics(test, vector_search_collection):
                 'resource': 'gcp.vector-search-collection',
                 'filters': [{
                     'type': 'metrics',
-                    'name': read_metric(read),
+                    'name': _read_metric(read),
                     'aligner': 'ALIGN_SUM',
                     'reducer': 'REDUCE_SUM',
                     'group-by-fields': ['resource.labels.collection'],
@@ -142,6 +140,7 @@ def test_vector_search_collection_read_metrics(test, vector_search_collection):
             session_factory=factory,
         ).run()
 
+    # Leftover collections from an earlier recording were trimmed from this listing.
     # The unused collection has no datapoints, so only missing-value matches
     # it. A broken metric key would match both.
     assert [r['name'] for r in run('lte', **{'missing-value': 0})] == [idle]
@@ -150,7 +149,7 @@ def test_vector_search_collection_read_metrics(test, vector_search_collection):
     assert [r['name'] for r in active] == [busy]
     metrics = active[0]['c7n.metrics']
     counts = {
-        read: int(metrics[f'{read_metric(read)}.ALIGN_SUM.REDUCE_SUM']
+        read: int(metrics[f'{_read_metric(read)}.ALIGN_SUM.REDUCE_SUM']
                   ['points'][0]['value']['int64Value'])
         for read in READS
     }
@@ -187,6 +186,7 @@ def test_vector_search_collection_index_filter(test, vector_search_collection):
         },
         session_factory=factory,
     )
+    # Leftover collections from an earlier recording were trimmed from this listing.
     active, unused = sorted(policy.run(), key=lambda r: r['name'])
     assert (active['name'], unused['name']) == (busy, idle)
     assert [i['name'] for i in active['c7n:MatchedIndexes']] == [f'{busy}/indexes/c7n-idx']
@@ -205,19 +205,21 @@ def test_vector_search_collection_index_filter(test, vector_search_collection):
     assert matches(min_replicas('gte', 2)) == []
 
 
-def test_vector_search_collection_metric_key_validation(test):
-    with pytest.raises(FilterValidationError) as ectx:
+def test_vector_search_collection_metrics_invalid_metric_key(test):
+    # Index metrics carry an empty collection_id, so they can't be matched to
+    # a collection.
+    with pytest.raises(
+        FilterValidationError,
+        match="metric-key 'resource.labels.collection_id' not supported",
+    ):
         test.load_policy({
-            'name': 'vector-search-collection-bad-key',
+            'name': 'vector-search-collection-invalid-metric-key',
             'resource': 'gcp.vector-search-collection',
             'filters': [{
                 'type': 'metrics',
                 'name': 'vectorsearch.googleapis.com/index/replicas',
-                # Index metrics carry an empty collection_id, so they can't
-                # be matched to a collection.
                 'metric-key': 'resource.labels.collection_id',
                 'op': 'gt',
                 'value': 0,
             }],
-        })
-    assert "supported keys: resource.labels.collection" in str(ectx.value)
+        }, validate=True)
