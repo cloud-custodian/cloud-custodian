@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction, SetIamPolicy
 from c7n_gcp.filters import IamPolicyFilter, TimeRangeFilter
@@ -181,6 +182,112 @@ class SpannerInstancePatch(MethodAction):
                       'field_mask': ', '.join(['nodeCount'])}
                   }
         return result
+
+
+@SpannerInstance.action_registry.register('set-autoscaling')
+class SpannerInstanceSetAutoscaling(MethodAction):
+    """Enable or update managed autoscaling on a Spanner instance.
+
+    Limits are given either in nodes (``minNodes`` / ``maxNodes``) or in
+    processing units (``minProcessingUnits`` / ``maxProcessingUnits``), not
+    both. ``storageUtilizationPercent`` is required; the CPU targets are
+    optional.
+
+    The maximum can be at most 10 times the minimum.
+
+    The whole ``autoscalingConfig`` is replaced, except that any existing
+    ``asymmetricAutoscalingOptions`` on the instance are kept.
+
+    Managed autoscaling requires the ENTERPRISE or ENTERPRISE_PLUS edition,
+    so instances on any other edition are skipped with a warning.
+
+    GCP action is https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances/patch
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-spanner-instance-enable-autoscaling
+            resource: gcp.spanner-instance
+            filters:
+              - type: value
+                key: instanceType
+                value: PROVISIONED
+              - type: value
+                key: edition
+                op: in
+                value: [ENTERPRISE, ENTERPRISE_PLUS]
+              - type: value
+                key: autoscalingConfig
+                value: absent
+            actions:
+              - type: set-autoscaling
+                minNodes: 1
+                maxNodes: 3
+                highPriorityCpuUtilizationPercent: 65
+                storageUtilizationPercent: 95
+    """
+    node_limits = ('minNodes', 'maxNodes')
+    processing_unit_limits = ('minProcessingUnits', 'maxProcessingUnits')
+
+    schema = type_schema(
+        'set-autoscaling',
+        required=['storageUtilizationPercent'],
+        minNodes={'type': 'integer', 'minimum': 1},
+        maxNodes={'type': 'integer', 'minimum': 1},
+        minProcessingUnits={'type': 'integer', 'minimum': 1000, 'multipleOf': 1000},
+        maxProcessingUnits={'type': 'integer', 'minimum': 1000, 'multipleOf': 1000},
+        highPriorityCpuUtilizationPercent={'type': 'integer', 'minimum': 10, 'maximum': 90},
+        totalCpuUtilizationPercent={'type': 'integer', 'minimum': 10, 'maximum': 90},
+        storageUtilizationPercent={'type': 'integer', 'minimum': 10, 'maximum': 99},
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    # https://cloud.google.com/spanner/docs/managed-autoscaler
+    attr_filter = ('edition', ('ENTERPRISE', 'ENTERPRISE_PLUS'))
+    max_limit_ratio = 10
+
+    def validate(self):
+        has_nodes = any(k in self.data for k in self.node_limits)
+        has_units = any(k in self.data for k in self.processing_unit_limits)
+        if has_nodes == has_units:
+            raise PolicyValidationError(
+                f"{self.type} requires either {' / '.join(self.node_limits)} or "
+                f"{' / '.join(self.processing_unit_limits)}, not both, on {self.manager.data}")
+        low, high = self.node_limits if has_nodes else self.processing_unit_limits
+        if low not in self.data or high not in self.data:
+            raise PolicyValidationError(
+                f"{self.type} requires both {low} and {high} on {self.manager.data}")
+        if self.data[low] > self.data[high]:
+            raise PolicyValidationError(
+                f"{self.type} {low} must not exceed {high} on {self.manager.data}")
+        if self.data[high] > self.max_limit_ratio * self.data[low]:
+            raise PolicyValidationError(
+                f"{self.type} {high} must not exceed {self.max_limit_ratio} times {low} "
+                f"on {self.manager.data}")
+        return self
+
+    def get_resource_params(self, model, resource):
+        limits = {k: self.data[k]
+                  for k in self.node_limits + self.processing_unit_limits
+                  if k in self.data}
+        targets = {k: self.data[k]
+                   for k in ('highPriorityCpuUtilizationPercent',
+                             'totalCpuUtilizationPercent',
+                             'storageUtilizationPercent')
+                   if k in self.data}
+        config = {'autoscalingLimits': limits, 'autoscalingTargets': targets}
+        asymmetric = resource.get('autoscalingConfig', {}).get('asymmetricAutoscalingOptions')
+        if asymmetric:
+            config['asymmetricAutoscalingOptions'] = asymmetric
+        return {'name': resource['name'],
+                'body': {
+                    'instance': {
+                        'name': resource['name'],
+                        'autoscalingConfig': config,
+                    },
+                    'fieldMask': 'autoscalingConfig'}}
 
 
 SpannerInstance.action_registry.register('set-iam-policy', SetIamPolicy)

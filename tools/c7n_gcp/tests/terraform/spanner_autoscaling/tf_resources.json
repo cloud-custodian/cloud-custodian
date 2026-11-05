@@ -1,0 +1,45 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_spanner_instance": {
+            "c7n": {
+                "autoscaling_config": [],
+                "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+                "default_backup_schedule_type": "AUTOMATIC",
+                "deletion_policy": "DELETE",
+                "display_name": "malamute-spanner-as",
+                "edition": "ENTERPRISE",
+                "effective_labels": {
+                    "env": "c7n-test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "force_destroy": false,
+                "id": "cloud-custodian/malamute-spanner-as",
+                "instance_type": "PROVISIONED",
+                "labels": {
+                    "env": "c7n-test"
+                },
+                "name": "malamute-spanner-as",
+                "num_nodes": 1,
+                "processing_units": 1000,
+                "project": "cloud-custodian",
+                "state": "READY",
+                "terraform_labels": {
+                    "env": "c7n-test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        },
+        "random_pet": {
+            "c7n": {
+                "id": "malamute",
+                "keepers": null,
+                "length": 1,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}
