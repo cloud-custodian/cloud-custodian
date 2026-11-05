@@ -95,6 +95,46 @@ Special Values
         - "Versioning.Status": "absent"
 
 
+Required Values
+~~~~~~~~~~~~~~~
+
+The optional ``required`` boolean combines presence and comparison checks:
+
+* ``required: true`` matches only when the selected value is present and
+  satisfies the condition.
+* ``required: false`` matches when the value is absent or satisfies the
+  condition.
+* When omitted, existing comparison behavior is unchanged. For example,
+  ``op: ne`` can match an absent value, whereas ``op: eq`` normally does not.
+
+Presence follows the ``present`` and ``absent`` special values: a missing
+field or a value of ``null`` is absent. Values of ``false``, ``0``, an empty
+string, an empty list, and an empty object are present. Presence is checked
+on the selected value after ``value_regex`` extraction and before
+``value_type`` conversion. A failed ``value_regex`` extraction is absent.
+
+For example, match resources whose Environment tag exists and differs
+from ``prod``:
+
+.. code-block:: yaml
+
+    filters:
+      - type: value
+        key: tag:Environment
+        required: true
+        op: ne
+        value: prod
+
+To match resources whose tag is either absent or equals ``prod``, use
+``required: false`` with ``op: eq`` instead.
+
+The presence rule also applies when comparing special values: combining
+``required: true`` with ``value: absent`` never matches; combining
+``required: false`` with ``value: present`` matches both absent and present
+values. The option is not supported with ``value_type: resource_count``,
+which compares the size of a resource collection rather than a field.
+
+
 Comparison Operators
 ~~~~~~~~~~~~~~~~~~~~
 
