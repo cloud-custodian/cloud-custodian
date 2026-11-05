@@ -19,6 +19,7 @@ import pytest
 
 
 PROJECT_ID = 'cloud-custodian'
+_PROJECT_KEYS = {'project', 'projectId', 'project_id', 'projectNumber', 'project_number'}
 _EMAIL = re.compile(r'[\w.+%-]+@[\w.-]+\.\w+')
 _STAMP = re.compile(r'(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.(\d{1,9}))?(?:Z|\+00:00)')
 
@@ -61,20 +62,41 @@ class RecordedEvent:
         self.project_id = project_id
         self._session = None
         self._results = {}
+        self._project_aliases = {project_id}
+        self._project_metadata_loaded = False
+
+    def _load_project_aliases(self, value):
+        """Resolve numeric identities only when the recording contains them."""
+        if self._project_metadata_loaded:
+            return
+        serialized = json.dumps(value, sort_keys=True)
+        if not (self.project_id.isdigit() or re.search(
+                r'projects/\d+(?=/|"|$)|"project_?[Nn]umber":\s*"?\d+', serialized)):
+            return
+        metadata = self._session.client('cloudresourcemanager', 'v1', 'projects').execute_query(
+            'get', {'projectId': self.project_id})
+        project_id = metadata.get('projectId')
+        project_number = str(metadata.get('projectNumber', ''))
+        if not project_id or not project_number.isdigit() or self.project_id not in (
+                project_id, project_number):
+            raise ValueError('Cannot resolve the recording project identity')
+        self._project_aliases.update((project_id, project_number))
+        self._project_metadata_loaded = True
 
     def _sanitize(self, value, key=''):
         if isinstance(value, dict):
             return {k: self._sanitize(v, k) for k, v in value.items()}
         if isinstance(value, list):
             return [self._sanitize(v, key) for v in value]
+        if key in _PROJECT_KEYS and str(value) in self._project_aliases:
+            return PROJECT_ID
         if not isinstance(value, str):
             return value
         if key == 'callerIp':
             return '198.51.100.1'
-        if value == self.project_id:
-            value = PROJECT_ID
         value = re.sub(
-            r'(?<=projects/){}(?=/|$)'.format(re.escape(self.project_id)),
+            r'(?<=projects/)(?:{})(?=/|$)'.format(
+                '|'.join(re.escape(alias) for alias in sorted(self._project_aliases))),
             PROJECT_ID, value)
         return _EMAIL.sub('user@example.com', value)
 
@@ -99,6 +121,9 @@ class RecordedEvent:
         if self.recording and self._session is None:
             self._session = self.session_factory()
             self.project_id = self._session.get_default_project()
+            self._project_aliases = {self.project_id}
+        if self.recording:
+            self._load_project_aliases([resource_name, labels or {}, after])
         query = self._sanitize({'resource_name': resource_name, 'method': method,
                                 'labels': labels or {}})
         key = hashlib.sha256(json.dumps(query, sort_keys=True).encode()).hexdigest()
@@ -113,6 +138,7 @@ class RecordedEvent:
                 for entry in self._get_entries(resource_name, method, labels or {}):
                     collected[json.dumps(entry, sort_keys=True)] = entry
                 entries = list(collected.values())
+                self._load_project_aliases(entries)
             else:
                 if not path.is_file():
                     raise FileNotFoundError('No recorded audit events at {}'.format(path))
@@ -120,7 +146,8 @@ class RecordedEvent:
                 if payload.get('version') != 1 or payload.get('query') != query:
                     raise ValueError('Invalid audit recording at {}'.format(path))
                 entries = payload['entries']
-            selected = self._select(entries, expression, first, after)
+            selected = self._select(
+                entries, expression, first, after, self._sanitize if self.recording else None)
             if selected is not None:
                 if self.recording:
                     self.directory.mkdir(parents=True, exist_ok=True)
@@ -137,7 +164,7 @@ class RecordedEvent:
             time.sleep(min(poll_interval_seconds, max(0, deadline - time.monotonic())))
 
     @staticmethod
-    def _select(entries, expression, first, after):
+    def _select(entries, expression, first, after, predicate_view=None):
         groups = {}
         seen = set()
         for entry in sorted(entries, key=lambda e: (
@@ -154,7 +181,8 @@ class RecordedEvent:
         # Filter whole operations, not individual entries, so a predicate that
         # matches the initial entry does not hide its completion entry.
         if expression:
-            operations = [g for g in operations if any(expression.search(e) for e in g)]
+            operations = [g for g in operations if any(
+                expression.search(predicate_view(e) if predicate_view else e) for e in g)]
         if isinstance(after, int):
             operations = operations[after + 1:after + 2]
         elif after is not None:
@@ -165,9 +193,11 @@ class RecordedEvent:
         if not operations:
             return None
         candidates = []
+        marked = any((e.get('operation') or {}).get(flag)
+                     for e in operations[0] for flag in ('first', 'last'))
         for entry in operations[0]:
             op = entry.get('operation') or {}
-            if op.get('first' if first else 'last') or not (op.get('first') or op.get('last')):
+            if op.get('first' if first else 'last') or not marked:
                 candidates.append(entry)
         if candidates:
             return candidates[0] if first else candidates[-1]

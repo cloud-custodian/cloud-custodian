@@ -1,7 +1,7 @@
 .. _gcp_recorded_event_fixture:
 
 Packaged audit event fixture
-===========================
+============================
 
 ``c7n_gcp.testing`` provides an opt-in pytest fixture for capturing Cloud
 Audit Log entries and replaying them without querying Cloud Logging. It is
@@ -60,7 +60,8 @@ Multiple operations raise an ambiguity error unless ``after`` is supplied:
   starting strictly after its timestamp. Nanosecond precision is preserved.
 
 The JMESPath expression is a predicate: an operation is retained if any of
-its records matches. Its terminal record remains available even when only
+its records matches. Predicates evaluate the sanitized view in both modes;
+use the placeholder identities in expressions. Its terminal record remains available even when only
 the initial record matches. Missing or incomplete live operations are polled
 until timeout. Visibility is limited to records returned by Cloud Logging;
 later arriving operations can introduce ambiguity in a subsequent lookup.
@@ -77,6 +78,10 @@ after, and JMESPath selectors share that query's recorded entries.
 
 Records on disk replace the live project with ``cloud-custodian``, email
 addresses with ``user@example.com``, and caller IPs with ``198.51.100.1``.
+The recording project ID and numeric project number are treated as aliases.
+When numeric project identities occur, recording resolves them through Cloud
+Resource Manager and requires ``resourcemanager.projects.get`` access.
+Unrelated project references and dataset IDs are preserved.
 Returned live entries retain their original identity for policy execution;
 replayed entries use the placeholders. Review generated files before
 committing them. No policy API flight recordings are produced by this helper.

@@ -293,3 +293,106 @@ def test_registered_fixture_uses_scoped_terraform_replay(
     args = constructor.call_args.args
     assert args[1] is False
     assert args[2] == recorder_tf._c7n_audit_setup[0]
+
+
+@pytest.mark.parametrize('first', [False, True])
+def test_marked_operation_does_not_select_middle_entry(tmp_path, first):
+    initial, terminal = pair()
+    middle = event(1, {'id': '0', 'producer': 'service'})
+    terminal['timestamp'] = '2026-01-01T00:00:02Z'
+    entries = [middle, terminal] if first else [initial, middle]
+    assert testing.RecordedEvent._select(entries, None, first, None) is None
+
+
+def test_polling_waits_for_last_marker_after_middle_entry(tmp_path, monkeypatch):
+    initial, terminal = pair()
+    middle = event(1, {'id': '0', 'producer': 'service'})
+    terminal['timestamp'] = '2026-01-01T00:00:02Z'
+    record, client, _ = recorder(tmp_path, [[initial, middle], [terminal]])
+    monkeypatch.setattr(testing.time, 'sleep', lambda delay: None)
+    assert record('thing', 'create') == terminal
+    assert client.execute_paged_query.call_count == 2
+
+
+def test_predicates_use_sanitized_view_but_live_result_preserves_resource(tmp_path):
+    entry = event(protoPayload={'resourceName': 'projects/live-project/things/t',
+                               'authenticationInfo': {'principalEmail': 'dev@example.org'}})
+    record, _, _ = recorder(tmp_path, [[entry]])
+    predicate = "protoPayload.authenticationInfo.principalEmail == 'user@example.com'"
+    live = record('projects/live-project/things/t', 'create', jmespath=predicate,
+                  timeout_seconds=0)
+    assert live == entry
+    replay = testing.RecordedEvent(tmp_path, False)
+    offline = replay('projects/cloud-custodian/things/t', 'create', jmespath=predicate)
+    assert offline == record._sanitize(live)
+
+
+def test_numeric_project_aliases_use_authoritative_metadata(tmp_path):
+    entry = event(protoPayload={
+        'projectId': 'live-project', 'projectNumber': 123456789012,
+        'resourceName': 'projects/123456789012/things/t',
+        'request': {'datasetId': 'live-project', 'otherDatasetId': '123456789012',
+                    'publicImage': 'projects/987654321098/images/image'},
+    })
+    record, client, _ = recorder(tmp_path, [[entry]])
+    client.execute_query.return_value = {'projectId': 'live-project',
+                                        'projectNumber': '123456789012'}
+    live = record('projects/123456789012/things/t', 'create')
+    assert live == entry
+    data = json.loads(next(tmp_path.iterdir()).read_text())
+    payload = data['entries'][0]['protoPayload']
+    assert payload['projectId'] == 'cloud-custodian'
+    assert payload['projectNumber'] == 'cloud-custodian'
+    assert payload['resourceName'] == 'projects/cloud-custodian/things/t'
+    assert payload['request'] == entry['protoPayload']['request']
+    client.execute_query.assert_called_once_with('get', {'projectId': 'live-project'})
+    assert testing.RecordedEvent(tmp_path, False)(
+        'projects/cloud-custodian/things/t', 'create') == record._sanitize(live)
+
+
+def test_numeric_default_project_also_redacts_named_alias(tmp_path):
+    entry = event(protoPayload={'resourceName': 'projects/live-project/things/t',
+                               'projectNumber': '123456789012'})
+    record, client, factory = recorder(tmp_path, [[entry]])
+    factory.return_value.get_default_project.return_value = '123456789012'
+    client.execute_query.return_value = {'projectId': 'live-project',
+                                        'projectNumber': '123456789012'}
+    record('projects/live-project/things/t', 'create')
+    data = json.loads(next(tmp_path.iterdir()).read_text())
+    assert data['query']['resource_name'] == 'projects/cloud-custodian/things/t'
+    assert data['entries'][0]['protoPayload']['projectNumber'] == 'cloud-custodian'
+
+
+def test_unrelated_numeric_project_is_preserved(tmp_path):
+    record, client, _ = recorder(tmp_path, [[event(resource='projects/987654321098')]])
+    client.execute_query.return_value = {'projectId': 'live-project',
+                                        'projectNumber': '123456789012'}
+    record('thing', 'create')
+    data = json.loads(next(tmp_path.iterdir()).read_text())
+    assert data['entries'][0]['resource'] == 'projects/987654321098'
+
+
+@pytest.mark.parametrize('metadata', [
+    {'projectId': 'another-project', 'projectNumber': '123456789012'},
+    {'projectId': 'live-project'},
+])
+def test_invalid_project_metadata_does_not_write_recording(tmp_path, metadata):
+    record, client, _ = recorder(tmp_path, [[event(resource='projects/123456789012')]])
+    client.execute_query.return_value = metadata
+    with pytest.raises(ValueError, match='recording project identity'):
+        record('thing', 'create')
+    assert not list(tmp_path.iterdir())
+
+
+def test_project_metadata_access_failure_does_not_write_recording(tmp_path):
+    record, client, _ = recorder(tmp_path, [[event(resource='projects/123456789012')]])
+    client.execute_query.side_effect = PermissionError('Project metadata access denied')
+    with pytest.raises(PermissionError, match='metadata access denied'):
+        record('thing', 'create')
+    assert not list(tmp_path.iterdir())
+
+
+def test_named_project_recording_does_not_fetch_metadata(tmp_path):
+    record, client, _ = recorder(tmp_path, [[event(resource='projects/live-project')]])
+    record('thing', 'create')
+    client.execute_query.assert_not_called()
