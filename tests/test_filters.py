@@ -2047,8 +2047,6 @@ class AnnotationSweeperTest(unittest.TestCase):
         self.assertEqual(resources, swept)
 
 
-if __name__ == "__main__":
-    unittest.main()
 
 
 class TestRequiredValueFilter(BaseTest):
@@ -2156,3 +2154,7 @@ class TestRequiredValueFilter(BaseTest):
                 base_filters.ValueFilter({
                     'type': 'value', 'value_type': 'resource_count', 'op': 'gt', 'value': 0,
                     'required': required}).validate()
+
+
+if __name__ == "__main__":
+    unittest.main()
