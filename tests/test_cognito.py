@@ -142,7 +142,7 @@ class UserPool(BaseTest):
             self.assertNotIn("private_key", provider.get("ProviderDetails", {}))
 
     def test_user_pool_log_delivery_missing_auth_events(self):
-        factory = self.record_flight_data("test_cognito_user_pool_log_delivery")
+        factory = self.replay_flight_data("test_cognito_user_pool_log_delivery")
         p = self.load_policy(
             {
                 "name": "user-pool-auth-events-not-in-cloudwatch",
