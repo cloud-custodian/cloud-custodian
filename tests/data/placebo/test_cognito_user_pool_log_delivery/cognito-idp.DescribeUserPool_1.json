@@ -2,8 +2,8 @@
     "status_code": 200,
     "data": {
         "UserPool": {
-            "Id": "us-east-1_CYIbNmI7Y",
-            "Name": "c7n-log-delivery-noncompliant",
+            "Id": "us-east-1_2axHYrTnt",
+            "Name": "c7n-log-delivery-compliant",
             "Policies": {
                 "PasswordPolicy": {
                     "MinimumLength": 8,
@@ -25,21 +25,21 @@
                 "__class__": "datetime",
                 "year": 2026,
                 "month": 11,
-                "day": 4,
-                "hour": 16,
-                "minute": 36,
+                "day": 5,
+                "hour": 11,
+                "minute": 42,
                 "second": 13,
-                "microsecond": 726000
+                "microsecond": 652000
             },
             "CreationDate": {
                 "__class__": "datetime",
                 "year": 2026,
                 "month": 11,
-                "day": 4,
-                "hour": 16,
-                "minute": 36,
+                "day": 5,
+                "hour": 11,
+                "minute": 42,
                 "second": 13,
-                "microsecond": 726000
+                "microsecond": 652000
             },
             "SchemaAttributes": [
                 {
@@ -278,7 +278,7 @@
                 "AllowAdminCreateUserOnly": false,
                 "UnusedAccountValidityDays": 7
             },
-            "Arn": "arn:aws:cognito-idp:us-east-1:644160558196:userpool/us-east-1_CYIbNmI7Y",
+            "Arn": "arn:aws:cognito-idp:us-east-1:644160558196:userpool/us-east-1_2axHYrTnt",
             "AccountRecoverySetting": {
                 "RecoveryMechanisms": [
                     {
@@ -291,7 +291,7 @@
                     }
                 ]
             },
-            "UserPoolTier": "ESSENTIALS",
+            "UserPoolTier": "PLUS",
             "KeyConfiguration": {
                 "KeyType": "AWS_OWNED_KEY"
             },
