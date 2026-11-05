@@ -86,8 +86,8 @@ class DatabricksSetCmkEncryptionAction(AzureBaseAction):
     api_version = '2024-05-01'
 
     def process(self, resources, event=None):
-        # Checked here, not in validate(): policies are validated before
-        # variables are expanded, and an unset variable stays literal text.
+        # Checked here, not in validate(): `custodian validate` and other loaders
+        # validate without expanding variables, so a placeholder would fail there.
         uri = self.data['key-vault-uri']
         if not uri.startswith('https://'):
             raise PolicyExecutionError(
