@@ -414,6 +414,10 @@ class KeyVaultUpdateAction(AzureBaseAction):
     To keep the tenant id the same, set it to "keep"
     To keep the sku settings the same, set it to {"current": True}
 
+    Access policies are not supported here, because the PATCH replaces the
+    vault's existing access policy entries. Use the ``update-access-policy``
+    action instead, which supports both ``add`` and ``replace`` operations.
+
     For more information on Vault patch properties:
 
     https://learn.microsoft.com/en-us/python/api/azure-mgmt-keyvault/azure.mgmt.keyvault.models.vaultpatchproperties?view=azure-python
@@ -437,6 +441,9 @@ class KeyVaultUpdateAction(AzureBaseAction):
     def generate_schema():
         configuration = model_to_jsonschema(models.VaultPatchProperties, models)
         properties = configuration["properties"]
+
+        # handled by the update-access-policy action, which can add or replace
+        del properties["access_policies"]
 
         properties["sku"] = {
             "anyOf": [
@@ -462,15 +469,6 @@ class KeyVaultUpdateAction(AzureBaseAction):
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()
-
-    def make_access_policy_entry(self, acp):
-        permissions = models.Permissions(**acp["permissions"])
-        return models.AccessPolicyEntry(
-            tenant_id=acp["tenant_id"],
-            object_id=acp["object_id"],
-            application_id=acp.get("application_id"),
-            permissions=permissions
-        )
 
     def make_network_acl_rule_set(self, acl):
         ip_rules = [
@@ -501,12 +499,6 @@ class KeyVaultUpdateAction(AzureBaseAction):
 
         if props.get("sku"):
             props["sku"] = models.Sku(**props["sku"])
-
-        if props.get("access_policies"):
-            props["access_policies"] = [
-                self.make_access_policy_entry(p)
-                for p in props["access_policies"]
-            ]
 
         if props.get("network_acls"):
             props["network_acls"] = self.make_network_acl_rule_set(props["network_acls"])

@@ -438,7 +438,6 @@ class KeyVaultUpdateActionTest(BaseTest):
         ('keep_tenant_current_sku', {'tenant_id': 'keep', 'sku': {'current': True}}),
         ('explicit_sku', {'sku': {'family': 'A', 'name': 'premium'}}),
         ('network_acls', {'network_acls': UPDATE_NETWORK_ACLS}),
-        ('access_policies', {'access_policies': [UPDATE_ACCESS_POLICY]}),
         ('retention_days', {'soft_delete_retention_in_days': 7}),
     ])
     def test_update_action_schema_valid(self, _, configuration):
@@ -450,9 +449,8 @@ class KeyVaultUpdateActionTest(BaseTest):
         ('ip_rule_missing_value', {'network_acls': {**UPDATE_NETWORK_ACLS, 'ip_rules': [{}]}}),
         ('vnet_rule_missing_id',
          {'network_acls': {**UPDATE_NETWORK_ACLS, 'virtual_network_rules': [{}]}}),
-        ('access_policy_missing_object_id',
-         {'access_policies': [{'tenant_id': 'tenant', 'permissions': {}}]}),
-        ('access_policy_not_a_list', {'access_policies': UPDATE_ACCESS_POLICY}),
+        # access policies belong to the update-access-policy action
+        ('access_policies_unsupported', {'access_policies': [UPDATE_ACCESS_POLICY]}),
         ('sku_missing_name', {'sku': {'family': 'A'}}),
         ('sku_current_false', {'sku': {'current': False}}),
         ('retention_days_fractional', {'soft_delete_retention_in_days': 7.5}),

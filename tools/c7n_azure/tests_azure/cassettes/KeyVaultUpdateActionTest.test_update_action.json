@@ -14,16 +14,16 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-length": [
-                        "4507"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: B5D18E3DD751404F9616538A951D26A3 Ref B: CHI261140509031 Ref C: 2026-10-23T14:11:02Z"
-                    ],
                     "x-ms-original-request-ids": [
-                        "7c1afdb0-3fad-41dd-9056-e94eecb0de3b",
-                        "86b77806-4df7-4c61-b678-218a35ad1efd",
-                        "99c0fa5f-5839-4904-8fe9-06c2cfffcee7"
+                        "5fd8a6f3-1fd9-4231-b66e-b3ee81352c6d",
+                        "067fe6d3-2f41-4ec2-8b27-a54dff7adbfd",
+                        "f22b2b8e-6aa9-45e0-91ec-7727177b88db"
+                    ],
+                    "content-length": [
+                        "4618"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -31,11 +31,11 @@
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
-                    "date": [
-                        "Fri, 23 Oct 2026 14:11:02 GMT"
+                    "x-msedge-ref": [
+                        "Ref A: 3F0AE33A934840858661A5F9CD0303DF Ref B: CHI261140502036 Ref C: 2026-11-05T20:06:39Z"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "date": [
+                        "Thu, 05 Nov 2026 20:06:41 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -100,9 +100,12 @@
                                 "location": "southcentralus",
                                 "tags": {},
                                 "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-11-05T20:04:50.89Z",
                                     "lastModifiedBy": "user@example.com",
                                     "lastModifiedByType": "User",
-                                    "lastModifiedAt": "2026-10-23T14:08:01.748Z"
+                                    "lastModifiedAt": "2026-11-05T20:04:50.89Z"
                                 },
                                 "properties": {
                                     "sku": {
@@ -193,6 +196,7 @@
                                     "enabledForDeployment": false,
                                     "enabledForDiskEncryption": false,
                                     "enabledForTemplateDeployment": false,
+                                    "enableSoftDelete": true,
                                     "enableRbacAuthorization": false,
                                     "vaultUri": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/",
                                     "provisioningState": "Succeeded",
@@ -249,7 +253,7 @@
                                 }
                             }
                         ],
-                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&%24skiptoken=5ZNNi9swEIb%2fiyg9xbGtxCEJhOJt0nRbWwHH3%2fgiWdrU668gyYnXIf%2b98ran3go97FIQ0owYJN535rmBhvXSKZpSgPUN7OyjHxzBGvyQ8izWul7jBp9YzRo5xUPH2TRva110ROS8OMuibYRuLhZPC2u50BjGRJvTnGiYrZYaJCxfWdAghC70M28vBWVc6G6R81a0T3L6nb2EuKukfhl38QmfC%2b2iStSrG2hASzPUMj9%2bEKX6qi1Zs6H7cKBfVjKJUIsjq3Kivkrib52KGycKO1pXLwRaMo0sw4nTKm%2fQWeXLBCIjjZFBop7T53yOhh1EW3uGhsc5Om02YAKOh8D%2f%2bnmHfM923q0D6ELiB5PuA5nA3sxnnnKgf07Gc%2bZJspfQ3Zb9wS8t10%2fmyLevSnm0e9M9TyJTOJFXkX1opEfztY%2bOb89d%2f%2fF68IOrO6DlWJPuQ5HGHk%2fjCiZxKOg2MNH2oUYwMMB9AjCv7dOJsxOWjPrjOKkxtz1XOTAi4GJeMq6ubtlvCjKwzv4zDjIwyf4g4d268PcsvKr%2fRcMbVv0veMjAHdx%2fAg%3d%3d"
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&%24skiptoken=5ZNbb5swFID%2fizXtKQRiLkoioYmtGVsHrpqQcBEvNnYpIVxkDCOJ8t9n2j3tbXtqNcnyTZbt75zvXEHNRuEVddmB9RVsnF2w34E1eBai7daqWuEa56xitZjjS8%2fZPGsqtetJl%2fGiFUVTd%2brCsp4sc2kpDGOiGDQjCmarpQIJy1Ym1AihltryZigo453qFxlvuuZJzH%2bw8wH3J6EOU999wm2hDPKIvNWGGjQVTbbFxw9dKZ9qSlbb1D1c6NeViEPU4NA8eeF4iqP7Xs5rLzz0tDqdCTRFEpqaFyWnrEatXC9jiLQkQhoJR06PmYEuG4juHB1dvhsot20wA7uHffDtywYFW8d7txFAA4k%2bL6i7FzEcF5m%2blREYj%2fE06ltBXAH9u3J8CErTD2IDBc5PSR5u3nTO5c%2bfYyi6JHoUiXuAXkQnGkk3HhE0BNaTsxfSgcBH4bt73XfvC5lbG9xmAPPKyXPOciwYDSaFpNrO1pfUk%2fY%2b5iXjcuua%2fjY%2fBev0P3M%2fBbP0D%2fvfbRT%2b3v8X%2btcKeMPU%2f1oDKbiB2y8%3d"
                     }
                 }
             }
@@ -257,7 +261,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&$skiptoken=5ZNNi9swEIb/iyg9xbGtxCEJhOJt0nRbWwHH3/giWdrU668gyYnXIf%2B98ran3go97FIQ0owYJN535rmBhvXSKZpSgPUN7OyjHxzBGvyQ8izWul7jBp9YzRo5xUPH2TRva110ROS8OMuibYRuLhZPC2u50BjGRJvTnGiYrZYaJCxfWdAghC70M28vBWVc6G6R81a0T3L6nb2EuKukfhl38QmfC%2B2iStSrG2hASzPUMj9%2BEKX6qi1Zs6H7cKBfVjKJUIsjq3Kivkrib52KGycKO1pXLwRaMo0sw4nTKm/QWeXLBCIjjZFBop7T53yOhh1EW3uGhsc5Om02YAKOh8D/%2BnmHfM923q0D6ELiB5PuA5nA3sxnnnKgf07Gc%2BZJspfQ3Zb9wS8t10/myLevSnm0e9M9TyJTOJFXkX1opEfztY%2BOb89d//F68IOrO6DlWJPuQ5HGHk/jCiZxKOg2MNH2oUYwMMB9AjCv7dOJsxOWjPrjOKkxtz1XOTAi4GJeMq6ubtlvCjKwzv4zDjIwyf4g4d268PcsvKr/RcMbVv0veMjAHdx/Ag%3D%3D",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&$skiptoken=5ZNbb5swFID/izXtKQRiLkoioYmtGVsHrpqQcBEvNnYpIVxkDCOJ8t9n2j3tbXtqNcnyTZbt75zvXEHNRuEVddmB9RVsnF2w34E1eBai7daqWuEa56xitZjjS8/ZPGsqtetJl/GiFUVTd%2BrCsp4sc2kpDGOiGDQjCmarpQIJy1Ym1AihltryZigo453qFxlvuuZJzH%2Bw8wH3J6EOU999wm2hDPKIvNWGGjQVTbbFxw9dKZ9qSlbb1D1c6NeViEPU4NA8eeF4iqP7Xs5rLzz0tDqdCTRFEpqaFyWnrEatXC9jiLQkQhoJR06PmYEuG4juHB1dvhsot20wA7uHffDtywYFW8d7txFAA4k%2BL6i7FzEcF5m%2BlREYj/E06ltBXAH9u3J8CErTD2IDBc5PSR5u3nTO5c%2BfYyi6JHoUiXuAXkQnGkk3HhE0BNaTsxfSgcBH4bt73XfvC5lbG9xmAPPKyXPOciwYDSaFpNrO1pfUk/Y%2B5iXjcuua/jY/Bev0P3M/BbP0D/vfbRT%2B3v8X%2BtcKeMPU/1oDKbiB2y8%3D",
                 "body": null,
                 "headers": {}
             },
@@ -267,16 +271,16 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "x-ms-original-request-ids": [
+                        "ac4b4815-fe8b-43d4-b322-8e922ed07803",
+                        "56c8e07b-6eef-4c09-a6ae-668ac99fa72c",
+                        "09236918-2eca-4619-9a1c-b8ab3826cd9a"
+                    ],
                     "content-length": [
                         "1620"
                     ],
-                    "x-msedge-ref": [
-                        "Ref A: C3A9BB35940941F4BFB85252DCD248E2 Ref B: CHI261140502052 Ref C: 2026-10-23T14:11:03Z"
-                    ],
-                    "x-ms-original-request-ids": [
-                        "fd5a4815-8323-4d98-8f8e-71972f82cd38",
-                        "145ea887-7c8b-4917-92bc-c14a42b86581",
-                        "e59fe1ce-6331-4228-ba7f-c6233ac060d3"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -284,11 +288,11 @@
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
-                    "date": [
-                        "Fri, 23 Oct 2026 14:11:03 GMT"
+                    "x-msedge-ref": [
+                        "Ref A: DE545BE3EE4B403590CFC9EBBC8848C3 Ref B: CHI261140506025 Ref C: 2026-11-05T20:06:42Z"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "date": [
+                        "Thu, 05 Nov 2026 20:06:42 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -362,14 +366,14 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "x-ms-original-request-ids": [
+                        "6ece71da-9948-4f16-891c-7c9767cd9264"
+                    ],
                     "content-length": [
                         "12"
                     ],
-                    "x-msedge-ref": [
-                        "Ref A: 2C4117BB7251408BBF10B3996D709209 Ref B: CHI261140505052 Ref C: 2026-10-23T14:11:04Z"
-                    ],
-                    "x-ms-original-request-ids": [
-                        "1e7a0768-422c-4985-81a1-8e559f217c3a"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -377,11 +381,11 @@
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
-                    "date": [
-                        "Fri, 23 Oct 2026 14:11:03 GMT"
+                    "x-msedge-ref": [
+                        "Ref A: 6A4DB0A303B64A1EAF9DB864337595F0 Ref B: CH1AA2020620031 Ref C: 2026-11-05T20:06:43Z"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "date": [
+                        "Thu, 05 Nov 2026 20:06:42 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -407,32 +411,32 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
                     "date": [
-                        "Fri, 23 Oct 2026 14:11:05 GMT"
+                        "Thu, 05 Nov 2026 20:06:43 GMT"
+                    ],
+                    "content-length": [
+                        "1673"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 3C77AF2D93FE47A7B71851976431183D Ref B: CH1AA2030814023 Ref C: 2026-11-05T20:06:43Z"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-writes": [
                         "2999"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "199"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "azure-deprecating": [
                         "Due to an RBAC security default, Key Vault's Resource Manager API versions older than 2026-02-01 will retire on 2027-04-01 (https://learn.microsoft.com/en-us/azure/key-vault/general/access-control-default?tabs=azure-cli)"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "1547"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 4D658E2D44894749B7E295D444493191 Ref B: CHI261140507054 Ref C: 2026-10-23T14:11:04Z"
                     ]
                 },
                 "body": {
@@ -443,9 +447,12 @@
                         "location": "southcentralus",
                         "tags": {},
                         "systemData": {
+                            "createdBy": "user@example.com",
+                            "createdByType": "User",
+                            "createdAt": "2026-11-05T20:04:50.89Z",
                             "lastModifiedBy": "user@example.com",
                             "lastModifiedByType": "User",
-                            "lastModifiedAt": "2026-10-23T14:11:05.016Z"
+                            "lastModifiedAt": "2026-11-05T20:06:43.864Z"
                         },
                         "properties": {
                             "sku": {
@@ -536,6 +543,7 @@
                             "enabledForDeployment": false,
                             "enabledForDiskEncryption": false,
                             "enabledForTemplateDeployment": false,
+                            "enableSoftDelete": true,
                             "enableRbacAuthorization": false,
                             "vaultUri": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/",
                             "provisioningState": "Succeeded",
@@ -559,28 +567,28 @@
                 },
                 "headers": {
                     "date": [
-                        "Fri, 23 Oct 2026 14:11:05 GMT"
+                        "Thu, 05 Nov 2026 20:06:44 GMT"
+                    ],
+                    "content-length": [
+                        "1673"
                     ],
                     "x-cache": [
                         "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 8287C3D48B0345909534EF839035D322 Ref B: CHI261140502052 Ref C: 2026-11-05T20:06:44Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "azure-deprecating": [
                         "Due to an RBAC security default, Key Vault's Resource Manager API versions older than 2026-02-01 will retire on 2027-04-01 (https://learn.microsoft.com/en-us/azure/key-vault/general/access-control-default?tabs=azure-cli)"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-global-reads": [
-                        "3749"
-                    ],
-                    "content-length": [
-                        "1547"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: EC404B3BE6594FFB8F0FB1E43FDB17AA Ref B: CHI261140509031 Ref C: 2026-10-23T14:11:05Z"
                     ]
                 },
                 "body": {
@@ -591,9 +599,12 @@
                         "location": "southcentralus",
                         "tags": {},
                         "systemData": {
+                            "createdBy": "user@example.com",
+                            "createdByType": "User",
+                            "createdAt": "2026-11-05T20:04:50.89Z",
                             "lastModifiedBy": "user@example.com",
                             "lastModifiedByType": "User",
-                            "lastModifiedAt": "2026-10-23T14:11:05.016Z"
+                            "lastModifiedAt": "2026-11-05T20:06:43.864Z"
                         },
                         "properties": {
                             "sku": {
@@ -684,6 +695,7 @@
                             "enabledForDeployment": false,
                             "enabledForDiskEncryption": false,
                             "enabledForTemplateDeployment": false,
+                            "enableSoftDelete": true,
                             "enableRbacAuthorization": false,
                             "vaultUri": "https://cckeyvault1nculsl5b5flbc.vault.azure.net/",
                             "provisioningState": "Succeeded",
