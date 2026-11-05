@@ -422,6 +422,25 @@ class OrgTest(TestUtils):
             catch_exceptions=False)
         self.assertEqual(result.exit_code, 0)
 
+    def test_run_worker_exception_exit_code(self):
+        run_dir = self.setup_run_dir()
+
+        # in-process executor that stores worker exceptions on the future
+        class AsyncExecutor(org.MainThreadExecutor):
+            c7n_async = True
+
+        run_account = mock.MagicMock(side_effect=RuntimeError("worker died"))
+        self.patch(org, 'run_account', run_account)
+        self.patch(org, 'ProcessPoolExecutor', AsyncExecutor)
+        self.change_cwd(run_dir)
+        runner = CliRunner()
+        result = runner.invoke(
+            org.cli,
+            ['run', '-c', 'accounts.yml', '-u', 'policies.yml',
+             '-s', 'output', '--cache-path', 'cache'],
+            catch_exceptions=False)
+        self.assertEqual(result.exit_code, 1)
+
     # ==================== Tests for c7n-org validate command ====================
 
     def test_validate_command_valid_policy(self):

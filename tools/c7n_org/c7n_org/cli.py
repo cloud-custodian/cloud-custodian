@@ -1397,6 +1397,7 @@ def run(config, use, output_dir, accounts, not_accounts, tags, region,
                 log.warning(
                     "Error running policy in %s @ %s exception: %s",
                     a['name'], r, f.exception())
+                success = False
                 continue
 
             account_region_pcounts, account_region_success = f.result()
