@@ -2107,3 +2107,4 @@ class SmsVoiceAccountTest(BaseTest):
         limits = resources[0]['c7n:SmsVoiceSpendLimits']
         self.assertTrue(limits['TEXT_MESSAGE_MONTHLY_SPEND_LIMIT']['Overridden'])
         self.assertFalse(limits['VOICE_MESSAGE_MONTHLY_SPEND_LIMIT']['Overridden'])
+        self.assertFalse(limits['MEDIA_MESSAGE_MONTHLY_SPEND_LIMIT']['Overridden'])

@@ -2832,7 +2832,8 @@ class SmsVoiceAccountAttributes(ValueFilter):
         client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
         for r in resources:
             if self.annotation_key not in r:
-                attrs = client.describe_account_attributes().get('AccountAttributes', [])
+                attrs = self.manager.retry(
+                    client.describe_account_attributes).get('AccountAttributes', [])
                 r[self.annotation_key] = {a['Name']: a['Value'] for a in attrs}
         return super().process(resources, event)
 
@@ -2878,7 +2879,7 @@ class SmsVoiceSpendLimits(ValueFilter):
         client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
         for r in resources:
             if self.annotation_key not in r:
-                limits = client.describe_spend_limits().get('SpendLimits', [])
+                limits = self.manager.retry(client.describe_spend_limits).get('SpendLimits', [])
                 r[self.annotation_key] = {lim['Name']: lim for lim in limits}
         return super().process(resources, event)
 

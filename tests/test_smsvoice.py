@@ -110,6 +110,19 @@ class SmsVoicePoolTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_arns(resources), [resources[0]['PoolArn']])
 
+    def test_sms_voice_pool_cross_account(self):
+        session_factory = self.replay_flight_data('test_sms_voice_pool_cross_account')
+        p = self.load_policy(
+            {'name': 'sms-voice-pool-cross-account',
+             'resource': 'aws.sms-voice-pool',
+             'filters': [{'type': 'cross-account'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        # one pool shared with a foreign account, others without a resource policy
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(_tag(resources[0]), 'shared')
+        self.assertTrue(resources[0]['CrossAccountViolations'])
+
 
 class SmsVoiceConfigurationSetTest(BaseTest):
 
