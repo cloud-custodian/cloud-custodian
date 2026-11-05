@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import datetime
-from unittest import mock
 
 from azure.keyvault.keys import KeyRotationPolicyAction
 
@@ -179,13 +178,31 @@ class KeyVaultKeyTest(BaseTest):
             datetime.datetime.fromisoformat("2025-03-01 00:00:00+00:00")
         )
 
-    def _rotation_policy_action(self, action):
-        p = self.load_policy({
-            'name': 'test-key-vault-key-set-rotation-policy',
+    def _rotation_policy(self, name, filters=(), actions=()):
+        vault_filter = {
+            'type': 'parent',
+            'filter': {'type': 'value', 'key': 'name', 'value': 'c7ntestvault'}
+        }
+        return self.load_policy({
+            'name': name,
             'resource': 'azure.keyvault-key',
-            'actions': [dict(action, type='set-rotation-policy')]
+            'filters': [vault_filter] + list(filters),
+            'actions': list(actions),
         }, validate=True)
-        return p.resource_manager, p.resource_manager.actions[0]
+
+    def _key_names(self, resources):
+        return sorted(r['id'].rsplit('/', 1)[-1] for r in resources)
+
+    def test_key_vault_keys_rotation_auto_rotation(self):
+        # notify-key has a saved rotation policy that only notifies, so it is never rotated.
+        p = self._rotation_policy('test-key-vault-keys-auto-rotation', filters=[
+            {'type': 'rotation-policy', 'state': 'Disabled', 'auto-rotation': True}])
+        self.assertEqual(self._key_names(p.run()), ['notify-key'])
+
+    def test_key_vault_keys_rotation_notify_only_is_enabled(self):
+        p = self._rotation_policy('test-key-vault-keys-rotation-enabled', filters=[
+            {'type': 'rotation-policy', 'state': 'Enabled'}])
+        self.assertEqual(self._key_names(p.run()), ['notify-key', 'rotate-key'])
 
     def test_key_vault_key_set_rotation_policy_schema(self):
         for action in (
@@ -212,40 +229,37 @@ class KeyVaultKeyTest(BaseTest):
                 }, validate=True)
 
     def test_key_vault_key_set_rotation_policy_action(self):
-        manager, action = self._rotation_policy_action({
+        p = self._rotation_policy('test-key-vault-key-set-rotation-policy', actions=[{
+            'type': 'set-rotation-policy',
             'expires_in': 'P1Y',
             'lifetime_actions': [
                 {'action': 'Rotate', 'trigger': {'time_before_expiry': 'P30D'}},
                 {'action': 'Notify', 'trigger': {'time_after_create': 'P300D'}},
             ]
-        })
-        key = {'id': 'https://c7ntestvault.vault.azure.net/keys/mykey/0123456789'}
-        with mock.patch.object(type(manager), 'get_client') as get_client:
-            action.process([key])
+        }])
+        resources = p.run()
+        self.assertEqual(self._key_names(resources), ['notify-key'])
 
-        get_client.assert_called_once_with(vault_url='https://c7ntestvault.vault.azure.net')
-        client = get_client.return_value
-        client.get_key_rotation_policy.assert_called_once_with('mykey')
-        update = client.update_key_rotation_policy
-        update.assert_called_once()
-        args, kwargs = update.call_args
-        self.assertEqual(args, ('mykey', client.get_key_rotation_policy.return_value))
-        self.assertEqual(kwargs['expires_in'], 'P1Y')
-        rotate, notify = kwargs['lifetime_actions']
+        client = p.resource_manager.get_client(vault_url='https://c7ntestvault.vault.azure.net')
+        policy = client.get_key_rotation_policy('notify-key')
+        self.assertEqual(policy.expires_in, 'P1Y')
+        rotate, notify = policy.lifetime_actions
         self.assertEqual(rotate.action, KeyRotationPolicyAction.rotate)
         self.assertEqual(rotate.time_before_expiry, 'P30D')
-        self.assertIsNone(rotate.time_after_create)
         self.assertEqual(notify.action, KeyRotationPolicyAction.notify)
         self.assertEqual(notify.time_after_create, 'P300D')
-        self.assertIsNone(notify.time_before_expiry)
+        # The policy was read, updated with PUT and read back.
+        self.assertTrue(self.cassette.all_played)
 
     def test_key_vault_key_set_rotation_policy_expires_in_only(self):
-        manager, action = self._rotation_policy_action({'expires_in': 'P90D'})
-        key = {'id': 'https://c7ntestvault.vault.azure.net/keys/mykey/0123456789'}
-        with mock.patch.object(type(manager), 'get_client') as get_client:
-            action.process([key])
+        p = self._rotation_policy('test-key-vault-key-set-rotation-policy-expires-in', actions=[
+            {'type': 'set-rotation-policy', 'expires_in': 'P90D'}])
+        p.run()
 
-        client = get_client.return_value
-        client.update_key_rotation_policy.assert_called_once_with(
-            'mykey', client.get_key_rotation_policy.return_value,
-            expires_in='P90D', lifetime_actions=None)
+        client = p.resource_manager.get_client(vault_url='https://c7ntestvault.vault.azure.net')
+        policy = client.get_key_rotation_policy('notify-key')
+        self.assertEqual(policy.expires_in, 'P90D')
+        # The lifetime actions of the current policy are kept.
+        notify, = policy.lifetime_actions
+        self.assertEqual(notify.action, KeyRotationPolicyAction.notify)
+        self.assertTrue(self.cassette.all_played)

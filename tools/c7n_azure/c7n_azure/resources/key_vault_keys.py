@@ -183,10 +183,27 @@ class KeyVaultKeyRotationFilter(Filter):
              filters:
                 - type: rotation-policy
                   state: Disabled
+
+    By default a key counts as enabled when it has a saved rotation policy, even if
+    that policy only notifies. With ``auto-rotation: true`` the policy must also have
+    a ``Rotate`` lifetime action.
+
+    Find all keyvault keys that are not rotated automatically
+
+    .. code-block:: yaml
+
+        policies:
+           - name: key-vault-keys-auto-rotation-is-disabled
+             resource: azure.keyvault-keys
+             filters:
+                - type: rotation-policy
+                  state: Disabled
+                  auto-rotation: true
     """
     schema = type_schema(
         'rotation-policy', required=['state'],
-        state={'type': 'string', 'enum': ['Enabled', 'Disabled']}
+        state={'type': 'string', 'enum': ['Enabled', 'Disabled']},
+        **{'auto-rotation': {'type': 'boolean'}}
     )
 
     def process(self, resources, event=None):
@@ -195,8 +212,12 @@ class KeyVaultKeyRotationFilter(Filter):
             id = KeyProperties(key_id=key['id'])
             client = self.manager.get_client(vault_url=id.vault_url)
             rotation = client.get_key_rotation_policy(id.name)
-            if (self.data.get('state') == 'Disabled' and not rotation.id) or \
-               (self.data.get('state') == 'Enabled' and rotation.id):
+            enabled = bool(rotation.id)
+            if enabled and self.data.get('auto-rotation'):
+                enabled = any(
+                    a.action == KeyRotationPolicyAction.rotate
+                    for a in rotation.lifetime_actions or [])
+            if (self.data.get('state') == 'Enabled') == enabled:
                 matched.append(key)
         return matched
 
