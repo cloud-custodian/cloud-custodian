@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
+
 import pytest
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
@@ -42,6 +44,17 @@ class DatabricksSetCmkEncryptionTest(BaseTest):
         'key-vault-uri': key_vault_uri,
         'key-name': 'cctest-dbfs-key',
     }
+
+    def setUp(self):
+        self.put_bodies = []
+        super().setUp()
+
+    def _request_callback(self, request):
+        # Cassettes save request bodies as mock_body, so keep what the action
+        # actually sent before the base class replaces it.
+        if request.method == 'PUT' and request.body != b'mock_body':
+            self.put_bodies.append(json.loads(request.body))
+        return super()._request_callback(request)
 
     def _load_policy(self, action):
         with self.sign_out_patch():
@@ -158,3 +171,9 @@ class DatabricksSetCmkEncryptionTest(BaseTest):
         assert key.key_name == 'cctest-dbfs-key'
         assert workspace.parameters.prepare_encryption.value is True
         assert workspace.sku.name == 'premium'
+        sent = self.put_bodies[-1]['properties']['parameters']['encryption']['value']
+        assert sent == {
+            'keySource': 'Microsoft.Keyvault',
+            'keyvaulturi': vault.properties.vault_uri,
+            'KeyName': 'cctest-dbfs-key',
+        }
