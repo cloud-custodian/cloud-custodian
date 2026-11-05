@@ -19,7 +19,7 @@ from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, RetryPageIterator
 from c7n.filters import ListItemFilter
 
 from c7n.resources.iam import CredentialReport
@@ -2799,6 +2799,100 @@ class SetBedrockModelInvocationLogging(BaseAction):
             client.put_model_invocation_logging_configuration(loggingConfig=params)
         else:
             client.delete_model_invocation_logging_configuration()
+
+
+class SmsVoiceAccountSettingFilter(ValueFilter):
+    """Base for End User Messaging SMS account settings, keyed by setting name."""
+
+    annotate = False
+    operation = list_key = annotation_key = None
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
+        paginator = client.get_paginator(self.operation)
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        items = paginator.paginate().build_full_result().get(self.list_key, [])
+        settings = self.transform({i['Name']: i for i in items})
+        for r in resources:
+            r[self.annotation_key] = settings
+
+    def transform(self, settings):
+        return settings
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
+@filters.register('sms-voice-account-attributes')
+class SmsVoiceAccountAttributes(SmsVoiceAccountSettingFilter):
+    """Filter on End User Messaging SMS account attributes for the region,
+    as a mapping of attribute name to value (``ACCOUNT_TIER``,
+    ``DEFAULT_PROTECT_CONFIGURATION_ID``).
+
+    :example:
+
+    Find accounts without a default protect configuration
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sms-voice-no-default-protect-configuration
+                resource: account
+                filters:
+                  - type: sms-voice-account-attributes
+                    key: DEFAULT_PROTECT_CONFIGURATION_ID
+                    value: empty
+    """
+
+    schema = type_schema('sms-voice-account-attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('sms-voice:DescribeAccountAttributes',)
+    operation = 'describe_account_attributes'
+    list_key = 'AccountAttributes'
+    annotation_key = 'c7n:SmsVoiceAccountAttributes'
+
+    def transform(self, settings):
+        return {k: v.get('Value') for k, v in settings.items()}
+
+
+@filters.register('sms-voice-spend-limits')
+class SmsVoiceSpendLimits(SmsVoiceAccountSettingFilter):
+    """Filter on End User Messaging monthly spend limits for the region, keyed
+    by limit name (eg. ``TEXT_MESSAGE_MONTHLY_SPEND_LIMIT``), each with
+    ``EnforcedLimit``, ``MaxLimit`` and ``Overridden``.
+
+    :example:
+
+    Find accounts that haven't overridden the SMS, MMS and voice spend limits
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sms-voice-spend-limits-not-overridden
+                resource: account
+                filters:
+                  - or:
+                    - type: sms-voice-spend-limits
+                      key: TEXT_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+                    - type: sms-voice-spend-limits
+                      key: MEDIA_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+                    - type: sms-voice-spend-limits
+                      key: VOICE_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+    """
+
+    schema = type_schema('sms-voice-spend-limits', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('sms-voice:DescribeSpendLimits',)
+    operation = 'describe_spend_limits'
+    list_key = 'SpendLimits'
+    annotation_key = 'c7n:SmsVoiceSpendLimits'
 
 
 @filters.register('ec2-metadata-defaults')
