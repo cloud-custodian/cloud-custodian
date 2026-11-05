@@ -171,16 +171,21 @@ class AccountOrganization(ValueFilter):
 class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
 
-    Gets the macie session info for the account, and
-    the macie adminstrator account for the current account if
-    configured.
+    Gets the macie session info for the account, the macie
+    administrator account for the current account if configured,
+    and the automated sensitive data discovery configuration
+    (``automatedDiscovery``).
     """
 
     schema = type_schema('check-macie', rinherit=ValueFilter.schema)
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
-    permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
+    permissions = (
+        'macie2:GetMacieSession',
+        'macie2:GetAdministratorAccount',
+        'macie2:GetAutomatedDiscoveryConfiguration',
+    )
 
     def process(self, resources, event=None):
 
@@ -210,6 +215,10 @@ class MacieEnabled(ValueFilter):
         else:
             info['master'] = minfo
         info['administrator'] = info['master']
+
+        if info.get('status') == 'ENABLED':
+            info['automatedDiscovery'] = client.get_automated_discovery_configuration()
+            info['automatedDiscovery'].pop('ResponseMetadata')
         account[self.annotation_key] = info
 
 

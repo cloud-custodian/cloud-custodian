@@ -54,7 +54,39 @@ class AccountTests(BaseTest):
             'status': 'ENABLED',
             'updatedAt': datetime.datetime(
                 2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
+            'automatedDiscovery': {
+                'autoEnableOrganizationMembers': 'ALL',
+                'classificationScopeId': 'a4d6b97a599087a3b44165c6af20c41c',
+                'firstEnabledAt': datetime.datetime(
+                    2023, 9, 19, 23, 3, 42, tzinfo=tz.tzutc()),
+                'lastUpdatedAt': datetime.datetime(
+                    2023, 9, 19, 23, 3, 42, tzinfo=tz.tzutc()),
+                'sensitivityInspectionTemplateId': '584cd334c22ea024897fbca2f3fb2cf1',
+                'status': 'ENABLED',
+            },
         }
+
+    def test_macie_automated_discovery_disabled(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie_automated_discovery_disabled')
+        p = self.load_policy({
+            'name': 'macie-automated-discovery-disabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'or': [
+                    {'type': 'check-macie',
+                     'key': 'status',
+                     'value': 'ENABLED',
+                     'op': 'ne'},
+                    {'type': 'check-macie',
+                     'key': 'automatedDiscovery.status',
+                     'value': 'ENABLED',
+                     'op': 'ne'}]}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:macie']['automatedDiscovery']['status'], 'DISABLED')
 
     def test_macie_disabled(self):
         factory = self.replay_flight_data(
