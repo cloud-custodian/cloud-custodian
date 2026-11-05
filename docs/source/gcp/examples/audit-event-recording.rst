@@ -3,6 +3,10 @@
 Recording gcp-audit Event Fixtures
 ====================================
 
+For new tests, use :ref:`gcp_recorded_event_fixture`, the packaged
+``c7n_gcp.testing.recorded_event`` fixture. The legacy helper described below
+remains available for existing consumers and is deprecated.
+
 Tests for ``gcp-audit`` mode policies run
 ``exec_mode.run(event_data("some-event.json"), None)`` against a
 fixture event -- a Cloud Audit Log ``LogEntry``. The test helper,
