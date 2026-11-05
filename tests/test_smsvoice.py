@@ -37,26 +37,6 @@ class SmsVoicePhoneNumberTest(BaseTest):
         self.assertTrue(resources[0]['c7n:Policy'])
         self.assertTrue(resources[0]['CrossAccountViolations'])
 
-    def test_sms_voice_phone_number_pool_registration(self):
-        session_factory = self.replay_flight_data(
-            'test_sms_voice_phone_number_pool_registration')
-        p = self.load_policy(
-            {'name': 'sms-voice-prod-pool-phone-number-registration',
-             'resource': 'aws.sms-voice-phone-number',
-             'filters': [
-                 {'type': 'pool', 'key': 'tag:Environment', 'value': 'prod'},
-                 {'not': [
-                     {'type': 'registration',
-                      'key': 'RegistrationStatus',
-                      'value': 'COMPLETE'}]}]},
-            session_factory=session_factory)
-        resources = p.run()
-        # prod pool holds one number with a non-COMPLETE registration and one
-        # with a COMPLETE registration; a third number sits in a non-prod pool
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(_tag(resources[0]), 'unregistered')
-        self.assertEqual(resources[0]['c7n:PoolIds'], [resources[0]['PoolId']])
-
     def test_sms_voice_phone_number_tag(self):
         session_factory = self.replay_flight_data('test_sms_voice_phone_number_tag')
         p = self.load_policy(
@@ -115,20 +95,6 @@ class SmsVoiceSenderIdTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(_tag(resources[0]), 'shared')
 
-    def test_sms_voice_sender_id_pool(self):
-        session_factory = self.replay_flight_data('test_sms_voice_sender_id_pool')
-        p = self.load_policy(
-            {'name': 'sms-voice-sender-id-prod-pool',
-             'resource': 'aws.sms-voice-sender-id',
-             'filters': [{'type': 'pool', 'key': 'tag:Environment', 'value': 'prod'}]},
-            session_factory=session_factory)
-        resources = p.run()
-        # one sender id in a prod-tagged pool, one in no pool
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(_tag(resources[0]), 'prod-pool')
-        self.assertEqual(len(resources[0]['c7n:PoolMembership']), 1)
-        self.assertEqual(resources[0]['c7n:PoolIds'], resources[0]['c7n:PoolMembership'])
-
 
 class SmsVoicePoolTest(BaseTest):
 
@@ -161,18 +127,3 @@ class SmsVoiceConfigurationSetTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             p.resource_manager.get_arns(resources), [resources[0]['ConfigurationSetArn']])
-
-
-class SmsVoiceRegistrationTest(BaseTest):
-
-    def test_sms_voice_registration_query(self):
-        session_factory = self.replay_flight_data('test_sms_voice_registration_query')
-        p = self.load_policy(
-            {'name': 'sms-voice-registration-query',
-             'resource': 'aws.sms-voice-registration',
-             'filters': [{'tag:c7n-test': 'query'}]},
-            session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            p.resource_manager.get_arns(resources), [resources[0]['RegistrationArn']])

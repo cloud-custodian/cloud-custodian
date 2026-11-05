@@ -19,7 +19,7 @@ from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, RetryPageIterator
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.filters import ListItemFilter
 
 from c7n.resources.iam import CredentialReport
@@ -2801,34 +2801,8 @@ class SetBedrockModelInvocationLogging(BaseAction):
             client.delete_model_invocation_logging_configuration()
 
 
-class SmsVoiceAccountSettingFilter(ValueFilter):
-    """Base for End User Messaging SMS account settings, keyed by setting name."""
-
-    annotate = False
-    operation = list_key = annotation_key = None
-
-    def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
-        paginator = client.get_paginator(self.operation)
-        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-        items = paginator.paginate().build_full_result().get(self.list_key, [])
-        settings = self.transform({i['Name']: i for i in items})
-        for r in resources:
-            r[self.annotation_key] = settings
-
-    def transform(self, settings):
-        return settings
-
-    def process(self, resources, event=None):
-        self.augment([r for r in resources if self.annotation_key not in r])
-        return super().process(resources, event)
-
-    def __call__(self, r):
-        return super().__call__(r[self.annotation_key])
-
-
 @filters.register('sms-voice-account-attributes')
-class SmsVoiceAccountAttributes(SmsVoiceAccountSettingFilter):
+class SmsVoiceAccountAttributes(ValueFilter):
     """Filter on End User Messaging SMS account attributes for the region,
     as a mapping of attribute name to value (``ACCOUNT_TIER``,
     ``DEFAULT_PROTECT_CONFIGURATION_ID``).
@@ -2848,19 +2822,26 @@ class SmsVoiceAccountAttributes(SmsVoiceAccountSettingFilter):
                     value: empty
     """
 
+    annotation_key = 'c7n:SmsVoiceAccountAttributes'
+    annotate = False
     schema = type_schema('sms-voice-account-attributes', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('sms-voice:DescribeAccountAttributes',)
-    operation = 'describe_account_attributes'
-    list_key = 'AccountAttributes'
-    annotation_key = 'c7n:SmsVoiceAccountAttributes'
 
-    def transform(self, settings):
-        return {k: v.get('Value') for k, v in settings.items()}
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
+        for r in resources:
+            if self.annotation_key not in r:
+                attrs = client.describe_account_attributes().get('AccountAttributes', [])
+                r[self.annotation_key] = {a['Name']: a['Value'] for a in attrs}
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
 
 
 @filters.register('sms-voice-spend-limits')
-class SmsVoiceSpendLimits(SmsVoiceAccountSettingFilter):
+class SmsVoiceSpendLimits(ValueFilter):
     """Filter on End User Messaging monthly spend limits for the region, keyed
     by limit name (eg. ``TEXT_MESSAGE_MONTHLY_SPEND_LIMIT``), each with
     ``EnforcedLimit``, ``MaxLimit`` and ``Overridden``.
@@ -2887,12 +2868,22 @@ class SmsVoiceSpendLimits(SmsVoiceAccountSettingFilter):
                       value: false
     """
 
+    annotation_key = 'c7n:SmsVoiceSpendLimits'
+    annotate = False
     schema = type_schema('sms-voice-spend-limits', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('sms-voice:DescribeSpendLimits',)
-    operation = 'describe_spend_limits'
-    list_key = 'SpendLimits'
-    annotation_key = 'c7n:SmsVoiceSpendLimits'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
+        for r in resources:
+            if self.annotation_key not in r:
+                limits = client.describe_spend_limits().get('SpendLimits', [])
+                r[self.annotation_key] = {lim['Name']: lim for lim in limits}
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
 
 
 @filters.register('ec2-metadata-defaults')

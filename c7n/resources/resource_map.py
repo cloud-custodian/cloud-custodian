@@ -378,7 +378,6 @@ ResourceMap = {
   "aws.sms-voice-configuration-set": "c7n.resources.smsvoice.SmsVoiceConfigurationSet",
   "aws.sms-voice-phone-number": "c7n.resources.smsvoice.SmsVoicePhoneNumber",
   "aws.sms-voice-pool": "c7n.resources.smsvoice.SmsVoicePool",
-  "aws.sms-voice-registration": "c7n.resources.smsvoice.SmsVoiceRegistration",
   "aws.sms-voice-sender-id": "c7n.resources.smsvoice.SmsVoiceSenderId",
   "aws.snowball": "c7n.resources.snowball.Snowball",
   "aws.snowball-cluster": "c7n.resources.snowball.SnowballCluster",

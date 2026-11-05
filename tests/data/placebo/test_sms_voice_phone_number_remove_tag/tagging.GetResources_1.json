@@ -1,0 +1,78 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sms-voice:us-east-1:644160558196:phone-number/phone-efa0b998177e44f3ac6e46d3c0172c46",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "c7n-recording",
+                        "Value": "smsvoice"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "tag"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:sms-voice:us-east-1:644160558196:phone-number/phone-b62cd989e806413c8c787df513acdfab",
+                "Tags": [
+                    {
+                        "Key": "c7n-recording",
+                        "Value": "smsvoice"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "query"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:sms-voice:us-east-1:644160558196:phone-number/phone-ac4b9972b135445db87eb0e0b98b8f15",
+                "Tags": [
+                    {
+                        "Key": "c7n-recording",
+                        "Value": "smsvoice"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "registered"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:sms-voice:us-east-1:644160558196:phone-number/phone-6bf27c04ec53436095ebb6093844456f",
+                "Tags": [
+                    {
+                        "Key": "c7n-recording",
+                        "Value": "smsvoice"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "shared"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:sms-voice:us-east-1:644160558196:phone-number/phone-023840da44a44c2db9408eb9df89914f",
+                "Tags": [
+                    {
+                        "Key": "c7n-recording",
+                        "Value": "smsvoice"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "unregistered"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
