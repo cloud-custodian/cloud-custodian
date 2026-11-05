@@ -2047,8 +2047,6 @@ class AnnotationSweeperTest(unittest.TestCase):
         self.assertEqual(resources, swept)
 
 
-
-
 class TestRequiredValueFilter(BaseTest):
 
     def test_missing_and_null(self):
