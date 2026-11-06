@@ -1,0 +1,41 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 02 Oct 2026 14:02:38 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "746",
+    "-content-encoding": "gzip",
+    "content-location": "https://dlp.googleapis.com/v2/projects/cloud-custodian/locations/-/discoveryConfigs?alt=json"
+  },
+  "body": {
+    "discoveryConfigs": [
+      {
+        "name": "projects/cloud-custodian/locations/us/discoveryConfigs/8338945954561565050",
+        "inspectTemplates": [
+          "projects/cloud-custodian/locations/us/inspectTemplates/4167487095981753467"
+        ],
+        "targets": [
+          {
+            "bigQueryTarget": {
+              "filter": {
+                "otherTables": {}
+              }
+            }
+          }
+        ],
+        "createTime": "2026-10-02T14:02:36.223251Z",
+        "updateTime": "2026-10-02T14:02:36.223251Z",
+        "status": "PAUSED",
+        "displayName": "c7n-dlp-discovery-configs"
+      }
+    ],
+    "nextPageToken": "c7n-page-token"
+  }
+}

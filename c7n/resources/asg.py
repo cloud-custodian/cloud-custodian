@@ -20,9 +20,11 @@ import c7n.policy
 from c7n.manager import resources
 from c7n import query
 from c7n.resources.securityhub import PostFinding
-from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
+from c7n.tags import (
+    TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction,
+    TagValueResolver, has_dynamic_tag_values, tag_value_schema)
 from c7n.utils import (
-    FormatDate, local_session, type_schema, chunks, get_retry, select_keys)
+    local_session, type_schema, chunks, get_retry, select_keys)
 
 from .ec2 import deserialize_user_data
 
@@ -1104,7 +1106,7 @@ class RemoveTag(Action):
 
 @ASG.action_registry.register('tag')
 @ASG.action_registry.register('mark')
-class Tag(Action):
+class Tag(TagValueResolver, Action):
     """Action to add a tag to an ASG
 
     The *propagate* parameter can be used to specify that the tag being added
@@ -1125,13 +1127,32 @@ class Tag(Action):
                     key: OwnerName
                     value: OwnerName
                     propagate: true
+
+    Tag values may also be looked up per-asg from the asg's attributes:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: asg-tag-owner
+                resource: asg
+                actions:
+                  - type: tag
+                    propagate: true
+                    tags:
+                      Owner:
+                        type: resource
+                        key: "Tags[?Key=='Team'].Value | [0]"  # from the Team tag
+                        default-value: unknown
+                      CostCenter:
+                        type: resource
+                        default-value: unassigned  # set only if CostCenter absent
     """
 
     schema = type_schema(
         'tag',
         key={'type': 'string'},
-        value={'type': 'string'},
-        tags={'type': 'object'},
+        value=tag_value_schema(),
+        tags={'type': 'object', 'additionalProperties': tag_value_schema()},
         # Backwards compatibility
         tag={'type': 'string'},
         msg={'type': 'string'},
@@ -1141,34 +1162,57 @@ class Tag(Action):
     permissions = ('autoscaling:CreateOrUpdateTags',)
     batch_size = 1
 
-    def get_tag_set(self):
-        tags = []
+    def get_tag_spec_map(self):
+        spec_map = {}
+        tags = self.data.get('tags', {})
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
-        value = self.data.get(
-            'value', self.data.get(
-                'msg', 'AutoScaleGroup does not meet policy guidelines'))
+        value = self.data.get('value', self.data.get('msg'))
+        # The mark default only applies to the single-tag form. A policy that
+        # spells out a tags mapping gets that mapping and nothing else --
+        # otherwise every asg picks up a marker tag it never asked for, and a
+        # conditional default can never resolve to an empty payload.
+        if value is None and not tags:
+            value = 'AutoScaleGroup does not meet policy guidelines'
         if key and value:
-            tags.append({'Key': key, 'Value': value})
+            spec_map[key] = value
 
-        for k, v in self.data.get('tags', {}).items():
-            tags.append({'Key': k, 'Value': v})
+        spec_map.update(tags)
 
-        return tags
+        return spec_map
+
+    def resolve_tag_sets(self, asgs, spec_map):
+        """Yield (asg_set, tags) pairs to submit.
+
+        Static values are shared by every asg, so they go out in batches.
+        Dynamic values are resolved per asg and then regrouped, so asgs that
+        land on the same payload still batch together, and an asg whose tags
+        all resolve to skip drops out entirely.
+        """
+        if not has_dynamic_tag_values(spec_map):
+            tags = [{'Key': k, 'Value': v} for k, v in spec_map.items()]
+            self.interpolate_values(tags)
+            for asg_set in chunks(asgs, self.batch_size):
+                yield asg_set, tags
+            return
+
+        for asg_set, resolved in self.resolve_and_group(asgs, spec_map):
+            tags = [{'Key': k, 'Value': v} for k, v in resolved.items()]
+            for chunk in chunks(asg_set, self.batch_size):
+                yield chunk, tags
 
     def process(self, asgs):
-        tags = self.get_tag_set()
+        spec_map = self.get_tag_spec_map()
         error = None
-
-        self.interpolate_values(tags)
 
         client = self.get_client()
         with self.executor_factory(max_workers=2) as w:
             futures = {}
-            for asg_set in chunks(asgs, self.batch_size):
+            for asg_set, tags in self.resolve_tag_sets(asgs, spec_map):
                 futures[w.submit(
-                    self.process_resource_set, client, asg_set, tags)] = asg_set
+                    self.process_resource_set, client, asg_set, tags)] = (
+                        asg_set, tags)
             for f in as_completed(futures):
-                asg_set = futures[f]
+                asg_set, tags = futures[f]
                 if f.exception():
                     self.log.exception(
                         "Exception tagging tag:%s error:%s asg:%s" % (
@@ -1193,14 +1237,6 @@ class Tag(Action):
                 tag_params.append(atags)
                 a.setdefault('Tags', []).append(atags)
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
-
-    def interpolate_values(self, tags):
-        params = {
-            'account_id': self.manager.config.account_id,
-            'now': FormatDate.utcnow(),
-            'region': self.manager.config.region}
-        for t in tags:
-            t['Value'] = t['Value'].format(**params)
 
     def get_client(self):
         return local_session(self.manager.session_factory).client('autoscaling')

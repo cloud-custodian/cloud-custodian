@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "accessPoints": [
+            {
+                "accessPointArn": "arn:aws:s3files:us-east-1:644160558196:file-system/fs-0a8f3e632ed09c2d4/access-point/fsap-0e635ea792b509a43",
+                "accessPointId": "fsap-0e635ea792b509a43",
+                "fileSystemId": "fs-0a8f3e632ed09c2d4",
+                "status": "available",
+                "ownerId": "644160558196",
+                "posixUser": {
+                    "uid": 1000,
+                    "gid": 1000
+                },
+                "rootDirectory": {
+                    "path": "/data",
+                    "creationPermissions": {
+                        "ownerUid": 1000,
+                        "ownerGid": 1000,
+                        "permissions": "0755"
+                    }
+                }
+            }
+        ]
+    }
+}

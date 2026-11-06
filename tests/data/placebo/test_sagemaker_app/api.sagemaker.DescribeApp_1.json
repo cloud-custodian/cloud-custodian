@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "AppArn": "arn:aws:sagemaker:us-east-1:644160558196:app/d-szjlsjfyqmaq/c7n-profile-comic-chicken/JupyterServer/c7n-app-comic-chicken",
+        "AppType": "JupyterServer",
+        "AppName": "c7n-app-comic-chicken",
+        "DomainId": "d-szjlsjfyqmaq",
+        "UserProfileName": "c7n-profile-comic-chicken",
+        "Status": "InService",
+        "EffectiveTrustedIdentityPropagationStatus": "DISABLED",
+        "RecoveryMode": false,
+        "LastHealthCheckTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 15,
+            "hour": 12,
+            "minute": 20,
+            "second": 51,
+            "microsecond": 484000
+        },
+        "LastUserActivityTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 15,
+            "hour": 12,
+            "minute": 20,
+            "second": 51,
+            "microsecond": 484000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 7,
+            "day": 15,
+            "hour": 12,
+            "minute": 20,
+            "second": 51,
+            "microsecond": 484000
+        },
+        "ResourceSpec": {
+            "SageMakerImageArn": "arn:aws:ecr:us-east-1:644160558196:repository/looseleaf-jupyter-server-3",
+            "InstanceType": "system"
+        },
+        "ResponseMetadata": {}
+    }
+}

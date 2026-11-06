@@ -1,0 +1,84 @@
+{
+  "headers": {
+    "etag": "vprPdDSXZPNz6vHoz2Qi547GiZ0=/KHifhhKrXlDVHL0XwG2W82kdtbA=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 30 Sep 2026 15:58:19 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3475",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies?alt=json"
+  },
+  "body": {
+    "kind": "compute#targetHttpsProxyList",
+    "id": "projects/cloud-custodian/global/targetHttpsProxies",
+    "items": [
+      {
+        "kind": "compute#targetHttpsProxy",
+        "id": "3657098629032742754",
+        "creationTimestamp": "2026-09-30T08:58:05.527-07:00",
+        "name": "c7n-default-aa7f-https-good",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies/c7n-default-aa7f-https-good",
+        "urlMap": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/c7n-default-aa7f-urlmap",
+        "sslCertificates": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/c7n-default-aa7f-cert"
+        ],
+        "quicOverride": "NONE",
+        "sslPolicy": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/c7n-default-aa7f-good",
+        "fingerprint": "eWmtHCE-9FE=",
+        "tlsEarlyData": "DISABLED"
+      },
+      {
+        "kind": "compute#targetHttpsProxy",
+        "id": "2603121230916652898",
+        "creationTimestamp": "2026-09-30T08:58:05.953-07:00",
+        "name": "c7n-default-aa7f-https-none",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies/c7n-default-aa7f-https-none",
+        "urlMap": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/c7n-default-aa7f-urlmap",
+        "sslCertificates": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/c7n-default-aa7f-cert"
+        ],
+        "quicOverride": "NONE",
+        "fingerprint": "tUieqhM7-us=",
+        "tlsEarlyData": "DISABLED"
+      },
+      {
+        "kind": "compute#targetHttpsProxy",
+        "id": "203287616958795618",
+        "creationTimestamp": "2026-09-30T08:58:05.498-07:00",
+        "name": "c7n-default-aa7f-https-weak",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies/c7n-default-aa7f-https-weak",
+        "urlMap": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/c7n-default-aa7f-urlmap",
+        "sslCertificates": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/c7n-default-aa7f-cert"
+        ],
+        "quicOverride": "NONE",
+        "sslPolicy": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/c7n-default-aa7f-weak",
+        "fingerprint": "1qrgmeFF278=",
+        "tlsEarlyData": "DISABLED"
+      },
+      {
+        "kind": "compute#targetHttpsProxy",
+        "id": "2427009597342519138",
+        "creationTimestamp": "2026-09-30T08:58:05.407-07:00",
+        "name": "c7n-default-aa7f-https-weak2",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies/c7n-default-aa7f-https-weak2",
+        "urlMap": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/c7n-default-aa7f-urlmap",
+        "sslCertificates": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/c7n-default-aa7f-cert"
+        ],
+        "quicOverride": "NONE",
+        "sslPolicy": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/c7n-default-aa7f-weak",
+        "fingerprint": "1qrgmeFF278=",
+        "tlsEarlyData": "DISABLED"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies"
+  }
+}

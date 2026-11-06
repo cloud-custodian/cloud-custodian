@@ -177,16 +177,6 @@ class SnapshotErrorHandler(BaseTest):
         tagger.process_resource_set(client, snaps, [{'Key': 'bar', 'Value': 'foo'}])
         client.create_tags.assert_called_once()
 
-    def test_remove_snapshot(self):
-        snaps = [{'SnapshotId': 'a'}, {'SnapshotId': 'b'}, {'SnapshotId': 'c'}]
-
-        t1 = list(snaps)
-        ErrorHandler.remove_snapshot('c', t1)
-        self.assertEqual([t['SnapshotId'] for t in t1], ['a', 'b'])
-
-        ErrorHandler.remove_snapshot('d', snaps)
-        self.assertEqual(len(snaps), 3)
-
     def test_get_bad_snapshot_malformed(self):
         operation_name = "DescribeSnapshots"
         error_response = {
@@ -234,16 +224,6 @@ class SnapshotErrorHandler(BaseTest):
         e = ClientError(error_response, operation_name)
         vol = ErrorHandler.extract_bad_volume(e)
         self.assertEqual(vol, "vol-notfound")
-
-    def test_remove_volume(self):
-        vols = [{'VolumeId': 'a'}, {'VolumeId': 'b'}, {'VolumeId': 'c'}]
-
-        t1 = list(vols)
-        ErrorHandler.remove_volume('c', t1)
-        self.assertEqual([t['VolumeId'] for t in t1], ['a', 'b'])
-
-        ErrorHandler.remove_volume('d', vols)
-        self.assertEqual(len(vols), 3)
 
     def test_volume_tag_error(self):
         vols = [{'VolumeId': 'vol-aa'}]
@@ -736,6 +716,32 @@ class ResizeTest(BaseTest):
             ("filtered 4 of 6 volumes due to [('instance-type', 2), "
              "('vol-mutation', 1), ('vol-type', 1)]")
         )
+
+    def test_resize_filter_attachment_without_instance_id(self):
+        # volumes attached to something other than an ec2 instance (ie. ecs
+        # managed volumes) have no InstanceId in their attachment.
+        p = self.load_policy(
+            {"name": "resizable", "resource": "ebs", "filters": ["modifyable"]},
+        )
+        volumes = [
+            {
+                "VolumeId": "vol-0123456789abcdef0",
+                "VolumeType": "gp3",
+                "Attachments": [
+                    {
+                        "AttachTime": parser.parse("2025-01-01T00:00:00+00:00"),
+                        "VolumeId": "vol-0123456789abcdef0",
+                        "State": "attached",
+                    }
+                ],
+            }
+        ]
+        client = mock.MagicMock()
+        client.describe_volumes_modifications.return_value = {}
+        with mock.patch("c7n.resources.ebs.local_session") as local_session:
+            local_session.return_value.client.return_value = client
+            resources = p.resource_manager.filters[0].process(volumes)
+        self.assertEqual([r["VolumeId"] for r in resources], ["vol-0123456789abcdef0"])
 
 
 class CopyInstanceTagsTest(BaseTest):

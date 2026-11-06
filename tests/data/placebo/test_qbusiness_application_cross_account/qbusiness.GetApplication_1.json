@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "displayName": "c7n-test-app",
+        "applicationId": "ed27546d-6f28-4480-820e-6592404f720f",
+        "applicationArn": "arn:aws:qbusiness:us-east-1:644160558196:application/ed27546d-6f28-4480-820e-6592404f720f",
+        "identityType": "AWS_IAM_IDC",
+        "roleArn": "arn:aws:iam::644160558196:role/service-role/QBusiness-c7n-test-app",
+        "status": "ACTIVE",
+        "description": "application used to exercise the cross-account filter",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 11,
+            "day": 14,
+            "hour": 9,
+            "minute": 23,
+            "second": 41,
+            "microsecond": 512000
+        },
+        "updatedAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 5,
+            "day": 2,
+            "hour": 16,
+            "minute": 7,
+            "second": 18,
+            "microsecond": 884000
+        }
+    }
+}

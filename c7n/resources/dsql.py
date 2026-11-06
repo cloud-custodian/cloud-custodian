@@ -3,6 +3,7 @@
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import (
@@ -75,6 +76,7 @@ class RemoveTagDsqlCluster(RemoveTag):
 
 
 DsqlCluster.action_registry.register('mark-for-op', TagDelayedAction)
+DsqlCluster.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
 
 
 @DsqlCluster.filter_registry.register('cross-account')

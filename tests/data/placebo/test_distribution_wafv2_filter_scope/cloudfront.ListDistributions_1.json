@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DistributionList": {
+            "Marker": "",
+            "MaxItems": 100,
+            "IsTruncated": false,
+            "Quantity": 1,
+            "Items": [
+                {
+                    "Id": "E1EXAMPLE1234",
+                    "ARN": "arn:aws:cloudfront::123456789012:distribution/E1EXAMPLE1234",
+                    "Status": "Deployed",
+                    "LastModifiedTime": {
+                        "hour": 0,
+                        "microsecond": 0,
+                        "second": 0,
+                        "year": 2024,
+                        "month": 1,
+                        "day": 1,
+                        "minute": 0
+                    },
+                    "DomainName": "d111111abcdef8.cloudfront.net",
+                    "Aliases": {
+                        "Quantity": 0,
+                        "Items": []
+                    },
+                    "Origins": {
+                        "Quantity": 1,
+                        "Items": [
+                            {
+                                "Id": "S3-example",
+                                "DomainName": "example-bucket.s3.amazonaws.com",
+                                "OriginPath": ""
+                            }
+                        ]
+                    },
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": "S3-example",
+                        "ViewerProtocolPolicy": "redirect-to-https"
+                    },
+                    "CacheBehaviors": {
+                        "Quantity": 0,
+                        "Items": []
+                    },
+                    "CustomErrorResponses": {
+                        "Quantity": 0,
+                        "Items": []
+                    },
+                    "Comment": "",
+                    "PriceClass": "PriceClass_All",
+                    "Enabled": true,
+                    "ViewerCertificate": {
+                        "CloudFrontDefaultCertificate": true,
+                        "MinimumProtocolVersion": "TLSv1",
+                        "CertificateSource": "cloudfront"
+                    },
+                    "Restrictions": {
+                        "GeoRestriction": {
+                            "RestrictionType": "none",
+                            "Quantity": 0
+                        }
+                    },
+                    "WebACLId": "arn:aws:wafv2:us-east-1:123456789012:global/webacl/example-cloudfront-acl/11111111-2222-3333-4444-555555555555",
+                    "HttpVersion": "http2",
+                    "IsIPV6Enabled": true
+                }
+            ]
+        }
+    }
+}

@@ -34,3 +34,23 @@ class TestKube(KubeTest):
             call("Filtered from 5 to 5 namespace"),
         ]
         p.resource_manager.log.debug.assert_has_calls(calls)
+
+    def test_kube_cache_keyed_by_resource_type(self):
+        # Two resource types sharing one cache must not be handed each other's
+        # resources.
+        pod = self.load_policy({"name": "pods", "resource": "k8s.pod"}, cache=True)
+        deployment = self.load_policy(
+            {"name": "deployments", "resource": "k8s.deployment"}, config=pod.options
+        )
+        for p, kind in ((pod, "Pod"), (deployment, "Deployment")):
+            # Close each cache connection before the temp dir is removed, as
+            # windows won't delete a file that is still open.
+            self.addCleanup(p.resource_manager._cache.close)
+            self.patch(
+                p.resource_manager.source,
+                "get_resources",
+                lambda query, kind=kind: [{"kind": kind}],
+            )
+
+        self.assertEqual(pod.resource_manager.resources(), [{"kind": "Pod"}])
+        self.assertEqual(deployment.resource_manager.resources(), [{"kind": "Deployment"}])

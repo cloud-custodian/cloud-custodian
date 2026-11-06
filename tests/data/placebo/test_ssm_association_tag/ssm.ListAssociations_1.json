@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "Associations": [
+            {
+                "Name": "AWS-GatherSoftwareInventory",
+                "AssociationId": "b1f5c622-1777-4264-9518-429dbe6fd231",
+                "AssociationVersion": "1",
+                "Targets": [
+                    {
+                        "Key": "tag:c7n-test",
+                        "Values": [
+                            "dev"
+                        ]
+                    }
+                ],
+                "Overview": {
+                    "Status": "Pending",
+                    "DetailedStatus": "Creating"
+                },
+                "AssociationName": "c7n-test-tagged"
+            },
+            {
+                "Name": "AWS-GatherSoftwareInventory",
+                "AssociationId": "bc35cc61-5daa-49ad-8783-619d92fcec1d",
+                "AssociationVersion": "1",
+                "Targets": [
+                    {
+                        "Key": "tag:c7n-test",
+                        "Values": [
+                            "dev"
+                        ]
+                    }
+                ],
+                "Overview": {
+                    "Status": "Pending",
+                    "DetailedStatus": "Creating"
+                },
+                "AssociationName": "c7n-test-untagged"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

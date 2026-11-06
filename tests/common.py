@@ -10,7 +10,7 @@ from c7n.config import Bag
 
 from c7n.testing import TestUtils, TextTestIO, functional # NOQA
 
-from .zpill import PillTest, ACCOUNT_ID
+from .zpill import PillTest, ACCOUNT_ID  # NOQA
 
 
 logging.getLogger("placebo.pill").setLevel(logging.DEBUG)
@@ -32,10 +32,6 @@ if "AWS_DEFAULT_REGION" not in os.environ:
 class BaseTest(TestUtils, PillTest):
 
     # custodian_schema = C7N_SCHEMA
-
-    @property
-    def account_id(self):
-        return ACCOUNT_ID
 
     def _get_policy_config(self, **kw):
         if 'account_id' not in kw:

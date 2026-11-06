@@ -1,0 +1,143 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_ec2_transit_gateway": {
+            "example": {
+                "amazon_side_asn": 64512,
+                "arn": "arn:aws:ec2:us-east-2:644160558196:transit-gateway/tgw-00000000000000001",
+                "association_default_route_table_id": "tgw-rtb-00000000000000001",
+                "auto_accept_shared_attachments": "disable",
+                "default_route_table_association": "enable",
+                "default_route_table_propagation": "enable",
+                "description": "Example Transit Gateway for Route Table Testing",
+                "dns_support": "enable",
+                "encryption_support": "disable",
+                "id": "tgw-00000000000000001",
+                "multicast_support": "disable",
+                "owner_id": "644160558196",
+                "propagation_default_route_table_id": "tgw-rtb-00000000000000001",
+                "region": "us-east-2",
+                "security_group_referencing_support": "disable",
+                "tags": {
+                    "Name": "c7n-test-tgw"
+                },
+                "tags_all": {
+                    "Name": "c7n-test-tgw"
+                },
+                "timeouts": null,
+                "transit_gateway_cidr_blocks": null,
+                "vpn_ecmp_support": "enable"
+            }
+        },
+        "aws_ec2_transit_gateway_route_table": {
+            "available": {
+                "arn": "arn:aws:ec2:us-east-2:644160558196:transit-gateway-route-table/tgw-rtb-00000000000000002",
+                "default_association_route_table": false,
+                "default_propagation_route_table": false,
+                "id": "tgw-rtb-00000000000000002",
+                "region": "us-east-2",
+                "tags": {
+                    "Name": "c7n-test-available-rt"
+                },
+                "tags_all": {
+                    "Name": "c7n-test-available-rt"
+                },
+                "transit_gateway_id": "tgw-00000000000000001"
+            }
+        },
+        "aws_ec2_transit_gateway_vpc_attachment": {
+            "test": {
+                "appliance_mode_support": "disable",
+                "arn": "arn:aws:ec2:us-east-2:644160558196:transit-gateway-attachment/tgw-attach-00000000000000001",
+                "dns_support": "enable",
+                "id": "tgw-attach-00000000000000001",
+                "ipv6_support": "disable",
+                "region": "us-east-2",
+                "security_group_referencing_support": "enable",
+                "subnet_ids": [
+                    "subnet-00000000000000001"
+                ],
+                "tags": {
+                    "Name": "c7n-test-attachment"
+                },
+                "tags_all": {
+                    "Name": "c7n-test-attachment"
+                },
+                "transit_gateway_default_route_table_association": true,
+                "transit_gateway_default_route_table_propagation": true,
+                "transit_gateway_id": "tgw-00000000000000001",
+                "vpc_id": "vpc-00000000000000001",
+                "vpc_owner_id": "644160558196"
+            }
+        },
+        "aws_subnet": {
+            "test": {
+                "arn": "arn:aws:ec2:us-east-2:644160558196:subnet/subnet-00000000000000001",
+                "assign_ipv6_address_on_creation": false,
+                "availability_zone": "us-east-2a",
+                "availability_zone_id": "use2-az1",
+                "cidr_block": "10.0.1.0/24",
+                "customer_owned_ipv4_pool": "",
+                "enable_dns64": false,
+                "enable_lni_at_device_index": 0,
+                "enable_resource_name_dns_a_record_on_launch": false,
+                "enable_resource_name_dns_aaaa_record_on_launch": false,
+                "id": "subnet-00000000000000001",
+                "ipv4_ipam_pool_id": null,
+                "ipv4_netmask_length": null,
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_association_id": "",
+                "ipv6_ipam_pool_id": null,
+                "ipv6_native": false,
+                "ipv6_netmask_length": null,
+                "map_customer_owned_ip_on_launch": false,
+                "map_public_ip_on_launch": false,
+                "outpost_arn": "",
+                "owner_id": "644160558196",
+                "private_dns_hostname_type_on_launch": "ip-name",
+                "region": "us-east-2",
+                "tags": {
+                    "Name": "c7n-test-subnet"
+                },
+                "tags_all": {
+                    "Name": "c7n-test-subnet"
+                },
+                "timeouts": null,
+                "vpc_id": "vpc-00000000000000001"
+            }
+        },
+        "aws_vpc": {
+            "test": {
+                "arn": "arn:aws:ec2:us-east-2:644160558196:vpc/vpc-00000000000000001",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.0.0.0/16",
+                "default_network_acl_id": "acl-00000000000000001",
+                "default_route_table_id": "rtb-00000000000000001",
+                "default_security_group_id": "sg-00000000000000001",
+                "dhcp_options_id": "dopt-00000000000000001",
+                "enable_dns_hostnames": false,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "id": "vpc-00000000000000001",
+                "instance_tenancy": "default",
+                "ipv4_ipam_pool_id": null,
+                "ipv4_netmask_length": null,
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_network_border_group": "",
+                "ipv6_ipam_pool_id": "",
+                "ipv6_netmask_length": 0,
+                "main_route_table_id": "rtb-00000000000000001",
+                "owner_id": "644160558196",
+                "region": "us-east-2",
+                "tags": {
+                    "Name": "c7n-test-vpc"
+                },
+                "tags_all": {
+                    "Name": "c7n-test-vpc"
+                }
+            }
+        }
+    }
+}

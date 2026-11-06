@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Env",
+                "ResourceId": "i-0f0b98cda19cde0a0",
+                "ResourceType": "instance",
+                "Value": "Production"
+            },
+            {
+                "Key": "Name",
+                "ResourceId": "i-0f0b98cda19cde0a0",
+                "ResourceType": "instance",
+                "Value": "custodian-tester"
+            },
+            {
+                "Key": "Owner",
+                "ResourceId": "i-0f0b98cda19cde0a0",
+                "ResourceType": "instance",
+                "Value": "robot"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

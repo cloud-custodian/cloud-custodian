@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "ApiKeyRequired": false,
+                "AuthorizationType": "NONE",
+                "RouteId": "ms6wuq0",
+                "RouteKey": "GET /no-auth",
+                "Target": "integrations/ev8tgnj"
+            },
+            {
+                "ApiKeyRequired": false,
+                "AuthorizationType": "AWS_IAM",
+                "RouteId": "v7guotm",
+                "RouteKey": "GET /iam-auth",
+                "Target": "integrations/ev8tgnj"
+            }
+        ]
+    }
+}

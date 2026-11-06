@@ -1,0 +1,237 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/privateDnsZones?api-version=2024-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Mon, 24 Aug 2026 17:59:03 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "7dc71cda-9fe5-11f1-b82d-757a5d80cdc2"
+                    ],
+                    "cache-control": [
+                        "private"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "60000"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "1099"
+                    ],
+                    "content-length": [
+                        "1441"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-other.neqbrvxs5rnvm.cloudcustodiantest.com",
+                                "name": "c7n-other.neqbrvxs5rnvm.cloudcustodiantest.com",
+                                "type": "Microsoft.Network/privateDnsZones",
+                                "etag": "b71cd59b-b276-489a-a4b0-fd65eab74b58",
+                                "location": "global",
+                                "properties": {
+                                    "internalId": "SW1tdXRhYmxlWm9uZUlkZW50aXR5OzIyNjU1OGZhLWMyMGYtNGNkMi1hYzdhLWI3MGY1YjYwYzk5NTsw",
+                                    "maxNumberOfRecordSets": 25000,
+                                    "maxNumberOfVirtualNetworkLinks": 1000,
+                                    "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                                    "numberOfRecordSets": 1,
+                                    "numberOfVirtualNetworkLinks": 0,
+                                    "numberOfVirtualNetworkLinksWithRegistration": 0,
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com",
+                                "name": "c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com",
+                                "type": "Microsoft.Network/privateDnsZones",
+                                "etag": "fdb23da0-49d1-46f3-8a4f-f17870f67d30",
+                                "location": "global",
+                                "properties": {
+                                    "internalId": "SW1tdXRhYmxlWm9uZUlkZW50aXR5OzlhY2M0ZDViLWY0ZmItNDlhZC1hYzA4LWJlN2RmNzY0MTg0MTsw",
+                                    "maxNumberOfRecordSets": 25000,
+                                    "maxNumberOfVirtualNetworkLinks": 1000,
+                                    "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                                    "numberOfRecordSets": 3,
+                                    "numberOfVirtualNetworkLinks": 0,
+                                    "numberOfVirtualNetworkLinksWithRegistration": 0,
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-other.neqbrvxs5rnvm.cloudcustodiantest.com/aLL?api-version=2024-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Mon, 24 Aug 2026 17:59:04 GMT"
+                    ],
+                    "cache-control": [
+                        "private"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59999"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "1099"
+                    ],
+                    "content-length": [
+                        "602"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-other.neqbrvxs5rnvm.cloudcustodiantest.com/SOA/@",
+                                "name": "@",
+                                "type": "Microsoft.Network/privateDnsZones/SOA",
+                                "etag": "f3ad410b-6e0d-42ea-a499-31160d0a86a6",
+                                "properties": {
+                                    "fqdn": "c7n-other.neqbrvxs5rnvm.cloudcustodiantest.com.",
+                                    "ttl": 3600,
+                                    "soaRecord": {
+                                        "email": "azureprivatedns-host.microsoft.com",
+                                        "expireTime": 2419200,
+                                        "host": "azureprivatedns.net",
+                                        "minimumTtl": 10,
+                                        "refreshTime": 3600,
+                                        "retryTime": 300,
+                                        "serialNumber": 1
+                                    },
+                                    "isAutoRegistered": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com/aLL?api-version=2024-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Mon, 24 Aug 2026 17:59:04 GMT"
+                    ],
+                    "cache-control": [
+                        "private"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59997"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "1099"
+                    ],
+                    "content-length": [
+                        "1542"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com/SOA/@",
+                                "name": "@",
+                                "type": "Microsoft.Network/privateDnsZones/SOA",
+                                "etag": "02aa2346-72a4-4fcb-9cd0-2b0a3e150289",
+                                "properties": {
+                                    "fqdn": "c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com.",
+                                    "ttl": 3600,
+                                    "soaRecord": {
+                                        "email": "azureprivatedns-host.microsoft.com",
+                                        "expireTime": 2419200,
+                                        "host": "azureprivatedns.net",
+                                        "minimumTtl": 10,
+                                        "refreshTime": 3600,
+                                        "retryTime": 300,
+                                        "serialNumber": 1
+                                    },
+                                    "isAutoRegistered": false
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com/A/other",
+                                "name": "other",
+                                "type": "Microsoft.Network/privateDnsZones/A",
+                                "etag": "138b383b-4cdd-47ca-ad35-5fa004f48b4e",
+                                "properties": {
+                                    "fqdn": "other.c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com.",
+                                    "ttl": 3600,
+                                    "aRecords": [
+                                        {
+                                            "ipv4Address": "1.2.3.6"
+                                        }
+                                    ],
+                                    "isAutoRegistered": false
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_private-dns/providers/Microsoft.Network/privateDnsZones/c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com/A/www",
+                                "name": "www",
+                                "type": "Microsoft.Network/privateDnsZones/A",
+                                "etag": "8f22ef90-0d8f-4168-a1a7-2200170dd2b2",
+                                "properties": {
+                                    "fqdn": "www.c7n-test.neqbrvxs5rnvm.cloudcustodiantest.com.",
+                                    "ttl": 3600,
+                                    "aRecords": [
+                                        {
+                                            "ipv4Address": "1.2.3.4"
+                                        },
+                                        {
+                                            "ipv4Address": "1.2.3.5"
+                                        }
+                                    ],
+                                    "isAutoRegistered": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "collaboration": {
+            "id": "62647862-bee9-42e8-8c07-99b0fc492f3a",
+            "arn": "arn:aws:cleanrooms:us-east-1:644160558196:collaboration/62647862-bee9-42e8-8c07-99b0fc492f3a",
+            "name": "Compliant Collaboration",
+            "description": "Compliant Collaboration",
+            "creatorAccountId": "644160558196",
+            "creatorDisplayName": "Compliant Member",
+            "createTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 2,
+                "minute": 2,
+                "second": 3,
+                "microsecond": 366000
+            },
+            "updateTime": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 6,
+                "day": 9,
+                "hour": 2,
+                "minute": 2,
+                "second": 3,
+                "microsecond": 366000
+            },
+            "memberStatus": "ACTIVE",
+            "membershipId": "c5773151-1c6c-40ff-86f2-543d68654295",
+            "membershipArn": "arn:aws:cleanrooms:us-east-1:644160558196:membership/c5773151-1c6c-40ff-86f2-543d68654295",
+            "dataEncryptionMetadata": {
+                "allowCleartext": false,
+                "allowDuplicates": false,
+                "allowJoinsOnColumnsWithDifferentNames": false,
+                "preserveNulls": false
+            },
+            "queryLogStatus": "ENABLED",
+            "analyticsEngine": "SPARK",
+            "allowedResultRegions": [
+                "us-east-1"
+            ],
+            "isMetricsEnabled": false
+        }
+    }
+}

@@ -1,8 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import datetime
 import logging
 
+from dateutil.parser import isoparse
+
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import Filter
 from c7n.utils import type_schema
 from c7n_azure.actions.base import AzureBaseAction
@@ -257,6 +261,70 @@ class WhiteListFilter(Filter):
                 policy['principalName'] = GraphHelper.get_principal_name(aad_object)
 
         return access_policies
+
+
+class KeyVaultPropertiesUpdateAction(AzureBaseAction):
+    """Shared date handling for the ``update`` actions on Key Vault child resources.
+
+    ``not_before`` and ``expires_on`` are checked when the policy is validated,
+    then resolved once per run into ``self.not_before`` and ``self.expires_on``
+    for ``_process_resource`` to send. An ``expires_in_days`` value, where the
+    subclass schema allows it, sets the expiration relative to the run.
+    """
+
+    def validate(self):
+        if 'expires_on' in self.data and 'expires_in_days' in self.data:
+            raise PolicyValidationError(
+                f"'expires_on' and 'expires_in_days' are mutually exclusive "
+                f"on {self.manager.data}")
+        for field in ('not_before', 'expires_on'):
+            if field not in self.data:
+                continue
+            try:
+                isoparse(self.data[field])
+            except (TypeError, ValueError):
+                raise PolicyValidationError(
+                    f"'{field}' must be an ISO formatted date, "
+                    f"got {self.data[field]!r} on {self.manager.data}")
+        if self.data.get('not_before') and self.data.get('expires_on'):
+            self._check_window(
+                isoparse(self.data['not_before']),
+                isoparse(self.data['expires_on']),
+                PolicyValidationError)
+        return self
+
+    def _check_window(self, not_before, expires_on, error):
+        # Naive datetimes are sent to Key Vault as UTC, so compare them as UTC.
+        def as_utc(dt):
+            if dt.tzinfo is None:
+                return dt.replace(tzinfo=datetime.timezone.utc)
+            return dt
+
+        if not_before and expires_on and as_utc(not_before) >= as_utc(expires_on):
+            raise error(
+                f"'not_before' ({not_before.isoformat()}) must be earlier than the "
+                f"expiration ({expires_on.isoformat()}) on {self.manager.data}")
+
+    def process(self, resources, event=None):
+        # Imported here so the test harness's patch of utcnow takes effect.
+        from c7n_azure.utils import utcnow
+
+        # Resolved once per run, before resources are split across worker threads,
+        # so every resource gets the same expiration.
+        # isoparse accepts a trailing 'Z', which fromisoformat rejects before Python 3.11.
+        self.not_before = self.expires_on = None
+        if self.data.get('not_before'):
+            self.not_before = isoparse(self.data['not_before'])
+
+        if self.data.get('expires_on'):
+            self.expires_on = isoparse(self.data['expires_on'])
+        elif 'expires_in_days' in self.data:
+            self.expires_on = utcnow() + datetime.timedelta(days=self.data['expires_in_days'])
+
+        # An expires_in_days expiration is only known now; check before updating anything.
+        self._check_window(self.not_before, self.expires_on, PolicyExecutionError)
+
+        return super().process(resources, event)
 
 
 @KeyVault.action_registry.register('update-access-policy')

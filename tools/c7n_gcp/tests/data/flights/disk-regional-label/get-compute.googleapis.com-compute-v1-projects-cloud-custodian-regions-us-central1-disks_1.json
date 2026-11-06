@@ -1,0 +1,47 @@
+{
+  "headers": {
+    "etag": "XgZHu_Epie0YwFBAbOMv2mjmAr4=/UhSUzIDbJby5LqzoJ_6AVwuGbrA=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 12 Aug 2026 20:03:35 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1224",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks?filter=name+%3D+c7n-regional-jenkins&alt=json"
+  },
+  "body": {
+    "kind": "compute#diskList",
+    "id": "projects/cloud-custodian/regions/us-central1/disks",
+    "items": [
+      {
+        "kind": "compute#disk",
+        "id": "6800825139925708326",
+        "creationTimestamp": "2026-08-12T13:00:09.315-07:00",
+        "name": "c7n-regional-jenkins",
+        "sizeGb": "10",
+        "status": "READY",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks/c7n-regional-jenkins",
+        "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/diskTypes/pd-ssd",
+        "labels": {
+          "test_label": "test_value"
+        },
+        "labelFingerprint": "CHILmtzyjdE=",
+        "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+        "replicaZones": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b"
+        ],
+        "physicalBlockSizeBytes": "4096",
+        "enableConfidentialCompute": false,
+        "satisfiesPzi": true
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/disks"
+  }
+}

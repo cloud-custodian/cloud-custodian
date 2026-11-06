@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "EndpointName": "c7n-endpoint-metrics-bold-fowl-idle",
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint-metrics-bold-fowl-idle",
+        "EndpointConfigName": "c7n-em-idle-900bb2c3ad790e42e00a88255f",
+        "ProductionVariants": [
+            {
+                "VariantName": "AllTraffic",
+                "DeployedImages": [
+                    {
+                        "SpecifiedImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.7-1",
+                        "ResolvedImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost@sha256:b4f13edb198529c460692015797fa1ca6a8ff1ed64a149297174d922121b8fc4",
+                        "ResolutionTime": {
+                            "__class__": "datetime",
+                            "year": 2026,
+                            "month": 9,
+                            "day": 10,
+                            "hour": 14,
+                            "minute": 4,
+                            "second": 37,
+                            "microsecond": 434000
+                        }
+                    }
+                ],
+                "CurrentWeight": 1.0,
+                "DesiredWeight": 1.0,
+                "CurrentInstanceCount": 1,
+                "DesiredInstanceCount": 1
+            }
+        ],
+        "EndpointStatus": "InService",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 10,
+            "hour": 14,
+            "minute": 4,
+            "second": 36,
+            "microsecond": 645000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 10,
+            "hour": 14,
+            "minute": 8,
+            "second": 12,
+            "microsecond": 731000
+        },
+        "MetricsConfig": {
+            "EnableDetailedObservability": true
+        },
+        "ResponseMetadata": {}
+    }
+}

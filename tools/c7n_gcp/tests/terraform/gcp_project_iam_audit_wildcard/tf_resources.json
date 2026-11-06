@@ -1,0 +1,86 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_project": {
+            "project": {
+                "auto_create_network": null,
+                "billing_account": "000000-000000-000000",
+                "deletion_policy": "PREVENT",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "folder_id": "",
+                "id": "projects/stkl-kody-mullins",
+                "labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "name": "stkl-kody-mullins",
+                "number": "82151825516",
+                "org_id": "728386023487",
+                "project_id": "stkl-kody-mullins",
+                "tags": null,
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                }
+            }
+        },
+        "google_project_iam_audit_config": {
+            "all_services": {
+                "audit_log_config": [
+                    {
+                        "exempted_members": [
+                            "serviceAccount:c7n-audit-wildcard@stkl-kody-mullins.iam.gserviceaccount.com"
+                        ],
+                        "log_type": "DATA_WRITE"
+                    }
+                ],
+                "etag": "BwZd1UzGW+Y=",
+                "id": "stkl-kody-mullins/audit_config/allServices",
+                "project": "stkl-kody-mullins",
+                "service": "allServices"
+            },
+            "storage": {
+                "audit_log_config": [
+                    {
+                        "exempted_members": [
+                            "serviceAccount:c7n-audit-wildcard@stkl-kody-mullins.iam.gserviceaccount.com"
+                        ],
+                        "log_type": "DATA_READ"
+                    }
+                ],
+                "etag": "BwZd1UzGW+Y=",
+                "id": "stkl-kody-mullins/audit_config/storage.googleapis.com",
+                "project": "stkl-kody-mullins",
+                "service": "storage.googleapis.com"
+            }
+        },
+        "google_project_iam_member": {
+            "sa_viewer": {
+                "condition": [],
+                "etag": "BwZd1UzGW+Y=",
+                "id": "stkl-kody-mullins/roles/viewer/serviceAccount:c7n-audit-wildcard@stkl-kody-mullins.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-audit-wildcard@stkl-kody-mullins.iam.gserviceaccount.com",
+                "project": "stkl-kody-mullins",
+                "role": "roles/viewer"
+            }
+        },
+        "google_service_account": {
+            "sa": {
+                "account_id": "c7n-audit-wildcard",
+                "create_ignore_already_exists": null,
+                "deletion_policy": "DELETE",
+                "description": "",
+                "disabled": false,
+                "display_name": "C7N Audit Wildcard Test SA",
+                "email": "c7n-audit-wildcard@stkl-kody-mullins.iam.gserviceaccount.com",
+                "id": "projects/cloud-custodian/serviceAccounts/c7n-audit-wildcard@stkl-kody-mullins.iam.gserviceaccount.com",
+                "member": "serviceAccount:c7n-audit-wildcard@stkl-kody-mullins.iam.gserviceaccount.com",
+                "name": "projects/cloud-custodian/serviceAccounts/c7n-audit-wildcard@stkl-kody-mullins.iam.gserviceaccount.com",
+                "project": "stkl-kody-mullins",
+                "timeouts": null,
+                "unique_id": "108776348046598870543"
+            }
+        }
+    }
+}

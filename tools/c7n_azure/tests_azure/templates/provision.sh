@@ -182,6 +182,27 @@ deploy_resource() {
         az keyvault storage add --vault-name ${vault_name} -n storage1 --active-key-name key1 --resource-id ${storage_id} --auto-regenerate-key True --regeneration-period P720D  --output None
         az keyvault storage add --vault-name ${vault_name} -n storage2 --active-key-name key2 --resource-id ${storage_id} --auto-regenerate-key False --output None
 
+    elif [[ "$fileName" == "keyvault-secret.json" ]]; then
+
+        az deployment group create --resource-group $rgName --template-file $file --output None || {
+            echo "Failed to deploy Key Vault secret fixture in resource group '${rgName}'."
+            print_failed_group_deployment "$rgName"
+            exit 1
+        }
+
+        # The vault uses RBAC authorization; grant Key Vault Secrets Officer for data-plane access.
+        principal_type="ServicePrincipal"
+        if [[ ${is_user} -eq 1 ]]; then
+            principal_type="User"
+        fi
+        if ! ensure_role_for_active_principal \
+            "$rgName" \
+            "b86a8fe4-44ce-4948-aee5-eccb2c155cd7" \
+            "$principal_type"; then
+            echo "Required role assignment check failed; cannot continue with Key Vault secret fixture."
+            exit 1
+        fi
+
     elif [[ "$fileName" == "aks.json" ]]; then
 
         az deployment group create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --mode Complete --output None
@@ -189,10 +210,12 @@ deploy_resource() {
     elif [[ "$fileName" == "cognitive-service-deployment.json" ]]; then
 
         openai_location="${AZURE_OPENAI_LOCATION:-eastus}"
-        model_name="${AZURE_OPENAI_MODEL_NAME:-gpt-4o-mini}"
-        model_version="${AZURE_OPENAI_MODEL_VERSION:-2024-07-18}"
+        model_name="${AZURE_OPENAI_MODEL_NAME:-gpt-5-nano}"
+        model_version="${AZURE_OPENAI_MODEL_VERSION:-2025-08-07}"
+        # Pinned by committed test fixtures (recorded VCR cassettes reference this exact
+        # deployment name) -- do not rename to match the model default above.
         deployment_name="${AZURE_OPENAI_DEPLOYMENT_NAME:-cctest-gpt4o-mini}"
-        account_name="${AZURE_OPENAI_ACCOUNT_NAME}"
+        account_name="${AZURE_OPENAI_ACCOUNT_NAME:-cctestcogdeploy}"
 
         if az cognitiveservices account show-deleted \
             --resource-group "$rgName" \
@@ -249,6 +272,8 @@ deploy_resource() {
             exit 1
         fi
 
+        sku_name="${AZURE_OPENAI_SKU_NAME:-GlobalStandard}"
+
         if ! az cognitiveservices account deployment create \
             --resource-group $rgName \
             --name $account_name \
@@ -256,7 +281,7 @@ deploy_resource() {
             --model-format OpenAI \
             --model-name $model_name \
             --model-version $model_version \
-            --sku-name Standard \
+            --sku-name $sku_name \
             --sku-capacity 1 \
             --output None; then
             echo "Failed to create Cognitive Services deployment ${deployment_name} in account ${account_name}"
@@ -294,6 +319,10 @@ deploy_resource() {
 
         rm -f cost-management.body
 
+    elif [[ "$fileName" == "budget.json" ]]; then
+
+        az deployment sub create --location $resourceLocation --name cctest-budget \
+            --template-file $file --output None
     elif [[ "$fileName" == "ai-foundry-application.json" ]]; then
 
         unique_suffix="$(date +%s%N | tail -c 13)"

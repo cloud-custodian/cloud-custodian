@@ -151,7 +151,7 @@ def get_accounts_for_ou(client, ou, active, recursive=True, ignoredAccounts=()):
                 continue
 
             if active:
-                if a['Status'] == 'ACTIVE':
+                if a['State'] == 'ACTIVE':
                     results.append(a)
             else:
                 results.append(a)

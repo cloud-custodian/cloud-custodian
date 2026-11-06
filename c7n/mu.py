@@ -1820,6 +1820,24 @@ class ConfigRule(AWSEventBase):
     """
     client_service = 'config'
 
+    # Fields that AWS Config's DescribeConfigRules response includes for an
+    # existing rule, but that are output-only / system-managed and can be
+    # rejected by PutConfigRule if echoed back verbatim on an update, e.g.:
+    #
+    #   InvalidParameterValueException: AWS Config populates the
+    #   RuleEvaluationVisibility field for ServiceLinkedConfigRule. Try
+    #   again without populating the RuleEvaluationVisibility field.
+    #
+    # This has been observed for ordinary customer-owned CUSTOM_LAMBDA
+    # rules that use EvaluationModes, not just true service-linked rules,
+    # so we always strip these before merging our own params back in.
+    readonly_fields = (
+        'ConfigRuleArn',
+        'ConfigRuleId',
+        'CreatedBy',
+        'RuleEvaluationVisibility',
+    )
+
     def __repr__(self):
         return "<ConfigRule>"
 
@@ -1897,6 +1915,8 @@ class ConfigRule(AWSEventBase):
 
         if rule and self.delta(rule, params):
             log.debug("Updating config rule for %s" % self)
+            for f in self.readonly_fields:
+                rule.pop(f, None)
             rule.update(params)
             return LambdaRetry(self.client.put_config_rule, ConfigRule=rule)
         elif rule:

@@ -135,6 +135,79 @@ class ResolverTest(BaseTest):
             fh.flush()
             self.assertEqual(resolver.resolve("file:%s" % fh.name, {'auth': 'token'}), content)
 
+    def test_resolve_cache_key_includes_headers(self):
+        # a response fetched with one set of credentials must not be
+        # served to a caller presenting different ones
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+
+        alice_content = json.dumps({"tenant": "alice"})
+        bob_content = json.dumps({"tenant": "bob"})
+
+        with tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd(), delete=False) as fh:
+            self.addCleanup(os.unlink, fh.name)
+            fh.write(alice_content)
+            fh.flush()
+            uri = "file:%s" % fh.name
+
+            self.assertEqual(
+                resolver.resolve(uri, {"authorization": "alice-token"}),
+                alice_content,
+            )
+
+            # rewrite the file so a cache hit is distinguishable from a fetch
+            fh.seek(0)
+            fh.truncate()
+            fh.write(bob_content)
+            fh.flush()
+
+            self.assertEqual(
+                resolver.resolve(uri, {"authorization": "bob-token"}),
+                bob_content,
+            )
+
+    def test_resolve_cache_hit_on_identical_headers(self):
+        # same uri and same headers is still a cache hit
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+        content = json.dumps({"tenant": "alice"})
+
+        fh = tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd(), delete=False)
+        fh.write(content)
+        fh.flush()
+        fh.close()
+        uri = "file:%s" % fh.name
+
+        headers = {"authorization": "alice-token"}
+        self.assertEqual(resolver.resolve(uri, dict(headers)), content)
+        self.assertEqual(cache.saves, 1)
+
+        # without the file a fetch would fail, so content proves a cache hit
+        os.unlink(fh.name)
+        self.assertEqual(resolver.resolve(uri, dict(headers)), content)
+        self.assertEqual(cache.saves, 1)
+
+    def test_resolve_does_not_mutate_headers(self):
+        # ValuesFrom reuses one headers dict across calls, mutating it
+        # would change the cache key and defeat caching
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+        content = json.dumps({"tenant": "alice"})
+
+        fh = tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd(), delete=False)
+        self.addCleanup(os.unlink, fh.name)
+        fh.write(content)
+        fh.flush()
+        fh.close()
+        uri = "file:%s" % fh.name
+
+        headers = {"authorization": "alice-token"}
+        resolver.resolve(uri, headers)
+        self.assertEqual(headers, {"authorization": "alice-token"})
+
+        resolver.resolve(uri, headers)
+        self.assertEqual(cache.saves, 1)
+
 
 def test_value_from_sqlkv(tmp_path):
 
@@ -423,6 +496,41 @@ class UrlValueTest(BaseTest):
             )
         os.remove("test_dict.csv")
         self.assertEqual(values.get_values(), {"0", "1", "2", "3", "4"})
+
+    def test_csv_expr_using_dict_blank_rows(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": "account_id", "format": "csv2dict"},
+            "account_id,reason\n111,special\n222,\n\n444,\n",
+        )
+        self.assertEqual(values.get_values(), {"111", "222", "444"})
+
+    def test_csv_expr_using_dict_trailing_blank_rows(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": "reason", "format": "csv2dict"},
+            "account_id,reason\r\n111,special\r\n222,\r\n\r\n",
+        )
+        self.assertEqual(values.get_values(), {"special", ""})
+
+    def test_csv_expr_using_dict_blank_rows_index(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": "account_id[2]", "format": "csv2dict"},
+            "\naccount_id,reason\n111,special\n\n222,\n444,\n",
+        )
+        self.assertEqual(values.get_values(), "444")
+
+    def test_csv_no_expr_using_dict_blank_rows(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "format": "csv2dict"},
+            "account_id,reason\n111,special\n\n222,\n",
+        )
+        self.assertEqual(values.get_values(), {"111", "special", "222", ""})
+
+    def test_csv_expr_using_dict_short_rows_kept(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": "account_id", "format": "csv2dict"},
+            "account_id,reason\n111,special\n222\n",
+        )
+        self.assertEqual(values.get_values(), {"111", "222"})
 
     def test_csv_column(self):
         with open("test_column.csv", "w") as out:

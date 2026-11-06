@@ -19,8 +19,10 @@ from azure.identity._credentials.azure_cli import _run_command
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from requests import HTTPError
 
+from c7n.output import APICallStats, api_stats_outputs
+
 from c7n_azure import constants
-from c7n_azure.utils import (C7nRetryPolicy, ManagedGroupHelper,
+from c7n_azure.utils import (ApiStatsHookPolicy, C7nRetryPolicy, ManagedGroupHelper,
                              ResourceIdParser, StringUtils,
                              cost_query_override_api_version,
                              custodian_azure_send_override,
@@ -256,18 +258,23 @@ class Session:
                            base_url=self.cloud_endpoints.endpoints.resource_manager)
             legacy = True
         else:
+            hooks = {'raw_response_hook': log_response_data}
+            # TODO: remove when azure-mgmt-costmanagement is upgraded past 1.x.
+            # https://github.com/Azure/azure-sdk-for-python/issues/17351 is closed,
+            # but 1.x still queries with api-version 2020-06-01, which is not
+            # supported, so replace it with 2019-11-01, which works as expected.
+            # Later releases default to a newer api-version, and honour the
+            # api_version keyword.
+            if client == 'azure.mgmt.costmanagement.CostManagementClient':
+                hooks['raw_request_hook'] = cost_query_override_api_version
+
             client_args = {
                 'credential': self.credentials,
-                'raw_response_hook': log_response_data,
+                # Runs the hooks, and records each request attempt for api stats.
+                'custom_hook_policy': ApiStatsHookPolicy(**hooks),
                 'retry_policy': C7nRetryPolicy(),
                 'credential_scopes': [self.resource_endpoint + ".default"]
             }
-
-            # TODO: remove when fixed: https://github.com/Azure/azure-sdk-for-python/issues/17351
-            # This workaround will replace used api-version for costmanagement requests
-            # 2020-06-01 is not supported, but 2019-11-01 is working as expected.
-            if client == 'azure.mgmt.costmanagement.CostManagementClient':
-                client_args['raw_request_hook'] = cost_query_override_api_version
 
             # Handle Microsoft Graph API client configuration
             from c7n_azure.constants import MSGRAPH_RESOURCE_ID
@@ -400,3 +407,12 @@ class Session:
             return self.cloud_endpoints.endpoints.microsoft_graph_resource_id
         else:
             return getattr(self.cloud_endpoints.endpoints, endpoint)
+
+
+@api_stats_outputs.register('azure')
+class ApiStats(APICallStats):
+    """Count azure api requests by method and resource type, and their time.
+
+    e.g. GET Microsoft.Compute/virtualMachines. Each retry of a request is
+    counted as a call.
+    """

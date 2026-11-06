@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import logging
 import isodate
 import operator
@@ -21,6 +22,7 @@ from azure.core.exceptions import HttpResponseError
 from c7n_azure.provider import resources
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.offhours import OffHour, OnHour, Time
@@ -147,6 +149,42 @@ class MetricFilter(Filter):
                 timeframe: 24
                 period_start: start-of-day
 
+    The ``dimensions`` key lets a policy filter a resource by a metric of that
+    resource's parent, restricted back to the resource itself with an OData
+    filter clause. When ``dimensions`` is set, the filter queries the parent
+    resource's scope, taken from the ``c7n:parent-id`` annotation, instead of
+    the resource's own id. Each dimension's ``value`` accepts a literal
+    string, or one of two sentinels: ``resource-name`` (the resource's own
+    ``name``) or ``resource-id`` (the resource's own ``id``). Because those
+    two strings are reserved as sentinels, a dimension value can't currently
+    be the literal string ``resource-name`` or ``resource-id`` themselves.
+
+    :example:
+
+    Find Azure OpenAI model deployments with no requests in the last week,
+    by querying the parent Cognitive Services account's ``AzureOpenAIRequests``
+    metric and filtering it back to the deployment via the
+    ``ModelDeploymentName`` dimension
+
+    .. code-block:: yaml
+
+        policies:
+          - name: unused-openai-deployments
+            resource: azure.cognitiveservice-deployment
+            filters:
+              - type: metric
+                metric: AzureOpenAIRequests
+                metric_namespace: Microsoft.CognitiveServices/accounts
+                aggregation: total
+                op: lte
+                threshold: 0
+                timeframe: 168
+                interval: P1D
+                no_data_action: to_zero
+                dimensions:
+                  - name: ModelDeploymentName
+                    value: resource-name
+
     """
 
     DEFAULT_TIMEFRAME = 24
@@ -177,7 +215,19 @@ class MetricFilter(Filter):
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
             'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
-            'filter': {'type': 'string'}
+            'filter': {'type': 'string'},
+            'dimensions': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['name', 'value'],
+                    'properties': {
+                        'name': {'type': 'string'},
+                        'value': {'type': 'string'},
+                    },
+                },
+            },
         }
     }
     schema_alias = True
@@ -206,6 +256,7 @@ class MetricFilter(Filter):
         self.metricnamespace = self.data.get("metric_namespace", None)
         # default to false if not passed in
         self.period_start = self.data.get('period_start', 'auto')
+        self.dimensions = self.data.get('dimensions', [])
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes
@@ -235,7 +286,7 @@ class MetricFilter(Filter):
             metrics_data = self.client.metrics.list(
                 self.get_resource_id(resource),
                 timespan=self.timespan,
-                interval=self.interval,
+                interval=isodate.duration_isoformat(self.interval),
                 metricnames=self.metric,
                 aggregation=self.aggregation,
                 metricnamespace=self.metricnamespace,
@@ -262,11 +313,33 @@ class MetricFilter(Filter):
 
         return m
 
+    _DIMENSION_VALUE_SENTINELS = {
+        'resource-name': lambda r: r.get('name'),
+        'resource-id': lambda r: r.get('id'),
+    }
+
+    def resolve_dimension_value(self, resource, value):
+        resolver = self._DIMENSION_VALUE_SENTINELS.get(value)
+        return resolver(resource) if resolver else value
+
     def get_resource_id(self, resource):
+        if self.dimensions and 'c7n:parent-id' in resource:
+            return resource['c7n:parent-id']
         return resource['id']
 
     def get_filter(self, resource):
-        return self.filter
+        if not self.dimensions:
+            return self.filter
+        clauses = []
+        for d in self.dimensions:
+            value = self.resolve_dimension_value(resource, d['value'])
+            if value is None:
+                raise PolicyExecutionError(
+                    "policy:%s Could not resolve dimension %s for resource %s" % (
+                        self.manager.ctx.policy.name, d['name'], resource.get('id')))
+            clauses.append("%s eq '%s'" % (d['name'], str(value).replace("'", "''")))
+        dim_filter = " and ".join(clauses)
+        return "%s and %s" % (self.filter, dim_filter) if self.filter else dim_filter
 
     def _write_metric_to_resource(self, resource, metrics_data, m):
         resource_metrics = resource.setdefault(get_annotation_prefix('metrics'), {})
@@ -276,12 +349,13 @@ class MetricFilter(Filter):
         }
 
     def _get_metrics_cache_key(self):
-        return "{}, {}, {}, {}, {}".format(
+        return "{}, {}, {}, {}, {}, {}".format(
             self.metric,
             self.aggregation,
             self.timeframe,
             self.interval,
             self.filter,
+            self.dimensions,
         )
 
     def _get_cached_metric_data(self, resource):
@@ -450,11 +524,33 @@ class DiagnosticSettingsFilter(ValueFilter):
                 value: True
                 op: in
                 value_type: swap
+
+    :example:
+
+    Find KeyVaults that don't send AuditEvent logs anywhere. A log entry that uses a
+    category group has ``category_group`` set instead of ``category``. On a Key Vault
+    both the ``audit`` and ``allLogs`` groups include AuditEvent, so either one counts.
+    The filter matches a resource when any one of its settings matches, and Azure may
+    list unconfigured groups such as ``audit`` as disabled.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-keyvaults-without-audit-logs
+            resource: azure.keyvault
+            filters:
+              - not:
+                - type: diagnostic-settings
+                  key: >-
+                    logs[?(category == 'AuditEvent' || category_group == 'audit'
+                    || category_group == 'allLogs') && enabled]
+                  value: not-null
     """
 
     schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
     schema_alias = True
     log = logging.getLogger('custodian.azure.filters.DiagnosticSettingsFilter')
+    api_version = '2021-05-01-preview'
 
     def process(self, resources, event=None):
         futures = []
@@ -475,12 +571,11 @@ class DiagnosticSettingsFilter(ValueFilter):
             return results
 
     def process_resource_set(self, resources):
-        #: :type: azure.mgmt.monitor.MonitorManagementClient
-        client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        #: :type: azure.mgmt.resource.ResourceManagementClient
+        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
         matched = []
         for resource in resources:
-            settings = client.diagnostic_settings.list(resource['id'])
-            settings = [s.as_dict() for s in settings.value]
+            settings = [self._normalize(s) for s in self.get_raw_settings(client, resource['id'])]
             # put an empty item in when no diag settings, so the absent operator can function
             if not settings:
                 settings = [{}]
@@ -490,6 +585,45 @@ class DiagnosticSettingsFilter(ValueFilter):
                 matched.append(resource)
 
         return matched
+
+    @classmethod
+    def get_raw_settings(cls, client, scope_id):
+        """List the diagnostic settings on a resource or subscription id, in the shape
+        Azure's REST API returns them: properties nested, camelCase keys.
+
+        Not the monitor SDK: azure-mgmt-monitor 7.0 has no diagnostic settings, and older
+        releases list at 2017-05-01-preview, where Azure leaves out any setting that uses
+        a category group such as allLogs.
+        """
+        response = client.resources.get_by_id(
+            # Named arguments: azure-mgmt-resource 26 makes api_version keyword-only.
+            resource_id=f"{scope_id}/providers/Microsoft.Insights/diagnosticSettings",
+            api_version=cls.api_version,
+            # The response is a list, not one resource, so keep the raw JSON.
+            # text(), not json(): older azure-mgmt-resource releases return
+            # responses that have no json() method.
+            cls=lambda pipeline_response, deserialized, headers: json.loads(
+                pipeline_response.http_response.text()))
+        return response.get('value') or []
+
+    @classmethod
+    def _normalize(cls, setting):
+        """Shape a raw diagnostic setting the way the monitor SDK's as_dict() did, which
+        existing policies are written against: properties flattened, snake_case keys,
+        nulls dropped. Fields that model didn't know, such as category_group, are kept.
+        """
+        setting = dict(setting)
+        setting.update(setting.pop('properties', None) or {})
+        return cls._snake_case_keys(setting)
+
+    @classmethod
+    def _snake_case_keys(cls, value):
+        if isinstance(value, dict):
+            return {StringUtils.camel_to_snake(k): cls._snake_case_keys(v)
+                    for k, v in value.items() if v is not None}
+        if isinstance(value, list):
+            return [cls._snake_case_keys(v) for v in value]
+        return value
 
 
 class PolicyCompliantFilter(Filter):
@@ -1007,11 +1141,9 @@ class CostFilter(ValueFilter):
         query_filter = None
         if not is_resource_group:
             query_filter = QueryFilter(
-                dimension=QueryComparisonExpression(name='ResourceType',
-                                                    operator='In',
-                                                    values=[manager.resource_type.resource_type]))
-            if 'dimension' in query_filter._attribute_map:
-                query_filter._attribute_map['dimension']['key'] = 'dimensions'
+                dimensions=QueryComparisonExpression(name='ResourceType',
+                                                     operator='In',
+                                                     values=[manager.resource_type.resource_type]))
 
         dataset = QueryDataset(grouping=grouping, aggregation=aggregation, filter=query_filter)
 

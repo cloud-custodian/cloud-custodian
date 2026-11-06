@@ -30,18 +30,31 @@ from c7n.query import (
     ChildResourceManager,
     ConfigSource,
     DescribeSource,
+    DescribeWithResourceTags,
     QueryResourceManager,
     TypeInfo,
 )
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag, universal_augment
 from c7n.utils import (
-    get_partition, local_session, type_schema, chunks, filter_empty, QueryParser,
+    get_partition, get_retry, local_session, type_schema, chunks, filter_empty, QueryParser,
     select_keys
 )
 
 from c7n.resources.aws import Arn
 from c7n.resources.securityhub import OtherResourcePostFinding
+
+
+_iam_tag_retry = get_retry((
+    'ConcurrentModification',
+    'TooManyRequestsException',
+    'ThrottlingException',
+    'RequestLimitExceeded',
+    'Throttled',
+    'ThrottledException',
+    'Throttling',
+    'Client.RequestLimitExceeded',
+))
 
 
 class DescribeGroup(DescribeSource):
@@ -149,8 +162,7 @@ class RoleTag(Tag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                self.manager.retry(
-                    client.tag_role, RoleName=role['RoleName'], Tags=tags)
+                _iam_tag_retry(client.tag_role, RoleName=role['RoleName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -164,8 +176,7 @@ class RoleRemoveTag(RemoveTag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                self.manager.retry(
-                    client.untag_role, RoleName=role['RoleName'], TagKeys=tags)
+                _iam_tag_retry(client.untag_role, RoleName=role['RoleName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -281,8 +292,7 @@ class UserTag(Tag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                self.manager.retry(
-                    client.tag_user, UserName=u['UserName'], Tags=tags)
+                _iam_tag_retry(client.tag_user, UserName=u['UserName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -296,8 +306,7 @@ class UserRemoveTag(RemoveTag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                self.manager.retry(
-                    client.untag_user, UserName=u['UserName'], TagKeys=tags)
+                _iam_tag_retry(client.untag_user, UserName=u['UserName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -452,6 +461,11 @@ class InstanceProfile(QueryResourceManager):
         global_resource = True
         arn = 'Arn'
         cfn_type = 'AWS::IAM::InstanceProfile'
+        universal_taggable = object()
+
+    # list_instance_profiles does not return tags, fetch them in bulk
+    # via the resource groups tagging api.
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @resources.register('iam-certificate')
@@ -849,7 +863,7 @@ class IamRoleUsage(Filter):
         profiles.update(self.scan_ec2_roles())
 
         manager = self.manager.get_resource_manager('iam-profile')
-        iprofiles = manager.resources()
+        iprofiles = manager.resources(augment=False)
         results = []
         for p in iprofiles:
             if p['InstanceProfileName'] not in profiles:
@@ -2092,8 +2106,9 @@ class UserPolicy(ValueFilter):
         matched = []
         for r in resources:
             for p in r['c7n:Policies']:
-                if self.match(p) and r not in matched:
+                if self.match(p):
                     matched.append(r)
+                    break
         return matched
 
 

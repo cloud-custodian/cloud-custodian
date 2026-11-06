@@ -7,6 +7,7 @@ import requests
 
 from c7n_azure import constants
 from c7n_azure.actions.delete import DeleteAction
+from c7n_azure.actions.diagnostic_settings import SetDiagnosticSettingsAction
 from c7n_azure.actions.lock import LockAction
 from c7n_azure.actions.tagging import (AutoTagDate)
 from c7n_azure.actions.tagging import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction
@@ -21,11 +22,13 @@ from c7n_azure.utils import ResourceIdParser
 # ARM resources which do not currently support tagging
 # for database it is a C7N known issue (#4543)
 arm_tags_unsupported = ['microsoft.network/dnszones/',
+                        'microsoft.network/privatednszones/',
                         'microsoft.sql/servers/databases',
                         'microsoft.storage/storageaccounts/blobservices/containers',
                         'microsoft.cognitiveservices/accounts/deployments',
                         'microsoft.cognitiveservices/accounts/projects/connections',
-                        'microsoft.machinelearningservices/workspaces/jobs']
+                        'microsoft.machinelearningservices/workspaces/jobs',
+                        'microsoft.machinelearningservices/workspaces/schedules']
 
 
 class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):
@@ -148,6 +151,9 @@ class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
 
         if resource_class.resource_type.diagnostic_settings_enabled:
             resource_class.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
+            resource_class.action_registry.register(
+                'set-diagnostic-settings', SetDiagnosticSettingsAction
+            )
 
 
 class ChildArmResourceManager(ChildResourceManager, ArmResourceManager, metaclass=QueryMeta):

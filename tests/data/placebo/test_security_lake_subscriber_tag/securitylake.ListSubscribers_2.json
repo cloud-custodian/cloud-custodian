@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "subscribers": [
+            {
+                "subscriberArn": "arn:aws:securitylake:us-east-1:644160558196:subscriber/1234abcd-12ab-34cd-56ef-1234567890ab",
+                "subscriberId": "1234abcd-12ab-34cd-56ef-1234567890ab",
+                "subscriberName": "test-subscriber",
+                "subscriberStatus": "ACTIVE",
+                "accessTypes": [
+                    "S3"
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/AmazonSecurityLake-1234abcd-12ab-34cd-56ef-1234567890ab",
+                "s3BucketArn": "arn:aws:s3:::aws-security-data-lake-subscriber",
+                "subscriberIdentity": {
+                    "externalId": "extid123",
+                    "principal": "644160558196"
+                },
+                "sources": [],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 1,
+                    "day": 15,
+                    "hour": 12,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "nextToken": null
+    }
+}

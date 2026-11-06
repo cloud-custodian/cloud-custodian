@@ -1,0 +1,309 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "job_name": {
+            "value": "c7n-evaluation-default-8ebe",
+            "type": "string"
+        },
+        "model_arn": {
+            "value": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
+            "type": "string"
+        },
+        "output_s3_uri": {
+            "value": "s3://c7n-evaluation-default-8ebe-output/evaluations/",
+            "type": "string"
+        },
+        "role_arn": {
+            "value": "arn:aws:iam::644160558196:role/c7n-evaluation-default-8ebe-role",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "aws_caller_identity": {
+            "current": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_admin_1ca370fb35bf6b13/kody.mullins@sixfeetup.com",
+                "id": "644160558196",
+                "user_id": "AROAXGZAMH754FNWODWUX:kody.mullins@sixfeetup.com"
+            }
+        },
+        "aws_iam_policy_document": {
+            "assume_role": {
+                "id": "1967008192",
+                "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"bedrock.amazonaws.com\"\n      },\n      \"Condition\": {\n        \"ArnLike\": {\n          \"aws:SourceArn\": \"arn:aws:bedrock:us-east-1:644160558196:evaluation-job/*\"\n        },\n        \"StringEquals\": {\n          \"aws:SourceAccount\": \"644160558196\"\n        }\n      }\n    }\n  ]\n}",
+                "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Principal\":{\"Service\":\"bedrock.amazonaws.com\"},\"Condition\":{\"ArnLike\":{\"aws:SourceArn\":\"arn:aws:bedrock:us-east-1:644160558196:evaluation-job/*\"},\"StringEquals\":{\"aws:SourceAccount\":\"644160558196\"}}}]}",
+                "override_json": null,
+                "override_policy_documents": null,
+                "policy_id": null,
+                "source_json": null,
+                "source_policy_documents": null,
+                "statement": [
+                    {
+                        "actions": [
+                            "sts:AssumeRole"
+                        ],
+                        "condition": [
+                            {
+                                "test": "ArnLike",
+                                "values": [
+                                    "arn:aws:bedrock:us-east-1:644160558196:evaluation-job/*"
+                                ],
+                                "variable": "aws:SourceArn"
+                            },
+                            {
+                                "test": "StringEquals",
+                                "values": [
+                                    "644160558196"
+                                ],
+                                "variable": "aws:SourceAccount"
+                            }
+                        ],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [
+                            {
+                                "identifiers": [
+                                    "bedrock.amazonaws.com"
+                                ],
+                                "type": "Service"
+                            }
+                        ],
+                        "resources": [],
+                        "sid": ""
+                    }
+                ],
+                "version": "2012-10-17"
+            },
+            "bedrock_evaluation": {
+                "id": "1461870173",
+                "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"s3:PutObject\",\n        \"s3:ListBucket\",\n        \"s3:GetObject\",\n        \"s3:GetBucketLocation\",\n        \"s3:AbortMultipartUpload\"\n      ],\n      \"Resource\": [\n        \"arn:aws:s3:::c7n-evaluation-default-8ebe-output/*\",\n        \"arn:aws:s3:::c7n-evaluation-default-8ebe-output\"\n      ]\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"bedrock:InvokeModelWithResponseStream\",\n        \"bedrock:InvokeModel\"\n      ],\n      \"Resource\": \"arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0\"\n    },\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"bedrock:StopModelInvocationJob\",\n        \"bedrock:GetProvisionedModelThroughput\",\n        \"bedrock:GetModelInvocationJob\",\n        \"bedrock:GetInferenceProfile\",\n        \"bedrock:CreateModelInvocationJob\"\n      ],\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+                "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:PutObject\",\"s3:ListBucket\",\"s3:GetObject\",\"s3:GetBucketLocation\",\"s3:AbortMultipartUpload\"],\"Resource\":[\"arn:aws:s3:::c7n-evaluation-default-8ebe-output/*\",\"arn:aws:s3:::c7n-evaluation-default-8ebe-output\"]},{\"Effect\":\"Allow\",\"Action\":[\"bedrock:InvokeModelWithResponseStream\",\"bedrock:InvokeModel\"],\"Resource\":\"arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0\"},{\"Effect\":\"Allow\",\"Action\":[\"bedrock:StopModelInvocationJob\",\"bedrock:GetProvisionedModelThroughput\",\"bedrock:GetModelInvocationJob\",\"bedrock:GetInferenceProfile\",\"bedrock:CreateModelInvocationJob\"],\"Resource\":\"*\"}]}",
+                "override_json": null,
+                "override_policy_documents": null,
+                "policy_id": null,
+                "source_json": null,
+                "source_policy_documents": null,
+                "statement": [
+                    {
+                        "actions": [
+                            "s3:AbortMultipartUpload",
+                            "s3:GetBucketLocation",
+                            "s3:GetObject",
+                            "s3:ListBucket",
+                            "s3:PutObject"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [],
+                        "resources": [
+                            "arn:aws:s3:::c7n-evaluation-default-8ebe-output",
+                            "arn:aws:s3:::c7n-evaluation-default-8ebe-output/*"
+                        ],
+                        "sid": ""
+                    },
+                    {
+                        "actions": [
+                            "bedrock:InvokeModel",
+                            "bedrock:InvokeModelWithResponseStream"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [],
+                        "resources": [
+                            "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0"
+                        ],
+                        "sid": ""
+                    },
+                    {
+                        "actions": [
+                            "bedrock:CreateModelInvocationJob",
+                            "bedrock:GetInferenceProfile",
+                            "bedrock:GetModelInvocationJob",
+                            "bedrock:GetProvisionedModelThroughput",
+                            "bedrock:StopModelInvocationJob"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [],
+                        "resources": [
+                            "*"
+                        ],
+                        "sid": ""
+                    }
+                ],
+                "version": "2012-10-17"
+            }
+        },
+        "aws_iam_role": {
+            "bedrock_evaluation": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-evaluation-default-8ebe-role",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Condition\":{\"ArnLike\":{\"aws:SourceArn\":\"arn:aws:bedrock:us-east-1:644160558196:evaluation-job/*\"},\"StringEquals\":{\"aws:SourceAccount\":\"644160558196\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"bedrock.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-07-16T22:07:17Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-evaluation-default-8ebe-role",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-evaluation-default-8ebe-role",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAXGZAMH752DSQ5OS52"
+            }
+        },
+        "aws_iam_role_policy": {
+            "bedrock_evaluation": {
+                "id": "c7n-evaluation-default-8ebe-role:c7n-evaluation-default-8ebe",
+                "name": "c7n-evaluation-default-8ebe",
+                "name_prefix": "",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"s3:PutObject\",\"s3:ListBucket\",\"s3:GetObject\",\"s3:GetBucketLocation\",\"s3:AbortMultipartUpload\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:s3:::c7n-evaluation-default-8ebe-output/*\",\"arn:aws:s3:::c7n-evaluation-default-8ebe-output\"]},{\"Action\":[\"bedrock:InvokeModelWithResponseStream\",\"bedrock:InvokeModel\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0\"},{\"Action\":[\"bedrock:StopModelInvocationJob\",\"bedrock:GetProvisionedModelThroughput\",\"bedrock:GetModelInvocationJob\",\"bedrock:GetInferenceProfile\",\"bedrock:CreateModelInvocationJob\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+                "role": "c7n-evaluation-default-8ebe-role"
+            }
+        },
+        "aws_s3_bucket": {
+            "output": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-evaluation-default-8ebe-output",
+                "bucket": "c7n-evaluation-default-8ebe-output",
+                "bucket_domain_name": "c7n-evaluation-default-8ebe-output.s3.amazonaws.com",
+                "bucket_namespace": "global",
+                "bucket_prefix": "",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-evaluation-default-8ebe-output.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "36b28bc69a41a1f44ff15f3d6bbcf2f5fd96d6cd49206458604c15ad38ebdf65",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-evaluation-default-8ebe-output",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "aws_s3_bucket_lifecycle_configuration": {
+            "output": {
+                "bucket": "c7n-evaluation-default-8ebe-output",
+                "expected_bucket_owner": "",
+                "id": "c7n-evaluation-default-8ebe-output",
+                "region": "us-east-1",
+                "rule": [
+                    {
+                        "abort_incomplete_multipart_upload": [],
+                        "expiration": [
+                            {
+                                "date": null,
+                                "days": 30,
+                                "expired_object_delete_marker": false
+                            }
+                        ],
+                        "filter": [
+                            {
+                                "and": [],
+                                "object_size_greater_than": null,
+                                "object_size_less_than": null,
+                                "prefix": "evaluations/",
+                                "tag": []
+                            }
+                        ],
+                        "id": "evaluation-output-retention",
+                        "noncurrent_version_expiration": [
+                            {
+                                "newer_noncurrent_versions": null,
+                                "noncurrent_days": 10
+                            }
+                        ],
+                        "noncurrent_version_transition": [],
+                        "prefix": "",
+                        "status": "Enabled",
+                        "transition": []
+                    }
+                ],
+                "timeouts": null,
+                "transition_default_minimum_object_size": "all_storage_classes_128K"
+            }
+        },
+        "aws_s3_bucket_versioning": {
+            "output": {
+                "bucket": "c7n-evaluation-default-8ebe-output",
+                "expected_bucket_owner": "",
+                "id": "c7n-evaluation-default-8ebe-output",
+                "mfa": null,
+                "region": "us-east-1",
+                "versioning_configuration": [
+                    {
+                        "mfa_delete": "Disabled",
+                        "status": "Enabled"
+                    }
+                ]
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "jr4=",
+                "b64_url": "jr4",
+                "byte_length": 2,
+                "dec": "36542",
+                "hex": "8ebe",
+                "id": "jr4",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

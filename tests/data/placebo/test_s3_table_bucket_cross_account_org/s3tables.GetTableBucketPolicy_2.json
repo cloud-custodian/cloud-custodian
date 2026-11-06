@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "resourcePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"OrgAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"s3tables:GetTableBucket\",\"s3tables:ListTables\"],\"Resource\":\"arn:aws:s3tables:us-east-1:644160558196:bucket/c7n-test-tb-compliant\",\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-c7ntest4321\"}}}]}"
+    }
+}
