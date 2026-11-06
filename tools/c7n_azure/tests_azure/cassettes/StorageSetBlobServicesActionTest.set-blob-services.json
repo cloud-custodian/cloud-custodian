@@ -1,0 +1,359 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Thu, 29 Oct 2026 18:16:31 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "00000000-0000-0000-0000-000000000001",
+                        "00000000-0000-0000-0000-000000000002",
+                        "00000000-0000-0000-0000-000000000003",
+                        "00000000-0000-0000-0000-000000000004"
+                    ],
+                    "content-length": [
+                        "11251"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: REDACTED Ref C: 2026-10-29T18:16:31Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-blob-services/providers/Microsoft.Storage/storageAccounts/ccblobsvc0000000000000",
+                                "name": "ccblobsvc0000000000000",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "keyCreationTime": {
+                                        "key1": "2026-10-29T18:13:37.4381065Z",
+                                        "key2": "2026-10-29T18:13:37.4381065Z"
+                                    },
+                                    "allowCrossTenantReplication": false,
+                                    "privateEndpointConnections": [],
+                                    "minimumTlsVersion": "TLS1_0",
+                                    "allowBlobPublicAccess": false,
+                                    "networkAcls": {
+                                        "ipv6Rules": [],
+                                        "bypass": "None",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2026-10-29T18:13:37.4532033Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2026-10-29T18:13:37.4532033Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2026-10-29T18:13:37.1043211Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://ccblobsvc0000000000000.dfs.core.windows.net/",
+                                        "web": "https://ccblobsvc0000000000000.z21.web.core.windows.net/",
+                                        "blob": "https://ccblobsvc0000000000000.blob.core.windows.net/",
+                                        "queue": "https://ccblobsvc0000000000000.queue.core.windows.net/",
+                                        "table": "https://ccblobsvc0000000000000.table.core.windows.net/",
+                                        "file": "https://ccblobsvc0000000000000.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "southcentralus",
+                                    "statusOfPrimary": "available"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-blob-services/providers/Microsoft.Storage/storageAccounts/ccblobsvc0000000000000/blobServices/default?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Thu, 29 Oct 2026 18:16:32 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "content-length": [
+                        "500"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: REDACTED Ref C: 2026-10-29T18:16:32Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-blob-services/providers/Microsoft.Storage/storageAccounts/ccblobsvc0000000000000/blobServices/default",
+                        "name": "default",
+                        "type": "Microsoft.Storage/storageAccounts/blobServices",
+                        "properties": {
+                            "containerDeleteRetentionPolicy": {
+                                "enabled": false
+                            },
+                            "cors": {
+                                "corsRules": []
+                            },
+                            "deleteRetentionPolicy": {
+                                "allowPermanentDelete": false,
+                                "enabled": false
+                            },
+                            "isVersioningEnabled": false
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-blob-services/providers/Microsoft.Storage/storageAccounts/ccblobsvc0000000000000/blobServices/default?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Thu, 29 Oct 2026 18:16:32 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "content-length": [
+                        "500"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: REDACTED Ref C: 2026-10-29T18:16:32Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-blob-services/providers/Microsoft.Storage/storageAccounts/ccblobsvc0000000000000/blobServices/default",
+                        "name": "default",
+                        "type": "Microsoft.Storage/storageAccounts/blobServices",
+                        "properties": {
+                            "containerDeleteRetentionPolicy": {
+                                "enabled": false
+                            },
+                            "cors": {
+                                "corsRules": []
+                            },
+                            "deleteRetentionPolicy": {
+                                "allowPermanentDelete": false,
+                                "enabled": false
+                            },
+                            "isVersioningEnabled": false
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-blob-services/providers/Microsoft.Storage/storageAccounts/ccblobsvc0000000000000/blobServices/default?api-version=2024-01-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Thu, 29 Oct 2026 18:16:33 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
+                    "content-length": [
+                        "468"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: REDACTED Ref C: 2026-10-29T18:16:33Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-blob-services/providers/Microsoft.Storage/storageAccounts/ccblobsvc0000000000000/blobServices/default",
+                        "name": "default",
+                        "type": "Microsoft.Storage/storageAccounts/blobServices",
+                        "properties": {
+                            "containerDeleteRetentionPolicy": {
+                                "enabled": true,
+                                "days": 14
+                            },
+                            "cors": {
+                                "corsRules": []
+                            },
+                            "deleteRetentionPolicy": {
+                                "allowPermanentDelete": false,
+                                "enabled": true,
+                                "days": 7
+                            },
+                            "isVersioningEnabled": true
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-blob-services/providers/Microsoft.Storage/storageAccounts/ccblobsvc0000000000000/blobServices/default?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Thu, 29 Oct 2026 18:16:34 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "content-length": [
+                        "516"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 00000000000000000000000000000000 Ref B: REDACTED Ref C: 2026-10-29T18:16:34Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-blob-services/providers/Microsoft.Storage/storageAccounts/ccblobsvc0000000000000/blobServices/default",
+                        "name": "default",
+                        "type": "Microsoft.Storage/storageAccounts/blobServices",
+                        "properties": {
+                            "containerDeleteRetentionPolicy": {
+                                "enabled": true,
+                                "days": 14
+                            },
+                            "cors": {
+                                "corsRules": []
+                            },
+                            "deleteRetentionPolicy": {
+                                "allowPermanentDelete": false,
+                                "enabled": true,
+                                "days": 7
+                            },
+                            "isVersioningEnabled": true
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
