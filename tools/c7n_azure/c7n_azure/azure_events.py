@@ -24,6 +24,10 @@ class AzureEvents:
             'resource_provider': 'Microsoft.Cdn/profiles',
             'event': 'write'},
 
+        'CognitiveServiceDeploymentWrite': {
+            'resource_provider': 'Microsoft.CognitiveServices/accounts/deployments',
+            'event': 'write'},
+
         'CognitiveServiceWrite': {
             'resource_provider': 'Microsoft.CognitiveServices/account',
             'event': 'write'},
