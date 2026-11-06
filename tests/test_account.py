@@ -1523,6 +1523,38 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_bedrock_data_retention_not_none(self):
+        factory = self.replay_flight_data('test_bedrock_data_retention_not_none')
+        p = self.load_policy({
+            'name': 'bedrock-data-retention-not-none',
+            'resource': 'account',
+            'filters': [{
+                'type': 'bedrock-data-retention',
+                'key': 'mode',
+                'op': 'ne',
+                'value': 'none'}]},
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:BedrockDataRetention']['mode'], 'inherit')
+
+    def test_bedrock_data_retention_none(self):
+        factory = self.replay_flight_data('test_bedrock_data_retention_none')
+        p = self.load_policy({
+            'name': 'bedrock-data-retention-none',
+            'resource': 'account',
+            'filters': [{
+                'type': 'bedrock-data-retention',
+                'key': 'mode',
+                'op': 'ne',
+                'value': 'none'}]},
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_update_bedrock_model_invocation_logging(self):
         factory = self.replay_flight_data("test_update_bedrock_model_invocation_logging")
         p = self.load_policy(
