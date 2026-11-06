@@ -2800,6 +2800,7 @@ class SetBedrockModelInvocationLogging(BaseAction):
         else:
             client.delete_model_invocation_logging_configuration()
 
+
 @filters.register('bedrock-data-retention')
 class BedrockDataRetention(ValueFilter):
     """Filter on the account level Bedrock data retention mode in the current region.
@@ -2839,7 +2840,8 @@ class BedrockDataRetention(ValueFilter):
 
     def __call__(self, r):
         return super().__call__(r[self.annotation_key])
-            
+
+
 @filters.register('sms-voice-account-attributes')
 class SmsVoiceAccountAttributes(ValueFilter):
     """Filter on End User Messaging SMS account attributes for the region,
@@ -2849,6 +2851,10 @@ class SmsVoiceAccountAttributes(ValueFilter):
     :example:
 
     Find accounts without a default protect configuration
+
+    .. code-block:: yaml
+
+            policies:
               - name: sms-voice-no-default-protect-configuration
                 resource: account
                 filters:
@@ -2917,6 +2923,9 @@ class SmsVoiceSpendLimits(ValueFilter):
                 limits = self.manager.retry(client.describe_spend_limits).get('SpendLimits', [])
                 r[self.annotation_key] = {lim['Name']: lim for lim in limits}
         return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
 
 
 @filters.register('ec2-metadata-defaults')
