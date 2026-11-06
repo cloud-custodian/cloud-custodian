@@ -150,6 +150,8 @@ CONFIG_SCHEMA = {
         "datadog_application_key": {"type": "string"},  # TODO: encrypt with KMS?
         "slack_token": {"type": "string"},
         "slack_webhook": {"type": "string"},
+        "slack_api_url": {"type": "string"},
+        "slack_webhook_prefixes": {"type": "array", "items": {"type": "string"}},
         "sendgrid_api_key": SECURED_STRING_SCHEMA,
         "splunk_hec_url": {"type": "string"},
         "splunk_hec_token": {"type": "string"},

@@ -163,6 +163,24 @@ def setup_defaults(config):
     config.setdefault("slack_webhook", None)
 
 
+SLACK_API_URL = "https://slack.com/api"
+SLACK_WEBHOOK_PREFIXES = ["https://hooks.slack.com/"]
+
+
+def is_slack_webhook(config, target):
+    """Returns whether a target is an incoming webhook URL, from Slack or a compatible service"""
+    if target == config.get("slack_webhook"):
+        return True
+    prefixes = config.get("slack_webhook_prefixes")
+    if prefixes is None:
+        prefixes = SLACK_WEBHOOK_PREFIXES
+    return any(target.startswith(prefix) for prefix in prefixes)
+
+
+def get_slack_api_url(config, method):
+    return "%s/%s" % ((config.get("slack_api_url") or SLACK_API_URL).rstrip("/"), method)
+
+
 def date_time_format(utc_str, tz_str="US/Eastern", format="%Y %b %d %H:%M %Z"):
     return parser.parse(utc_str).astimezone(gettz(tz_str)).strftime(format)
 

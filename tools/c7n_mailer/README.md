@@ -184,6 +184,18 @@ The Slack integration for c7n-mailer supports several flavors of messaging, list
 |             No              | `slack://webhook/#c7n-webhook-test`                                             | string | **(DEPRECATED)** Send to a Slack webhook; appended with the target channel. **IMPORTANT**: *This requires a `slack_webhook` value defined in the `mailer.yml`.* |
 |             Yes             | `slack://tag/resource-tag`                                                      | string | Send to target found in resource tag. Example of value in tag: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX                    |
 
+Incoming webhooks of other Slack-compatible services, such as Mattermost, can be used as
+targets too: add their URL prefix to `slack_webhook_prefixes` in `mailer.yml`, and the
+mailer posts to matching targets as webhooks. Setting `slack_webhook_prefixes` replaces
+the default, so include `https://hooks.slack.com/` if you also use Slack webhooks. A
+private or GovSlack workspace can be reached by setting `slack_api_url`.
+
+```yaml
+slack_webhook_prefixes:
+  - https://hooks.slack.com/
+  - https://mattermost.example.com/hooks/
+```
+
 Slack delivery can also be set via a resource's tag name. For example, using `slack://tag/slack_channel` will look for a tag name of `slack_channel`, and if matched on a resource will deliver the message to the value of that resource's tag:
 
 `slack_channel:https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX`
@@ -359,9 +371,11 @@ These fields are not necessary if c7n_mailer is run in a instance/lambda/etc wit
 
 ### Slack Config
 
-| Required? | Key           | Type   | Notes           |
-|:---------:|:--------------|:-------|:----------------|
-|           | `slack_token` | string | Slack API token |
+| Required? | Key                      | Type             | Notes                                                                                                                                  |
+|:---------:|:-------------------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------|
+|           | `slack_token`            | string           | Slack API token                                                                                                                        |
+|           | `slack_api_url`          | string           | Base URL of the Slack Web API, for example `https://slack-gov.com/api` for GovSlack. Defaults to `https://slack.com/api`                |
+|           | `slack_webhook_prefixes` | array of strings | URL prefixes of incoming webhook targets, for example `https://mattermost.example.com/hooks/`. Defaults to `https://hooks.slack.com/` |
 
 ### SendGrid Config
 

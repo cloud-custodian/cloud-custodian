@@ -5,7 +5,7 @@ import time
 
 import requests
 from c7n_mailer.ldap_lookup import Redis
-from c7n_mailer.utils import get_rendered_jinja
+from c7n_mailer.utils import get_rendered_jinja, get_slack_api_url, is_slack_webhook
 from c7n_mailer.utils_email import is_email
 
 
@@ -56,7 +56,7 @@ class SlackDelivery:
                 self.logger.debug(
                     "Generating messages for recipient list produced by resource owner resolution."
                 )
-            elif target.startswith("https://hooks.slack.com/"):
+            elif is_slack_webhook(self.config, target):
                 slack_messages[target] = get_rendered_jinja(
                     target,
                     sqs_message,
@@ -118,7 +118,9 @@ class SlackDelivery:
                 if is_email(resolved_addr):
                     ims = self.retrieve_user_im([resolved_addr])
                     slack_target = ims[resolved_addr]
-                elif not resolved_addr.startswith("#"):
+                elif not resolved_addr.startswith("#") and not is_slack_webhook(
+                    self.config, resolved_addr
+                ):
                     resolved_addr = "#" + resolved_addr
                     slack_target = resolved_addr
 
@@ -163,7 +165,7 @@ class SlackDelivery:
                 continue
 
             response = requests.post(
-                url="https://slack.com/api/users.lookupByEmail",
+                url=get_slack_api_url(self.config, "users.lookupByEmail"),
                 data={"email": address},
                 headers={
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -203,7 +205,7 @@ class SlackDelivery:
         return list
 
     def send_slack_msg(self, key, message_payload):
-        if key.startswith("https://hooks.slack.com/"):
+        if is_slack_webhook(self.config, key):
             response = requests.post(
                 url=key,
                 data=message_payload,
@@ -212,7 +214,7 @@ class SlackDelivery:
             )
         else:
             response = requests.post(
-                url="https://slack.com/api/chat.postMessage",
+                url=get_slack_api_url(self.config, "chat.postMessage"),
                 data=message_payload,
                 headers={
                     "Content-Type": "application/json;charset=utf-8",
