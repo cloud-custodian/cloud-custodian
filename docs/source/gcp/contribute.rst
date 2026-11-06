@@ -232,7 +232,7 @@ For example:
 
 
 Checking Recommender IDs
------------------------
+------------------------
 
 The Recommender catalog can be checked against Google's published recommender
 IDs without cloud credentials or resources. This check fetches the current
@@ -243,7 +243,8 @@ development dependencies:
 .. code-block:: bash
 
     C7N_RECOMMENDER_DOCS=yes C7N_FUNCTIONAL=no \
-        python -m pytest tools/c7n_gcp/tests/test_recommender.py -q
+        uv run --no-sync --package c7n_gcp python -m pytest \
+        tools/c7n_gcp/tests/test_recommender.py -q
 
 The catalog may contain only a subset of the documented recommenders. Unknown
 IDs and catalog keys that differ from their stored IDs fail the check. A fetch
