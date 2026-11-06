@@ -168,7 +168,15 @@ CONFIG_SCHEMA = {
         "http_proxy": {"type": "string"},
         "https_proxy": {"type": "string"},
         # Mapping account / emails
-        "account_emails": {"type": "object"},
+        "account_emails": {
+            "type": "object",
+            "additionalProperties": {
+                "oneOf": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"type": "string"}},
+                ]
+            },
+        },
     },
 }
 
