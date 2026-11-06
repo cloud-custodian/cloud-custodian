@@ -2801,6 +2801,77 @@ class SetBedrockModelInvocationLogging(BaseAction):
             client.delete_model_invocation_logging_configuration()
 
 
+@filters.register('logs-account-policy')
+class LogsAccountPolicy(ListItemFilter):
+    """Filter on CloudWatch Logs account level policies.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: account-missing-data-protection-policy
+                resource: aws.account
+                filters:
+                  - type: logs-account-policy
+                    policy-type: DATA_PROTECTION_POLICY
+                    count: 0
+
+              - name: account-subscription-filter-non-company-destination
+                resource: aws.account
+                filters:
+                  - type: logs-account-policy
+                    policy-type: SUBSCRIPTION_FILTER_POLICY
+                    attrs:
+                      - type: value
+                        key: policyDocument.DestinationArn
+                        op: not-in
+                        value:
+                          - arn:aws:logs:us-east-1:123456789012:destination:corp-central
+    """
+    schema = type_schema(
+        'logs-account-policy',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+        required=['policy-type'],
+        **{'policy-type': {'enum': [
+            'DATA_PROTECTION_POLICY', 'SUBSCRIPTION_FILTER_POLICY',
+            'FIELD_INDEX_POLICY', 'TRANSFORMER_POLICY',
+            'METRIC_EXTRACTION_POLICY', 'RETENTION_POLICY']}})
+    permissions = ('logs:DescribeAccountPolicies',)
+    # describe additionally requires the read permission of the policy type
+    policy_type_permissions = {
+        'DATA_PROTECTION_POLICY': 'logs:GetDataProtectionPolicy',
+        'SUBSCRIPTION_FILTER_POLICY': 'logs:DescribeSubscriptionFilters',
+        'FIELD_INDEX_POLICY': 'logs:DescribeIndexPolicies',
+        'TRANSFORMER_POLICY': 'logs:GetTransformer',
+    }
+    annotation_key = 'c7n:LogsAccountPolicies'
+
+    def get_permissions(self):
+        extra = self.policy_type_permissions.get(self.data.get('policy-type'))
+        if extra:
+            return self.permissions + (extra,)
+        return self.permissions
+
+    def get_item_values(self, resource):
+        client = local_session(self.manager.session_factory).client('logs')
+        policies = []
+        params = {'policyType': self.data['policy-type']}
+        while True:
+            response = self.manager.retry(
+                client.describe_account_policies, **params)
+            policies.extend(response.get('accountPolicies', []))
+            if not response.get('nextToken'):
+                break
+            params['nextToken'] = response['nextToken']
+        for p in policies:
+            p['policyDocument'] = json.loads(p.get('policyDocument') or '{}')
+        resource[self.annotation_key] = policies
+        return policies
+
+
 @filters.register('ec2-metadata-defaults')
 class EC2MetadataDefaults(ValueFilter):
     """Filter on the default instance metadata service (IMDS) settings for the specified account and

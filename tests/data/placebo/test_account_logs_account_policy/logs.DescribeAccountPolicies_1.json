@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "accountPolicies": [
+            {
+                "policyName": "c7n-test-account-sub",
+                "policyDocument": "{\"RoleArn\":\"arn:aws:iam::644160558196:role/c7n-test-cwl-subscription\",\"DestinationArn\":\"arn:aws:kinesis:ca-central-1:644160558196:stream/c7n-test-sub-dest\",\"FilterPattern\":\"\",\"Distribution\":\"Random\"}",
+                "lastUpdatedTime": 1785169278786,
+                "policyType": "SUBSCRIPTION_FILTER_POLICY",
+                "scope": "ALL",
+                "accountId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
