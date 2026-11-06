@@ -2430,11 +2430,20 @@ class LaunchTemplate(query.QueryResourceManager):
             self.session_factory).client('ec2')
         template_versions = []
         for r in resources:
-            template_versions.extend(
-                client.describe_launch_template_versions(
-                    LaunchTemplateId=r['LaunchTemplateId']).get(
-                        'LaunchTemplateVersions', ()))
+            versions = client.describe_launch_template_versions(
+                LaunchTemplateId=r['LaunchTemplateId']).get(
+                    'LaunchTemplateVersions', ())
+            self._copy_template_tags(versions, r.get('Tags', ()))
+            template_versions.extend(versions)
         return template_versions
+
+    @staticmethod
+    def _copy_template_tags(versions, tags):
+        # Tags live on the launch template, not on its versions, so carry
+        # the parent template's tags onto each version record (copied per
+        # version so records don't share mutable tag dicts).
+        for v in versions:
+            v['Tags'] = [dict(t) for t in tags]
 
     def get_arns(self, resources):
         arns = []
@@ -2442,7 +2451,7 @@ class LaunchTemplate(query.QueryResourceManager):
             arns.append(self.generate_arn(f"{r['LaunchTemplateId']}/{r['VersionNumber']}"))
         return arns
 
-    def get_resources(self, rids, cache=True):
+    def get_resources(self, rids, cache=True, augment=True):
         # Launch template versions have a compound primary key
         #
         # Support one of four forms of resource ids:
@@ -2454,6 +2463,10 @@ class LaunchTemplate(query.QueryResourceManager):
         #
         # If an alias version is given $Latest, $Default, the alias will be
         # preserved as an annotation on the returned object 'c7n:VersionAlias'
+        #
+        # With augment=False the parent template tags are not fetched, for
+        # callers that only need LaunchTemplateData (no
+        # ec2:DescribeLaunchTemplates call or permission needed).
         if not rids:
             return []
 
@@ -2474,6 +2487,7 @@ class LaunchTemplate(query.QueryResourceManager):
 
         results = []
         # We may end up fetching duplicates on $Latest and $Version
+        found = {}
         for tid, tversions in t_versions.items():
             try:
                 ltv = client.describe_launch_template_versions(
@@ -2491,7 +2505,47 @@ class LaunchTemplate(query.QueryResourceManager):
                 if not tversion.isdigit():
                     t['c7n:VersionAlias'] = tversion
                 results.append(t)
-        return results
+            found[tid] = ltv
+
+        if not augment or not found:
+            return results
+
+        # Version records carry no tags; fetch them from the parent
+        # templates. Versions whose parent template could not be fetched
+        # (deleted between calls) are dropped, as above, rather than
+        # reported as untagged.
+        template_tags = self._get_template_tags(client, list(found))
+        for tid, versions in found.items():
+            if tid in template_tags:
+                self._copy_template_tags(versions, template_tags[tid])
+        return [r for r in results if r['LaunchTemplateId'] in template_tags]
+
+    def _get_template_tags(self, client, template_ids):
+        try:
+            return self._describe_template_tags(client, template_ids)
+        except ClientError as e:
+            if e.response['Error']['Code'] != "InvalidLaunchTemplateId.NotFound":
+                raise
+        # One of the templates no longer exists, which fails the whole
+        # batch. Look the templates up one at a time to keep the others.
+        template_tags = {}
+        for tid in template_ids:
+            try:
+                template_tags.update(self._describe_template_tags(client, [tid]))
+            except ClientError as e:
+                if e.response['Error']['Code'] != "InvalidLaunchTemplateId.NotFound":
+                    raise
+        return template_tags
+
+    @staticmethod
+    def _describe_template_tags(client, template_ids):
+        paginator = client.get_paginator('describe_launch_templates')
+        paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
+        template_tags = {}
+        for page in paginator.paginate(LaunchTemplateIds=template_ids):
+            for lt in page.get('LaunchTemplates', ()):
+                template_tags[lt['LaunchTemplateId']] = lt.get('Tags', [])
+        return template_tags
 
     def get_asg_templates(self, asgs):
         templates = {}

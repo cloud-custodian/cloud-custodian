@@ -2522,6 +2522,8 @@ class TestLaunchTemplate(BaseTest):
             'arn:aws:ec2:us-east-1:644160558196:launch-template/lt-00b3b2755218e3fdd/4',
             p.resource_manager.get_arns(resources)
         )
+        self.assertTrue(
+            all(r['Tags'] == [{'Key': 'Owner', 'Value': 'test'}] for r in resources))
 
     def test_launch_template_versions(self):
         factory = self.replay_flight_data('test_launch_template_query')
@@ -2531,6 +2533,136 @@ class TestLaunchTemplate(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 8)
         self.assertTrue(all(['LaunchTemplateData' in r for r in resources]))
+
+    def test_launch_template_version_tags(self):
+        factory = self.replay_flight_data('test_launch_template_version_tags')
+        p = self.load_policy({
+            'name': 'lt-version-missing-owner',
+            'resource': 'aws.launch-template-version',
+            'filters': [{'tag:Owner': 'absent'}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(
+            [(r['LaunchTemplateName'], r['VersionNumber']) for r in resources],
+            [('untagged-template', 1)])
+        self.assertEqual(resources[0]['Tags'], [])
+
+        p = self.load_policy({
+            'name': 'lt-version-owner',
+            'resource': 'aws.launch-template-version',
+            'filters': [{'tag:Owner': 'platform'}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(
+            sorted((r['LaunchTemplateName'], r['VersionNumber']) for r in resources),
+            [('tagged-template', 1), ('tagged-template', 2)])
+        for r in resources:
+            self.assertEqual(
+                {t['Key']: t['Value'] for t in r['Tags']},
+                {'Owner': 'platform', 'Environment': 'dev'})
+
+    def test_launch_template_version_tags_by_id(self):
+        factory = self.replay_flight_data('test_launch_template_version_tags_by_id')
+        p = self.load_policy({
+            'name': 'lt-version-by-id',
+            'resource': 'aws.launch-template-version'}, session_factory=factory)
+        resources = p.resource_manager.get_resources(
+            ['lt-0aaaaaaaaaaaaaaa1', 'lt-0bbbbbbbbbbbbbbb2'])
+        by_name = {}
+        for r in resources:
+            by_name.setdefault(r['LaunchTemplateName'], []).append(r)
+        self.assertEqual(len(by_name['tagged-template']), 2)
+        for r in by_name['tagged-template']:
+            self.assertEqual(
+                {t['Key']: t['Value'] for t in r['Tags']},
+                {'Owner': 'platform', 'Environment': 'dev'})
+        self.assertIsNot(
+            by_name['tagged-template'][0]['Tags'][0],
+            by_name['tagged-template'][1]['Tags'][0])
+        self.assertEqual(by_name['untagged-template'][0]['Tags'], [])
+
+    def test_launch_template_version_tags_paged(self):
+        # describe_launch_templates returns the parents across two pages
+        factory = self.replay_flight_data('test_launch_template_version_tags_paged')
+        p = self.load_policy({
+            'name': 'lt-version-by-id-paged',
+            'resource': 'aws.launch-template-version'}, session_factory=factory)
+        resources = p.resource_manager.get_resources(
+            ['lt-0aaaaaaaaaaaaaaa1', 'lt-0bbbbbbbbbbbbbbb2'])
+        tags = {
+            (r['LaunchTemplateName'], r['VersionNumber']):
+                {t['Key']: t['Value'] for t in r['Tags']}
+            for r in resources}
+        self.assertEqual(tags, {
+            ('tagged-template', 1): {'Owner': 'platform', 'Environment': 'dev'},
+            ('tagged-template', 2): {'Owner': 'platform', 'Environment': 'dev'},
+            ('untagged-template', 1): {}})
+
+    def test_launch_template_version_tags_parent_deleted(self):
+        # untagged-template is deleted after its versions were fetched, so
+        # the batched describe_launch_templates call fails with NotFound.
+        # The surviving template keeps its tags and the deleted template's
+        # version is dropped instead of being reported as untagged.
+        factory = self.replay_flight_data(
+            'test_launch_template_version_tags_parent_deleted')
+        p = self.load_policy({
+            'name': 'lt-version-by-id-deleted',
+            'resource': 'aws.launch-template-version'}, session_factory=factory)
+        resources = p.resource_manager.get_resources(
+            ['lt-0aaaaaaaaaaaaaaa1', 'lt-0bbbbbbbbbbbbbbb2'])
+        self.assertEqual(
+            sorted((r['LaunchTemplateName'], r['VersionNumber']) for r in resources),
+            [('tagged-template', 1), ('tagged-template', 2)])
+        for r in resources:
+            self.assertEqual(
+                {t['Key']: t['Value'] for t in r['Tags']},
+                {'Owner': 'platform', 'Environment': 'dev'})
+
+    def test_launch_template_version_get_resources_no_augment(self):
+        # augment=False skips the parent template lookup; the flight data
+        # has no DescribeLaunchTemplates response.
+        factory = self.replay_flight_data('test_launch_template_get')
+        p = self.load_policy({
+            'name': 'lt-version-no-augment',
+            'resource': 'aws.launch-template-version'}, session_factory=factory)
+        with mock.patch.object(
+                p.resource_manager, '_get_template_tags') as get_tags:
+            resources = p.resource_manager.get_resources(
+                ['lt-00b3b2755218e3fdd'], augment=False)
+        get_tags.assert_not_called()
+        self.assertEqual(len(resources), 4)
+        self.assertTrue(all('Tags' not in r for r in resources))
+
+    def test_launch_template_version_tag_actions(self):
+        # tag actions on this resource act on the parent template id
+        factory = self.replay_flight_data('test_launch_template_version_tag_actions')
+        p = self.load_policy({
+            'name': 'lt-version-tag-actions',
+            'resource': 'aws.launch-template-version',
+            'filters': [{'tag:Owner': 'platform'}],
+            'actions': [
+                {'type': 'tag', 'key': 'Reviewed', 'value': 'yes'},
+                {'type': 'remove-tag', 'tags': ['Environment']}]},
+            session_factory=factory)
+        # placebo replays responses regardless of request, so hook the
+        # request itself (before-parameter-build; placebo answers before-call)
+        sent = {}
+        session = utils.local_session(factory)
+        for op in ('CreateTags', 'DeleteTags'):
+            session.events.register(
+                'before-parameter-build.ec2.%s' % op,
+                lambda params, op=op, **kw: sent.setdefault(op, []).append(
+                    {k: params[k] for k in ('Resources', 'Tags')}))
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        # both versions share one parent template, so the id appears per
+        # resource, and the request goes to the parent LaunchTemplateId
+        parent = ['lt-0aaaaaaaaaaaaaaa1', 'lt-0aaaaaaaaaaaaaaa1']
+        self.assertEqual(sent, {
+            'CreateTags': [{
+                'Resources': parent,
+                'Tags': [{'Key': 'Reviewed', 'Value': 'yes'}]}],
+            'DeleteTags': [{
+                'Resources': parent,
+                'Tags': [{'Key': 'Environment'}]}]})
 
     def test_launch_template_id_not_found(self):
         factory = self.replay_flight_data("test_launch_template_id_not_found")

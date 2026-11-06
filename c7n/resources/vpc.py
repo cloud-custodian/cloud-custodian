@@ -3169,7 +3169,7 @@ class UnusedKeyPairs(Filter):
 
         tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
         for tversion in tmpl_mgr.get_resources(
-                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+                list(tmpl_mgr.get_asg_templates(asgs).keys()), augment=False):
             key_names.add(tversion['LaunchTemplateData'].get('KeyName'))
         return key_names
 
