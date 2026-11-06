@@ -2834,7 +2834,7 @@ class BedrockDataRetention(ValueFilter):
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('bedrock')
         for r in resources:
-            retention = client.get_account_data_retention()
+            retention = self.manager.retry(client.get_account_data_retention)
             retention.pop('ResponseMetadata', None)
             r[self.annotation_key] = retention
 
