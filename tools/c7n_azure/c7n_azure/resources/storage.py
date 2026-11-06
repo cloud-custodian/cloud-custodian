@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import logging
 
 from azure.cosmosdb.table import TableService
@@ -12,7 +13,7 @@ from azure.storage.common.models import Logging, RetentionPolicy
 from azure.storage.file import FileService
 from azure.storage.queue import QueueServiceClient
 from c7n.exceptions import PolicyValidationError
-from c7n.filters.core import type_schema, ListItemFilter
+from c7n.filters.core import type_schema, Filter, ListItemFilter
 from c7n.utils import get_annotation_prefix, local_session, merge_dict
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
@@ -703,6 +704,77 @@ class StorageSettingsUtilities:
                        .format(storage_type))(logging=logging_settings)
 
 
+@Storage.action_registry.register('update')
+class StorageUpdateAction(AzureBaseAction):
+    """Update scalar storage account settings.
+
+    :example:
+
+    Default to Microsoft Entra authorization in the Azure portal for accounts
+    where the setting is absent or false:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-default-to-entra-authorization
+            resource: azure.storage
+            filters:
+              - or:
+                  - properties.defaultToOAuthAuthentication: absent
+                  - properties.defaultToOAuthAuthentication: false
+            actions:
+              - type: update
+                properties:
+                  defaultToOAuthAuthentication: true
+
+    Property names follow the Azure REST API. Only supplied properties are
+    updated. Setting ``allowedCopyScope`` to ``null`` clears that restriction.
+    Changing the portal default does not disable Shared Key authorization.
+
+    Enabling ``isSftpEnabled`` requires hierarchical namespace to be enabled
+    on the account and incurs SFTP charges while enabled.
+    """
+
+    schema = type_schema(
+        'update',
+        required=['properties'],
+        properties={
+            'type': 'object',
+            'minProperties': 1,
+            'additionalProperties': False,
+            # TODO: Support mutable encryption properties after live API verification.
+            'properties': {
+                'defaultToOAuthAuthentication': {'type': 'boolean'},
+                'supportsHttpsTrafficOnly': {'type': 'boolean'},
+                'allowBlobPublicAccess': {'type': 'boolean'},
+                'allowSharedKeyAccess': {'type': 'boolean'},
+                'allowCrossTenantReplication': {'type': 'boolean'},
+                'isLocalUserEnabled': {'type': 'boolean'},
+                'isSftpEnabled': {'type': 'boolean'},
+                'minimumTlsVersion': {'enum': ['TLS1_0', 'TLS1_1', 'TLS1_2']},
+                'publicNetworkAccess': {
+                    'enum': ['Enabled', 'Disabled', 'SecuredByPerimeter'],
+                },
+                'accessTier': {'enum': ['Hot', 'Cool', 'Cold']},
+                'allowedCopyScope': {'enum': ['AAD', 'PrivateLink', None]},
+            },
+        },
+    )
+    permissions = ('Microsoft.Storage/storageAccounts/write',)
+
+    def _prepare_processing(self) -> None:
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource: dict) -> None:
+        # SDK model serialization drops explicit nulls, so send the validated JSON.
+        body = json.dumps({'properties': self.data['properties']}).encode()
+        self.client.storage_accounts.update(
+            resource['resourceGroup'],
+            resource['name'],
+            body,
+        )
+
+
 @Storage.action_registry.register('require-secure-transfer')
 class RequireSecureTransferAction(AzureBaseAction):
     """Action that updates the Secure Transfer setting on Storage Accounts.
@@ -759,6 +831,102 @@ class RequireSecureTransferAction(AzureBaseAction):
             kwargs["minimum_tls_version"] = self.data.get("minimum_tls_version")
 
         update_params = StorageAccountUpdateParameters(**kwargs)
+        self.client.storage_accounts.update(
+            resource['resourceGroup'],
+            resource['name'],
+            update_params,
+        )
+
+
+@Storage.filter_registry.register('blob-public-access')
+class BlobPublicAccessFilter(Filter):
+    """Filter Storage Accounts by whether anonymous (public) blob access is
+    allowed at the account level (the ``allowBlobPublicAccess`` property).
+
+    Azure does not always return ``allowBlobPublicAccess`` in the account
+    properties. When it is absent the account permits anonymous access, so this
+    filter treats a missing value as ``True`` (allowed). This makes it suitable
+    for the CIS Microsoft Azure Foundations control "Ensure that 'Allow Blob
+    Anonymous Access' is set to 'Disabled'", which a plain ``value`` filter
+    would miss on accounts where the property is not present.
+
+    :example:
+
+    Find all Storage Accounts that allow anonymous blob access (CIS 4.17),
+    including those where the property is unset, and disable it.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: cis-4-17-blob-anonymous-access
+              resource: azure.storage
+              filters:
+                - type: blob-public-access
+                  value: true
+              actions:
+                - type: set-blob-public-access
+                  value: False
+    """
+
+    schema = type_schema(
+        'blob-public-access',
+        **{
+            'value': {'type': 'boolean', 'default': True},
+        })
+
+    def process(self, resources, event=None):
+        target = self.data.get('value', True)
+        return [
+            r for r in resources
+            if r['properties'].get('allowBlobPublicAccess', True) == target
+        ]
+
+
+@Storage.action_registry.register('set-blob-public-access')
+class SetBlobPublicAccessAction(AzureBaseAction):
+    """Action that updates the ``allowBlobPublicAccess`` setting on Storage Accounts.
+
+    This is the account-level master switch for anonymous (public) blob access.
+    When set to ``False``, anonymous access is denied for all containers and blobs
+    in the account regardless of an individual container's ``publicAccess`` setting.
+    This is the recommended remediation for CIS Microsoft Azure Foundations control
+    "Ensure that 'Allow Blob Anonymous Access' is set to 'Disabled'".
+
+    To manage the public access level of an individual container instead, see the
+    ``set-public-access`` action on the ``azure.storage-container`` resource.
+
+    :example:
+
+    Disable anonymous blob access on all storage accounts that currently allow it,
+    including accounts where ``allowBlobPublicAccess`` has never been set (Azure
+    then allows anonymous access by default).
+
+    .. code-block:: yaml
+
+        policies:
+            - name: disable-blob-anonymous-access
+              resource: azure.storage
+              filters:
+                - type: blob-public-access
+                  value: true
+              actions:
+                - type: set-blob-public-access
+                  value: False
+    """
+
+    # Default to False assuming the user wants anonymous access disabled
+    schema = type_schema(
+        'set-blob-public-access',
+        **{
+            'value': {'type': 'boolean', 'default': False},
+        })
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        update_params = StorageAccountUpdateParameters(
+            allow_blob_public_access=self.data.get('value', False))
         self.client.storage_accounts.update(
             resource['resourceGroup'],
             resource['name'],
