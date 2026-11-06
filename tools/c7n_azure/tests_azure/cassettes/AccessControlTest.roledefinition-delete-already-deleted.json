@@ -14,6 +14,9 @@
                     "message": "No Content"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 06 Nov 2026 16:56:23 GMT"
+                    ],
                     "x-ms-ratelimit-remaining-subscription-deletes": [
                         "199"
                     ],
@@ -23,17 +26,14 @@
                     "x-ms-ratelimit-remaining-subscription-global-deletes": [
                         "2999"
                     ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 80BAEDEA70F7434D9217DC46372FDA19 Ref B: CH1AA2020613009 Ref C: 2026-11-06T16:37:45Z"
-                    ],
                     "content-type": [
                         "text/html"
                     ],
-                    "date": [
-                        "Fri, 06 Nov 2026 16:37:45 GMT"
+                    "x-msedge-ref": [
+                        "Ref A: 77C118598C714F31A8C661EE2F33F349 Ref B: CHI261140501060 Ref C: 2026-11-06T16:56:22Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ]
                 },
                 "body": {
@@ -44,44 +44,41 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000010?api-version=2015-07-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions?$filter=roleName%20eq%20%27cctest-roledefinition-delete%27&api-version=2015-07-01",
                 "body": null,
                 "headers": {}
             },
             "response": {
                 "status": {
-                    "code": 404,
-                    "message": "Not Found"
+                    "code": 200,
+                    "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 06 Nov 2026 16:56:23 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "x-cache": [
-                        "CONFIG_NOCACHE"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
                     ],
-                    "x-msedge-ref": [
-                        "Ref A: 50CBCECEA812421AA8777A0CA7674D74 Ref B: CH1AA2020611019 Ref C: 2026-11-06T16:37:46Z"
+                    "content-length": [
+                        "12"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Fri, 06 Nov 2026 16:37:46 GMT"
+                    "x-msedge-ref": [
+                        "Ref A: AF6F78BCC7A4485BACE61B9B185BDC10 Ref B: CHI261140510034 Ref C: 2026-11-06T16:56:24Z"
                     ],
-                    "content-length": [
-                        "152"
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
                     ]
                 },
                 "body": {
                     "data": {
-                        "error": {
-                            "code": "RoleDefinitionDoesNotExist",
-                            "message": "The specified role definition with ID '00000000-0000-0000-0000-000000000010' does not exist."
-                        }
+                        "value": []
                     }
                 }
             }
