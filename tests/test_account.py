@@ -88,6 +88,24 @@ class AccountTests(BaseTest):
         self.assertEqual(
             resources[0]['c7n:macie']['automatedDiscovery']['status'], 'DISABLED')
 
+    def test_macie_automated_discovery_denied(self):
+        client = mock.MagicMock()
+        client.exceptions.AccessDeniedException = type(
+            'AccessDeniedException', (Exception,), {})
+        client.get_macie_session.return_value = {
+            'status': 'ENABLED', 'ResponseMetadata': {}}
+        client.get_administrator_account.return_value = {'administrator': {}}
+        client.get_automated_discovery_configuration.side_effect = (
+            client.exceptions.AccessDeniedException('denied'))
+        self.patch(account, 'local_session',
+                   lambda factory: mock.MagicMock(client=lambda service: client))
+        f = account.MacieEnabled(
+            {'type': 'check-macie', 'key': 'status', 'value': 'ENABLED'},
+            manager=mock.MagicMock())
+        resource = {}
+        f.get_macie_info(resource)
+        self.assertEqual(resource['c7n:macie']['automatedDiscovery'], {})
+
     def test_macie_disabled(self):
         factory = self.replay_flight_data(
             'test_account_check_macie_disabled')
