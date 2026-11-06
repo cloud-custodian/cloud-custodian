@@ -1,0 +1,92 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 04 Nov 2026 15:08:41 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2832",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/indexEndpoints?alt=json"
+  },
+  "body": {
+    "indexEndpoints": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000003",
+        "displayName": "c7n-test-empty-e35b5fc3",
+        "etag": "AMEw9yO5Pr_6p1BR5PoynkJ4OJwGx5SHYXW9bcwgkc3ia-ArKJMA0Yhgj7-dkmqJ9nTn",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "createTime": "2026-11-04T14:08:44.200135Z",
+        "updateTime": "2026-11-04T14:08:45.405573Z",
+        "publicEndpointEnabled": true,
+        "publicEndpointDomainName": "100000003.us-central1-000000000000.vdb.vertexai.goog",
+        "encryptionSpec": {}
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000002",
+        "displayName": "c7n-test-idle-e35b5fc3",
+        "deployedIndexes": [
+          {
+            "id": "c7n_test_idle_e35b5fc3",
+            "index": "projects/cloud-custodian/locations/us-central1/indexes/2000000000000000001",
+            "createTime": "2026-11-04T14:09:15.223534Z",
+            "indexSyncTime": "2026-11-04T15:04:03.521383Z",
+            "deploymentGroup": "default",
+            "dedicatedResources": {
+              "machineSpec": {
+                "machineType": "e2-standard-2"
+              },
+              "minReplicaCount": 1,
+              "maxReplicaCount": 1
+            }
+          }
+        ],
+        "etag": "AMEw9yPryWtrXN0zu1q4G4W-6yZ-99EE5ZO5m6Rn0qhJbNkk675JzFEU91Qx3AM-Da8=",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "createTime": "2026-11-04T14:08:44.219714Z",
+        "updateTime": "2026-11-04T14:08:45.059226Z",
+        "publicEndpointEnabled": true,
+        "publicEndpointDomainName": "100000002.us-central1-000000000000.vdb.vertexai.goog",
+        "encryptionSpec": {}
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000001",
+        "displayName": "c7n-test-busy-e35b5fc3",
+        "deployedIndexes": [
+          {
+            "id": "c7n_test_busy_e35b5fc3",
+            "index": "projects/cloud-custodian/locations/us-central1/indexes/2000000000000000001",
+            "createTime": "2026-11-04T14:09:15.254949Z",
+            "indexSyncTime": "2026-11-04T15:07:35.640164Z",
+            "deploymentGroup": "default",
+            "dedicatedResources": {
+              "machineSpec": {
+                "machineType": "e2-standard-2"
+              },
+              "minReplicaCount": 1,
+              "maxReplicaCount": 1
+            }
+          }
+        ],
+        "etag": "AMEw9yO2bj9SYtuLjC9sJw0MEJExZjN82MbOYREPc8vnurerXju0jqqVqDSv9fXQOS6W",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "createTime": "2026-11-04T14:08:43.964241Z",
+        "updateTime": "2026-11-04T14:08:44.743452Z",
+        "publicEndpointEnabled": true,
+        "publicEndpointDomainName": "100000001.us-central1-000000000000.vdb.vertexai.goog",
+        "encryptionSpec": {}
+      }
+    ]
+  }
+}
