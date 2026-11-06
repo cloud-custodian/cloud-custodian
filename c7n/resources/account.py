@@ -2801,6 +2801,47 @@ class SetBedrockModelInvocationLogging(BaseAction):
             client.delete_model_invocation_logging_configuration()
 
 
+@filters.register('bedrock-data-retention')
+class BedrockDataRetention(ValueFilter):
+    """Filter on the account level Bedrock data retention mode in the current region.
+
+    Valid modes are default, none, aws_review, provider_data_share and inherit.
+    An account where the mode has never been set returns inherit.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: bedrock-data-retention-not-zero
+                resource: account
+                filters:
+                  - type: bedrock-data-retention
+                    key: mode
+                    op: ne
+                    value: none
+    """
+    annotation_key = 'c7n:BedrockDataRetention'
+    annotate = False
+    schema = type_schema('bedrock-data-retention', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('bedrock:GetAccountDataRetention',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        for r in resources:
+            retention = client.get_account_data_retention()
+            retention.pop('ResponseMetadata', None)
+            r[self.annotation_key] = retention
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
 @filters.register('ec2-metadata-defaults')
 class EC2MetadataDefaults(ValueFilter):
     """Filter on the default instance metadata service (IMDS) settings for the specified account and
