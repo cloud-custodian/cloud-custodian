@@ -1,0 +1,71 @@
+{
+  "pytest-terraform": 1,
+  "outputs": {},
+  "resources": {
+    "google_folder": {
+      "test": {
+        "configured_capabilities": [],
+        "create_time": "2026-11-04T19:01:30.319Z",
+        "deletion_policy": "DELETE",
+        "deletion_protection": false,
+        "display_name": "c7n-folder-audit",
+        "folder_id": "333333333333",
+        "id": "folders/333333333333",
+        "lifecycle_state": "ACTIVE",
+        "management_project": "",
+        "name": "folders/333333333333",
+        "parent": "folders/111111111111",
+        "tags": null,
+        "timeouts": null
+      }
+    },
+    "google_folder_iam_audit_config": {
+      "all_services": {
+        "audit_log_config": [
+          {
+            "exempted_members": [
+              "user:test-user@example.com"
+            ],
+            "log_type": "DATA_WRITE"
+          }
+        ],
+        "etag": "BwZfeAJozKM=",
+        "folder": "folders/333333333333",
+        "id": "folders/333333333333/audit_config/allServices",
+        "service": "allServices"
+      },
+      "storage": {
+        "audit_log_config": [
+          {
+            "exempted_members": [
+              "user:test-user@example.com"
+            ],
+            "log_type": "DATA_READ"
+          }
+        ],
+        "etag": "BwZfeAMiSEI=",
+        "folder": "folders/333333333333",
+        "id": "folders/333333333333/audit_config/storage.googleapis.com",
+        "service": "storage.googleapis.com"
+      }
+    },
+    "google_folder_iam_member": {
+      "preserved": {
+        "condition": [],
+        "etag": "BwZfeAMiSEI=",
+        "folder": "folders/333333333333",
+        "id": "folders/333333333333/roles/logging.viewer/user:test-user@example.com",
+        "member": "user:test-user@example.com",
+        "role": "roles/logging.viewer"
+      },
+      "removed": {
+        "condition": [],
+        "etag": "BwZfeAMiSEI=",
+        "folder": "folders/333333333333",
+        "id": "folders/333333333333/roles/viewer/user:test-user@example.com",
+        "member": "user:test-user@example.com",
+        "role": "roles/viewer"
+      }
+    }
+  }
+}
