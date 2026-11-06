@@ -177,7 +177,7 @@ class VertexAITypeInfo(TypeInfo):
     """Base resource_type for Vertex AI resources scoped to a location.
 
     Holds the attributes and methods shared by every regional Vertex AI
-    resource_type (endpoints, batch prediction jobs, custom jobs).
+    resource_type, such as endpoints, index endpoints, datasets and jobs.
     Resource-specific resource_type classes still need to set component,
     enum_spec, default_report_fields, asset_type, permissions, and
     urn_component.

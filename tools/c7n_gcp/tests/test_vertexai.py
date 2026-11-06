@@ -762,12 +762,15 @@ def _generate_publisher_model_traffic(project_id, location, model, calls=5):
         resp.raise_for_status()
 
 
-def _wait_for_metric(project_id, metric_filter, min_total=None, timeout=600, interval=30):
+def _wait_for_metric(
+        project_id, metric_filter, min_total=None, since=None, timeout=600, interval=30):
     """Poll Cloud Monitoring until ``metric_filter`` matches a time series.
     Avoids guessing a fixed propagation delay.
 
     With ``min_total``, keeps polling until the points add up to at least
-    that many, so a recording doesn't capture a partial count.
+    that many, so a recording doesn't capture a partial count. Pass
+    ``since`` as the time the traffic was sent, so points left over from
+    an earlier recording on the same resource don't count toward it.
 
     Keeps polling through throttling, server errors, and network errors,
     so one transient failure doesn't discard the recording.
@@ -782,9 +785,10 @@ def _wait_for_metric(project_id, metric_filter, min_total=None, timeout=600, int
         # Move the window forward each poll. A fixed end time never
         # covers points stamped after polling started.
         now = datetime.now(timezone.utc).replace(microsecond=0)
+        start = since or now - timedelta(hours=6)
         params = {
             'filter': metric_filter,
-            'interval.startTime': (now - timedelta(hours=6)).isoformat(),
+            'interval.startTime': start.isoformat(),
             'interval.endTime': now.isoformat(),
             'view': 'FULL',
         }
@@ -801,9 +805,13 @@ def _wait_for_metric(project_id, metric_filter, min_total=None, timeout=600, int
             if series and (min_total is None or total >= min_total):
                 return
         if time.time() >= deadline:
+            if min_total is None:
+                raise TimeoutError(
+                    f'No time series matched {metric_filter} '
+                    f'within {timeout}s of polling')
             raise TimeoutError(
                 f'{metric_filter} totalled {total}, expected at least '
-                f'{min_total or 1}, within {timeout}s of polling')
+                f'{min_total}, within {timeout}s of polling')
         time.sleep(interval)
 
 
@@ -2198,6 +2206,7 @@ def test_vertexai_index_endpoint_metrics(test, vertexai_index_endpoint):
     session_factory = test.replay_flight_data('vertexai_index_endpoint_metrics')
 
     if test.recording:
+        sent_at = datetime.now(timezone.utc).replace(microsecond=0)
         _query_index_endpoint(
             busy,
             resources['google_vertex_ai_index_endpoint_deployed_index']['busy'][
@@ -2207,7 +2216,8 @@ def test_vertexai_index_endpoint_metrics(test, vertexai_index_endpoint):
             busy['project'],
             f'metric.type = "{metric_type}" AND '
             f'resource.labels.index_endpoint_id = "{busy["name"]}"',
-            min_total=queries)
+            min_total=queries,
+            since=sent_at)
 
     policy = test.load_policy(
         {
