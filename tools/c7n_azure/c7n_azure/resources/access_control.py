@@ -414,10 +414,9 @@ class DeleteRoleDefinitionAction(AzureBaseAction):
     ``Microsoft.Authorization/roleDefinitions/delete`` on all of them, as Owner
     and User Access Administrator have.
 
-    A role that can be assigned in a management group is still listed at the
-    subscription in its ``id``, so the delete is sent there. If Azure answers
-    that the role is already gone, the action lists roles at that scope again
-    and fails if the role is still there.
+    A role that can be assigned in a management group is a tenant-level object.
+    It is still listed at the subscription in its ``id``, and the delete sent
+    there removes it everywhere, including every subscription under that group.
 
     A role that still has assignments fails with Azure's ``RoleDefinitionHasAssignments``
     error. Remove active assignments first with the ``delete`` action on

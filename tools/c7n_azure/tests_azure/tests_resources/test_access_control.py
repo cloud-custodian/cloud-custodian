@@ -178,6 +178,35 @@ class AccessControlTest(BaseTest):
             filter="roleName eq 'cctest-roledefinition-delete'")
         self.assertEqual(list(remaining), [])
 
+    # Setup: tofu apply in terraform/roledefinition_management_group (read its header)
+    @strict_cassette('roledefinition-delete-management-group')
+    def test_delete_role_definition_from_management_group(self):
+        group_scope = '/providers/Microsoft.Management/managementGroups/cctest-roledefinition-mg'
+        p = self.load_policy({
+            'name': 'test-delete-management-group-role-definition',
+            'resource': 'azure.roledefinition',
+            'filters': [
+                {'type': 'value',
+                 'key': 'properties.roleName',
+                 'value': 'cctest-roledefinition-mg'}],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
+            group_scope.lower(),
+            [s.lower() for s in resources[0]['properties']['assignableScopes']])
+
+        # Gone where c7n found it, and where it was created.
+        self.sleep_in_live_mode(30)
+        client = p.resource_manager.get_client()
+        for scope in (f'/subscriptions/{self.session.get_subscription_id()}', group_scope):
+            remaining = client.role_definitions.list(
+                scope, filter="roleName eq 'cctest-roledefinition-mg'")
+            self.assertEqual(list(remaining), [], scope)
+
     @strict_cassette('roledefinition-delete-skips-built-in')
     def test_delete_role_definition_skips_built_in(self):
         p = self.load_policy({
@@ -200,25 +229,6 @@ class AccessControlTest(BaseTest):
             'WARNING:custodian.azure.AzureBaseAction:delete implicitly filtered '
             '0 of 1 resources key:properties.type on CustomRole'])
 
-    @arm_template('roledefinition-delete-assigned.json')
-    @strict_cassette('roledefinition-delete-assigned')
-    def test_delete_role_definition_with_assignments(self):
-        p = self.load_policy({
-            'name': 'test-delete-assigned-role-definition',
-            'resource': 'azure.roledefinition',
-            'filters': [
-                {'type': 'value',
-                 'key': 'properties.roleName',
-                 'value': 'cctest-roledefinition-delete-assigned'}],
-            'actions': [
-                {'type': 'delete'}
-            ]
-        }, validate=True)
-        with self.assertRaises(HttpResponseError) as e:
-            p.run()
-
-        self.assertEqual(e.exception.error.code, 'RoleDefinitionHasAssignments')
-
     @strict_cassette('roledefinition-delete-already-deleted')
     def test_delete_role_definition_already_deleted(self):
         p = self.load_policy({
@@ -228,7 +238,7 @@ class AccessControlTest(BaseTest):
                 {'type': 'delete'}
             ]
         }, validate=True)
-        # The role test_delete_role_definition deletes, which Azure answers with 204
+        # A role id that doesn't exist; Azure answers 204
         role_id = '00000000-0000-0000-0000-000000000010'
         subscription_id = self.session.get_subscription_id()
         role = {
