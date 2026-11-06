@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigurationSets": [
+            {
+                "ConfigurationSetArn": "arn:aws:sms-voice:us-east-1:644160558196:configuration-set/c7n-query",
+                "ConfigurationSetName": "c7n-query",
+                "EventDestinations": [],
+                "DefaultMessageFeedbackEnabled": false,
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 32,
+                    "microsecond": 293000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
