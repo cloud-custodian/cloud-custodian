@@ -296,6 +296,9 @@ class WorkSpacesDirectorySg(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetIds[]"
 
 
+WorkspaceDirectory.filter_registry.register('network-location', net_filters.NetworkLocation)
+
+
 @WorkspaceDirectory.filter_registry.register('connection-aliases')
 class WorkspacesDirectoryConnectionAliases(ValueFilter):
     """Filter workspace directories based on connection aliases
