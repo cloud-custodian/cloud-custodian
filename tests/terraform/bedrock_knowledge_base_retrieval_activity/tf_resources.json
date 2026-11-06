@@ -1,0 +1,451 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "canary_knowledge_base_arn": {
+            "value": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/M3DS4ESUXQ",
+            "type": "string"
+        },
+        "idle_knowledge_base_arn": {
+            "value": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/WEIEAWHV7H",
+            "type": "string"
+        },
+        "log_group_name": {
+            "value": "c7n-kb-activity-default-2b71",
+            "type": "string"
+        },
+        "used_knowledge_base_arn": {
+            "value": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/MH5KZUMFB1",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "aws_bedrockagent_knowledge_base": {
+            "canary": {
+                "arn": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/M3DS4ESUXQ",
+                "created_at": "2026-10-08T22:12:00Z",
+                "description": null,
+                "failure_reasons": null,
+                "id": "M3DS4ESUXQ",
+                "knowledge_base_configuration": [
+                    {
+                        "kendra_knowledge_base_configuration": [],
+                        "managed_knowledge_base_configuration": [],
+                        "sql_knowledge_base_configuration": [],
+                        "type": "VECTOR",
+                        "vector_knowledge_base_configuration": [
+                            {
+                                "embedding_model_arn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0",
+                                "embedding_model_configuration": [],
+                                "supplemental_data_storage_configuration": []
+                            }
+                        ]
+                    }
+                ],
+                "name": "c7n-kb-activity-default-2b71-canary",
+                "region": "us-east-1",
+                "role_arn": "arn:aws:iam::644160558196:role/c7n-kb-activity-default-2b71-kb",
+                "storage_configuration": [
+                    {
+                        "mongo_db_atlas_configuration": [],
+                        "neptune_analytics_configuration": [],
+                        "opensearch_managed_cluster_configuration": [],
+                        "opensearch_serverless_configuration": [],
+                        "pinecone_configuration": [],
+                        "rds_configuration": [],
+                        "redis_enterprise_cloud_configuration": [],
+                        "s3_vectors_configuration": [
+                            {
+                                "index_arn": "arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/canary",
+                                "index_name": null,
+                                "vector_bucket_arn": null
+                            }
+                        ],
+                        "type": "S3_VECTORS"
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "updated_at": "2026-10-08T22:12:00Z"
+            },
+            "idle": {
+                "arn": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/WEIEAWHV7H",
+                "created_at": "2026-10-08T22:12:00Z",
+                "description": null,
+                "failure_reasons": null,
+                "id": "WEIEAWHV7H",
+                "knowledge_base_configuration": [
+                    {
+                        "kendra_knowledge_base_configuration": [],
+                        "managed_knowledge_base_configuration": [],
+                        "sql_knowledge_base_configuration": [],
+                        "type": "VECTOR",
+                        "vector_knowledge_base_configuration": [
+                            {
+                                "embedding_model_arn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0",
+                                "embedding_model_configuration": [],
+                                "supplemental_data_storage_configuration": []
+                            }
+                        ]
+                    }
+                ],
+                "name": "c7n-kb-activity-default-2b71-idle",
+                "region": "us-east-1",
+                "role_arn": "arn:aws:iam::644160558196:role/c7n-kb-activity-default-2b71-kb",
+                "storage_configuration": [
+                    {
+                        "mongo_db_atlas_configuration": [],
+                        "neptune_analytics_configuration": [],
+                        "opensearch_managed_cluster_configuration": [],
+                        "opensearch_serverless_configuration": [],
+                        "pinecone_configuration": [],
+                        "rds_configuration": [],
+                        "redis_enterprise_cloud_configuration": [],
+                        "s3_vectors_configuration": [
+                            {
+                                "index_arn": "arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/idle",
+                                "index_name": null,
+                                "vector_bucket_arn": null
+                            }
+                        ],
+                        "type": "S3_VECTORS"
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "updated_at": "2026-10-08T22:12:00Z"
+            },
+            "used": {
+                "arn": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/MH5KZUMFB1",
+                "created_at": "2026-10-08T22:12:00Z",
+                "description": null,
+                "failure_reasons": null,
+                "id": "MH5KZUMFB1",
+                "knowledge_base_configuration": [
+                    {
+                        "kendra_knowledge_base_configuration": [],
+                        "managed_knowledge_base_configuration": [],
+                        "sql_knowledge_base_configuration": [],
+                        "type": "VECTOR",
+                        "vector_knowledge_base_configuration": [
+                            {
+                                "embedding_model_arn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0",
+                                "embedding_model_configuration": [],
+                                "supplemental_data_storage_configuration": []
+                            }
+                        ]
+                    }
+                ],
+                "name": "c7n-kb-activity-default-2b71-used",
+                "region": "us-east-1",
+                "role_arn": "arn:aws:iam::644160558196:role/c7n-kb-activity-default-2b71-kb",
+                "storage_configuration": [
+                    {
+                        "mongo_db_atlas_configuration": [],
+                        "neptune_analytics_configuration": [],
+                        "opensearch_managed_cluster_configuration": [],
+                        "opensearch_serverless_configuration": [],
+                        "pinecone_configuration": [],
+                        "rds_configuration": [],
+                        "redis_enterprise_cloud_configuration": [],
+                        "s3_vectors_configuration": [
+                            {
+                                "index_arn": "arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/used",
+                                "index_name": null,
+                                "vector_bucket_arn": null
+                            }
+                        ],
+                        "type": "S3_VECTORS"
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "updated_at": "2026-10-08T22:12:00Z"
+            }
+        },
+        "aws_cloudtrail": {
+            "trail": {
+                "advanced_event_selector": [
+                    {
+                        "field_selector": [
+                            {
+                                "ends_with": [],
+                                "equals": [
+                                    "AWS::Bedrock::KnowledgeBase"
+                                ],
+                                "field": "resources.type",
+                                "not_ends_with": [],
+                                "not_equals": [],
+                                "not_starts_with": [],
+                                "starts_with": []
+                            },
+                            {
+                                "ends_with": [],
+                                "equals": [
+                                    "Data"
+                                ],
+                                "field": "eventCategory",
+                                "not_ends_with": [],
+                                "not_equals": [],
+                                "not_starts_with": [],
+                                "starts_with": []
+                            }
+                        ],
+                        "name": "Bedrock knowledge base data events"
+                    }
+                ],
+                "arn": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-kb-activity-default-2b71",
+                "cloud_watch_logs_group_arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-kb-activity-default-2b71:*",
+                "cloud_watch_logs_role_arn": "arn:aws:iam::644160558196:role/c7n-kb-activity-default-2b71-trail",
+                "enable_log_file_validation": false,
+                "enable_logging": true,
+                "event_selector": [],
+                "home_region": "us-east-1",
+                "id": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-kb-activity-default-2b71",
+                "include_global_service_events": true,
+                "insight_selector": [],
+                "is_multi_region_trail": false,
+                "is_organization_trail": false,
+                "kms_key_id": "",
+                "name": "c7n-kb-activity-default-2b71",
+                "region": "us-east-1",
+                "s3_bucket_name": "c7n-kb-activity-default-2b71",
+                "s3_key_prefix": "",
+                "sns_topic_arn": "",
+                "sns_topic_name": "",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_cloudwatch_log_group": {
+            "trail": {
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-kb-activity-default-2b71",
+                "deletion_protection_enabled": false,
+                "id": "c7n-kb-activity-default-2b71",
+                "kms_key_id": "",
+                "log_group_class": "STANDARD",
+                "name": "c7n-kb-activity-default-2b71",
+                "name_prefix": "",
+                "region": "us-east-1",
+                "retention_in_days": 1,
+                "skip_destroy": false,
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_iam_role": {
+            "kb": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-kb-activity-default-2b71-kb",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Condition\":{\"StringEquals\":{\"aws:SourceAccount\":\"644160558196\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"bedrock.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-10-08T22:11:51Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-kb-activity-default-2b71-kb",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-kb-activity-default-2b71-kb",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAEXAMPLEKBROLE0000"
+            },
+            "trail": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-kb-activity-default-2b71-trail",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-10-08T22:11:50Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-kb-activity-default-2b71-trail",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-kb-activity-default-2b71-trail",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAEXAMPLETRAILROLE0"
+            }
+        },
+        "aws_iam_role_policy": {
+            "kb": {
+                "id": "c7n-kb-activity-default-2b71-kb:terraform-7d1d5022256942a53d984a7a57",
+                "name": "terraform-7d1d5022256942a53d984a7a57",
+                "name_prefix": "terraform-",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"bedrock:InvokeModel\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0\"},{\"Action\":[\"s3vectors:GetIndex\",\"s3vectors:QueryVectors\",\"s3vectors:PutVectors\",\"s3vectors:GetVectors\",\"s3vectors:DeleteVectors\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/used\",\"arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/idle\",\"arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/canary\"]}]}",
+                "role": "c7n-kb-activity-default-2b71-kb"
+            },
+            "trail": {
+                "id": "c7n-kb-activity-default-2b71-trail:terraform-f54e9af412b761976535b160ce",
+                "name": "terraform-f54e9af412b761976535b160ce",
+                "name_prefix": "terraform-",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:logs:us-east-1:644160558196:log-group:c7n-kb-activity-default-2b71:*\"}]}",
+                "role": "c7n-kb-activity-default-2b71-trail"
+            }
+        },
+        "aws_s3_bucket": {
+            "trail": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-kb-activity-default-2b71",
+                "bucket": "c7n-kb-activity-default-2b71",
+                "bucket_domain_name": "c7n-kb-activity-default-2b71.s3.amazonaws.com",
+                "bucket_namespace": "global",
+                "bucket_prefix": "",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-kb-activity-default-2b71.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "0000000000000000000000000000000000000000000000000000000000000000",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-kb-activity-default-2b71",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "aws_s3_bucket_policy": {
+            "trail": {
+                "bucket": "c7n-kb-activity-default-2b71",
+                "id": "c7n-kb-activity-default-2b71",
+                "policy": "{\"Statement\":[{\"Action\":\"s3:GetBucketAcl\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-kb-activity-default-2b71\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::c7n-kb-activity-default-2b71\"},{\"Action\":\"s3:PutObject\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-kb-activity-default-2b71\",\"s3:x-amz-acl\":\"bucket-owner-full-control\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::c7n-kb-activity-default-2b71/AWSLogs/644160558196/*\"}],\"Version\":\"2012-10-17\"}",
+                "region": "us-east-1"
+            }
+        },
+        "aws_s3vectors_index": {
+            "canary": {
+                "creation_time": "2026-10-08T22:11:50Z",
+                "data_type": "float32",
+                "dimension": 1024,
+                "distance_metric": "cosine",
+                "encryption_configuration": [
+                    {
+                        "kms_key_arn": null,
+                        "sse_type": "AES256"
+                    }
+                ],
+                "index_arn": "arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/canary",
+                "index_name": "canary",
+                "metadata_configuration": [],
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {},
+                "vector_bucket_name": "c7n-kb-activity-default-2b71"
+            },
+            "idle": {
+                "creation_time": "2026-10-08T22:11:50Z",
+                "data_type": "float32",
+                "dimension": 1024,
+                "distance_metric": "cosine",
+                "encryption_configuration": [
+                    {
+                        "kms_key_arn": null,
+                        "sse_type": "AES256"
+                    }
+                ],
+                "index_arn": "arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/idle",
+                "index_name": "idle",
+                "metadata_configuration": [],
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {},
+                "vector_bucket_name": "c7n-kb-activity-default-2b71"
+            },
+            "used": {
+                "creation_time": "2026-10-08T22:11:50Z",
+                "data_type": "float32",
+                "dimension": 1024,
+                "distance_metric": "cosine",
+                "encryption_configuration": [
+                    {
+                        "kms_key_arn": null,
+                        "sse_type": "AES256"
+                    }
+                ],
+                "index_arn": "arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/used",
+                "index_name": "used",
+                "metadata_configuration": [],
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {},
+                "vector_bucket_name": "c7n-kb-activity-default-2b71"
+            }
+        },
+        "aws_s3vectors_vector_bucket": {
+            "kb": {
+                "creation_time": "2026-10-08T22:11:50Z",
+                "encryption_configuration": [
+                    {
+                        "kms_key_arn": null,
+                        "sse_type": "AES256"
+                    }
+                ],
+                "force_destroy": true,
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {},
+                "vector_bucket_arn": "arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71",
+                "vector_bucket_name": "c7n-kb-activity-default-2b71"
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "K3E=",
+                "b64_url": "K3E",
+                "byte_length": 2,
+                "dec": "11121",
+                "hex": "2b71",
+                "id": "K3E",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
