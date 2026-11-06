@@ -263,9 +263,9 @@ class PolicyChecker:
         for s_cond_op in list(s['Condition'].keys()):
             set_op, _, base_op = s_cond_op.rpartition(':')
             # Set operators only restrict access when they wrap a supported
-            # operator. Negated (StringNotEquals) and IfExists variants
-            # match requests outside the listed values.
-            if set_op and set_op not in set_conditions:
+            # positive operator. Negated (StringNotEquals, NotIpAddress) and
+            # IfExists variants match requests outside the listed values.
+            if set_op and (set_op not in set_conditions or base_op.startswith('Not')):
                 continue
             if base_op not in conditions:
                 continue

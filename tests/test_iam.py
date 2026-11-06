@@ -3289,6 +3289,13 @@ class CrossAccountChecker(TestCase):
                 "aws:PrincipalArn": "arn:aws:iam::123456789012:root"}})
         self.assertEqual(len(checker.check(policy)), 1)
 
+        # NotIpAddress is a supported plain operator, but not inside a set operator
+        checker = PolicyChecker({})
+        policy = self._public_statement_policy({
+            "ForAnyValue:NotIpAddress": {"aws:SourceIp": "10.0.0.0/8"}})
+        self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
+        self.assertEqual(len(checker.check(policy)), 1)
+
     def test_if_exists_set_operators_are_not_restrictive(self):
         """IfExists is true when the key is absent from the request."""
         checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
