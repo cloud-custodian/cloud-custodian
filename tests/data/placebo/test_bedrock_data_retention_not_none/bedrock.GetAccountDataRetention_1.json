@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "mode": "inherit",
+        "updatedAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 9,
+            "day": 30,
+            "hour": 6,
+            "minute": 39,
+            "second": 11,
+            "microsecond": 616000
+        }
+    }
+}
