@@ -2,9 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+from unittest.mock import MagicMock, patch
+
+import redis
 
 from common import get_ldap_lookup, PETER, BILL
-from c7n_mailer.ldap_lookup import have_sqlite
+from c7n_mailer.ldap_lookup import have_sqlite, LdapLookup, Redis
 
 SKIP_REASON = "Azure Pipelines still broken"
 
@@ -103,3 +106,28 @@ class MailerLdapTest(unittest.TestCase):
         self.ldap_lookup.connection = None
         to_addr = self.ldap_lookup.get_email_to_addrs_from_uid("doesnotexist", manager=True)
         self.assertEqual(to_addr, [])
+
+
+class RedisConnectionTest(unittest.TestCase):
+    def test_host_and_port(self):
+        conn = Redis(redis_host="redis.example.com", redis_port=6380).connection
+        kwargs = conn.connection_pool.connection_kwargs
+        self.assertEqual((kwargs["host"], kwargs["port"]), ("redis.example.com", 6380))
+        self.assertNotEqual(conn.connection_pool.connection_class, redis.SSLConnection)
+
+    def test_url_with_tls(self):
+        conn = Redis(redis_host="ignored", redis_url="rediss://redis.example.com:6380/2").connection
+        kwargs = conn.connection_pool.connection_kwargs
+        self.assertEqual(
+            (kwargs["host"], kwargs["port"], kwargs["db"]), ("redis.example.com", 6380, 2)
+        )
+        self.assertEqual(conn.connection_pool.connection_class, redis.SSLConnection)
+
+    def test_ldap_lookup_uses_redis_url_from_config(self):
+        # Only the LDAP connection is replaced, so the config is read by LdapLookup itself.
+        config = {"cache_engine": "redis", "redis_url": "rediss://redis.example.com:6380/0"}
+        with patch.object(LdapLookup, "get_connection", return_value=MagicMock()):
+            lookup = LdapLookup(config, MagicMock())
+        conn = lookup.caching.connection
+        self.assertEqual(conn.connection_pool.connection_kwargs["host"], "redis.example.com")
+        self.assertEqual(conn.connection_pool.connection_class, redis.SSLConnection)
