@@ -4,7 +4,8 @@
 import logging
 import re
 
-from azure.core.exceptions import HttpResponseError
+from azure.core.exceptions import HttpResponseError, ResourceNotFoundError
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.query import sources
@@ -413,6 +414,11 @@ class DeleteRoleDefinitionAction(AzureBaseAction):
     ``Microsoft.Authorization/roleDefinitions/delete`` on all of them, as Owner
     and User Access Administrator have.
 
+    A role that can be assigned in a management group is still listed, and
+    deleted, at the subscription in its ``id``. If Azure answers that delete as
+    already done while the role still exists, the action fails instead of
+    reporting it deleted.
+
     A role that still has assignments fails with Azure's ``RoleDefinitionHasAssignments``
     error. Remove active assignments first with the ``delete`` action on
     ``azure.roleassignment`` and its ``role`` filter. Eligible assignments must be
@@ -455,8 +461,7 @@ class DeleteRoleDefinitionAction(AzureBaseAction):
                 self._log_modified_resource(resource, self._process_resource(resource))
             except Exception as e:
                 self.log.error(
-                    "Deleting role '%s' failed: %s",
-                    resource['properties']['roleName'], e,
+                    f"Deleting role '{resource['properties']['roleName']}' failed: {e}",
                     exc_info=True, extra=self._get_action_log_metadata(resource))
                 failures.append(e)
         if failures:
@@ -466,15 +471,25 @@ class DeleteRoleDefinitionAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
+        scope = self.get_scope(resource['id'])
+        name = resource['properties']['roleName']
         try:
-            self.client.role_definitions.delete(
-                self.get_scope(resource['id']), resource['name'])
+            self.client.role_definitions.delete(scope, resource['name'])
         except HttpResponseError as error:
             # A role that's already gone is answered with 204, which this SDK rejects.
             if error.response is None or error.response.status_code != 204:
                 raise
-            return "role '%s' already deleted" % resource['properties']['roleName']
-        return "deleted role '%s'" % resource['properties']['roleName']
+            return self._confirm_deleted(scope, resource['name'], name)
+        return f"deleted role '{name}'"
+
+    def _confirm_deleted(self, scope, role_id, name):
+        # A 204 doesn't prove the role is gone, so look it up.
+        try:
+            self.client.role_definitions.get(scope, role_id)
+        except ResourceNotFoundError:
+            return f"role '{name}' already deleted"
+        raise PolicyExecutionError(
+            f"Role '{name}' still exists at '{scope}' after Azure answered 204")
 
     @staticmethod
     def get_scope(role_id):
@@ -482,5 +497,5 @@ class DeleteRoleDefinitionAction(AzureBaseAction):
             r"^(.+)\/providers\/Microsoft\.Authorization\/roleDefinitions\/[^\/]+$",
             role_id, flags=re.IGNORECASE)
         if not match:
-            raise ValueError("Unexpected role definition id '%s'" % role_id)
+            raise ValueError(f"Unexpected role definition id '{role_id}'")
         return match.group(1)

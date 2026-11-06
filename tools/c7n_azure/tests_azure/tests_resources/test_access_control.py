@@ -174,7 +174,7 @@ class AccessControlTest(BaseTest):
         self.sleep_in_live_mode(30)
         client = p.resource_manager.get_client()
         remaining = client.role_definitions.list(
-            '/subscriptions/%s' % self.session.get_subscription_id(),
+            f'/subscriptions/{self.session.get_subscription_id()}',
             filter="roleName eq 'cctest-roledefinition-delete'")
         self.assertEqual(list(remaining), [])
 
@@ -230,9 +230,10 @@ class AccessControlTest(BaseTest):
         }, validate=True)
         # The role test_delete_role_definition deletes, which Azure answers with 204
         role_id = '00000000-0000-0000-0000-000000000010'
+        subscription_id = self.session.get_subscription_id()
         role = {
-            'id': '/subscriptions/%s/providers/Microsoft.Authorization/roleDefinitions/%s' % (
-                self.session.get_subscription_id(), role_id),
+            'id': (f'/subscriptions/{subscription_id}'
+                   f'/providers/Microsoft.Authorization/roleDefinitions/{role_id}'),
             'name': role_id,
             'properties': {'roleName': 'cctest-roledefinition-delete'},
         }
@@ -274,7 +275,7 @@ class AccessControlTest(BaseTest):
 
         self.sleep_in_live_mode(30)
         client = p.resource_manager.get_client()
-        scope = '/subscriptions/%s' % self.session.get_subscription_id()
+        scope = f'/subscriptions/{self.session.get_subscription_id()}'
         deleted = client.role_definitions.list(
             scope, filter="roleName eq 'cctest-roledefinition-delete'")
         assigned = client.role_definitions.list(

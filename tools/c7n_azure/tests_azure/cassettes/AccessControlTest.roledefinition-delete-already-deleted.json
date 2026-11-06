@@ -14,30 +14,75 @@
                     "message": "No Content"
                 },
                 "headers": {
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
+                        "2999"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 80BAEDEA70F7434D9217DC46372FDA19 Ref B: CH1AA2020613009 Ref C: 2026-11-06T16:37:45Z"
+                    ],
+                    "content-type": [
+                        "text/html"
+                    ],
+                    "date": [
+                        "Fri, 06 Nov 2026 16:37:45 GMT"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000010?api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
                     "cache-control": [
                         "no-cache"
                     ],
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
-                        "2999"
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
                     ],
                     "x-msedge-ref": [
-                        "Ref A: A30D7F0942EA4326B8038F1EB74C2CCC Ref B: CHI261140502042 Ref C: 2026-11-02T14:47:44Z"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-deletes": [
-                        "199"
+                        "Ref A: 50CBCECEA812421AA8777A0CA7674D74 Ref B: CH1AA2020611019 Ref C: 2026-11-06T16:37:46Z"
                     ],
                     "content-type": [
-                        "text/html"
+                        "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Mon, 02 Nov 2026 14:47:45 GMT"
+                        "Fri, 06 Nov 2026 16:37:46 GMT"
+                    ],
+                    "content-length": [
+                        "152"
                     ]
                 },
                 "body": {
-                    "string": ""
+                    "data": {
+                        "error": {
+                            "code": "RoleDefinitionDoesNotExist",
+                            "message": "The specified role definition with ID '00000000-0000-0000-0000-000000000010' does not exist."
+                        }
+                    }
                 }
             }
         }
