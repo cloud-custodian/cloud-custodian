@@ -91,7 +91,7 @@ class DatabricksSetCmkEncryptionAction(AzureBaseAction):
         uri = self.data['key-vault-uri']
         if not uri.startswith('https://'):
             raise PolicyExecutionError(
-                "set-cmk-encryption: key-vault-uri must start with https://, got %r" % uri)
+                f"set-cmk-encryption: key-vault-uri must start with https://, got {uri!r}")
 
         resources = self.filter_resources(
             resources, 'properties.parameters.prepareEncryption.value', (True,))
@@ -107,8 +107,8 @@ class DatabricksSetCmkEncryptionAction(AzureBaseAction):
                 self._log_modified_resource(resource, self._process_resource(resource))
             except Exception as e:
                 self.log.error(
-                    "Setting customer-managed key on '%s' in resource group '%s' failed: %s",
-                    resource.get('name'), resource.get('resourceGroup'), e,
+                    f"Setting customer-managed key on '{resource.get('name')}' "
+                    f"in resource group '{resource.get('resourceGroup')}' failed: {e}",
                     exc_info=True, extra=self._get_action_log_metadata(resource))
                 failures.append(e)
         if failures:
@@ -128,7 +128,7 @@ class DatabricksSetCmkEncryptionAction(AzureBaseAction):
         self.client.resources.begin_create_or_update_by_id(
             resource_id=resource['id'], api_version=self.api_version, parameters=workspace
         ).result()
-        return "Set customer-managed key '{}'".format(self.data['key-name'])
+        return f"Set customer-managed key '{self.data['key-name']}'"
 
     def set_key(self, properties):
         """Set the key as the DBFS root encryption in workspace ``properties``."""
