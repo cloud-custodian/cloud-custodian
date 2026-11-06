@@ -1493,6 +1493,25 @@ class AccountTests(BaseTest):
             policies[0]['policyDocument']['DestinationArn'],
             'arn:aws:kinesis:ca-central-1:644160558196:stream/c7n-test-sub-dest')
 
+    def test_logs_account_policy_missing(self):
+        factory = self.replay_flight_data(
+            'test_account_logs_account_policy_missing', region='ca-central-1')
+        p = self.load_policy({
+            'name': 'account-missing-data-protection-policy',
+            'resource': 'account',
+            'filters': [{
+                'type': 'logs-account-policy',
+                'policy-type': 'DATA_PROTECTION_POLICY',
+                'count': 0}]},
+            config={'region': 'ca-central-1'},
+            session_factory=factory)
+        self.assertEqual(
+            p.resource_manager.filters[0].get_permissions(),
+            ('logs:DescribeAccountPolicies', 'logs:GetDataProtectionPolicy'))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:LogsAccountPolicies'], [])
+
     def test_bedrock_model_invocation_logging_disabled(self):
         factory = self.replay_flight_data('test_bedrock_model_invocation_logging_disabled')
         p = self.load_policy({

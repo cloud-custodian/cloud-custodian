@@ -2649,17 +2649,30 @@ class LogsAccountPolicy(ListItemFilter):
         **{'policy-type': {'enum': [
             'DATA_PROTECTION_POLICY', 'SUBSCRIPTION_FILTER_POLICY',
             'FIELD_INDEX_POLICY', 'TRANSFORMER_POLICY',
-            'METRIC_EXTRACTION_POLICY']}})
-    permissions = (
-        'logs:DescribeAccountPolicies', 'logs:GetDataProtectionPolicy')
+            'METRIC_EXTRACTION_POLICY', 'RETENTION_POLICY']}})
+    permissions = ('logs:DescribeAccountPolicies',)
+    # describe additionally requires the read permission of the policy type
+    policy_type_permissions = {
+        'DATA_PROTECTION_POLICY': 'logs:GetDataProtectionPolicy',
+        'SUBSCRIPTION_FILTER_POLICY': 'logs:DescribeSubscriptionFilters',
+        'FIELD_INDEX_POLICY': 'logs:DescribeIndexPolicies',
+        'TRANSFORMER_POLICY': 'logs:GetTransformer',
+    }
     annotation_key = 'c7n:LogsAccountPolicies'
+
+    def get_permissions(self):
+        extra = self.policy_type_permissions.get(self.data['policy-type'])
+        if extra:
+            return self.permissions + (extra,)
+        return self.permissions
 
     def get_item_values(self, resource):
         client = local_session(self.manager.session_factory).client('logs')
         policies = []
         params = {'policyType': self.data['policy-type']}
         while True:
-            response = client.describe_account_policies(**params)
+            response = self.manager.retry(
+                client.describe_account_policies, **params)
             policies.extend(response.get('accountPolicies', []))
             if not response.get('nextToken'):
                 break
