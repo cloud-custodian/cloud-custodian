@@ -202,6 +202,12 @@ class VertexAITypeInfo(TypeInfo):
         # Resource name format: projects/{project}/locations/{location}/<component>/<id>
         return resource['name'].split('/')[3]
 
+    @classmethod
+    def get_metric_resource_name(cls, resource, metric_key=None):
+        # Monitoring labels Vertex AI metrics with the bare id, the last
+        # part of the full resource name.
+        return resource['name'].split('/')[-1]
+
 
 @resources.register('vertex-ai-location')
 class VertexAILocation:
@@ -298,11 +304,6 @@ class VertexAIEndpoint(VertexAIQueryManager):
         urn_component = 'endpoint'
         metric_key = 'resource.labels.endpoint_id'
         supported_metric_keys = ('resource.labels.endpoint_id',)
-
-        @classmethod
-        def get_metric_resource_name(cls, resource, metric_key=None):
-            # Endpoint metrics are keyed by the terminal endpoint id.
-            return resource['name'].split('/')[-1]
 
 
 @VertexAIEndpoint.action_registry.register('monitor')
@@ -731,11 +732,6 @@ class VertexAIIndexEndpoint(VertexAIQueryManager):
         urn_component = 'index-endpoint'
         metric_key = 'resource.labels.index_endpoint_id'
         supported_metric_keys = ('resource.labels.index_endpoint_id',)
-
-        @classmethod
-        def get_metric_resource_name(cls, resource, metric_key=None):
-            # Index endpoint metrics are keyed by the terminal endpoint id.
-            return resource['name'].split('/')[-1]
 
 
 @resources.register('vertex-ai-dataset')

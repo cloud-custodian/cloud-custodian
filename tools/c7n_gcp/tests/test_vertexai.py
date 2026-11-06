@@ -731,18 +731,26 @@ def test_vertexai_endpoint_metric_resource_name():
     )
 
 
-def _generate_publisher_model_traffic(project_id, location, model, calls=5):
-    """Send generateContent calls to a Model Garden model.
+def _authorized_session():
+    """Return a requests session signed with the default Google credentials.
 
-    Only runs during recording, since Cloud Monitoring's token_count
-    metric has no data until the model gets requests.
+    Only the recording helpers below use it; replay never calls Google.
     """
     import google.auth
     from google.auth.transport.requests import AuthorizedSession
 
     credentials, _ = google.auth.default(
         scopes=['https://www.googleapis.com/auth/cloud-platform'])
-    session = AuthorizedSession(credentials)
+    return AuthorizedSession(credentials)
+
+
+def _generate_publisher_model_traffic(project_id, location, model, calls=5):
+    """Send generateContent calls to a Model Garden model.
+
+    Only runs during recording, since Cloud Monitoring's token_count
+    metric has no data until the model gets requests.
+    """
+    session = _authorized_session()
     url = (
         f'https://{location}-aiplatform.googleapis.com/v1/projects/'
         f'{project_id}/locations/{location}/publishers/google/models/'
@@ -754,22 +762,22 @@ def _generate_publisher_model_traffic(project_id, location, model, calls=5):
         resp.raise_for_status()
 
 
-def _wait_for_metric(project_id, metric_filter, timeout=600, interval=30):
+def _wait_for_metric(project_id, metric_filter, min_total=None, timeout=600, interval=30):
     """Poll Cloud Monitoring until ``metric_filter`` matches a time series.
     Avoids guessing a fixed propagation delay.
+
+    With ``min_total``, keeps polling until the points add up to at least
+    that many, so a recording doesn't capture a partial count.
 
     Keeps polling through throttling, server errors, and network errors,
     so one transient failure doesn't discard the recording.
     """
-    import google.auth
     import requests
-    from google.auth.transport.requests import AuthorizedSession
 
-    credentials, _ = google.auth.default(
-        scopes=['https://www.googleapis.com/auth/cloud-platform'])
-    session = AuthorizedSession(credentials)
+    session = _authorized_session()
     url = f'https://monitoring.googleapis.com/v3/projects/{project_id}/timeSeries'
     deadline = time.time() + timeout
+    total = 0
     while True:
         # Move the window forward each poll. A fixed end time never
         # covers points stamped after polling started.
@@ -786,12 +794,16 @@ def _wait_for_metric(project_id, metric_filter, timeout=600, interval=30):
             resp = None
         if resp is not None and resp.status_code != 429 and resp.status_code < 500:
             resp.raise_for_status()
-            if resp.json().get('timeSeries'):
+            series = resp.json().get('timeSeries', [])
+            total = sum(
+                int(point['value'].get('int64Value', 0))
+                for one in series for point in one['points'])
+            if series and (min_total is None or total >= min_total):
                 return
         if time.time() >= deadline:
             raise TimeoutError(
-                f'No time series matched {metric_filter} '
-                f'within {timeout}s of polling')
+                f'{metric_filter} totalled {total}, expected at least '
+                f'{min_total or 1}, within {timeout}s of polling')
         time.sleep(interval)
 
 
@@ -2107,12 +2119,7 @@ def _query_index_endpoint(endpoint, deployed_index_id, calls=5):
     Only runs during recording, since ``query/request_count`` has no data
     until the endpoint gets queries.
     """
-    import google.auth
-    from google.auth.transport.requests import AuthorizedSession
-
-    credentials, _ = google.auth.default(
-        scopes=['https://www.googleapis.com/auth/cloud-platform'])
-    session = AuthorizedSession(credentials)
+    session = _authorized_session()
     url = f'https://{endpoint["public_endpoint_domain_name"]}/v1/{endpoint["id"]}:findNeighbors'
     body = {
         'deployedIndexId': deployed_index_id,
@@ -2187,17 +2194,20 @@ def test_vertexai_index_endpoint_metrics(test, vertexai_index_endpoint):
     busy = resources['google_vertex_ai_index_endpoint']['busy']
     idle = resources['google_vertex_ai_index_endpoint']['idle']
     metric_type = 'aiplatform.googleapis.com/matching_engine/query/request_count'
+    queries = 5
     session_factory = test.replay_flight_data('vertexai_index_endpoint_metrics')
 
     if test.recording:
         _query_index_endpoint(
             busy,
             resources['google_vertex_ai_index_endpoint_deployed_index']['busy'][
-                'deployed_index_id'])
+                'deployed_index_id'],
+            calls=queries)
         _wait_for_metric(
             busy['project'],
             f'metric.type = "{metric_type}" AND '
-            f'resource.labels.index_endpoint_id = "{busy["name"]}"')
+            f'resource.labels.index_endpoint_id = "{busy["name"]}"',
+            min_total=queries)
 
     policy = test.load_policy(
         {
@@ -2227,6 +2237,9 @@ def test_vertexai_index_endpoint_metrics(test, vertexai_index_endpoint):
     matched = policy.run()
 
     assert [r['name'].split('/')[-1] for r in matched] == [idle['name']]
+    # The busy endpoint is filtered out, so read its count off the filter.
+    busy_series = policy.resource_manager.filters[-1].resource_metric_dict[busy['name']]
+    assert busy_series['points'][0]['value']['int64Value'] == str(queries)
 
 
 def test_vertexai_index_endpoint_metrics_invalid_metric_key(test):
