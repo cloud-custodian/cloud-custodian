@@ -4,7 +4,10 @@
 from gcp_common import BaseTest, event_data
 import time
 
+import pytest
 from pytest_terraform import terraform
+
+from c7n.exceptions import PolicyValidationError
 
 
 class SpannerInstanceTest(BaseTest):
@@ -478,3 +481,174 @@ def test_spanner_backup_iam(test):
     resources = policy.run()
     assert len(resources) == 1
     assert resources[0]['c7n:iamPolicy']['bindings'][0]['role'] == 'roles/editor'
+
+
+@terraform('spanner_autoscaling')
+def test_spanner_autoscaling_set(test, spanner_autoscaling):
+    instance_name = spanner_autoscaling['google_spanner_instance.c7n.name']
+    session_factory = test.replay_flight_data('spanner-autoscaling-set')
+    policy = test.load_policy({
+        'name': 'spanner-autoscaling-set',
+        'resource': 'gcp.spanner-instance',
+        'filters': [
+            {'type': 'value', 'key': 'displayName', 'value': instance_name},
+            {'type': 'value', 'key': 'autoscalingConfig', 'value': 'absent'},
+        ],
+        'actions': [{
+            'type': 'set-autoscaling',
+            'minNodes': 1,
+            'maxNodes': 2,
+            'highPriorityCpuUtilizationPercent': 65,
+            'storageUtilizationPercent': 95,
+        }],
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # The patch is a long-running operation; the instance keeps reporting its
+    # old config until it completes, so poll until autoscaling shows up.
+    client = policy.resource_manager.get_client()
+    for _ in range(30):
+        instance = client.execute_query('get', {'name': resources[0]['name']})
+        if 'autoscalingConfig' in instance:
+            break
+        if test.recording:
+            time.sleep(5)
+    else:
+        raise AssertionError('Timed out waiting for autoscalingConfig to be applied.')
+
+    assert instance['autoscalingConfig'] == {
+        'autoscalingLimits': {'minNodes': 1, 'maxNodes': 2},
+        'autoscalingTargets': {
+            'highPriorityCpuUtilizationPercent': 65,
+            'storageUtilizationPercent': 95,
+        },
+    }
+    # Fields outside the field mask are untouched.
+    assert instance['labels'] == resources[0]['labels']
+    assert instance['labels']['env'] == 'c7n-test'
+    assert instance['displayName'] == instance_name
+
+
+def _load_set_autoscaling(test, **action):
+    return test.load_policy({
+        'name': 'spanner-autoscaling',
+        'resource': 'gcp.spanner-instance',
+        'actions': [dict(type='set-autoscaling', **action)],
+    }, validate=True)
+
+
+@pytest.mark.parametrize('action, message', [
+    ({}, 'not both'),
+    ({'minNodes': 1, 'maxNodes': 2, 'minProcessingUnits': 1000, 'maxProcessingUnits': 2000},
+     'not both'),
+    ({'minNodes': 1, 'maxProcessingUnits': 2000}, 'not both'),
+    ({'minNodes': 1}, 'requires both minNodes and maxNodes'),
+    ({'maxProcessingUnits': 2000}, 'requires both minProcessingUnits and maxProcessingUnits'),
+    ({'minNodes': 3, 'maxNodes': 2}, 'minNodes must not exceed maxNodes'),
+    ({'minProcessingUnits': 3000, 'maxProcessingUnits': 2000},
+     'minProcessingUnits must not exceed maxProcessingUnits'),
+    ({'minNodes': 1, 'maxNodes': 11}, 'maxNodes must not exceed 10 times minNodes'),
+    ({'minProcessingUnits': 1000, 'maxProcessingUnits': 11000},
+     'maxProcessingUnits must not exceed 10 times minProcessingUnits'),
+])
+def test_spanner_autoscaling_invalid_limits(test, action, message):
+    with pytest.raises(PolicyValidationError, match=message):
+        _load_set_autoscaling(test, storageUtilizationPercent=95, **action)
+
+
+@pytest.mark.parametrize('action', [
+    {'storageUtilizationPercent': 100},
+    {'storageUtilizationPercent': 9},
+    {'storageUtilizationPercent': 95, 'highPriorityCpuUtilizationPercent': 95},
+    {'storageUtilizationPercent': 95, 'totalCpuUtilizationPercent': 5},
+    {'storageUtilizationPercent': 95, 'minNodes': 0},
+    {'storageUtilizationPercent': 95, 'minProcessingUnits': 1500},
+    {'minNodes': 1, 'maxNodes': 2},
+])
+def test_spanner_autoscaling_schema_bounds(test, action):
+    with pytest.raises(PolicyValidationError, match='Failed to validate policy'):
+        _load_set_autoscaling(test, **dict({'minNodes': 1, 'maxNodes': 2}, **action))
+
+
+def test_spanner_autoscaling_max_ratio_allowed(test):
+    _load_set_autoscaling(test, minNodes=1, maxNodes=10, storageUtilizationPercent=95)
+
+
+def test_spanner_autoscaling_skips_ineligible_editions(test):
+    policy = _load_set_autoscaling(
+        test, minNodes=1, maxNodes=2, storageUtilizationPercent=95)
+    action = policy.resource_manager.actions[0]
+    resources = [
+        {'name': 'standard', 'edition': 'STANDARD'},
+        {'name': 'enterprise', 'edition': 'ENTERPRISE'},
+        {'name': 'enterprise-plus', 'edition': 'ENTERPRISE_PLUS'},
+        {'name': 'unspecified', 'edition': 'EDITION_UNSPECIFIED'},
+        {'name': 'free'},
+    ]
+    assert [r['name'] for r in action.filter_resources(resources)] == [
+        'enterprise', 'enterprise-plus']
+
+
+def test_spanner_autoscaling_processing_units_params(test):
+    policy = _load_set_autoscaling(
+        test,
+        minProcessingUnits=1000,
+        maxProcessingUnits=3000,
+        highPriorityCpuUtilizationPercent=65,
+        totalCpuUtilizationPercent=80,
+        storageUtilizationPercent=90,
+    )
+    action = policy.resource_manager.actions[0]
+    name = 'projects/p/instances/i'
+    params = action.get_resource_params(None, {'name': name})
+    assert params == {
+        'name': name,
+        'body': {
+            'instance': {
+                'name': name,
+                'autoscalingConfig': {
+                    'autoscalingLimits': {
+                        'minProcessingUnits': 1000, 'maxProcessingUnits': 3000},
+                    'autoscalingTargets': {
+                        'highPriorityCpuUtilizationPercent': 65,
+                        'totalCpuUtilizationPercent': 80,
+                        'storageUtilizationPercent': 90,
+                    },
+                },
+            },
+            'fieldMask': 'autoscalingConfig',
+        },
+    }
+
+
+def test_spanner_autoscaling_keeps_asymmetric_options(test):
+    policy = _load_set_autoscaling(
+        test, minProcessingUnits=1000, maxProcessingUnits=3000, storageUtilizationPercent=90)
+    action = policy.resource_manager.actions[0]
+    asymmetric = [{'replicaSelection': {'location': 'us-east1'}}]
+    name = 'projects/p/instances/i'
+    params = action.get_resource_params(None, {
+        'name': name,
+        'autoscalingConfig': {
+            'autoscalingLimits': {'minNodes': 1, 'maxNodes': 2},
+            'autoscalingTargets': {'storageUtilizationPercent': 95},
+            'asymmetricAutoscalingOptions': asymmetric,
+        },
+    })
+    assert params == {
+        'name': name,
+        'body': {
+            'instance': {
+                'name': name,
+                'autoscalingConfig': {
+                    'autoscalingLimits': {
+                        'minProcessingUnits': 1000, 'maxProcessingUnits': 3000},
+                    'autoscalingTargets': {'storageUtilizationPercent': 90},
+                    'asymmetricAutoscalingOptions': asymmetric,
+                },
+            },
+            'fieldMask': 'autoscalingConfig',
+        },
+    }
