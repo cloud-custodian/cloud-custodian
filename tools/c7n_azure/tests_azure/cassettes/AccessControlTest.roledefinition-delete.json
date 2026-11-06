@@ -1,0 +1,182 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions?api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 14:45:59 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "769"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 14F30D3380B845379D1D33D47A572F05 Ref B: CHI261140510054 Ref C: 2026-11-02T14:45:59Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "roleName": "cctest-roledefinition-delete",
+                                    "type": "CustomRole",
+                                    "description": "Cloud Custodian test fixture",
+                                    "assignableScopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "permissions": [
+                                        {
+                                            "actions": [
+                                                "Microsoft.Resources/subscriptions/resourceGroups/read"
+                                            ],
+                                            "notActions": []
+                                        }
+                                    ],
+                                    "createdOn": "2026-11-02T14:45:01.5867872Z",
+                                    "updatedOn": "2026-11-02T14:45:01.5867872Z",
+                                    "createdBy": "00000000-0000-0000-0000-000000000002",
+                                    "updatedBy": "00000000-0000-0000-0000-000000000002"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000010",
+                                "type": "Microsoft.Authorization/roleDefinitions",
+                                "name": "00000000-0000-0000-0000-000000000010"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000010?api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 14:46:02 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "756"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 46246B495D7F4C839D1B747D04D36247 Ref B: CHI261140502031 Ref C: 2026-11-02T14:46:00Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
+                        "2999"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "199"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "roleName": "cctest-roledefinition-delete",
+                            "type": "CustomRole",
+                            "description": "Cloud Custodian test fixture",
+                            "assignableScopes": [
+                                "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                            ],
+                            "permissions": [
+                                {
+                                    "actions": [
+                                        "Microsoft.Resources/subscriptions/resourceGroups/read"
+                                    ],
+                                    "notActions": []
+                                }
+                            ],
+                            "createdOn": "2026-11-02T14:45:01.5867872Z",
+                            "updatedOn": "2026-11-02T14:46:01.5326654Z",
+                            "createdBy": "00000000-0000-0000-0000-000000000002",
+                            "updatedBy": "00000000-0000-0000-0000-000000000002"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000010",
+                        "type": "Microsoft.Authorization/roleDefinitions",
+                        "name": "00000000-0000-0000-0000-000000000010"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions?$filter=roleName%20eq%20%27cctest-roledefinition-delete%27&api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 02 Nov 2026 14:46:32 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "13"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F68332CFEF2F426E89613460CCAA1415 Ref B: CHI261140512060 Ref C: 2026-11-02T14:46:32Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        }
+    ]
+}
