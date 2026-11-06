@@ -231,6 +231,26 @@ For example:
     pytest tools/c7n_gcp/tests -n auto
 
 
+Checking Recommender IDs
+-----------------------
+
+The Recommender catalog can be checked against Google's published recommender
+IDs without cloud credentials or resources. This check fetches the current
+documentation and is skipped during ordinary offline test runs. To enable it,
+run the following command from the repository root after installing the GCP
+development dependencies:
+
+.. code-block:: bash
+
+    C7N_RECOMMENDER_DOCS=yes C7N_FUNCTIONAL=no \
+        python -m pytest tools/c7n_gcp/tests/test_recommender.py -q
+
+The catalog may contain only a subset of the documented recommenders. Unknown
+IDs and catalog keys that differ from their stored IDs fail the check. A fetch
+failure or a document without IDs also fails rather than silently skipping
+validation.
+
+
 Updating Existing Tests
 -----------------------
 
