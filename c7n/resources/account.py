@@ -2850,7 +2850,7 @@ class LogsAccountPolicy(ListItemFilter):
     annotation_key = 'c7n:LogsAccountPolicies'
 
     def get_permissions(self):
-        extra = self.policy_type_permissions.get(self.data['policy-type'])
+        extra = self.policy_type_permissions.get(self.data.get('policy-type'))
         if extra:
             return self.permissions + (extra,)
         return self.permissions
