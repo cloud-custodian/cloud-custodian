@@ -2805,10 +2805,6 @@ class SetBedrockModelInvocationLogging(BaseAction):
 class LogsAccountPolicy(ListItemFilter):
     """Filter on CloudWatch Logs account level policies.
 
-    Retrieves the account policies of the given type via
-    ``DescribeAccountPolicies``. Each policy's ``policyDocument`` json
-    string is parsed so its fields can be matched against with ``attrs``.
-
     :example:
 
     .. code-block:: yaml
