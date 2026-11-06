@@ -728,6 +728,63 @@ class VertexAIDataset(VertexAIQueryManager):
         urn_component = 'dataset'
 
 
+@resources.register('vertex-ai-index')
+class VertexAIIndex(VertexAIQueryManager):
+    """Vertex AI Vector Search indexes.
+
+    :example:
+
+    Find indexes with no deployments that have not been updated in 30 days:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-index-undeployed
+            resource: gcp.vertex-ai-index
+            filters:
+              - or:
+                  - type: value
+                    key: deployedIndexes
+                    value: absent
+                  - type: value
+                    key: deployedIndexes
+                    value: []
+              - type: value
+                key: updateTime
+                value_type: age
+                op: gte
+                value: 30
+
+    :example:
+
+    Find indexes missing an owner label:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-index-missing-owner
+            resource: gcp.vertex-ai-index
+            filters:
+              - type: value
+                key: labels.owner
+                value: absent
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.indexes'
+        enum_spec = ('list', 'indexes[]', None)
+        default_report_fields = [
+            'name',
+            'displayName',
+            'deployedIndexes',
+            'createTime',
+            'updateTime',
+        ]
+        asset_type = 'aiplatform.googleapis.com/Index'
+        permissions = ('aiplatform.indexes.list',)
+        urn_component = 'index'
+
+
 @resources.register('vertex-ai-model')
 class VertexAIModel(VertexAIQueryManager):
     """GCP Vertex AI Model Registry Resource

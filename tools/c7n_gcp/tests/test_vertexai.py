@@ -7,6 +7,7 @@ import time
 import logging
 from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, patch
+import freezegun
 import pytest
 from google.api_core.client_options import ClientOptions
 from googleapiclient.errors import HttpError
@@ -400,6 +401,111 @@ def poll_for_state(
         )
 
     return resources
+
+
+def test_vertexai_index_resource_registered(test) -> None:
+    policy = test.load_policy(
+        {'name': 'vertexai-index-check', 'resource': 'gcp.vertex-ai-index'},
+    )
+    assert policy.resource_manager.get_permissions() == ('aiplatform.indexes.list',)
+
+
+@terraform('vertexai_index', scope='module')
+def test_vertexai_index_query(test, vertexai_index) -> None:
+    session_factory = test.replay_flight_data(
+        'vertexai-index-query',
+        project_id=test.project_id,
+    )
+    names = vertexai_index.outputs['index_display_names']['value']
+    policy = test.load_policy(
+        {
+            'name': 'vertexai-indexes',
+            'resource': 'gcp.vertex-ai-index',
+            'query': [{'location': 'us-central1'}, {'location': 'us-east1'}],
+            'filters': [
+                {'type': 'value', 'key': 'displayName', 'op': 'in',
+                 'value': list(names.values())},
+            ],
+        },
+        session_factory=session_factory,
+    )
+    indexes = policy.run()
+    assert {r['displayName'] for r in indexes} == set(names.values())
+    assert {r['c7n:location']['name'] for r in indexes} == {
+        'us-central1',
+        'us-east1',
+    }
+    for index in indexes:
+        location = index['name'].split('/')[3]
+        index_id = index['name'].split('/')[-1]
+        assert policy.resource_manager.get_urns([index]) == [
+            f'gcp:aiplatform:{location}:{test.project_id}:index/{index_id}',
+        ]
+
+
+@terraform('vertexai_index', scope='module')
+def test_vertexai_index_filtering(test, vertexai_index) -> None:
+    session_factory = test.replay_flight_data('vertexai-index-filtering')
+    names = vertexai_index.outputs['index_display_names']['value']
+    central = names['central']
+    east = names['east']
+    undeployed = {
+        'or': [
+            {'type': 'value', 'key': 'deployedIndexes', 'value': 'absent'},
+            {'type': 'value', 'key': 'deployedIndexes', 'value': []},
+        ],
+    }
+    cases = [
+        ([undeployed], {east}),
+        ([{'type': 'value', 'key': 'labels.owner', 'value': 'absent'}], {east}),
+        ([{'displayName': central}], {central}),
+        ([{'indexUpdateMethod': 'STREAM_UPDATE'}], {central, east}),
+        ([{'indexUpdateMethod': 'BATCH_UPDATE'}], set()),
+        ([{'type': 'value', 'key': 'createTime', 'op': 'lt',
+           'value': '2100-01-01T00:00:00Z'}], {central, east}),
+        ([{'type': 'value', 'key': 'createTime', 'op': 'gt',
+           'value': '2100-01-01T00:00:00Z'}], set()),
+        ([undeployed, {'type': 'value', 'key': 'updateTime',
+                       'value_type': 'age', 'op': 'gte', 'value': 30}], {east}),
+        ([{'type': 'value', 'key': 'updateTime',
+           'value_type': 'age', 'op': 'lt', 'value': 30}], set()),
+    ]
+    for filters, expected in cases:
+        policy = test.load_policy(
+            {
+                'name': 'vertexai-index-filter',
+                'resource': 'gcp.vertex-ai-index',
+                'query': [{'location': 'us-central1'}, {'location': 'us-east1'}],
+                'filters': [
+                    {'type': 'value', 'key': 'displayName', 'op': 'in',
+                     'value': [central, east]},
+                    *filters,
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with freezegun.freeze_time('2100-01-01'):
+            selected = policy.run()
+        assert {r['displayName'] for r in selected} == expected
+
+
+@terraform('vertexai_index', scope='module')
+def test_vertexai_index_get_resource(test, vertexai_index) -> None:
+    session_factory = test.replay_flight_data('vertexai-index-get-resource')
+    policy = test.load_policy(
+        {'name': 'vertexai-index-get', 'resource': 'gcp.vertex-ai-index'},
+        session_factory=session_factory,
+    )
+    name = vertexai_index.outputs['central_index_name']['value']
+    index = policy.resource_manager.get_resource({'resourceName': name})
+    # The response can identify the project by number rather than ID.
+    assert index['name'].split('/', 2)[2] == name.split('/', 2)[2]
+    assert index['displayName'] == (
+        vertexai_index.outputs['index_display_names']['value']['central']
+    )
+    assert index['deployedIndexes'][0]['deployedIndexId'] == (
+        vertexai_index.outputs['deployed_index_id']['value']
+    )
 
 
 def test_vertexai_dataset_resource_registered(test):
