@@ -205,14 +205,14 @@ class MacieEnabled(ValueFilter):
             info = client.get_macie_session()
             info.pop('ResponseMetadata')
         except client.exceptions.AccessDeniedException as e:
-            self.log.warning('macie filter error accessing macie session %s', e)
+            self.log.info('macie filter error accessing macie session %s', e)
             info = {}
 
         try:
             minfo = client.get_administrator_account().get('administrator')
         except (client.exceptions.AccessDeniedException,
                 client.exceptions.ResourceNotFoundException) as e:
-            self.log.warning('macie filter error accessing administrator account %s', e)
+            self.log.info('macie filter error accessing administrator account %s', e)
             info['master'] = {}
         else:
             info['master'] = minfo
