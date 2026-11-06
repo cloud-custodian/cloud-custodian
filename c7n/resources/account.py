@@ -171,16 +171,21 @@ class AccountOrganization(ValueFilter):
 class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
 
-    Gets the macie session info for the account, and
-    the macie adminstrator account for the current account if
-    configured.
+    Gets the macie session info for the account, the macie
+    administrator account for the current account if configured,
+    and the automated sensitive data discovery configuration
+    (``automatedDiscovery``).
     """
 
     schema = type_schema('check-macie', rinherit=ValueFilter.schema)
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
-    permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
+    permissions = (
+        'macie2:GetMacieSession',
+        'macie2:GetAdministratorAccount',
+        'macie2:GetAutomatedDiscoveryConfiguration',
+    )
 
     def process(self, resources, event=None):
 
@@ -199,17 +204,28 @@ class MacieEnabled(ValueFilter):
         try:
             info = client.get_macie_session()
             info.pop('ResponseMetadata')
-        except client.exceptions.AccessDeniedException:
+        except client.exceptions.AccessDeniedException as e:
+            self.log.info('macie filter error accessing macie session %s', e)
             info = {}
 
         try:
             minfo = client.get_administrator_account().get('administrator')
         except (client.exceptions.AccessDeniedException,
-                client.exceptions.ResourceNotFoundException):
+                client.exceptions.ResourceNotFoundException) as e:
+            self.log.info('macie filter error accessing administrator account %s', e)
             info['master'] = {}
         else:
             info['master'] = minfo
         info['administrator'] = info['master']
+
+        if info.get('status') == 'ENABLED':
+            try:
+                info['automatedDiscovery'] = client.get_automated_discovery_configuration()
+                info['automatedDiscovery'].pop('ResponseMetadata')
+            except client.exceptions.AccessDeniedException as e:
+                self.log.warning(
+                    'macie filter error accessing automated discovery configuration %s', e)
+                info['automatedDiscovery'] = {}
         account[self.annotation_key] = info
 
 
