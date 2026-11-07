@@ -198,3 +198,24 @@ class QueryResourceManagerTest(BaseTest):
         # Check that the warning message was logged
         self.assertTrue("Resource not found: get_core_network using" in output.getvalue())
         self.assertTrue(resources[0]["CoreNetworkArn"] not in output.getvalue())
+
+    def test_detail_spec_access_denied(self):
+        # A resource policy that denies the Get* call on one topic must not
+        # abort the run for the rest of the account (#9455).
+        session_factory = self.replay_flight_data("test_detail_spec_access_denied")
+        p = self.load_policy(
+            {"name": "sns-detail-access-denied", "resource": "sns"},
+            session_factory=session_factory,
+        )
+        output = self.capture_logging(
+            name=p.resource_manager.log.name, level=logging.WARNING
+        )
+        resources = p.run()
+        self.assertEqual(
+            [r["TopicArn"] for r in resources],
+            ["arn:aws:sns:us-east-1:644160558196:readable"],
+        )
+        self.assertIn(
+            "Access denied: get_topic_attributes using "
+            "{'TopicArn': 'arn:aws:sns:us-east-1:644160558196:denied'}",
+            output.getvalue())

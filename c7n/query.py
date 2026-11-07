@@ -21,7 +21,8 @@ from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags, universal_augment
 from c7n.utils import (
     local_session, generate_arn, get_retry,
-    chunks, camelResource, jmespath_compile, get_path, is_not_found
+    chunks, camelResource, jmespath_compile, get_path, is_not_found,
+    is_access_denied
 )
 
 try:
@@ -751,10 +752,15 @@ def _scalar_augment(manager, model, detail_spec, client, resource_set):
         try:
             response = op(*args, **kw)
         except ClientError as e:
-            if not is_not_found(e):
-                raise
-            manager.log.warning("Resource not found: %s using %s" % (detail_op, kw))
-            continue
+            if is_not_found(e):
+                manager.log.warning("Resource not found: %s using %s" % (detail_op, kw))
+                continue
+            # A resource policy can deny a single resource; skip it rather
+            # than abort the policy for the whole account and region.
+            if is_access_denied(e):
+                manager.log.warning("Access denied: %s using %s" % (detail_op, kw))
+                continue
+            raise
         if detail_path:
             response = response[detail_path]
         else:
