@@ -1538,6 +1538,114 @@ class TestTargetGroupAttributesFilter(BaseTest):
 
         self.assertTrue(has_insecure_redirect)
 
+    def test_appelb_filter_by_listener_rules_correlated_with_listener(self):
+        """Test correlating listener rules with their parent listener attributes"""
+        self.patch(AppELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_appelb_listener_rules_filter")
+
+        # Policy matching rules on HTTP listener
+        p_http = self.load_policy(
+            {
+                "name": "appelb-http-listener-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Listener.Protocol",
+                                "value": "HTTP"
+                            },
+                            {
+                                "type": "value",
+                                "key": "Actions[0].Type",
+                                "value": "redirect"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p_http.run()
+        self.assertEqual(len(resources), 1)
+
+        # Verify parent listener metadata is attached to rules
+        rule = resources[0]['c7n:ListenerRules'][0]
+        self.assertIn('Listener', rule)
+        self.assertEqual(rule['Listener']['Protocol'], 'HTTP')
+        self.assertEqual(rule['Listener']['Port'], 80)
+        self.assertEqual(rule['ListenerArn'], rule['Listener']['ListenerArn'])
+
+        # Policy matching rules on HTTPS listener should not match this ALB
+        p_https = self.load_policy(
+            {
+                "name": "appelb-https-listener-rules",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "listener-rule",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "Listener.Protocol",
+                                "value": "HTTPS"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources_https = p_https.run()
+        self.assertEqual(len(resources_https), 0)
+
+    def test_appelb_listener_rules_multi_listener_correlation(self):
+        """Test rule correlation across multiple listeners on the same ALB"""
+        from unittest.mock import MagicMock, patch
+        p = self.load_policy({
+            "name": "alb-rules",
+            "resource": "app-elb",
+            "filters": [
+                {
+                    "type": "listener-rule",
+                    "attrs": [
+                        {"type": "value", "key": "Listener.Protocol", "value": "HTTP"},
+                        {"type": "value", "key": "Priority", "value": "10"}
+                    ]
+                }
+            ]
+        })
+        flt = p.resource_manager.filters[0]
+        client = MagicMock()
+        client.describe_listeners.return_value = {
+            "Listeners": [
+                {"ListenerArn": "arn:listener:http", "Port": 80, "Protocol": "HTTP"},
+                {"ListenerArn": "arn:listener:https", "Port": 443, "Protocol": "HTTPS"},
+            ]
+        }
+        client.describe_rules.side_effect = lambda ListenerArn, **kw: {
+            "Rules": [
+                {"RuleArn": f"arn:rule:{ListenerArn}:1", "Priority": "10", "IsDefault": False},
+                {"RuleArn": f"arn:rule:{ListenerArn}:def",
+                 "Priority": "default", "IsDefault": True},
+            ]
+        }
+        alb = {"LoadBalancerArn": "arn:alb:1"}
+        with patch("c7n.resources.appelb.local_session") as local_session:
+            local_session.return_value.client.return_value = client
+            matched = flt.process([alb])
+            self.assertEqual(len(matched), 1)
+
+            rules = alb['c7n:ListenerRules']
+            self.assertEqual(rules[0]['Listener']['Protocol'], 'HTTP')
+            self.assertEqual(rules[0]['Listener']['Port'], 80)
+            self.assertEqual(rules[0]['ListenerArn'], 'arn:listener:http')
+            self.assertEqual(rules[1]['Listener']['Protocol'], 'HTTPS')
+            self.assertEqual(rules[1]['Listener']['Port'], 443)
+            self.assertEqual(rules[1]['ListenerArn'], 'arn:listener:https')
+
     def test_appelb_listener_rules_fetch_error_listeners(self):
         # Test exception handling when DescribeListeners fails
         from unittest import mock
