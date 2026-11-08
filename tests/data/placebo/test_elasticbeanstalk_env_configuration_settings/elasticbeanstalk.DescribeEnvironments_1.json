@@ -1,0 +1,61 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fef96e19-d9ef-11e7-91fc-ad895682fabc", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fef96e19-d9ef-11e7-91fc-ad895682fabc", 
+                "content-length": "2978", 
+                "vary": "Accept-Encoding", 
+                "connection": "keep-alive", 
+                "date": "Tue, 05 Dec 2017 19:10:45 GMT", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Environments": [
+            {
+                "ApplicationName": "re-jenkins", 
+                "EnvironmentName": "c7n-eb-tag-test", 
+                "VersionLabel": "app-477e-170601_115505", 
+                "Status": "Ready", 
+                "Description": "Test for c7n EB Env tagging PR", 
+                "EnvironmentLinks": [], 
+                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
+                "EndpointURL": "awseb-e-r-AWSEBLoa-1AP6BTJDB7GEL-1575897575.us-east-1.elb.amazonaws.com", 
+                "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
+                "EnvironmentId": "e-rdthyjww23", 
+                "CNAME": "c7n-eb-tag-test.us-east-1.elasticbeanstalk.com", 
+                "AbortableOperationInProgress": false, 
+                "Tier": {
+                    "Version": " ", 
+                    "Type": "Standard", 
+                    "Name": "WebServer"
+                }, 
+                "Health": "Green", 
+                "DateUpdated": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 34, 
+                    "microsecond": 561000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 2
+                }, 
+                "DateCreated": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 48, 
+                    "microsecond": 789000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 57
+                }, 
+                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test"
+            }
+        ]
+    }
+}
