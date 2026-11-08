@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 20 Mar 2026 16:50:26 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=76",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "303",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-get?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-get",
+    "description": "Cloud Custodian get test log bucket",
+    "createTime": "2026-03-20T16:50:24.132630114Z",
+    "updateTime": "2026-03-20T16:50:24.132630114Z",
+    "retentionDays": 30,
+    "lifecycleState": "ACTIVE"
+  }
+}

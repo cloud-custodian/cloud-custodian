@@ -1,0 +1,148 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 20 Mar 2026 16:50:11 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=65",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5379",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/locations/-/buckets?alt=json"
+  },
+  "body": {
+    "buckets": [
+      {
+        "name": "projects/cloud-custodian/locations/global/buckets/_Default",
+        "description": "Default bucket",
+        "updateTime": "2026-03-20T16:12:00.048628250Z",
+        "retentionDays": 7,
+        "lifecycleState": "ACTIVE"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/buckets/_Required",
+        "description": "Audit bucket",
+        "locked": true,
+        "retentionDays": 400,
+        "lifecycleState": "ACTIVE"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:01:17.605318289Z",
+        "updateTime": "2026-03-20T15:01:23.075517385Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-dashing-frog",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:50:57.728153583Z",
+        "updateTime": "2026-03-20T15:51:02.580664089Z",
+        "retentionDays": 7,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-direct-dassie",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:18:32.747072973Z",
+        "updateTime": "2026-03-20T15:18:37.432869267Z",
+        "retentionDays": 7,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-epic-kit",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:08:09.780887084Z",
+        "updateTime": "2026-03-20T15:08:14.353363258Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-filter",
+        "description": "Cloud Custodian filter test log bucket",
+        "createTime": "2026-03-20T16:50:09.549737599Z",
+        "updateTime": "2026-03-20T16:50:09.549737599Z",
+        "retentionDays": 30,
+        "lifecycleState": "ACTIVE"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-flowing-mammal",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:50:26.067385787Z",
+        "updateTime": "2026-03-20T15:50:31.165181261Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-fond-ferret",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:49:15.755036791Z",
+        "updateTime": "2026-03-20T15:49:19.441939460Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-in-dinosaur",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:49:07.920258671Z",
+        "updateTime": "2026-03-20T15:49:12.707936754Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-nearby-crow",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:10:21.832190615Z",
+        "updateTime": "2026-03-20T15:10:26.885203079Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-pro-gecko",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T16:11:58.141139210Z",
+        "updateTime": "2026-03-20T16:12:02.659202026Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-quick-bobcat",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:50:05.893156907Z",
+        "updateTime": "2026-03-20T15:50:10.695065984Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-set-retention",
+        "description": "Cloud Custodian set retention test log bucket",
+        "createTime": "2026-03-20T16:49:45.578264308Z",
+        "updateTime": "2026-03-20T16:49:49.756866268Z",
+        "retentionDays": 7,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-tops-turkey",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:49:22.599925531Z",
+        "updateTime": "2026-03-20T15:49:26.099346799Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-workable-dingo",
+        "description": "Cloud Custodian test log bucket",
+        "createTime": "2026-03-20T15:55:58.556885970Z",
+        "updateTime": "2026-03-20T15:56:02.550033250Z",
+        "retentionDays": 30,
+        "lifecycleState": "DELETE_REQUESTED"
+      }
+    ]
+  }
+}

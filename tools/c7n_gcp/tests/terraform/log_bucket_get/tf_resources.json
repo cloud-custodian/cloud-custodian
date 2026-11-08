@@ -1,0 +1,22 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_logging_project_bucket_config": {
+            "test": {
+                "bucket_id": "c7n-log-bucket-get",
+                "cmek_settings": [],
+                "description": "Cloud Custodian get test log bucket",
+                "enable_analytics": false,
+                "id": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-get",
+                "index_configs": [],
+                "lifecycle_state": "ACTIVE",
+                "location": "us-central1",
+                "locked": false,
+                "name": "projects/cloud-custodian/locations/us-central1/buckets/c7n-log-bucket-get",
+                "project": "stacklet-personal-2",
+                "retention_days": 30
+            }
+        }
+    }
+}
