@@ -84,6 +84,87 @@ AppFlow.action_registry.register('mark-for-op', TagDelayedAction)
 AppFlow.filter_registry.register('marked-for-op', TagActionFilter)
 
 
+@AppFlow.action_registry.register('deactivate')
+class DeactivateAppFlowResource(BaseAction):
+    """Action to deactivate (stop) an AppFlow flow.
+
+    This deactivates schedule and event-triggered flows. On-demand flows
+    cannot be deactivated and will raise an error.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: deactivate-app-flow
+                resource: app-flow
+                filters:
+                  - type: value
+                    key: flowStatus
+                    value: Active
+                  - type: value
+                    key: triggerType
+                    value: Scheduled
+                actions:
+                  - deactivate
+    """
+
+    permissions = ('appflow:StopFlow',)
+    schema = type_schema('deactivate')
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('appflow')
+        for r in resources:
+            self.manager.retry(
+                client.stop_flow,
+                flowName=r['flowName'],
+                ignore_err_codes=(
+                    'ResourceNotFoundException',
+                    'UnsupportedOperationException',
+                )
+            )
+
+
+@AppFlow.action_registry.register('activate')
+class ActivateAppFlowResource(BaseAction):
+    """Action to activate (start) an AppFlow flow.
+
+    For on-demand flows, this runs the flow immediately. For schedule
+    and event-triggered flows, this activates the flow.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: activate-app-flow
+                resource: app-flow
+                filters:
+                  - type: value
+                    key: flowStatus
+                    value: Draft
+                actions:
+                  - activate
+    """
+
+    permissions = ('appflow:StartFlow',)
+    schema = type_schema('activate')
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('appflow')
+        for r in resources:
+            self.manager.retry(
+                client.start_flow,
+                flowName=r['flowName'],
+                ignore_err_codes=(
+                    'ResourceNotFoundException',
+                    'ConflictException',
+                )
+            )
+
+
 @AppFlow.action_registry.register('delete')
 class DeleteAppFlowResource(BaseAction):
     """Action to delete an AppFlow
