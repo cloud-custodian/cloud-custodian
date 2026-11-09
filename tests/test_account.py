@@ -1556,7 +1556,6 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_appstream_usage_reports_disabled(self):
-        """Record: us-east-1 with no AppStream usage report subscription."""
         factory = self.replay_flight_data('test_appstream_usage_reports_disabled')
         p = self.load_policy({
             'name': 'appstream-usage-reports-disabled',
@@ -1572,7 +1571,6 @@ class AccountTests(BaseTest):
         self.assertEqual(resources[0]['c7n:AppStreamUsageReports'], {})
 
     def test_appstream_usage_reports_enabled(self):
-        """Record: us-east-1 with an AppStream usage report subscription."""
         factory = self.replay_flight_data('test_appstream_usage_reports_enabled')
         p = self.load_policy({
             'name': 'appstream-usage-reports-enabled',

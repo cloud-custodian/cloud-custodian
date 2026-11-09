@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subnets": [
+            {
+                "AvailabilityZoneId": "use1-az4",
+                "MapCustomerOwnedIpOnLaunch": false,
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-00577da7461ff5a4c",
+                "EnableDns64": false,
+                "Ipv6Native": false,
+                "PrivateDnsNameOptionsOnLaunch": {
+                    "HostnameType": "ip-name",
+                    "EnableResourceNameDnsARecord": false,
+                    "EnableResourceNameDnsAAAARecord": false
+                },
+                "BlockPublicAccessStates": {
+                    "InternetGatewayBlockMode": "off"
+                },
+                "SubnetId": "subnet-00577da7461ff5a4c",
+                "State": "available",
+                "VpcId": "vpc-0b876ccff795def31",
+                "CidrBlock": "10.0.144.0/20",
+                "AvailableIpAddressCount": 4089,
+                "AvailabilityZone": "us-east-1d",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false
+            },
+            {
+                "AvailabilityZoneId": "use1-az1",
+                "MapCustomerOwnedIpOnLaunch": false,
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-011b4785e8543b12d",
+                "EnableDns64": false,
+                "Ipv6Native": false,
+                "PrivateDnsNameOptionsOnLaunch": {
+                    "HostnameType": "ip-name",
+                    "EnableResourceNameDnsARecord": false,
+                    "EnableResourceNameDnsAAAARecord": false
+                },
+                "BlockPublicAccessStates": {
+                    "InternetGatewayBlockMode": "off"
+                },
+                "SubnetId": "subnet-011b4785e8543b12d",
+                "State": "available",
+                "VpcId": "vpc-0b876ccff795def31",
+                "CidrBlock": "10.0.32.0/20",
+                "AvailableIpAddressCount": 4091,
+                "AvailabilityZone": "us-east-1b",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
