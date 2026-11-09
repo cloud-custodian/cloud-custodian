@@ -4,6 +4,7 @@
 import logging
 import requests
 import re
+from urllib.parse import urlsplit
 
 from c7n.utils import local_session, type_schema
 from c7n.filters import ValueFilter
@@ -12,6 +13,31 @@ from c7n_azure.query import QueryResourceManager, TypeInfo, TypeMeta, DescribeSo
 from c7n_azure.provider import resources
 
 log = logging.getLogger('custodian.azure.graph')
+
+# Hosts of the published Microsoft Graph service root endpoints (global, US Government L4,
+# US Government L5 (DOD) and China operated by 21Vianet):
+# https://learn.microsoft.com/en-us/graph/deployments#microsoft-graph-and-graph-explorer-service-root-endpoints
+GRAPH_SERVICE_ROOT_HOSTS = frozenset({
+    'graph.microsoft.com',
+    'graph.microsoft.us',
+    'dod-graph.microsoft.us',
+    'microsoftgraph.chinacloudapi.cn',
+})
+
+
+def is_graph_service_url(url):
+    """Return True if an absolute URL points at a Microsoft Graph service root host.
+
+    The host is compared exactly, so a look-alike such as ``graph.microsoft.com.example.net``
+    or a URL carrying credentials or a non-default port is refused.
+    """
+    parts = urlsplit(url)
+    return (
+        parts.scheme == 'https'
+        and parts.hostname in GRAPH_SERVICE_ROOT_HOSTS
+        and parts.port is None
+        and parts.username is None
+    )
 
 
 class GraphSource(DescribeSource):
@@ -22,13 +48,13 @@ class GraphSource(DescribeSource):
     """
 
     def get_resources(self, query=None):
-        """Get resources from Microsoft Graph API."""
-        try:
-            # Use the manager's Graph API methods to retrieve resources
-            return self.manager.get_graph_resources()
-        except Exception as e:
-            log.error(f"Error retrieving resources via Graph API: {e}")
-            return []
+        """Get resources from Microsoft Graph API.
+
+        Errors are not swallowed here: an empty list would look like an empty
+        tenant to the policy, so failures propagate like they do for ARM sources.
+        ``make_graph_request`` already logs request errors.
+        """
+        return self.manager.get_graph_resources()
 
 
 # Microsoft Graph API Endpoint to Permissions Mapping
@@ -52,6 +78,10 @@ GRAPH_ENDPOINT_PERMISSIONS = {
 
     # Organization endpoints
     'organization': ['Organization.Read.All'],
+
+    # Application and service principal endpoints
+    'applications': ['Application.Read.All'],
+    'servicePrincipals': ['Application.Read.All'],
 
     # Policy endpoints (require beta API)
     'identity/conditionalAccess/policies': ['Policy.Read.All'],
@@ -138,7 +168,16 @@ class GraphResourceManager(QueryResourceManager):
         return session.get_session_for_resource(MSGRAPH_RESOURCE_ID)
 
     def make_graph_request(self, endpoint, method='GET', data=None):
-        """Make a request to Microsoft Graph API with minimum required permissions."""
+        """Make a request to Microsoft Graph API with minimum required permissions.
+
+        ``endpoint`` is a path relative to the v1.0 root, or an absolute URL such as an
+        ``@odata.nextLink``. An absolute URL must be on a Microsoft Graph service root host,
+        so the bearer token is never sent anywhere else.
+        """
+        absolute = endpoint.startswith(('https://', 'http://'))
+        if absolute and not is_graph_service_url(endpoint):
+            log.error(f"Refusing Graph API request to a non-Graph URL: {endpoint}")
+            raise ValueError(f"Not a Microsoft Graph service URL: {endpoint}")
         try:
             session = self.get_client()
             session._initialize_session()
@@ -169,7 +208,11 @@ class GraphResourceManager(QueryResourceManager):
             if '$count' in endpoint:
                 headers['ConsistencyLevel'] = 'eventual'
 
-            url = f'https://graph.microsoft.com/v1.0/{endpoint}'
+            # An absolute URL (such as an @odata.nextLink) was checked above and is used as-is
+            if absolute:
+                url = endpoint
+            else:
+                url = f'https://graph.microsoft.com/v1.0/{endpoint}'
 
             if method == 'GET':
                 response = requests.get(url, headers=headers, timeout=30)
@@ -183,6 +226,20 @@ class GraphResourceManager(QueryResourceManager):
         except requests.exceptions.RequestException as e:
             log.error(f"Microsoft Graph API request failed for {endpoint}: {e}")
             raise
+
+    def list_graph_collection(self, endpoint):
+        """Return every item of a Microsoft Graph collection, following ``@odata.nextLink``.
+
+        Collections such as applications, service principals, users and groups can span
+        several pages. ``@odata.nextLink`` is an absolute URL and is passed back to
+        ``make_graph_request`` unchanged, so subclasses that override it pick it up.
+        """
+        items = []
+        while endpoint:
+            response = self.make_graph_request(endpoint)
+            items.extend(response.get('value', []))
+            endpoint = response.get('@odata.nextLink')
+        return items
 
     def make_batched_graph_request(self, batch):
         """Make a batched request to Microsoft Graph API."""
