@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+from c7n.utils import local_session
 
 
 class AppStreamTest(BaseTest):
@@ -52,6 +53,10 @@ class AppStreamTest(BaseTest):
 
     def test_appstream_image_builder_tag(self):
         factory = self.replay_flight_data('test_appstream_image_builder_tag')
+        sent = []
+        local_session(factory).events.register(
+            'before-parameter-build.resource-groups-tagging-api.TagResources',
+            lambda params, **kw: sent.append(params))
         p = self.load_policy({
             'name': 'appstream-image-builder-tag',
             'resource': 'aws.appstream-image-builder',
@@ -60,9 +65,9 @@ class AppStreamTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = factory().client('appstream')
-        tags = client.list_tags_for_resource(ResourceArn=resources[0]['Arn'])['Tags']
-        self.assertEqual(tags.get('Env'), 'dev')
+        self.assertEqual(sent, [{
+            'ResourceARNList': [resources[0]['Arn']],
+            'Tags': {'Env': 'dev'}}])
 
     def test_appstream_app_block_builder_query(self):
         factory = self.replay_flight_data('test_appstream_app_block_builder_query')
