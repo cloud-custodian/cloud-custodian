@@ -191,8 +191,8 @@ class AppStreamTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_appstream_image_cross_account(self):
-        """Record: two private images; c7n-test-image shared with an external
-        account, c7n-test-image-2 not shared."""
+        """Record: two unshared private images, c7n-test-image and c7n-test-image-2,
+        then edit the recording so c7n-test-image is shared with an external account."""
         factory = self.replay_flight_data('test_appstream_image_cross_account')
         p = self.load_policy({
             'name': 'appstream-image-cross-account',
