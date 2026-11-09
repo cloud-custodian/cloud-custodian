@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.filters.iamaccess import CrossAccountAccessFilter
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import NetworkLocation, SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
 from c7n import query
 from c7n.resolver import ValuesFrom
@@ -171,40 +171,20 @@ class AppStreamUser(query.QueryResourceManager):
         cfn_type = "AWS::AppStream::User"
 
 
-@AppStreamFleet.filter_registry.register('subnet')
-class AppStreamFleetSubnetFilter(SubnetFilter):
+class AppStreamSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "VpcConfig.SubnetIds[]"
 
 
-@AppStreamFleet.filter_registry.register('security-group')
-class AppStreamFleetSecurityGroupFilter(SecurityGroupFilter):
+class AppStreamSecurityGroupFilter(SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
 
 
-@AppStreamImageBuilder.filter_registry.register('subnet')
-class AppStreamImageBuilderSubnetFilter(SubnetFilter):
-
-    RelatedIdsExpression = "VpcConfig.SubnetIds[]"
-
-
-@AppStreamImageBuilder.filter_registry.register('security-group')
-class AppStreamImageBuilderSecurityGroupFilter(SecurityGroupFilter):
-
-    RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
-
-
-@AppStreamAppBlockBuilder.filter_registry.register('subnet')
-class AppStreamAppBlockBuilderSubnetFilter(SubnetFilter):
-
-    RelatedIdsExpression = "VpcConfig.SubnetIds[]"
-
-
-@AppStreamAppBlockBuilder.filter_registry.register('security-group')
-class AppStreamAppBlockBuilderSecurityGroupFilter(SecurityGroupFilter):
-
-    RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
+for klass in (AppStreamFleet, AppStreamImageBuilder, AppStreamAppBlockBuilder):
+    klass.filter_registry.register('subnet', AppStreamSubnetFilter)
+    klass.filter_registry.register('security-group', AppStreamSecurityGroupFilter)
+    klass.filter_registry.register('network-location', NetworkLocation)
 
 
 @AppStreamImage.filter_registry.register('cross-account')

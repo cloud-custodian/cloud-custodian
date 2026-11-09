@@ -146,6 +146,22 @@ class AppStreamTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_appstream_fleet_network_location(self):
+        """Record: one fleet tagged NetworkLocation=private whose subnet and
+        security group are also tagged NetworkLocation=private."""
+        factory = self.replay_flight_data('test_appstream_fleet_network_location')
+        p = self.load_policy({
+            'name': 'appstream-fleet-network-location',
+            'resource': 'aws.appstream-fleet',
+            'filters': [{
+                'type': 'network-location',
+                'compare': ['resource', 'subnet', 'security-group'],
+                'key': 'tag:NetworkLocation',
+                'match': 'equal'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_appstream_image_builder_network_filters(self):
         """Record: one image builder in a subnet tagged Name=c7n-appstream
         using a security group named c7n-appstream."""
