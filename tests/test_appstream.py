@@ -119,15 +119,15 @@ class AppStreamTest(BaseTest):
         self.assertEqual(resources[0]['AuthenticationType'], 'USERPOOL')
 
     def test_appstream_fleet_subnet_filter(self):
-        """Record: one fleet in a subnet tagged Name=c7n-appstream."""
+        """Record: one fleet in a subnet with MapPublicIpOnLaunch false."""
         factory = self.replay_flight_data('test_appstream_fleet_subnet_filter')
         p = self.load_policy({
             'name': 'appstream-fleet-subnet',
             'resource': 'aws.appstream-fleet',
             'filters': [{
                 'type': 'subnet',
-                'key': 'tag:Name',
-                'value': 'c7n-appstream'}]},
+                'key': 'MapPublicIpOnLaunch',
+                'value': False}]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -147,15 +147,15 @@ class AppStreamTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_appstream_fleet_network_location(self):
-        """Record: one fleet tagged NetworkLocation=private whose subnet and
-        security group are also tagged NetworkLocation=private."""
+        """Record: one fleet tagged NetworkLocation=private whose security
+        group is also tagged NetworkLocation=private."""
         factory = self.replay_flight_data('test_appstream_fleet_network_location')
         p = self.load_policy({
             'name': 'appstream-fleet-network-location',
             'resource': 'aws.appstream-fleet',
             'filters': [{
                 'type': 'network-location',
-                'compare': ['resource', 'subnet', 'security-group'],
+                'compare': ['resource', 'security-group'],
                 'key': 'tag:NetworkLocation',
                 'match': 'equal'}]},
             session_factory=factory)
@@ -163,28 +163,28 @@ class AppStreamTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_appstream_image_builder_network_filters(self):
-        """Record: one image builder in a subnet tagged Name=c7n-appstream
+        """Record: one image builder in a subnet with MapPublicIpOnLaunch false
         using a security group named c7n-appstream."""
         factory = self.replay_flight_data('test_appstream_image_builder_network_filters')
         p = self.load_policy({
             'name': 'appstream-image-builder-network',
             'resource': 'aws.appstream-image-builder',
             'filters': [
-                {'type': 'subnet', 'key': 'tag:Name', 'value': 'c7n-appstream'},
+                {'type': 'subnet', 'key': 'MapPublicIpOnLaunch', 'value': False},
                 {'type': 'security-group', 'key': 'GroupName', 'value': 'c7n-appstream'}]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
     def test_appstream_app_block_builder_network_filters(self):
-        """Record: one app block builder in a subnet tagged Name=c7n-appstream
-        using a security group named c7n-appstream."""
+        """Record: one app block builder in a subnet with MapPublicIpOnLaunch
+        false using a security group named c7n-appstream."""
         factory = self.replay_flight_data('test_appstream_app_block_builder_network_filters')
         p = self.load_policy({
             'name': 'appstream-app-block-builder-network',
             'resource': 'aws.appstream-app-block-builder',
             'filters': [
-                {'type': 'subnet', 'key': 'tag:Name', 'value': 'c7n-appstream'},
+                {'type': 'subnet', 'key': 'MapPublicIpOnLaunch', 'value': False},
                 {'type': 'security-group', 'key': 'GroupName', 'value': 'c7n-appstream'}]},
             session_factory=factory)
         resources = p.run()
@@ -192,14 +192,12 @@ class AppStreamTest(BaseTest):
 
     def test_appstream_image_cross_account(self):
         """Record: two private images; c7n-test-image shared with an external
-        account, c7n-test-image-2 shared only with 123456789012."""
+        account, c7n-test-image-2 not shared."""
         factory = self.replay_flight_data('test_appstream_image_cross_account')
         p = self.load_policy({
             'name': 'appstream-image-cross-account',
             'resource': 'aws.appstream-image',
-            'filters': [{
-                'type': 'cross-account',
-                'whitelist': ['123456789012']}]},
+            'filters': [{'type': 'cross-account'}]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
