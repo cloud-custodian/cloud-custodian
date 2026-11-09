@@ -48,7 +48,6 @@ class AppStreamImageBuilder(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "appstream"
         enum_spec = ('describe_image_builders', 'ImageBuilders', None)
-        arn_type = "image-builder"
         arn = "Arn"
         id = "Name"
         name = "Name"
@@ -73,7 +72,6 @@ class AppStreamImage(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "appstream"
         enum_spec = ('describe_images', 'Images', {'Type': 'PRIVATE'})
-        arn_type = "image"
         arn = "Arn"
         id = "Name"
         name = "Name"
@@ -91,7 +89,6 @@ class AppStreamAppBlockBuilder(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "appstream"
         enum_spec = ('describe_app_block_builders', 'AppBlockBuilders', None)
-        arn_type = "app-block-builder"
         arn = "Arn"
         id = "Name"
         name = "Name"
@@ -110,7 +107,6 @@ class AppStreamAppBlock(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "appstream"
         enum_spec = ('describe_app_blocks', 'AppBlocks', None)
-        arn_type = "app-block"
         arn = "Arn"
         id = "Name"
         name = "Name"
@@ -129,7 +125,6 @@ class AppStreamApplication(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "appstream"
         enum_spec = ('describe_applications', 'Applications', None)
-        arn_type = "application"
         arn = "Arn"
         id = "Name"
         name = "Name"
