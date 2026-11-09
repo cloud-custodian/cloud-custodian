@@ -183,9 +183,9 @@ class AppStreamTest(BaseTest):
         p = self.load_policy({
             'name': 'appstream-image-cross-account',
             'resource': 'aws.appstream-image',
-            'filters': [{'type': 'cross-account'}]},
+            'filters': [{'type': 'cross-account', 'whitelist': ['111111111111']}]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], 'c7n-test-image')
-        self.assertEqual(len(resources[0]['c7n:CrossAccountViolations']), 1)
+        self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['123456789012'])

@@ -214,9 +214,7 @@ class AppStreamImageCrossAccount(CrossAccountAccessFilter):
             if r.get('ImageSharedWithOthers') == 'FALSE':
                 continue
             try:
-                shared = self.manager.retry(
-                    client.describe_image_permissions,
-                    Name=r['Name']).get('SharedImagePermissionsList', ())
+                shared = self.get_shared_permissions(client, r['Name'])
             except client.exceptions.ResourceNotFoundException:
                 continue
             violations = [
@@ -226,3 +224,13 @@ class AppStreamImageCrossAccount(CrossAccountAccessFilter):
                 r[self.annotation_key] = violations
                 results.append(r)
         return results
+
+    def get_shared_permissions(self, client, name):
+        params = {'Name': name}
+        shared = []
+        while True:
+            result = self.manager.retry(client.describe_image_permissions, **params)
+            shared.extend(result.get('SharedImagePermissionsList', ()))
+            if not result.get('NextToken'):
+                return shared
+            params['NextToken'] = result['NextToken']
