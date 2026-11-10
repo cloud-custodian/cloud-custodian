@@ -8,7 +8,9 @@ from msrestazure.tools import parse_resource_id
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n_azure.session import Session
 
-from ..azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template
+from ..azure_common import (
+    BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, strict_cassette
+)
 
 
 class VnetTest(BaseTest):
@@ -204,6 +206,7 @@ class VnetSetFlowLogActionTest(BaseTest):
             assert "'c7n-vnet-b'" in message
 
     @arm_template('vnet.json')
+    @strict_cassette('test_set_flow_log_updates_retention')
     def test_set_flow_log_updates_retention(self):
         # This test mutates its flow log, so it uses a dedicated vnet. The
         # c7n-vnet flow log must stay below 90 days for the retention filter test.
