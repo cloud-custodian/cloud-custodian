@@ -175,52 +175,6 @@ class ServiceDiscoveryService(QueryResourceManager):
         universal_taggable = object()
 
 
-@ServiceDiscoveryService.filter_registry.register('instance')
-class ServiceInstanceFilter(ListItemFilter):
-    """Filter services on the instances registered to them.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: servicediscovery-service-public-instance-ip
-            resource: aws.servicediscovery-service
-            filters:
-              - type: instance
-                attrs:
-                  - type: value
-                    key: Attributes.AWS_INSTANCE_IPV4
-                    op: not-in
-                    value_type: cidr
-                    value: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
-    """
-
-    schema = type_schema(
-        'instance',
-        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
-        count={'type': 'number'},
-        count_op={'$ref': '#/definitions/filters_common/comparison_operators'})
-
-    annotation_key = 'c7n:Instances'
-    permissions = ('servicediscovery:ListInstances',)
-
-    def __init__(self, data, manager=None):
-        super().__init__(data, manager)
-        data['key'] = f'"{self.annotation_key}"'
-
-    def get_item_values(self, service):
-        if self.annotation_key in service:
-            return service[self.annotation_key]
-        client = local_session(self.manager.session_factory).client('servicediscovery')
-        instances = self.manager.retry(
-            client.get_paginator('list_instances').paginate,
-            ServiceId=service['Id']
-        ).build_full_result().get('Instances', [])
-        service[self.annotation_key] = instances
-        return instances
-
-
 @ServiceDiscoveryService.action_registry.register('delete')
 class DeleteService(Action):
     """Delete a service.
