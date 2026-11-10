@@ -1007,7 +1007,9 @@ class AppELBListenerRuleFilter(ListItemFilter):
 
     This filter allows checking multiple attributes on listener rules,
     enabling policies to inspect non-default routing configurations
-    for security and compliance.
+    for security and compliance. Each rule also includes parent listener
+    metadata (e.g. ``Listener.Protocol``, ``Listener.Port``, ``ListenerArn``)
+    so policies can correlate rules with their parent listener.
 
     :example:
 
@@ -1096,6 +1098,9 @@ class AppELBListenerRuleFilter(ListItemFilter):
                         non_default_rules = [
                             r for r in rules if not r.get('IsDefault', False)
                         ]
+                        for r in non_default_rules:
+                            r['ListenerArn'] = listener['ListenerArn']
+                            r['Listener'] = dict(listener)
                         rule_map[alb['LoadBalancerArn']].extend(non_default_rules)
                     except ClientError as e:
                         log.warning(
