@@ -492,6 +492,29 @@ class FlowLogsFilter(ValueFilter, metaclass=ABCMeta):
     schema = type_schema('flow-logs', rinherit=ValueFilter.schema)
 
     annotation_key = 'c7n:flow-logs'
+    log = logging.getLogger('custodian.azure.filters.FlowLogsFilter')
+    client = None
+
+    def process(self, resources, event=None):
+        self.client = self.manager.get_client()
+
+        result, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._check_resources,
+            executor_factory=self.executor_factory,
+            log=self.log
+        )
+
+        # execute_in_parallel drops any chunk that raised. Re-raise so a failed
+        # lookup fails the policy instead of silently omitting resources.
+        if exceptions:
+            raise exceptions[0]
+
+        return result
+
+    def _check_resources(self, resources, event):
+        return [r for r in resources if self(r)]
 
     def _get_flow_logs(self, resource):
         parsed_ids = [
@@ -499,10 +522,11 @@ class FlowLogsFilter(ValueFilter, metaclass=ABCMeta):
             for log in resource['properties'].get('flowLogs', [])
         ]
 
-        client = self.manager.get_client()
+        if self.client is None:
+            self.client = self.manager.get_client()
 
         return [
-            client.flow_logs.get(
+            self.client.flow_logs.get(
                 parsed_id['resource_group'],
                 parsed_id['name'],
                 parsed_id['resource_name']
