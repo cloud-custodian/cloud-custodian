@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArn": "arn:aws:sms-voice:us-east-1:644160558196:pool/pool-ce26e13d806540c9894e16b5696c6a52",
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"c7nCrossAccount\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"sms-voice:DescribePools\",\"Resource\":\"arn:aws:sms-voice:us-east-1:644160558196:pool/pool-ce26e13d806540c9894e16b5696c6a52\"}]}",
+        "CreatedTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 11,
+            "day": 6,
+            "hour": 14,
+            "minute": 20,
+            "second": 5,
+            "microsecond": 108000
+        },
+        "ResponseMetadata": {}
+    }
+}

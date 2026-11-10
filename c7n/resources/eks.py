@@ -4,7 +4,7 @@ from typing import List
 
 import c7n.filters.vpc as net_filters
 from c7n.actions import Action
-from c7n.filters.core import ComparableVersion, ListItemFilter
+from c7n.filters.core import ComparableVersion, ListItemFilter, ValueFilter
 from c7n.filters.metrics import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
@@ -326,6 +326,74 @@ class UpgradeAvailable(Filter):
                     # upgrades,
                     results.append(r)
 
+        return results
+
+
+@EKS.filter_registry.register('version-support')
+class VersionSupport(ValueFilter):
+    """Filter clusters on the support lifecycle of their Kubernetes version
+
+    Each cluster is annotated with the entry for its Kubernetes version from
+    the EKS ``DescribeClusterVersions`` API under ``c7n:VersionSupport``, and
+    the filter matches against that entry like a value filter. Useful keys
+    are ``versionStatus`` (``STANDARD_SUPPORT``, ``EXTENDED_SUPPORT`` or
+    ``UNSUPPORTED``), ``endOfStandardSupportDate`` and
+    ``endOfExtendedSupportDate``.
+
+    A cluster whose version isn't known to the API is annotated with an empty
+    mapping, so only ``absent`` / ``empty`` checks will match it.
+
+    :example:
+
+    Find clusters on extended support, which EKS bills at a higher rate:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: eks-extended-support
+                resource: aws.eks
+                filters:
+                  - type: version-support
+                    key: versionStatus
+                    value: EXTENDED_SUPPORT
+
+    Find clusters whose standard support ends within the next 90 days (this
+    also matches versions whose standard support has already ended):
+
+    .. code-block:: yaml
+
+            policies:
+              - name: eks-standard-support-ending
+                resource: aws.eks
+                filters:
+                  - type: version-support
+                    key: endOfStandardSupportDate
+                    value_type: expiration
+                    op: lt
+                    value: 90
+    """
+
+    schema = type_schema('version-support', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('eks:DescribeClusterVersions',)
+    annotation_key = 'c7n:VersionSupport'
+
+    def get_cluster_versions(self):
+        client = local_session(self.manager.session_factory).client('eks')
+        paginator = client.get_paginator('describe_cluster_versions')
+        versions = {}
+        for page in paginator.paginate(includeAll=True):
+            for version_info in page.get('clusterVersions', ()):
+                versions[version_info['clusterVersion']] = version_info
+        return versions
+
+    def process(self, resources, event=None):
+        versions = self.get_cluster_versions()
+        results = []
+        for r in resources:
+            r[self.annotation_key] = versions.get(r.get('version'), {})
+            if self.match(r[self.annotation_key]):
+                results.append(r)
         return results
 
 
