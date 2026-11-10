@@ -240,12 +240,8 @@ class MacieEnabled(ValueFilter):
         if self.data.get('automated-discovery'):
             info['automatedDiscovery'] = {}
             if info.get('status') in ('ENABLED', 'PAUSED'):
-                try:
-                    info['automatedDiscovery'] = (
-                        client.get_automated_discovery_configuration())
-                    info['automatedDiscovery'].pop('ResponseMetadata')
-                except client.exceptions.AccessDeniedException:
-                    pass
+                info['automatedDiscovery'] = client.get_automated_discovery_configuration()
+                info['automatedDiscovery'].pop('ResponseMetadata')
         account[self.annotation_key] = info
 
 
