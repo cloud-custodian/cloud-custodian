@@ -54,16 +54,30 @@ class AccountTests(BaseTest):
             'status': 'ENABLED',
             'updatedAt': datetime.datetime(
                 2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
-            'automatedDiscovery': {
-                'autoEnableOrganizationMembers': 'ALL',
-                'classificationScopeId': 'a4d6b97a599087a3b44165c6af20c41c',
-                'firstEnabledAt': datetime.datetime(
-                    2023, 9, 19, 23, 3, 42, tzinfo=tz.tzutc()),
-                'lastUpdatedAt': datetime.datetime(
-                    2023, 9, 19, 23, 3, 42, tzinfo=tz.tzutc()),
-                'sensitivityInspectionTemplateId': '584cd334c22ea024897fbca2f3fb2cf1',
-                'status': 'ENABLED',
-            },
+        }
+
+    def test_macie_automated_discovery(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie_automated_discovery')
+        p = self.load_policy({
+            'name': 'macie-automated-discovery',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'check-macie-automated-discovery',
+                'key': 'status',
+                'value': 'ENABLED'}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['c7n:macie-automated-discovery'] == {
+            'autoEnableOrganizationMembers': 'ALL',
+            'classificationScopeId': 'a4d6b97a599087a3b44165c6af20c41c',
+            'firstEnabledAt': datetime.datetime(
+                2023, 9, 19, 23, 3, 42, tzinfo=tz.tzutc()),
+            'lastUpdatedAt': datetime.datetime(
+                2026, 11, 5, 20, 45, 6, tzinfo=tz.tzutc()),
+            'sensitivityInspectionTemplateId': '584cd334c22ea024897fbca2f3fb2cf1',
+            'status': 'ENABLED',
         }
 
     def test_macie_automated_discovery_disabled(self):
@@ -73,38 +87,40 @@ class AccountTests(BaseTest):
             'name': 'macie-automated-discovery-disabled',
             'resource': 'aws.account',
             'filters': [{
-                'or': [
-                    {'type': 'check-macie',
-                     'key': 'status',
-                     'value': 'ENABLED',
-                     'op': 'ne'},
-                    {'type': 'check-macie',
-                     'key': 'automatedDiscovery.status',
-                     'value': 'ENABLED',
-                     'op': 'ne'}]}]
+                'type': 'check-macie-automated-discovery',
+                'key': 'status',
+                'value': 'ENABLED',
+                'op': 'ne'}]
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]['c7n:macie']['automatedDiscovery']['status'], 'DISABLED')
+            resources[0]['c7n:macie-automated-discovery']['status'], 'DISABLED')
+
+        p = self.load_policy({
+            'name': 'macie-automated-discovery-enabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'check-macie-automated-discovery',
+                'key': 'status',
+                'value': 'ENABLED'}]
+        }, session_factory=factory)
+        self.assertEqual(len(p.run()), 0)
 
     def test_macie_automated_discovery_denied(self):
-        client = mock.MagicMock()
-        client.exceptions.AccessDeniedException = type(
-            'AccessDeniedException', (Exception,), {})
-        client.get_macie_session.return_value = {
-            'status': 'ENABLED', 'ResponseMetadata': {}}
-        client.get_administrator_account.return_value = {'administrator': {}}
-        client.get_automated_discovery_configuration.side_effect = (
-            client.exceptions.AccessDeniedException('denied'))
-        self.patch(account, 'local_session',
-                   lambda factory: mock.MagicMock(client=lambda service: client))
-        f = account.MacieEnabled(
-            {'type': 'check-macie', 'key': 'status', 'value': 'ENABLED'},
-            manager=mock.MagicMock())
-        resource = {}
-        f.get_macie_info(resource)
-        self.assertEqual(resource['c7n:macie']['automatedDiscovery'], {})
+        factory = self.replay_flight_data(
+            'test_account_check_macie_automated_discovery_denied')
+        p = self.load_policy({
+            'name': 'macie-automated-discovery-denied',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'check-macie-automated-discovery',
+                'key': 'status',
+                'value': 'absent'}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:macie-automated-discovery'], {})
 
     def test_macie_disabled(self):
         factory = self.replay_flight_data(
