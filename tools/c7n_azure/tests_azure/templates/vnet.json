@@ -71,6 +71,18 @@
       "properties": {
         "supportsHttpsTrafficOnly": true
       }
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2022-10-01",
+      "name": "c7n-vnet-flowlog-la",
+      "location": "South Central US",
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        },
+        "retentionInDays": 30
+      }
     }
   ],
   "outputs": {}

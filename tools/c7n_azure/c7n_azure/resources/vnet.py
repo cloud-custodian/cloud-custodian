@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from azure.mgmt.network.models import RetentionPolicyParameters
 from msrestazure.tools import parse_resource_id
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
@@ -124,7 +125,7 @@ class SetFlowLog(AzureBaseAction):
         if storage_account and not storage_account.startswith('/subscriptions/'):
             raise PolicyValidationError(
                 "set-flow-log storage-account must be a full resource id, "
-                "got: %s" % storage_account)
+                f"got: {storage_account}")
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()
@@ -133,44 +134,29 @@ class SetFlowLog(AzureBaseAction):
         existing_logs = resource['properties'].get('flowLogs', [])
         if not existing_logs:
             raise PolicyExecutionError(
-                "set-flow-log only updates an existing flow log; '%s' has none"
-                % resource['name'])
+                f"set-flow-log only updates an existing flow log; '{resource['name']}' has none")
 
         parsed_id = parse_resource_id(existing_logs[0]['id'])
         watcher_rg = parsed_id['resource_group']
         watcher_name = parsed_id['name']
         flow_log_name = parsed_id['resource_name']
 
-        existing_flow_log = None
-        if 'storage-account' not in self.data or 'enabled' not in self.data \
-                or 'retention' not in self.data:
-            existing_flow_log = self.client.flow_logs.get(
-                watcher_rg, watcher_name, flow_log_name
-            )
-
-        storage_id = self.data.get('storage-account')
-        if not storage_id:
-            storage_id = existing_flow_log.storage_id
-
-        params = {
-            'location': resource['location'],
-            'target_resource_id': resource['id'],
-            'storage_id': storage_id,
-            'enabled': self.data.get('enabled', existing_flow_log
-                                      and existing_flow_log.enabled),
-        }
-
+        # Flow logs have no partial update (only update_tags), and create_or_update
+        # replaces the whole resource. Modify only the requested fields on the
+        # existing model and PUT it back, so anything this action doesn't manage
+        # (Traffic Analytics, format, tags, ...) is preserved.
+        flow_log = self.client.flow_logs.get(watcher_rg, watcher_name, flow_log_name)
+        if 'enabled' in self.data:
+            flow_log.enabled = self.data['enabled']
         if 'retention' in self.data:
             retention = self.data['retention']
-            params['retention_policy'] = {
-                'days': retention,
-                'enabled': retention != 0,
-            }
-        elif existing_flow_log and existing_flow_log.retention_policy:
-            params['retention_policy'] = existing_flow_log.retention_policy
+            flow_log.retention_policy = RetentionPolicyParameters(
+                days=retention, enabled=retention != 0)
+        if 'storage-account' in self.data:
+            flow_log.storage_id = self.data['storage-account']
 
         self.client.flow_logs.begin_create_or_update(
-            watcher_rg, watcher_name, flow_log_name, params
+            watcher_rg, watcher_name, flow_log_name, flow_log
         ).result()
 
-        return "flow log '%s' updated on network watcher '%s'" % (flow_log_name, watcher_name)
+        return f"flow log '{flow_log_name}' updated on network watcher '{watcher_name}'"

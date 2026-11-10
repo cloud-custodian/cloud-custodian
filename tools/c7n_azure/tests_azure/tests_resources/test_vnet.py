@@ -207,6 +207,14 @@ class VnetSetFlowLogActionTest(BaseTest):
         storage_id = before.storage_id
         original_days = before.retention_policy.days
 
+        # The fixture enables Traffic Analytics and sets tags, neither of which
+        # the action manages; they must survive the update.
+        before_analytics = (
+            before.flow_analytics_configuration.network_watcher_flow_analytics_configuration
+        )
+        assert before_analytics.enabled
+        assert before.tags
+
         # Pick a target retention guaranteed to differ from whatever the fixture
         # currently has, so the action itself is the only thing that can produce
         # the observed change. Live re-runs against the same fixture (without
@@ -214,6 +222,8 @@ class VnetSetFlowLogActionTest(BaseTest):
         # to, so this can't assume a fixed starting value.
         target_days = 90 if original_days != 90 else 120
 
+        # All three options are given so the update path that previously
+        # skipped reading the existing flow log is the one exercised.
         p = self.load_policy({
             'name': 'test-azure-vnet',
             'resource': 'azure.vnet',
@@ -223,6 +233,7 @@ class VnetSetFlowLogActionTest(BaseTest):
             'actions': [
                 {
                     'type': 'set-flow-log',
+                    'storage-account': storage_id,
                     'enabled': True,
                     'retention': target_days
                 }
@@ -230,12 +241,21 @@ class VnetSetFlowLogActionTest(BaseTest):
         }, validate=True)
 
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        assert len(resources) == 1
 
         self.sleep_in_live_mode(30)
 
         after = client.flow_logs.get(watcher_rg, watcher.name, flow_log_name)
-        self.assertTrue(after.enabled)
-        self.assertEqual(after.storage_id, storage_id)
-        self.assertNotEqual(after.retention_policy.days, original_days)
-        self.assertEqual(after.retention_policy.days, target_days)
+        assert after.enabled
+        assert after.storage_id == storage_id
+        assert after.retention_policy.days != original_days
+        assert after.retention_policy.days == target_days
+
+        after_analytics = (
+            after.flow_analytics_configuration.network_watcher_flow_analytics_configuration
+        )
+        assert after_analytics.enabled
+        assert after_analytics.workspace_resource_id == before_analytics.workspace_resource_id
+        assert (after_analytics.traffic_analytics_interval
+                == before_analytics.traffic_analytics_interval)
+        assert after.tags == before.tags
