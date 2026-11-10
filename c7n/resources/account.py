@@ -225,15 +225,13 @@ class MacieEnabled(ValueFilter):
         try:
             info = client.get_macie_session()
             info.pop('ResponseMetadata')
-        except client.exceptions.AccessDeniedException as e:
-            self.log.info('macie filter error accessing macie session %s', e)
+        except client.exceptions.AccessDeniedException:
             info = {}
 
         try:
             minfo = client.get_administrator_account().get('administrator')
         except (client.exceptions.AccessDeniedException,
-                client.exceptions.ResourceNotFoundException) as e:
-            self.log.info('macie filter error accessing administrator account %s', e)
+                client.exceptions.ResourceNotFoundException):
             info['master'] = {}
         else:
             info['master'] = minfo
@@ -242,8 +240,12 @@ class MacieEnabled(ValueFilter):
         if self.data.get('automated-discovery'):
             info['automatedDiscovery'] = {}
             if info.get('status') in ('ENABLED', 'PAUSED'):
-                info['automatedDiscovery'] = client.get_automated_discovery_configuration()
-                info['automatedDiscovery'].pop('ResponseMetadata')
+                try:
+                    info['automatedDiscovery'] = (
+                        client.get_automated_discovery_configuration())
+                    info['automatedDiscovery'].pop('ResponseMetadata')
+                except client.exceptions.AccessDeniedException:
+                    pass
         account[self.annotation_key] = info
 
 
