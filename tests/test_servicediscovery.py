@@ -189,3 +189,36 @@ class TestServiceDiscoveryService(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertIn('NamespaceId', resources[0])
         self.assertEqual(p.resource_manager.get_arns(resources), [resources[0]['Arn']])
+
+    def test_servicediscovery_service_tag_untag(self):
+        factory = self.replay_flight_data('test_servicediscovery_service_tag')
+        client = factory().client('servicediscovery')
+
+        p = self.load_policy(
+            {
+                "name": "servicediscovery-service-tag",
+                "resource": "aws.servicediscovery-service",
+                "filters": [{"Name": "c7n-test-service"}],
+                "actions": [{"type": "tag", "key": "Env", "value": "Test"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = resources[0]['Arn']
+        tags = client.list_tags_for_resource(ResourceARN=arn)['Tags']
+        self.assertIn({'Key': 'Env', 'Value': 'Test'}, tags)
+
+        p = self.load_policy(
+            {
+                "name": "servicediscovery-service-untag",
+                "resource": "aws.servicediscovery-service",
+                "filters": [{"tag:Env": "Test"}],
+                "actions": [{"type": "remove-tag", "tags": ["Env"]}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(ResourceARN=arn)['Tags']
+        self.assertNotIn('Env', [t['Key'] for t in tags])
