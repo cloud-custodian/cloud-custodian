@@ -9,10 +9,8 @@ from google.cloud import storage
 from googleapiclient.errors import HttpError
 import yaml
 
-from c7n.filters.core import FilterValidationError
 from c7n.utils import local_session, jmespath_search, type_schema
 from c7n_gcp.actions import MethodAction
-from c7n_gcp.filters.metrics import GCPMetricsFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
     config_regions, QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo)
@@ -113,10 +111,11 @@ class VertexAIQueryManager(QueryResourceManager):
 
             # Invoke the client enumeration (Vertex AI API supports pagination)
             location_resources = []
-            for page in client.execute_paged_query(enum_op, params):
-                page_items = jmespath_search(path, page)
-                if page_items:
-                    location_resources.extend(page_items)
+            with self._ignore_access_errors():
+                for page in client.execute_paged_query(enum_op, params):
+                    page_items = jmespath_search(path, page)
+                    if page_items:
+                        location_resources.extend(page_items)
 
             # Annotate resources with their location
             for resource in location_resources:
@@ -298,24 +297,12 @@ class VertexAIEndpoint(VertexAIQueryManager):
         permissions = ('aiplatform.endpoints.list',)
         urn_component = 'endpoint'
         metric_key = 'resource.labels.endpoint_id'
+        supported_metric_keys = ('resource.labels.endpoint_id',)
 
         @classmethod
         def get_metric_resource_name(cls, resource, metric_key=None):
             # Endpoint metrics are keyed by the terminal endpoint id.
             return resource['name'].split('/')[-1]
-
-
-@VertexAIEndpoint.filter_registry.register('metrics')
-class VertexAIEndpointMetricsFilter(GCPMetricsFilter):
-
-    def validate(self):
-        super().validate()
-        metric_key = self.data.get('metric-key')
-        if metric_key and metric_key != self.manager.resource_type.metric_key:
-            raise FilterValidationError(
-                "vertex-ai-endpoint metrics filter only supports "
-                f"metric-key '{self.manager.resource_type.metric_key}', got '{metric_key}'")
-        return self
 
 
 @VertexAIEndpoint.action_registry.register('monitor')
@@ -839,6 +826,92 @@ class VertexAIEvaluationRun(VertexAIQueryManager):
         urn_component = 'evaluation-run'
 
 
+@resources.register('vertex-ai-metadata-store-artifact')
+class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
+    """GCP Vertex AI Metadata Store Artifact Resource
+
+    Vertex AI Metadata Store Artifacts represent inputs and outputs (e.g.
+    datasets, models) tracked for ML lineage, cost attribution, and
+    governance.
+
+    :example:
+
+    Find artifacts missing an owner label:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-artifacts-missing-owner-label
+            resource: gcp.vertex-ai-metadata-store-artifact
+            filters:
+              - type: value
+                key: labels.owner
+                value: absent
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.metadataStores.artifacts'
+        enum_spec = ('list', 'artifacts[]', None)
+        default_report_fields = ['name', 'displayName', 'createTime', 'updateTime']
+        permissions = (
+            'aiplatform.artifacts.list',
+            'aiplatform.metadataStores.list',
+            )
+        urn_component = 'metadata-store-artifact'
+        urn_id_segments = (-3, -1)
+
+    def _fetch_resources(self, query):
+        """Enumerate artifacts across every location and metadata store.
+
+        Artifacts are children of metadata stores, which are themselves
+        scoped to a location, so this adds a metadata-store enumeration
+        step in between the location loop and the artifact listing that
+        VertexAIQueryManager._fetch_resources otherwise does directly.
+        """
+        session = local_session(self.session_factory)
+        project = session.get_default_project()
+
+        location_query = self._get_location_query()
+        location_manager = self.get_resource_manager(
+            resource_type='vertex-ai-location',
+            data=({'query': location_query} if location_query else {})
+        )
+
+        all_resources = []
+        location_annotation_key = 'c7n:location'
+        enum_op, path, _ = self.resource_type.enum_spec
+
+        for location_instance in location_manager.resources():
+            location = location_instance['name']
+            store_client = self.get_location_client(
+                session, location, 'projects.locations.metadataStores')
+            artifact_client = None
+
+            parent = f'projects/{project}/locations/{location}'
+            with self._ignore_access_errors():
+                for store_page in store_client.execute_paged_query(
+                        'list', {'parent': parent}):
+                    stores = jmespath_search('metadataStores[]', store_page) or []
+                    for store in stores:
+                        if artifact_client is None:
+                            artifact_client = self.get_location_client(
+                                session, location, self.resource_type.component)
+                        artifacts = []
+                        with self._ignore_access_errors():
+                            for artifact_page in artifact_client.execute_paged_query(
+                                    enum_op, {'parent': store['name']}):
+                                page_items = jmespath_search(path, artifact_page)
+                                if page_items:
+                                    artifacts.extend(page_items)
+
+                        for artifact in artifacts:
+                            artifact[location_annotation_key] = location_instance
+
+                        all_resources.extend(artifacts)
+
+        return all_resources
+
+
 @resources.register('vertex-ai-batch-prediction-job')
 class VertexAIBatchPredictionJob(VertexAIQueryManager):
     """GCP Vertex AI Batch Prediction Job Resource
@@ -1358,6 +1431,30 @@ class VertexAIPublisherModel(ChildResourceManager):
                 key: name
                 op: regex
                 value: 'publishers/anthropic/.*'
+
+    :example: Find models that used more than 1,000,000 input tokens in the last day
+
+    Cloud Monitoring returns one ``token_count`` time series per combination
+    of metric labels, such as ``type`` (``input`` or ``output``) and
+    ``source`` region. Filter on the labels you want, then reduce the
+    remaining series to one value per model.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertex-ai-publisher-model-input-tokens
+            resource: gcp.vertex-ai-publisher-model
+            filters:
+              - type: metrics
+                name: aiplatform.googleapis.com/publisher/online_serving/token_count
+                filter: metric.labels.type = "input"
+                aligner: ALIGN_SUM
+                reducer: REDUCE_SUM
+                group-by-fields:
+                  - resource.labels.model_user_id
+                days: 1
+                op: greater-than
+                value: 1000000
     """
 
     def get_permissions(self):
@@ -1385,3 +1482,12 @@ class VertexAIPublisherModel(ChildResourceManager):
         urn_component = 'publisher-model'
         urn_id_segments = (-1,)
         parent_spec = {'resource': 'vertex-ai-publisher'}
+        metric_key = 'resource.labels.model_user_id'
+        supported_metric_keys = ('resource.labels.model_user_id',)
+
+        @classmethod
+        def get_metric_resource_name(cls, resource, metric_key=None):
+            # Monitoring labels the metric with the bare model id, the
+            # last part of the resource's full
+            # publishers/{publisher}/models/{model} name.
+            return resource['name'].split('/')[-1]

@@ -12,7 +12,7 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
@@ -623,6 +623,145 @@ class AccessAnalyzer(ValueFilter):
                 matched_analyzers.append(analyzer)
         account[self.annotation_key] = matched_analyzers
         return matched_analyzers and resources or []
+
+
+@actions.register('set-access-analyzer')
+class SetAccessAnalyzer(BaseAction):
+    """Enable or delete an external access analyzer in the policy's account and region.
+
+    ``enabled`` defaults to ``true`` and ensures an analyzer is present.
+    ``analyzer-type`` defaults to ``ACCOUNT`` and also supports ``ORGANIZATION``.
+    Organization analyzers require the management or delegated administrator
+    account, with trusted access to IAM Access Analyzer already enabled.
+
+    When enabled, an existing analyzer of the requested type in the region is left unchanged,
+    regardless of its name, including its tags and archive rules. Non-active
+    analyzers are logged with their status and status reason; they are not
+    replaced. When enabled, the configured name is used only when creating an analyzer.
+    When creation is needed, a name already used by a different type raises an error.
+    This action does not create unused-access or internal-access analyzers.
+    ``archive-rules`` accepts the ``ruleName`` and ``filter`` fields from the
+    Access Analyzer ``CreateAnalyzer`` API.
+
+    With ``enabled: false``, only the analyzer with the configured ``analyzer-name``
+    is deleted, after checking that its type matches ``analyzer-type``. A different
+    type raises an error; a missing analyzer is a no-op. Other analyzers are left
+    unchanged. Deleting an analyzer permanently deletes all of its findings and
+    cannot be undone. ``tags`` and ``archive-rules`` apply only to creation.
+    This action does not update existing analyzers; AWS ``UpdateAnalyzer`` does
+    not support external access analyzers.
+
+    IAM Access Analyzer creates its service-linked role automatically when needed.
+    Creation therefore needs ``iam:CreateServiceLinkedRole`` for
+    ``access-analyzer.amazonaws.com``, ``access-analyzer:ListAnalyzers`` and
+    ``access-analyzer:CreateAnalyzer``, plus ``access-analyzer:TagResource`` when
+    tags are supplied. Deletion needs only ``access-analyzer:ListAnalyzers`` and
+    ``access-analyzer:DeleteAnalyzer``.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: enable-missing-access-analyzer
+            resource: aws.account
+            filters:
+              - not:
+                  - type: access-analyzer
+                    key: "[type, status]"
+                    value: [ACCOUNT, ACTIVE]
+            actions:
+              - type: set-access-analyzer
+                enabled: true
+                analyzer-name: custodian-external-access
+                analyzer-type: ACCOUNT
+                tags:
+                  Owner: Security
+
+          - name: delete-named-access-analyzer
+            resource: aws.account
+            actions:
+              - type: set-access-analyzer
+                enabled: false
+                analyzer-name: custodian-external-access
+                analyzer-type: ACCOUNT
+    """
+
+    schema = type_schema(
+        'set-access-analyzer', required=['analyzer-name'], **{
+            'enabled': {'type': 'boolean', 'default': True},
+            'analyzer-name': {'type': 'string', 'minLength': 1, 'maxLength': 255,
+                              'pattern': '^[A-Za-z][A-Za-z0-9_.-]*$'},
+            'analyzer-type': {'enum': ['ACCOUNT', 'ORGANIZATION']},
+            'archive-rules': {'type': 'array', 'items': {'type': 'object'}},
+            'tags': {'type': 'object', 'additionalProperties': {'type': 'string'}},
+        })
+    permissions = (
+        'access-analyzer:ListAnalyzers', 'access-analyzer:CreateAnalyzer',
+        'iam:CreateServiceLinkedRole')
+
+    def get_permissions(self):
+        if not self.data.get('enabled', True):
+            return ('access-analyzer:ListAnalyzers', 'access-analyzer:DeleteAnalyzer')
+        if self.data.get('tags'):
+            return self.permissions + ('access-analyzer:TagResource',)
+        return self.permissions
+
+    def get_params(self):
+        params = {
+            'analyzerName': self.data['analyzer-name'],
+            'type': self.data.get('analyzer-type', 'ACCOUNT'),
+        }
+        for key, api_key in (('archive-rules', 'archiveRules'), ('tags', 'tags')):
+            if key in self.data:
+                params[api_key] = self.data[key]
+        return params
+
+    def validate(self):
+        if self.data.get('enabled', True):
+            shape_validate(self.get_params(), 'CreateAnalyzerRequest', 'accessanalyzer')
+        return self
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('accessanalyzer')
+        params = self.get_params()
+        analyzers = []
+        list_params = {}
+        while True:
+            response = self.manager.retry(client.list_analyzers, **list_params)
+            analyzers.extend(response['analyzers'])
+            if not response.get('nextToken'):
+                break
+            list_params['nextToken'] = response['nextToken']
+        if not self.data.get('enabled', True):
+            for analyzer in analyzers:
+                if analyzer['name'] != params['analyzerName']:
+                    continue
+                if analyzer['type'] != params['type']:
+                    raise PolicyExecutionError(
+                        "Access analyzer %s already has type %s, requested %s" % (
+                            params['analyzerName'], analyzer['type'], params['type']))
+                self.manager.retry(
+                    client.delete_analyzer, analyzerName=params['analyzerName'],
+                    ignore_err_codes=('ResourceNotFoundException',))
+                return
+            return
+        existing = [a for a in analyzers if a['type'] == params['type']]
+        if existing:
+            for analyzer in existing:
+                log = self.log.info if analyzer['status'] == 'ACTIVE' else self.log.warning
+                log(
+                    "Access analyzer %s of type %s already exists with status %s "
+                    "(reason: %s); skipping creation",
+                    analyzer['name'], analyzer['type'], analyzer['status'],
+                    analyzer.get('statusReason', {}).get('code', 'unspecified'))
+            return
+        for analyzer in analyzers:
+            if analyzer['name'] == params['analyzerName']:
+                raise PolicyExecutionError(
+                    "Access analyzer %s already has type %s, requested %s" % (
+                        params['analyzerName'], analyzer['type'], params['type']))
+        self.manager.retry(client.create_analyzer, **params)
 
 
 @filters.register('password-policy')
@@ -2544,6 +2683,60 @@ class BedrockModelInvocationLogging(ListItemFilter):
         return item_values
 
 
+@filters.register('iot-logging')
+class IoTLogging(ValueFilter):
+    """Check account level IoT logging configuration
+
+    IoT device activity logs are delivered to CloudWatch Logs. On top of the
+    fields returned by GetV2LoggingOptions, an extra key, loggingConfigured,
+    is set to true or false to signify whether logging has been configured for
+    the account at all. No other fields are present when it is false, so match
+    on loggingConfigured rather than on a missing field.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: iot-logging-not-enabled
+                resource: account
+                filters:
+                  - or:
+                    - type: iot-logging
+                      key: loggingConfigured
+                      value: false
+                    - type: iot-logging
+                      key: disableAllLogs
+                      value: true
+                    - type: iot-logging
+                      key: defaultLogLevel
+                      value: DISABLED
+    """
+    annotation_key = 'c7n:IoTLogging'
+    annotate = False
+    schema = type_schema('iot-logging', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('iot:GetV2LoggingOptions',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('iot')
+        for r in resources:
+            try:
+                options = client.get_v2_logging_options()
+                options.pop('ResponseMetadata', None)
+                options['loggingConfigured'] = True
+            except client.exceptions.NotConfiguredException:
+                options = {'loggingConfigured': False}
+            r[self.annotation_key] = options
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
 @actions.register('set-bedrock-model-invocation-logging')
 class SetBedrockModelInvocationLogging(BaseAction):
     """Set Bedrock Model Invocation Logging Configuration on an account.
@@ -2606,6 +2799,133 @@ class SetBedrockModelInvocationLogging(BaseAction):
             client.put_model_invocation_logging_configuration(loggingConfig=params)
         else:
             client.delete_model_invocation_logging_configuration()
+
+
+@filters.register('bedrock-data-retention')
+class BedrockDataRetention(ValueFilter):
+    """Filter on the account level Bedrock data retention mode in the current region.
+
+    Valid modes are default, none, aws_review, provider_data_share and inherit.
+    An account where the mode has never been set returns inherit.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: bedrock-data-retention-not-zero
+                resource: account
+                filters:
+                  - type: bedrock-data-retention
+                    key: mode
+                    op: ne
+                    value: none
+    """
+    annotation_key = 'c7n:BedrockDataRetention'
+    annotate = False
+    schema = type_schema('bedrock-data-retention', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('bedrock:GetAccountDataRetention',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        for r in resources:
+            retention = self.manager.retry(client.get_account_data_retention)
+            retention.pop('ResponseMetadata', None)
+            r[self.annotation_key] = retention
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
+@filters.register('sms-voice-account-attributes')
+class SmsVoiceAccountAttributes(ValueFilter):
+    """Filter on End User Messaging SMS account attributes for the region,
+    as a mapping of attribute name to value (``ACCOUNT_TIER``,
+    ``DEFAULT_PROTECT_CONFIGURATION_ID``).
+
+    :example:
+
+    Find accounts without a default protect configuration
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sms-voice-no-default-protect-configuration
+                resource: account
+                filters:
+                  - type: sms-voice-account-attributes
+                    key: DEFAULT_PROTECT_CONFIGURATION_ID
+                    value: empty
+    """
+
+    annotation_key = 'c7n:SmsVoiceAccountAttributes'
+    annotate = False
+    schema = type_schema('sms-voice-account-attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('sms-voice:DescribeAccountAttributes',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
+        for r in resources:
+            if self.annotation_key not in r:
+                attrs = self.manager.retry(
+                    client.describe_account_attributes).get('AccountAttributes', [])
+                r[self.annotation_key] = {a['Name']: a['Value'] for a in attrs}
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
+@filters.register('sms-voice-spend-limits')
+class SmsVoiceSpendLimits(ValueFilter):
+    """Filter on End User Messaging monthly spend limits for the region, keyed
+    by limit name (eg. ``TEXT_MESSAGE_MONTHLY_SPEND_LIMIT``), each with
+    ``EnforcedLimit``, ``MaxLimit`` and ``Overridden``.
+
+    :example:
+
+    Find accounts that haven't overridden the SMS, MMS and voice spend limits
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sms-voice-spend-limits-not-overridden
+                resource: account
+                filters:
+                  - or:
+                    - type: sms-voice-spend-limits
+                      key: TEXT_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+                    - type: sms-voice-spend-limits
+                      key: MEDIA_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+                    - type: sms-voice-spend-limits
+                      key: VOICE_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+    """
+
+    annotation_key = 'c7n:SmsVoiceSpendLimits'
+    annotate = False
+    schema = type_schema('sms-voice-spend-limits', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('sms-voice:DescribeSpendLimits',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
+        for r in resources:
+            if self.annotation_key not in r:
+                limits = self.manager.retry(client.describe_spend_limits).get('SpendLimits', [])
+                r[self.annotation_key] = {lim['Name']: lim for lim in limits}
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
 
 
 @filters.register('ec2-metadata-defaults')

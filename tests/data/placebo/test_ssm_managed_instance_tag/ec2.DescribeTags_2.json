@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Env",
+                "ResourceId": "i-0585418e43dc3377d",
+                "ResourceType": "instance",
+                "Value": "Prod"
+            },
+            {
+                "Key": "Name",
+                "ResourceId": "i-0585418e43dc3377d",
+                "ResourceType": "instance",
+                "Value": "c7n-test-ec2-ssm"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

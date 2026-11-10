@@ -1158,6 +1158,26 @@ class TestCustomDomainName(BaseTest):
             "arn:aws:apigateway:us-east-1::/domainnames/bad.example.com"
         )
 
+    def test_private_domain_name_arn(self):
+        factory = self.replay_flight_data("test_apigw_domain_name_private_arn")
+        p = self.load_policy(
+            {
+                "name": "apigw-domain-name-private-arn",
+                "resource": "apigw-domain-name",
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            [
+                "arn:aws:apigateway:us-east-1::/domainnames/public.example.com",
+                "arn:aws:apigateway:us-east-1:644160558196:"
+                "/domainnames/private.example.com+abcd1234",
+            ],
+        )
+
 
 class TestResourcePolicy(BaseTest):
     def test_rest_api_default_resource_policy(self):

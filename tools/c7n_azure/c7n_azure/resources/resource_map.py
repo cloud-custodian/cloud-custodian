@@ -26,6 +26,7 @@ ResourceMap = {
     "azure.cdn-endpoint": "c7n_azure.resources.cdn_endpoint.CdnEndpoint",
     "azure.cdnprofile": "c7n_azure.resources.cdn.CdnProfile",
     "azure.cognitiveservice": "c7n_azure.resources.ai_foundry.CognitiveService",
+    "azure.cognitiveservice-usage": "c7n_azure.resources.ai_foundry.CognitiveServiceUsage",
     "azure.ai-foundry-deployment": "c7n_azure.resources.ai_foundry.AiFoundryDeployment",
     "azure.cognitiveservice-deployment": "c7n_azure.resources.ai_foundry.AiFoundryCognitiveServiceDeployment", # noqa
     "azure.container-group": "c7n_azure.resources.aci.ContainerGroup",
@@ -36,6 +37,7 @@ ResourceMap = {
     "azure.cosmosdb-collection": "c7n_azure.resources.cosmos_db.CosmosDBCollection",
     "azure.cosmosdb-database": "c7n_azure.resources.cosmos_db.CosmosDBDatabase",
     "azure.cost-management-export": "c7n_azure.resources.cost_management_export.CostManagementExport",  # noqa
+    "azure.cost-management-scheduled-action": "c7n_azure.resources.cost_management_scheduled_action.CostManagementScheduledAction",  # noqa
     "azure.databricks": "c7n_azure.resources.databricks.Databricks",
     "azure.datafactory": "c7n_azure.resources.data_factory.DataFactory",
     "azure.datalake": "c7n_azure.resources.datalake_store.DataLakeStore",
@@ -68,10 +70,13 @@ ResourceMap = {
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
     "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning.MachineLearningWorkspace", # noqa
+    "azure.machine-learning-compute-cluster": "c7n_azure.resources.machine_learning_compute_cluster.MachineLearningComputeCluster", # noqa
     "azure.machine-learning-data-container": "c7n_azure.resources.machine_learning.MachineLearningDataContainer", # noqa
+    "azure.machine-learning-environment-version": "c7n_azure.resources.machine_learning_environment_version.MachineLearningEnvironmentVersion", # noqa
     "azure.machine-learning-job": "c7n_azure.resources.machine_learning_job.MachineLearningJob",
     "azure.machine-learning-model-version": "c7n_azure.resources.machine_learning_model_version.MachineLearningModelVersion", # noqa
     "azure.machine-learning-online-endpoint": "c7n_azure.resources.machine_learning_online_endpoint.MachineLearningOnlineEndpoint", # noqa
+    "azure.machine-learning-schedule": "c7n_azure.resources.machine_learning_schedule.MachineLearningSchedule", # noqa
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.monitor-log-profile": "c7n_azure.resources.monitor_logprofile.MonitorLogprofile",
     "azure.mariadb-server": "c7n_azure.resources.mariadb_server.MariaDBServer",
@@ -128,4 +133,6 @@ ResourceMap = {
     "azure.entraid-security-defaults": "c7n_azure.resources.entraid_security_defaults.EntraIDSecurityDefaults", # noqa
     "azure.entraid-authorization-policy": "c7n_azure.resources.entraid_authorization_policy.EntraIDAuthorizationPolicy", # noqa
     "azure.entraid-named-location": "c7n_azure.resources.entraid_named_locations.EntraIDNamedLocation", # noqa
+    "azure.entraid-application": "c7n_azure.resources.entraid_application.EntraIDApplication", # noqa
+    "azure.entraid-service-principal": "c7n_azure.resources.entraid_application.EntraIDServicePrincipal", # noqa
 }

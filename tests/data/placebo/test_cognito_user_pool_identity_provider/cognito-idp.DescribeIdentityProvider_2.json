@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "IdentityProvider": {
+            "UserPoolId": "us-east-1_bcxYACSFi",
+            "ProviderName": "c7n-oidc",
+            "ProviderType": "OIDC",
+            "ProviderDetails": {
+                "attributes_request_method": "GET",
+                "attributes_url": "https://idp.example.com/userinfo",
+                "attributes_url_add_attributes": "false",
+                "authorize_scopes": "openid email",
+                "authorize_url": "https://idp.example.com/authorize",
+                "client_id": "c7n-placeholder",
+                "client_secret": "c7n-placeholder-secret",
+                "jwks_uri": "https://idp.example.com/.well-known/jwks.json",
+                "oidc_issuer": "https://idp.example.com",
+                "token_url": "https://idp.example.com/token"
+            },
+            "AttributeMapping": {
+                "email": "email",
+                "username": "sub"
+            },
+            "IdpIdentifiers": [],
+            "LastModifiedDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 4,
+                "hour": 16,
+                "minute": 32,
+                "second": 13,
+                "microsecond": 116000
+            },
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 4,
+                "hour": 16,
+                "minute": 32,
+                "second": 13,
+                "microsecond": 116000
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

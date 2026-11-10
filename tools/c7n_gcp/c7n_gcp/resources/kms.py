@@ -254,6 +254,37 @@ class KmsCryptokeyIamPolicyFilter(IamPolicyFilter):
         return verb_arguments
 
 
+@KmsCryptoKey.action_registry.register('set-iam-policy')
+class KmsCryptoKeySetIamPolicy(SetIamPolicy):
+    """Sets IAM policy bindings on a gcp.kms-cryptokey resource.
+
+    GCP action is https://cloud.google.com/kms/docs/reference/rest/v1/projects.locations.keyRings.cryptoKeys/setIamPolicy
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-kms-cryptokey-remove-public-access
+            resource: gcp.kms-cryptokey
+            filters:
+              - type: iam-policy
+                user-role:
+                  role:
+                    op: glob
+                    value: '*'
+                  user:
+                    op: in
+                    value:
+                      - allUsers
+                      - allAuthenticatedUsers
+            actions:
+              - type: set-iam-policy
+                remove-bindings: matched
+    """
+    permissions = ('cloudkms.cryptoKeys.getIamPolicy', 'cloudkms.cryptoKeys.setIamPolicy')
+
+
 @resources.register('kms-cryptokey-version')
 class KmsCryptoKeyVersion(ChildResourceManager):
     """GCP Resource

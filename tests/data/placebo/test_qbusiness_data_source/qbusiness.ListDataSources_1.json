@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "dataSources": [
+            {
+                "displayName": "c7n-test-source",
+                "dataSourceId": "c9fb5b7a-fdaa-4565-ad89-8062951f7038",
+                "type": "S3V2",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 16,
+                    "minute": 13,
+                    "second": 41,
+                    "microsecond": 422000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 16,
+                    "minute": 13,
+                    "second": 41,
+                    "microsecond": 422000
+                },
+                "status": "ACTIVE"
+            }
+        ]
+    }
+}

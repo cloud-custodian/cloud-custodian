@@ -113,19 +113,29 @@ class GCPMetricsFilter(Filter):
     permissions = ("monitoring.timeSeries.list",)
 
     def validate(self):
-        if not self.data.get('metric-key') and \
-           not hasattr(self.manager.resource_type, 'metric_key'):
-            raise FilterValidationError("metric-key not defined for resource %s,"
-            "so must be provided in the policy" % (self.manager.type))
+        metric_key = self.data.get('metric-key')
+        if not metric_key and not hasattr(self.manager.resource_type, 'metric_key'):
+            raise FilterValidationError(
+                "metric-key not defined for resource %s, "
+                "so must be provided in the policy" % (self.manager.type))
+
+        supported_metric_keys = self.manager.resource_type.supported_metric_keys
+        if (
+            metric_key and
+            supported_metric_keys is not None and
+            metric_key not in supported_metric_keys
+        ):
+            raise FilterValidationError(
+                "metric-key '%s' not supported for resource %s, supported keys: %s" % (
+                    metric_key, self.manager.type, ', '.join(supported_metric_keys)))
 
         return self
 
-    def process(self, resources, event=None):
+    def initialize_metric(self):
         days = self.data.get('days', 14)
         duration = timedelta(days)
 
         self.metric = self.data['name']
-        self.metric_key = self.data.get('metric-key') or self.manager.resource_type.metric_key
         self.aligner = self.data.get('aligner', 'ALIGN_NONE')
         self.reducer = self.data.get('reducer', 'REDUCE_NONE')
         self.group_by_fields = self.data.get('group-by-fields', [])
@@ -143,24 +153,38 @@ class GCPMetricsFilter(Filter):
         self.filter = self.data.get('filter', '')
         self.c7n_metric_key = "%s.%s.%s" % (self.metric, self.aligner, self.reducer)
 
+    def get_query_params(self, query_filter):
+        return {
+            'filter': query_filter,
+            'interval_startTime': self.start.isoformat() + 'Z',
+            'interval_endTime': self.end.isoformat() + 'Z',
+            'aggregation_alignmentPeriod': self.period,
+            "aggregation_perSeriesAligner": self.aligner,
+            "aggregation_crossSeriesReducer": self.reducer,
+            "aggregation_groupByFields": self.group_by_fields,
+            'view': 'FULL'
+        }
+
+    def metric_project(self, resource=None):
+        return local_session(self.manager.session_factory).get_default_project()
+
+    def process(self, resources, event=None):
+        self.initialize_metric()
+        self.metric_key = self.data.get('metric-key') or self.manager.resource_type.metric_key
+
         session = local_session(self.manager.session_factory)
         client = session.client("monitoring", "v3", "projects.timeSeries")
-        project = session.get_default_project()
+        project = self.metric_project()
 
         time_series_data = []
         for batched_filter in self.get_batched_query_filter(resources):
-            query_params = {
-                'filter': batched_filter,
-                'interval_startTime': self.start.isoformat() + 'Z',
-                'interval_endTime': self.end.isoformat() + 'Z',
-                'aggregation_alignmentPeriod': self.period,
-                "aggregation_perSeriesAligner": self.aligner,
-                "aggregation_crossSeriesReducer": self.reducer,
-                "aggregation_groupByFields": self.group_by_fields,
-                'view': 'FULL'
-            }
-            metric_list = client.execute_query('list',
-                {'name': 'projects/' + project, **query_params})
+            metric_list = client.execute_query(
+                'list',
+                {
+                    'name': 'projects/' + project,
+                    **self.get_query_params(batched_filter),
+                },
+            )
             time_series_data.extend(metric_list.get('timeSeries', []))
 
         if not time_series_data:
@@ -237,8 +261,8 @@ class GCPMetricsFilter(Filter):
     @classmethod
     def register_resources(klass, registry, resource_class):
         if resource_class.filter_registry:
-            if resource_class.resource_type.allow_metrics_filters and \
-                    'metrics' not in resource_class.filter_registry:
+            if (resource_class.resource_type.allow_metrics_filters
+                    and 'metrics' not in resource_class.filter_registry):
                 resource_class.filter_registry.register('metrics', klass)
 
 

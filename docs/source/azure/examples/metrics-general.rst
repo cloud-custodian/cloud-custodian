@@ -66,6 +66,40 @@ Find SQL servers with less than 10% average DTU consumption over last 24 hours
             timeframe: 24
             filter:  "DatabaseResourceId eq '*'"
 
+The ``dimensions`` key lets a policy filter a resource by a metric of that
+resource's parent, restricted back to the resource itself with an OData
+filter clause. When ``dimensions`` is set, the filter queries the parent
+resource's scope, taken from the ``c7n:parent-id`` annotation, instead of the
+resource's own id. Each dimension's ``value`` accepts a literal string, or
+one of two sentinels: ``resource-name`` (the resource's own ``name``) or
+``resource-id`` (the resource's own ``id``). Because those two strings are
+reserved as sentinels, a dimension value can't currently be the literal
+string ``resource-name`` or ``resource-id`` themselves.
+
+Find Azure OpenAI model deployments with no requests in the last week, by
+querying the parent Cognitive Services account's ``AzureOpenAIRequests``
+metric and filtering it back to the deployment via the
+``ModelDeploymentName`` dimension
+
+.. code-block:: yaml
+
+    policies:
+      - name: unused-openai-deployments
+        resource: azure.cognitiveservice-deployment
+        filters:
+          - type: metric
+            metric: AzureOpenAIRequests
+            metric_namespace: Microsoft.CognitiveServices/accounts
+            aggregation: total
+            op: lte
+            threshold: 0
+            timeframe: 168
+            interval: P1D
+            no_data_action: to_zero
+            dimensions:
+              - name: ModelDeploymentName
+                value: resource-name
+
 Find storage accounts with low blob count
 
 .. code-block:: yaml

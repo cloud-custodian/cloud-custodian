@@ -1523,6 +1523,38 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_bedrock_data_retention_not_none(self):
+        factory = self.replay_flight_data('test_bedrock_data_retention_not_none')
+        p = self.load_policy({
+            'name': 'bedrock-data-retention-not-none',
+            'resource': 'account',
+            'filters': [{
+                'type': 'bedrock-data-retention',
+                'key': 'mode',
+                'op': 'ne',
+                'value': 'none'}]},
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:BedrockDataRetention']['mode'], 'inherit')
+
+    def test_bedrock_data_retention_none(self):
+        factory = self.replay_flight_data('test_bedrock_data_retention_none')
+        p = self.load_policy({
+            'name': 'bedrock-data-retention-none',
+            'resource': 'account',
+            'filters': [{
+                'type': 'bedrock-data-retention',
+                'key': 'mode',
+                'op': 'ne',
+                'value': 'none'}]},
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_update_bedrock_model_invocation_logging(self):
         factory = self.replay_flight_data("test_update_bedrock_model_invocation_logging")
         p = self.load_policy(
@@ -2068,3 +2100,43 @@ def test_fail_cloudtrail_include_management_events(test, cloudtrail_fail_include
     )
     return_value = p.run()
     test.assertEqual(len(return_value), 1)
+
+
+class SmsVoiceAccountTest(BaseTest):
+
+    def test_sms_voice_account_attributes(self):
+        session_factory = self.replay_flight_data('test_sms_voice_account_attributes')
+        p = self.load_policy(
+            {'name': 'sms-voice-no-default-protect-configuration',
+             'resource': 'aws.account',
+             'filters': [{
+                 'type': 'sms-voice-account-attributes',
+                 'key': 'DEFAULT_PROTECT_CONFIGURATION_ID',
+                 'value': 'empty'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        # recorded with no account default protect configuration assigned
+        self.assertEqual(len(resources), 1)
+        self.assertIn('ACCOUNT_TIER', resources[0]['c7n:SmsVoiceAccountAttributes'])
+
+    def test_sms_voice_spend_limits(self):
+        session_factory = self.replay_flight_data('test_sms_voice_spend_limits')
+        p = self.load_policy(
+            {'name': 'sms-voice-spend-limits-not-overridden',
+             'resource': 'aws.account',
+             'filters': [{'or': [
+                 {'type': 'sms-voice-spend-limits',
+                  'key': '%s.Overridden' % name,
+                  'value': False}
+                 for name in (
+                     'TEXT_MESSAGE_MONTHLY_SPEND_LIMIT',
+                     'MEDIA_MESSAGE_MONTHLY_SPEND_LIMIT',
+                     'VOICE_MESSAGE_MONTHLY_SPEND_LIMIT')]}]},
+            session_factory=session_factory)
+        resources = p.run()
+        # recorded with only the text message limit overridden
+        self.assertEqual(len(resources), 1)
+        limits = resources[0]['c7n:SmsVoiceSpendLimits']
+        self.assertTrue(limits['TEXT_MESSAGE_MONTHLY_SPEND_LIMIT']['Overridden'])
+        self.assertFalse(limits['VOICE_MESSAGE_MONTHLY_SPEND_LIMIT']['Overridden'])
+        self.assertFalse(limits['MEDIA_MESSAGE_MONTHLY_SPEND_LIMIT']['Overridden'])

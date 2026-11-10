@@ -1,0 +1,151 @@
+{
+    "status_code": 200,
+    "data": {
+        "Spaces": [
+            {
+                "DomainId": "d-000000000001",
+                "SpaceName": "c7n-classic-selected-quail",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 35,
+                    "microsecond": 348000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 37,
+                    "microsecond": 417000
+                },
+                "SpaceSettingsSummary": {}
+            },
+            {
+                "DomainId": "d-000000000001",
+                "SpaceName": "c7n-jupyterlab-selected-quail",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 28,
+                    "microsecond": 534000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 33,
+                    "microsecond": 624000
+                },
+                "SpaceSettingsSummary": {
+                    "AppType": "JupyterLab",
+                    "SpaceStorageSettings": {
+                        "EbsStorageSettings": {
+                            "EbsVolumeSizeInGb": 5
+                        }
+                    }
+                },
+                "SpaceSharingSettingsSummary": {
+                    "SharingType": "Private"
+                },
+                "OwnershipSettingsSummary": {
+                    "OwnerUserProfileName": "c7n-owner-selected-quail"
+                }
+            },
+            {
+                "DomainId": "d-000000000001",
+                "SpaceName": "c7n-cpu-selected-quail",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 26,
+                    "microsecond": 735000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 31,
+                    "microsecond": 808000
+                },
+                "SpaceSettingsSummary": {
+                    "AppType": "JupyterLab",
+                    "SpaceStorageSettings": {
+                        "EbsStorageSettings": {
+                            "EbsVolumeSizeInGb": 5
+                        }
+                    }
+                },
+                "SpaceSharingSettingsSummary": {
+                    "SharingType": "Private"
+                },
+                "OwnershipSettingsSummary": {
+                    "OwnerUserProfileName": "c7n-owner-selected-quail"
+                }
+            },
+            {
+                "DomainId": "d-000000000001",
+                "SpaceName": "c7n-codeeditor-selected-quail",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 26,
+                    "microsecond": 621000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 4,
+                    "second": 31,
+                    "microsecond": 729000
+                },
+                "SpaceSettingsSummary": {
+                    "AppType": "CodeEditor",
+                    "SpaceStorageSettings": {
+                        "EbsStorageSettings": {
+                            "EbsVolumeSizeInGb": 5
+                        }
+                    }
+                },
+                "SpaceSharingSettingsSummary": {
+                    "SharingType": "Private"
+                },
+                "OwnershipSettingsSummary": {
+                    "OwnerUserProfileName": "c7n-owner-selected-quail"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

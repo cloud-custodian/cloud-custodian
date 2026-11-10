@@ -80,7 +80,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/mlvvtest/models/cctest-model/versions?api-version=2023-04-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.MachineLearningServices/workspaces/mlvvtest/models/cctest-model/versions?api-version=2023-04-01&listViewType=All",
                 "body": null,
                 "headers": {}
             },

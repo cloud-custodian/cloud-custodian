@@ -1,0 +1,38 @@
+{
+  "headers": {
+    "etag": "P45GEQcVzhDmDx3GokUK8Dzk1Kg=/B8Bz4HC4JqgY7PEe5iG9sSU1DFo=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 30 Sep 2026 15:59:47 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "995",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/targetSslProxies?alt=json"
+  },
+  "body": {
+    "kind": "compute#targetSslProxyList",
+    "id": "projects/cloud-custodian/global/targetSslProxies",
+    "items": [
+      {
+        "kind": "compute#targetSslProxy",
+        "id": "4588591286513078024",
+        "creationTimestamp": "2026-09-30T08:59:35.339-07:00",
+        "name": "c7n-default-3e3a-ssl-weak",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetSslProxies/c7n-default-3e3a-ssl-weak",
+        "service": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendServices/c7n-default-3e3a-bs",
+        "sslCertificates": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/c7n-default-3e3a-cert"
+        ],
+        "proxyHeader": "NONE",
+        "sslPolicy": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/c7n-default-3e3a-weak"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetSslProxies"
+  }
+}

@@ -322,6 +322,27 @@ FindingTypes = {
 # Mostly undocumented value size limit
 SECHUB_VALUE_SIZE_LIMIT = 1024
 
+# Appended to a detail value cut down to SECHUB_VALUE_SIZE_LIMIT, so that
+# someone reading the finding can tell the value was cut.
+SECHUB_TRUNCATION_MARKER = '...'
+
+
+def truncate_value(value):
+    """Cap a finding detail value to the Security Hub per-value size limit.
+
+    Security Hub rejects the whole finding if any detail value is over the
+    limit, so an oversize value is cut short and marked as such rather than
+    costing the caller the finding.
+
+    The limit is inclusive. The service rejects with "should NOT be longer
+    than 1024 characters", so a value of exactly that length is accepted;
+    the user guide's "fewer than 1,024" is looser than what is enforced.
+    """
+    if len(value) <= SECHUB_VALUE_SIZE_LIMIT:
+        return value
+    keep = SECHUB_VALUE_SIZE_LIMIT - len(SECHUB_TRUNCATION_MARKER)
+    return value[:keep] + SECHUB_TRUNCATION_MARKER
+
 
 class PostFinding(Action):
     """Report a finding to AWS Security Hub.
@@ -651,9 +672,9 @@ class OtherResourcePostFinding(PostFinding):
                 v = dumps(v)
             elif isinstance(v, (int, float, bool)):
                 v = str(v)
-            else:
+            elif not isinstance(v, str):
                 continue
-            details[k] = v[:SECHUB_VALUE_SIZE_LIMIT]
+            details[k] = truncate_value(v)
 
         details['c7n:resource-type'] = self.manager.type
         other = {

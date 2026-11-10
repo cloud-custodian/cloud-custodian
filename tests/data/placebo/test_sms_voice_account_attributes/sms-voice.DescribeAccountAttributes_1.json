@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "AccountAttributes": [
+            {
+                "Name": "ACCOUNT_TIER",
+                "Value": "SANDBOX"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "dataAccessors": [
+            {
+                "displayName": "c7n-test-accessor",
+                "dataAccessorId": "b52c1e88-6a4d-4f39-8c07-1e9a3d5f7b20",
+                "dataAccessorArn": "arn:aws:qbusiness:us-east-1:644160558196:application/ed27546d-6f28-4480-820e-6592404f720f/data-accessor/b52c1e88-6a4d-4f39-8c07-1e9a3d5f7b20",
+                "idcApplicationArn": "arn:aws:sso::644160558196:application/ssoins-7223d3f1a9e04b6c/apl-a1b2c3d4e5f60718",
+                "principal": "arn:aws:iam::123456789012:role/c7n-test-accessor-principal",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 11,
+                    "day": 14,
+                    "hour": 9,
+                    "minute": 23,
+                    "second": 41,
+                    "microsecond": 512000
+                },
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 5,
+                    "day": 2,
+                    "hour": 16,
+                    "minute": 7,
+                    "second": 18,
+                    "microsecond": 884000
+                }
+            }
+        ]
+    }
+}

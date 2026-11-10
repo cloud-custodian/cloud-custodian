@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-000000000001",
+        "SpaceArn": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-jupyterlab-selected-quail",
+        "SpaceName": "c7n-jupyterlab-selected-quail",
+        "Status": "InService",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 15,
+            "hour": 16,
+            "minute": 4,
+            "second": 33,
+            "microsecond": 624000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 15,
+            "hour": 16,
+            "minute": 4,
+            "second": 28,
+            "microsecond": 534000
+        },
+        "SpaceSettings": {
+            "CodeEditorAppSettings": {
+                "DefaultResourceSpec": {
+                    "InstanceType": "ml.g4dn.xlarge"
+                }
+            },
+            "JupyterLabAppSettings": {
+                "DefaultResourceSpec": {
+                    "InstanceType": "ml.g4dn.xlarge"
+                }
+            },
+            "AppType": "JupyterLab",
+            "SpaceStorageSettings": {
+                "EbsStorageSettings": {
+                    "EbsVolumeSizeInGb": 5
+                }
+            }
+        },
+        "OwnershipSettings": {
+            "OwnerUserProfileName": "c7n-owner-selected-quail"
+        },
+        "SpaceSharingSettings": {
+            "SharingType": "Private"
+        },
+        "Url": "https://000000000000004.studio.us-east-1.sagemaker.aws/jupyterlab/default",
+        "ResponseMetadata": {}
+    }
+}

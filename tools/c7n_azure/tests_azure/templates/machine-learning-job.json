@@ -10,7 +10,7 @@
         "storageAccountName": "[concat('cctestmlws', parameters('uniqueId'))]",
         "keyVaultName": "[concat('cctestmlws', parameters('uniqueId'))]",
         "appInsightsName": "[concat('cctestmlws', parameters('uniqueId'))]",
-        "workspaceName": "cctest-mlws",
+        "workspaceName": "[concat('cctest-mlws-', parameters('uniqueId'))]",
         "jobName": "cctest-sweep-job"
     },
     "resources": [
@@ -73,18 +73,48 @@
             ]
         },
         {
+            "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/cctest-sweep-environment/1', variables('workspaceName'))]",
+            "properties": {
+                "environmentType": "UserCreated",
+                "image": "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
+                "isArchived": false,
+                "osType": "Linux"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
             "type": "Microsoft.MachineLearningServices/workspaces/jobs",
             "apiVersion": "2023-04-01",
             "name": "[format('{0}/{1}', variables('workspaceName'), variables('jobName'))]",
             "properties": {
+                "isArchived": false,
                 "jobType": "Sweep",
                 "limits": {
                     "jobLimitsType": "Sweep",
-                    "maxConcurrentTrials": 20
+                    "maxConcurrentTrials": 20,
+                    "maxTotalTrials": 1
+                },
+                "objective": {
+                    "goal": "Minimize",
+                    "primaryMetric": "loss"
+                },
+                "samplingAlgorithm": {
+                    "samplingAlgorithmType": "Random"
+                },
+                "searchSpace": {
+                    "x": "choice(1)"
+                },
+                "trial": {
+                    "command": "echo loss: 1",
+                    "environmentId": "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', variables('workspaceName'), 'cctest-sweep-environment', '1')]"
                 }
             },
             "dependsOn": [
-                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+                "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', variables('workspaceName'), 'cctest-sweep-environment', '1')]"
             ]
         }
     ]
