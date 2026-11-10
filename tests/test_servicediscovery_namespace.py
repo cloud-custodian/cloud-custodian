@@ -174,31 +174,6 @@ class ServiceNamespaceInstance(BaseTest):
 
 class ServiceDiscoveryNamespaceFilters(BaseTest):
 
-    def test_namespace_cross_account(self):
-        # Recording state: one namespace shared via a RAM resource share with an
-        # account other than 123456789012, and one namespace that is not shared.
-        # session_factory = self.record_flight_data('test_servicediscovery_namespace_cross_account')
-        session_factory = self.replay_flight_data('test_servicediscovery_namespace_cross_account')
-        p = self.load_policy(
-            {
-                "name": "servicediscovery-namespace-cross-account",
-                "resource": "servicediscovery-namespace",
-                "filters": [
-                    {
-                        "type": "cross-account",
-                        "whitelist": ["123456789012"]
-                    }
-                ]
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        violations = resources[0]['c7n:CrossAccountViolations']
-        self.assertTrue(violations)
-        self.assertNotIn(self.account_id, violations)
-        self.assertNotIn("123456789012", violations)
-
     def test_namespace_vpc(self):
         # Recording state: one DNS_PRIVATE namespace associated with a non-default VPC
         # and one HTTP namespace.

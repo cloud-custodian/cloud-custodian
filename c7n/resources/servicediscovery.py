@@ -10,10 +10,8 @@ from c7n.query import (
     DescribeWithResourceTags,
     ConfigSource,
 )
-from c7n.resolver import ValuesFrom
 from c7n.tags import universal_augment
 from c7n.filters import ListItemFilter
-from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.vpc import VpcFilter
 
 from c7n.utils import (
@@ -118,67 +116,6 @@ class SdNamespaceInstance(ListItemFilter):
                 service["Instances"] = response.get("Instances", [])
 
         return super().process(resources, event)
-
-
-@ServiceDiscoveryNamespace.filter_registry.register('cross-account')
-class NamespaceCrossAccountFilter(CrossAccountAccessFilter):
-    """Find namespaces shared via AWS RAM with principals that are not allowed.
-
-    Principals may be account ids, organization arns, or organizational unit arns.
-    Namespaces shared into the account by another owner are skipped.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: servicediscovery-namespace-cross-account
-            resource: aws.servicediscovery-namespace
-            filters:
-              - type: cross-account
-                whitelist:
-                  - "123456789012"
-                  - arn:aws:organizations::111111111111:organization/o-abcd1234
-    """
-
-    schema = type_schema(
-        'cross-account',
-        whitelist_from=ValuesFrom.schema,
-        whitelist={'type': 'array', 'items': {'type': 'string'}})
-
-    permissions = ('ram:GetResourceShareAssociations',)
-    annotation_key = 'c7n:CrossAccountViolations'
-
-    def get_share_associations(self, client, association_type, **params):
-        return [
-            a for a in client.get_paginator('get_resource_share_associations').paginate(
-                associationType=association_type, **params
-            ).build_full_result().get('resourceShareAssociations', [])
-            if a['status'] == 'ASSOCIATED'
-        ]
-
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('ram')
-        account_id = self.manager.config.account_id
-        accounts = self.get_accounts()
-        results = []
-        for r in resources:
-            if r.get('ResourceOwner', account_id) != account_id:
-                continue
-            share_arns = [
-                a['resourceShareArn'] for a in self.get_share_associations(
-                    client, 'RESOURCE', resourceArn=r['Arn'])
-            ]
-            if not share_arns:
-                continue
-            violations = {
-                a['associatedEntity'] for a in self.get_share_associations(
-                    client, 'PRINCIPAL', resourceShareArns=share_arns)
-            }.difference(accounts)
-            if violations:
-                r[self.annotation_key] = sorted(violations)
-                results.append(r)
-        return results
 
 
 @ServiceDiscoveryNamespace.filter_registry.register('vpc')
