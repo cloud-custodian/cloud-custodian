@@ -173,8 +173,6 @@ class ServiceNamespaceInstance(BaseTest):
 class TestServiceDiscoveryService(BaseTest):
 
     def test_servicediscovery_service(self):
-        # Recording state: an HTTP namespace containing one service named
-        # c7n-test-service tagged ASV=c7n-test.
         # session_factory = self.record_flight_data('test_servicediscovery_service')
         session_factory = self.replay_flight_data('test_servicediscovery_service')
         p = self.load_policy(
