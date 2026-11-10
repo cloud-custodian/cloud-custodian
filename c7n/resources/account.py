@@ -173,18 +173,44 @@ class MacieEnabled(ValueFilter):
 
     Gets the macie session info for the account, and
     the macie adminstrator account for the current account if
-    configured.
+    configured. With ``automated-discovery: true`` the automated
+    sensitive data discovery configuration is also fetched into
+    ``automatedDiscovery`` (empty when macie is not enabled).
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: macie-automated-discovery-disabled
+                resource: aws.account
+                filters:
+                  - type: check-macie
+                    automated-discovery: true
+                    key: automatedDiscovery.status
+                    value: ENABLED
+                    op: ne
     """
 
-    schema = type_schema('check-macie', rinherit=ValueFilter.schema)
+    schema = type_schema(
+        'check-macie', rinherit=ValueFilter.schema,
+        **{'automated-discovery': {'type': 'boolean'}})
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
     permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
 
+    def get_permissions(self):
+        perms = list(self.permissions)
+        if self.data.get('automated-discovery'):
+            perms.append('macie2:GetAutomatedDiscoveryConfiguration')
+        return perms
+
     def process(self, resources, event=None):
 
-        if self.annotation_key not in resources[0]:
+        info = resources[0].get(self.annotation_key)
+        if info is None or (
+                self.data.get('automated-discovery') and 'automatedDiscovery' not in info):
             self.get_macie_info(resources[0])
 
         if super().process([resources[0][self.annotation_key]]):
@@ -210,6 +236,12 @@ class MacieEnabled(ValueFilter):
         else:
             info['master'] = minfo
         info['administrator'] = info['master']
+
+        if self.data.get('automated-discovery'):
+            info['automatedDiscovery'] = {}
+            if info.get('status') in ('ENABLED', 'PAUSED'):
+                info['automatedDiscovery'] = client.get_automated_discovery_configuration()
+                info['automatedDiscovery'].pop('ResponseMetadata')
         account[self.annotation_key] = info
 
 
