@@ -2842,6 +2842,46 @@ class BedrockDataRetention(ValueFilter):
         return super().__call__(r[self.annotation_key])
 
 
+@filters.register('appstream-usage-reports')
+class AppStreamUsageReports(ValueFilter):
+    """Filter on the AppStream usage report subscription in the current region.
+
+    An account without a subscription is annotated with an empty object.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: appstream-usage-reports-disabled
+                resource: account
+                filters:
+                  - type: appstream-usage-reports
+                    key: S3BucketName
+                    value: absent
+    """
+    annotation_key = 'c7n:AppStreamUsageReports'
+    annotate = False
+    schema = type_schema('appstream-usage-reports', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('appstream:DescribeUsageReportSubscriptions',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('appstream')
+        for r in resources:
+            subscriptions = self.manager.retry(
+                client.describe_usage_report_subscriptions).get(
+                    'UsageReportSubscriptions', [])
+            r[self.annotation_key] = subscriptions[0] if subscriptions else {}
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
 @filters.register('sms-voice-account-attributes')
 class SmsVoiceAccountAttributes(ValueFilter):
     """Filter on End User Messaging SMS account attributes for the region,
