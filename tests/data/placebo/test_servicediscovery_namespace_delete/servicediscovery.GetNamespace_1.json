@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "Namespace": {
+            "Id": "ns-lsn3jvtnb4utkemk",
+            "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:namespace/ns-lsn3jvtnb4utkemk",
+            "ResourceOwner": "644160558196",
+            "Name": "c7n-delete-test",
+            "Type": "HTTP",
+            "Properties": {
+                "DnsProperties": {
+                    "SOA": {}
+                },
+                "HttpProperties": {
+                    "HttpName": "c7n-delete-test"
+                }
+            },
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 10,
+                "hour": 13,
+                "minute": 38,
+                "second": 33,
+                "microsecond": 285000
+            },
+            "CreatorRequestId": "f94e3429-2312-4732-9751-85c0c0d095cb"
+        },
+        "ResponseMetadata": {}
+    }
+}

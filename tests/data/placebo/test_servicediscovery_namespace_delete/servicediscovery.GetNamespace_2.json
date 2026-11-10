@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "Namespace": {
+            "Id": "ns-oojghklepwvn7r5y",
+            "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:namespace/ns-oojghklepwvn7r5y",
+            "ResourceOwner": "644160558196",
+            "Name": "c7n-test",
+            "Type": "HTTP",
+            "Properties": {
+                "DnsProperties": {
+                    "SOA": {}
+                },
+                "HttpProperties": {
+                    "HttpName": "c7n-test"
+                }
+            },
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 10,
+                "hour": 13,
+                "minute": 39,
+                "second": 14,
+                "microsecond": 957000
+            },
+            "CreatorRequestId": "8af2d220-3b62-4232-b519-738edd805f9f"
+        },
+        "ResponseMetadata": {}
+    }
+}

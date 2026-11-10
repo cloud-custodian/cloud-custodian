@@ -1,7 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import time
-
 from c7n.reports.csvout import Formatter
 from .apicallcaptor import ApiCallCaptor
 from c7n.resources.servicediscovery import ServiceDiscoveryNamespace
@@ -189,11 +187,15 @@ class ServiceDiscoveryNamespaceActions(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        if self.recording:
-            time.sleep(30)
+        # namespace deletion is asynchronous, so check the submitted operation
         client = session_factory().client('servicediscovery')
-        names = [n['Name'] for n in client.list_namespaces()['Namespaces']]
-        self.assertNotIn('c7n-delete-test', names)
+        operations = client.list_operations(Filters=[
+            {'Name': 'NAMESPACE_ID', 'Values': [resources[0]['Id']]},
+        ])['Operations']
+        types = [
+            client.get_operation(OperationId=o['Id'])['Operation']['Type'] for o in operations
+        ]
+        self.assertIn('DELETE_NAMESPACE', types)
 
 
 class TestServiceDiscoveryService(BaseTest):
