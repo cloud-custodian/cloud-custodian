@@ -1,5 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from unittest import mock
+
+import pytest
 from msrestazure.tools import parse_resource_id
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
@@ -170,7 +173,8 @@ class VnetSetFlowLogActionTest(BaseTest):
     def test_set_flow_log_requires_existing_flow_log(self):
         # No live calls needed: a vnet with no existing flow log fails before
         # the action ever touches the network client. This action only
-        # updates an existing flow log; it does not create one.
+        # updates an existing flow log; it does not create one. Every failing
+        # vnet must be reported, not just the first, and not swallowed.
         with self.sign_out_patch():
             p = self.load_policy({
                 'name': 'test-azure-vnet',
@@ -178,18 +182,26 @@ class VnetSetFlowLogActionTest(BaseTest):
                 'actions': [{'type': 'set-flow-log', 'retention': 90}]
             }, validate=True)
             action = p.resource_manager.actions[0]
-            resource = {
-                'id': (
-                    '/subscriptions/%s/resourceGroups/test_vnet'
-                    '/providers/Microsoft.Network/virtualNetworks/c7n-vnet'
-                    % DEFAULT_SUBSCRIPTION_ID
-                ),
-                'name': 'c7n-vnet',
-                'location': 'southcentralus',
-                'properties': {}
-            }
-            with self.assertRaises(PolicyExecutionError):
-                action._process_resource(resource)
+            resources = [
+                {
+                    'id': (
+                        f'/subscriptions/{DEFAULT_SUBSCRIPTION_ID}/resourceGroups/test_vnet'
+                        f'/providers/Microsoft.Network/virtualNetworks/{name}'
+                    ),
+                    'name': name,
+                    'location': 'southcentralus',
+                    'properties': {}
+                }
+                for name in ('c7n-vnet-a', 'c7n-vnet-b')
+            ]
+            with mock.patch.object(action, '_prepare_processing'), \
+                    pytest.raises(PolicyExecutionError) as excinfo:
+                action._process_resources(resources, None)
+
+            message = str(excinfo.value)
+            assert '2 resource(s)' in message
+            assert "'c7n-vnet-a'" in message
+            assert "'c7n-vnet-b'" in message
 
     @arm_template('vnet.json')
     def test_set_flow_log_updates_retention(self):

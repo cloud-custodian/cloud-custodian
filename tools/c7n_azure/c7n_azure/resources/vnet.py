@@ -130,6 +130,30 @@ class SetFlowLog(AzureBaseAction):
     def _prepare_processing(self):
         self.client = self.manager.get_client()
 
+    def _process_resources(self, resources, event):
+        # AzureBaseAction logs and swallows per-resource errors outside pytest, so
+        # the policy would report success with vnets left unchanged. Keep going
+        # through the rest of the chunk, then raise one error listing every failure.
+        self._prepare_processing()
+        failures = []
+        for r in resources:
+            try:
+                result = self._process_resource(r)
+                self._log_modified_resource(r, result)
+            except Exception as e:
+                self.log.exception(f"{self.type} failed for '{r['name']}'.",
+                                   extra=self._get_action_log_metadata(r))
+                failures.append(f"'{r['name']}': {e}")
+        if failures:
+            raise PolicyExecutionError(
+                f"{self.type} failed for {len(failures)} resource(s): {'; '.join(failures)}")
+
+    def handle_exceptions(self, exceptions):
+        # Each parallel chunk raises its own aggregated error; report all of them.
+        if len(exceptions) == 1:
+            raise exceptions[0]
+        raise PolicyExecutionError('; '.join(str(e) for e in exceptions))
+
     def _process_resource(self, resource):
         existing_logs = resource['properties'].get('flowLogs', [])
         if not existing_logs:
