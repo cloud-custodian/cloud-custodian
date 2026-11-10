@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserPools": [
+            {
+                "Id": "us-east-1_6DcUjs62w",
+                "Name": "c7n-app-client-compliant",
+                "LambdaConfig": {},
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 4,
+                    "hour": 15,
+                    "minute": 59,
+                    "second": 50,
+                    "microsecond": 563000
+                },
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 4,
+                    "hour": 15,
+                    "minute": 59,
+                    "second": 50,
+                    "microsecond": 563000
+                },
+                "ReplicaRegions": [
+                    "us-east-1"
+                ]
+            },
+            {
+                "Id": "us-east-1_zysSpToLN",
+                "Name": "c7n-app-client-noncompliant",
+                "LambdaConfig": {},
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 4,
+                    "hour": 15,
+                    "minute": 59,
+                    "second": 48,
+                    "microsecond": 929000
+                },
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 4,
+                    "hour": 15,
+                    "minute": 59,
+                    "second": 48,
+                    "microsecond": 929000
+                },
+                "ReplicaRegions": [
+                    "us-east-1"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

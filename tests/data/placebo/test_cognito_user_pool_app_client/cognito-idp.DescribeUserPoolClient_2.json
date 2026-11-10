@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserPoolClient": {
+            "UserPoolId": "us-east-1_zysSpToLN",
+            "ClientName": "c7n-implicit-password-client",
+            "ClientId": "7dsvbn6inn2c5b0p2elggdr4ks",
+            "LastModifiedDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 4,
+                "hour": 15,
+                "minute": 59,
+                "second": 49,
+                "microsecond": 584000
+            },
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 4,
+                "hour": 15,
+                "minute": 59,
+                "second": 49,
+                "microsecond": 584000
+            },
+            "RefreshTokenValidity": 30,
+            "TokenValidityUnits": {},
+            "ExplicitAuthFlows": [
+                "ALLOW_REFRESH_TOKEN_AUTH",
+                "ALLOW_USER_PASSWORD_AUTH"
+            ],
+            "SupportedIdentityProviders": [
+                "COGNITO"
+            ],
+            "CallbackURLs": [
+                "https://example.com/callback"
+            ],
+            "AllowedOAuthFlows": [
+                "implicit"
+            ],
+            "AllowedOAuthScopes": [
+                "openid"
+            ],
+            "AllowedOAuthFlowsUserPoolClient": true,
+            "EnableTokenRevocation": true,
+            "EnablePropagateAdditionalUserContextData": false,
+            "AuthSessionValidity": 3
+        },
+        "ResponseMetadata": {}
+    }
+}
