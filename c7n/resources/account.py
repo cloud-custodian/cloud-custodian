@@ -2893,6 +2893,92 @@ class BedrockDataRetention(ValueFilter):
         return super().__call__(r[self.annotation_key])
 
 
+@filters.register('sms-voice-account-attributes')
+class SmsVoiceAccountAttributes(ValueFilter):
+    """Filter on End User Messaging SMS account attributes for the region,
+    as a mapping of attribute name to value (``ACCOUNT_TIER``,
+    ``DEFAULT_PROTECT_CONFIGURATION_ID``).
+
+    :example:
+
+    Find accounts without a default protect configuration
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sms-voice-no-default-protect-configuration
+                resource: account
+                filters:
+                  - type: sms-voice-account-attributes
+                    key: DEFAULT_PROTECT_CONFIGURATION_ID
+                    value: empty
+    """
+
+    annotation_key = 'c7n:SmsVoiceAccountAttributes'
+    annotate = False
+    schema = type_schema('sms-voice-account-attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('sms-voice:DescribeAccountAttributes',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
+        for r in resources:
+            if self.annotation_key not in r:
+                attrs = self.manager.retry(
+                    client.describe_account_attributes).get('AccountAttributes', [])
+                r[self.annotation_key] = {a['Name']: a['Value'] for a in attrs}
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
+@filters.register('sms-voice-spend-limits')
+class SmsVoiceSpendLimits(ValueFilter):
+    """Filter on End User Messaging monthly spend limits for the region, keyed
+    by limit name (eg. ``TEXT_MESSAGE_MONTHLY_SPEND_LIMIT``), each with
+    ``EnforcedLimit``, ``MaxLimit`` and ``Overridden``.
+
+    :example:
+
+    Find accounts that haven't overridden the SMS, MMS and voice spend limits
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sms-voice-spend-limits-not-overridden
+                resource: account
+                filters:
+                  - or:
+                    - type: sms-voice-spend-limits
+                      key: TEXT_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+                    - type: sms-voice-spend-limits
+                      key: MEDIA_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+                    - type: sms-voice-spend-limits
+                      key: VOICE_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+    """
+
+    annotation_key = 'c7n:SmsVoiceSpendLimits'
+    annotate = False
+    schema = type_schema('sms-voice-spend-limits', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('sms-voice:DescribeSpendLimits',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
+        for r in resources:
+            if self.annotation_key not in r:
+                limits = self.manager.retry(client.describe_spend_limits).get('SpendLimits', [])
+                r[self.annotation_key] = {lim['Name']: lim for lim in limits}
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
 @filters.register('ec2-metadata-defaults')
 class EC2MetadataDefaults(ValueFilter):
     """Filter on the default instance metadata service (IMDS) settings for the specified account and

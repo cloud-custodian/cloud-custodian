@@ -1,0 +1,92 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserPools": [
+            {
+                "Id": "us-east-1_2axHYrTnt",
+                "Name": "c7n-log-delivery-compliant",
+                "LambdaConfig": {},
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 11,
+                    "minute": 42,
+                    "second": 13,
+                    "microsecond": 652000
+                },
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 11,
+                    "minute": 42,
+                    "second": 13,
+                    "microsecond": 652000
+                },
+                "ReplicaRegions": [
+                    "us-east-1"
+                ]
+            },
+            {
+                "Id": "us-east-1_SR5xpAuEa",
+                "Name": "c7n-log-delivery-noncompliant",
+                "LambdaConfig": {},
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 11,
+                    "minute": 42,
+                    "second": 15,
+                    "microsecond": 209000
+                },
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 11,
+                    "minute": 42,
+                    "second": 15,
+                    "microsecond": 209000
+                },
+                "ReplicaRegions": [
+                    "us-east-1"
+                ]
+            },
+            {
+                "Id": "us-east-1_o6VrhBMwX",
+                "Name": "c7n-log-delivery-noncompliant-other-sources",
+                "LambdaConfig": {},
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 11,
+                    "minute": 42,
+                    "second": 16,
+                    "microsecond": 989000
+                },
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 11,
+                    "minute": 42,
+                    "second": 16,
+                    "microsecond": 989000
+                },
+                "ReplicaRegions": [
+                    "us-east-1"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
