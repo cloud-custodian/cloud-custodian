@@ -173,14 +173,38 @@ class MacieEnabled(ValueFilter):
 
     Gets the macie session info for the account, and
     the macie adminstrator account for the current account if
-    configured.
+    configured. With ``automated-discovery: true`` the automated
+    sensitive data discovery configuration is also fetched into
+    ``automatedDiscovery`` (empty when macie is not enabled).
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: macie-automated-discovery-disabled
+                resource: aws.account
+                filters:
+                  - type: check-macie
+                    automated-discovery: true
+                    key: automatedDiscovery.status
+                    value: ENABLED
+                    op: ne
     """
 
-    schema = type_schema('check-macie', rinherit=ValueFilter.schema)
+    schema = type_schema(
+        'check-macie', rinherit=ValueFilter.schema,
+        **{'automated-discovery': {'type': 'boolean'}})
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
     permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
+
+    def get_permissions(self):
+        perms = list(self.permissions)
+        if self.data.get('automated-discovery'):
+            perms.append('macie2:GetAutomatedDiscoveryConfiguration')
+        return perms
 
     def process(self, resources, event=None):
 
@@ -199,68 +223,25 @@ class MacieEnabled(ValueFilter):
         try:
             info = client.get_macie_session()
             info.pop('ResponseMetadata')
-        except client.exceptions.AccessDeniedException:
+        except client.exceptions.AccessDeniedException as e:
+            self.log.info('macie filter error accessing macie session %s', e)
             info = {}
 
         try:
             minfo = client.get_administrator_account().get('administrator')
         except (client.exceptions.AccessDeniedException,
-                client.exceptions.ResourceNotFoundException):
+                client.exceptions.ResourceNotFoundException) as e:
+            self.log.info('macie filter error accessing administrator account %s', e)
             info['master'] = {}
         else:
             info['master'] = minfo
         info['administrator'] = info['master']
-        account[self.annotation_key] = info
 
-
-@filters.register('check-macie-automated-discovery')
-class MacieAutomatedDiscovery(ValueFilter):
-    """Check status of macie v2 automated sensitive data discovery in the account.
-
-    Annotates the account with the automated discovery configuration
-    (``status``, ``autoEnableOrganizationMembers``, ``classificationScopeId``,
-    ``sensitivityInspectionTemplateId``, ``firstEnabledAt``, ``lastUpdatedAt``,
-    ``disabledAt``), or an empty dict when macie is not enabled.
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: macie-automated-discovery-disabled
-                resource: aws.account
-                filters:
-                  - type: check-macie-automated-discovery
-                    key: status
-                    value: ENABLED
-                    op: ne
-    """
-
-    schema = type_schema('check-macie-automated-discovery', rinherit=ValueFilter.schema)
-    schema_alias = False
-    annotation_key = 'c7n:macie-automated-discovery'
-    annotate = False
-    permissions = ('macie2:GetAutomatedDiscoveryConfiguration',)
-
-    def process(self, resources, event=None):
-        if self.annotation_key not in resources[0]:
-            self.get_discovery_info(resources[0])
-
-        if super().process([resources[0][self.annotation_key]]):
-            return resources
-
-        return []
-
-    def get_discovery_info(self, account):
-        client = local_session(
-            self.manager.session_factory).client('macie2')
-
-        try:
-            info = client.get_automated_discovery_configuration()
-            info.pop('ResponseMetadata')
-        except client.exceptions.AccessDeniedException as e:
-            self.log.info('macie automated discovery configuration unavailable %s', e)
-            info = {}
+        if self.data.get('automated-discovery'):
+            info['automatedDiscovery'] = {}
+            if info.get('status') == 'ENABLED':
+                info['automatedDiscovery'] = client.get_automated_discovery_configuration()
+                info['automatedDiscovery'].pop('ResponseMetadata')
         account[self.annotation_key] = info
 
 

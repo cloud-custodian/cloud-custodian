@@ -39,6 +39,8 @@ class AccountTests(BaseTest):
                      'key': 'status',
                      'value': 'ENABLED'}]}]
         }, session_factory=factory)
+        self.assertNotIn(
+            'macie2:GetAutomatedDiscoveryConfiguration', p.get_permissions())
         resources = p.run()
         self.assertEqual(len(resources), 1)
         assert resources[0]['c7n:macie'] == {
@@ -63,13 +65,16 @@ class AccountTests(BaseTest):
             'name': 'macie-automated-discovery',
             'resource': 'aws.account',
             'filters': [{
-                'type': 'check-macie-automated-discovery',
-                'key': 'status',
+                'type': 'check-macie',
+                'automated-discovery': True,
+                'key': 'automatedDiscovery.status',
                 'value': 'ENABLED'}]
         }, session_factory=factory)
+        self.assertIn(
+            'macie2:GetAutomatedDiscoveryConfiguration', p.get_permissions())
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        assert resources[0]['c7n:macie-automated-discovery'] == {
+        assert resources[0]['c7n:macie']['automatedDiscovery'] == {
             'autoEnableOrganizationMembers': 'ALL',
             'classificationScopeId': 'a4d6b97a599087a3b44165c6af20c41c',
             'firstEnabledAt': datetime.datetime(
@@ -87,40 +92,32 @@ class AccountTests(BaseTest):
             'name': 'macie-automated-discovery-disabled',
             'resource': 'aws.account',
             'filters': [{
-                'type': 'check-macie-automated-discovery',
-                'key': 'status',
+                'type': 'check-macie',
+                'automated-discovery': True,
+                'key': 'automatedDiscovery.status',
                 'value': 'ENABLED',
                 'op': 'ne'}]
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]['c7n:macie-automated-discovery']['status'], 'DISABLED')
+            resources[0]['c7n:macie']['automatedDiscovery']['status'], 'DISABLED')
 
-        p = self.load_policy({
-            'name': 'macie-automated-discovery-enabled',
-            'resource': 'aws.account',
-            'filters': [{
-                'type': 'check-macie-automated-discovery',
-                'key': 'status',
-                'value': 'ENABLED'}]
-        }, session_factory=factory)
-        self.assertEqual(len(p.run()), 0)
-
-    def test_macie_automated_discovery_denied(self):
+    def test_macie_automated_discovery_macie_disabled(self):
         factory = self.replay_flight_data(
-            'test_account_check_macie_automated_discovery_denied')
+            'test_account_check_macie_disabled')
         p = self.load_policy({
-            'name': 'macie-automated-discovery-denied',
+            'name': 'macie-automated-discovery-macie-disabled',
             'resource': 'aws.account',
             'filters': [{
-                'type': 'check-macie-automated-discovery',
-                'key': 'status',
+                'type': 'check-macie',
+                'automated-discovery': True,
+                'key': 'automatedDiscovery.status',
                 'value': 'absent'}]
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['c7n:macie-automated-discovery'], {})
+        self.assertEqual(resources[0]['c7n:macie']['automatedDiscovery'], {})
 
     def test_macie_disabled(self):
         factory = self.replay_flight_data(
