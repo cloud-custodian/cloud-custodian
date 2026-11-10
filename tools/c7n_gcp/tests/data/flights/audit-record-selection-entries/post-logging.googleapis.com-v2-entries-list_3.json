@@ -1,0 +1,68 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sat, 24 Oct 2026 15:58:53 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=239",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1895",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "entries": [
+      {
+        "protoPayload": {
+          "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+          "status": {},
+          "authenticationInfo": {
+            "principalEmail": "user@example.com",
+            "principalSubject": "user:user@example.com",
+            "oauthInfo": {
+              "oauthClientId": "764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com"
+            }
+          },
+          "requestMetadata": {
+            "callerIp": "198.51.100.1",
+            "callerSuppliedUserAgent": "Terraform/1.5.5 (+https://www.terraform.io) Terraform-Plugin-SDK/2.40.1 terraform-provider-google/8.8.1,gzip(gfe)",
+            "requestAttributes": {},
+            "destinationAttributes": {}
+          },
+          "serviceName": "compute.googleapis.com",
+          "methodName": "v1.compute.instances.insert",
+          "resourceName": "projects/cloud-custodian/zones/us-central1-a/instances/c7n-selection-380a8d93",
+          "request": {
+            "@type": "type.googleapis.com/compute.instances.insert"
+          },
+          "apiVersionIdentifier": "v1"
+        },
+        "insertId": "-omsyowd708g",
+        "resource": {
+          "type": "gce_instance",
+          "labels": {
+            "zone": "us-central1-a",
+            "project_id": "cloud-custodian",
+            "instance_id": "5596281590158289779"
+          }
+        },
+        "timestamp": "2026-10-24T15:58:35.367697Z",
+        "severity": "NOTICE",
+        "labels": {
+          "compute.googleapis.com/root_trigger_id": "7ca98a2e-4526-4295-8765-cc27d16f2804"
+        },
+        "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+        "operation": {
+          "id": "operation-1792857500547-65e982a73fafb-03b2f8f3-61aa8b25",
+          "producer": "compute.googleapis.com",
+          "last": true
+        },
+        "receiveTimestamp": "2026-10-24T15:58:35.852816883Z"
+      }
+    ]
+  }
+}
