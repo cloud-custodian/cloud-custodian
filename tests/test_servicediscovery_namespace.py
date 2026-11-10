@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
+
 from c7n.reports.csvout import Formatter
 from .apicallcaptor import ApiCallCaptor
 from c7n.resources.servicediscovery import ServiceDiscoveryNamespace
@@ -168,3 +170,78 @@ class ServiceNamespaceInstance(BaseTest):
         self.assertEqual(resources[0]['Services'][0]["Id"], 'srv-3')
         self.assertEqual(resources[0]['Services'][0]["Instances"][0]["Id"],
                          'instance-id-1')
+
+
+class ServiceDiscoveryNamespaceFilters(BaseTest):
+
+    def test_namespace_cross_account(self):
+        # Recording state: one namespace shared via a RAM resource share with an
+        # account other than 123456789012, and one namespace that is not shared.
+        # session_factory = self.record_flight_data('test_servicediscovery_namespace_cross_account')
+        session_factory = self.replay_flight_data('test_servicediscovery_namespace_cross_account')
+        p = self.load_policy(
+            {
+                "name": "servicediscovery-namespace-cross-account",
+                "resource": "servicediscovery-namespace",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "whitelist": ["123456789012"]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        violations = resources[0]['c7n:CrossAccountViolations']
+        self.assertTrue(violations)
+        self.assertNotIn(self.account_id, violations)
+        self.assertNotIn("123456789012", violations)
+
+    def test_namespace_vpc(self):
+        # Recording state: one DNS_PRIVATE namespace associated with a non-default VPC
+        # and one HTTP namespace.
+        # session_factory = self.record_flight_data('test_servicediscovery_namespace_vpc')
+        session_factory = self.replay_flight_data('test_servicediscovery_namespace_vpc')
+        p = self.load_policy(
+            {
+                "name": "servicediscovery-namespace-vpc",
+                "resource": "servicediscovery-namespace",
+                "filters": [
+                    {
+                        "type": "vpc",
+                        "key": "IsDefault",
+                        "value": False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Type'], 'DNS_PRIVATE')
+        self.assertEqual(len(resources[0]['c7n:HostedZoneVpcs']), 1)
+        self.assertEqual(
+            resources[0]['c7n:matched-vpcs'], resources[0]['c7n:HostedZoneVpcs'])
+
+    def test_namespace_delete(self):
+        # Recording state: an empty HTTP namespace named c7n-delete-test.
+        # session_factory = self.record_flight_data('test_servicediscovery_namespace_delete')
+        session_factory = self.replay_flight_data('test_servicediscovery_namespace_delete')
+        p = self.load_policy(
+            {
+                "name": "servicediscovery-namespace-delete",
+                "resource": "servicediscovery-namespace",
+                "filters": [{"Name": "c7n-delete-test"}],
+                "actions": ["delete"]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(30)
+        client = session_factory().client('servicediscovery')
+        names = [n['Name'] for n in client.list_namespaces()['Namespaces']]
+        self.assertNotIn('c7n-delete-test', names)

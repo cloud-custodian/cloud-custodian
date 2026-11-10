@@ -1,15 +1,20 @@
 """
 Service Discovery Communications
 """
+from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import (
     QueryResourceManager,
     TypeInfo,
     DescribeSource,
+    DescribeWithResourceTags,
     ConfigSource,
 )
+from c7n.resolver import ValuesFrom
 from c7n.tags import universal_augment
 from c7n.filters import ListItemFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.filters.vpc import VpcFilter
 
 from c7n.utils import (
     local_session, type_schema
@@ -113,3 +118,235 @@ class SdNamespaceInstance(ListItemFilter):
                 service["Instances"] = response.get("Instances", [])
 
         return super().process(resources, event)
+
+
+@ServiceDiscoveryNamespace.filter_registry.register('cross-account')
+class NamespaceCrossAccountFilter(CrossAccountAccessFilter):
+    """Find namespaces shared via AWS RAM with principals that are not allowed.
+
+    Principals may be account ids, organization arns, or organizational unit arns.
+    Namespaces shared into the account by another owner are skipped.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: servicediscovery-namespace-cross-account
+            resource: aws.servicediscovery-namespace
+            filters:
+              - type: cross-account
+                whitelist:
+                  - "123456789012"
+                  - arn:aws:organizations::111111111111:organization/o-abcd1234
+    """
+
+    schema = type_schema(
+        'cross-account',
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('ram:GetResourceShareAssociations',)
+    annotation_key = 'c7n:CrossAccountViolations'
+
+    def get_share_associations(self, client, association_type, **params):
+        return [
+            a for a in client.get_paginator('get_resource_share_associations').paginate(
+                associationType=association_type, **params
+            ).build_full_result().get('resourceShareAssociations', [])
+            if a['status'] == 'ASSOCIATED'
+        ]
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ram')
+        account_id = self.manager.config.account_id
+        accounts = self.get_accounts()
+        results = []
+        for r in resources:
+            if r.get('ResourceOwner', account_id) != account_id:
+                continue
+            share_arns = [
+                a['resourceShareArn'] for a in self.get_share_associations(
+                    client, 'RESOURCE', resourceArn=r['Arn'])
+            ]
+            if not share_arns:
+                continue
+            violations = {
+                a['associatedEntity'] for a in self.get_share_associations(
+                    client, 'PRINCIPAL', resourceShareArns=share_arns)
+            }.difference(accounts)
+            if violations:
+                r[self.annotation_key] = sorted(violations)
+                results.append(r)
+        return results
+
+
+@ServiceDiscoveryNamespace.filter_registry.register('vpc')
+class NamespaceVpcFilter(VpcFilter):
+    """Filter private DNS namespaces by the VPCs associated with their hosted zone.
+
+    Only ``DNS_PRIVATE`` namespaces are evaluated.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: servicediscovery-namespace-unapproved-vpc
+            resource: aws.servicediscovery-namespace
+            filters:
+              - type: vpc
+                key: VpcId
+                op: not-in
+                value: [vpc-0123456789abcdef0]
+    """
+
+    RelatedIdsExpression = '"c7n:HostedZoneVpcs"[]'
+    vpc_annotation_key = 'c7n:HostedZoneVpcs'
+
+    def get_permissions(self):
+        return super().get_permissions() + ['route53:GetHostedZone']
+
+    def process(self, resources, event=None):
+        resources = [r for r in resources if r.get('Type') == 'DNS_PRIVATE']
+        client = local_session(self.manager.session_factory).client('route53')
+        for r in resources:
+            if self.vpc_annotation_key in r:
+                continue
+            zone = self.manager.retry(
+                client.get_hosted_zone, Id=r['Properties']['DnsProperties']['HostedZoneId'])
+            r[self.vpc_annotation_key] = [v['VPCId'] for v in zone.get('VPCs', [])]
+        return super().process(resources, event)
+
+
+@ServiceDiscoveryNamespace.action_registry.register('delete')
+class DeleteNamespace(Action):
+    """Delete a namespace.
+
+    AWS rejects the request while the namespace still contains services.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: servicediscovery-delete-public-namespace
+            resource: aws.servicediscovery-namespace
+            filters:
+              - Type: DNS_PUBLIC
+            actions:
+              - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('servicediscovery:DeleteNamespace',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('servicediscovery')
+        for r in resources:
+            self.manager.retry(
+                client.delete_namespace, Id=r['Id'], ignore_err_codes=('NamespaceNotFound',))
+
+
+@resources.register('servicediscovery-service')
+class ServiceDiscoveryService(QueryResourceManager):
+    """AWS Cloud Map service.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: servicediscovery-service-http-health-check
+            resource: aws.servicediscovery-service
+            filters:
+              - HealthCheckConfig.Type: HTTP
+    """
+
+    source_mapping = {'describe': DescribeWithResourceTags}
+
+    class resource_type(TypeInfo):
+        service = 'servicediscovery'
+        enum_spec = ('list_services', 'Services', None)
+        detail_spec = ('get_service', 'Id', 'Id', 'Service')
+        id = 'Id'
+        name = 'Name'
+        arn = 'Arn'
+        date = 'CreateDate'
+        cfn_type = 'AWS::ServiceDiscovery::Service'
+        universal_taggable = object()
+
+
+@ServiceDiscoveryService.filter_registry.register('instance')
+class ServiceInstanceFilter(ListItemFilter):
+    """Filter services on the instances registered to them.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: servicediscovery-service-public-instance-ip
+            resource: aws.servicediscovery-service
+            filters:
+              - type: instance
+                attrs:
+                  - type: value
+                    key: Attributes.AWS_INSTANCE_IPV4
+                    op: not-in
+                    value_type: cidr
+                    value: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+    """
+
+    schema = type_schema(
+        'instance',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'})
+
+    annotation_key = 'c7n:Instances'
+    permissions = ('servicediscovery:ListInstances',)
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        data['key'] = f'"{self.annotation_key}"'
+
+    def get_item_values(self, service):
+        if self.annotation_key in service:
+            return service[self.annotation_key]
+        client = local_session(self.manager.session_factory).client('servicediscovery')
+        instances = self.manager.retry(
+            client.get_paginator('list_instances').paginate,
+            ServiceId=service['Id']
+        ).build_full_result().get('Instances', [])
+        service[self.annotation_key] = instances
+        return instances
+
+
+@ServiceDiscoveryService.action_registry.register('delete')
+class DeleteService(Action):
+    """Delete a service.
+
+    AWS rejects the request while the service still has registered instances.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: servicediscovery-delete-empty-service
+            resource: aws.servicediscovery-service
+            filters:
+              - InstanceCount: 0
+            actions:
+              - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('servicediscovery:DeleteService',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('servicediscovery')
+        for r in resources:
+            self.manager.retry(
+                client.delete_service, Id=r['Id'], ignore_err_codes=('ServiceNotFound',))
