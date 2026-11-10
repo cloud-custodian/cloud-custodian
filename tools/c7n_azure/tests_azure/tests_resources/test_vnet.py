@@ -191,12 +191,15 @@ class VnetSetFlowLogActionTest(BaseTest):
 
     @arm_template('vnet.json')
     def test_set_flow_log_updates_retention(self):
-        flow_log_name = 'c7n-vnet-flowlog'
+        # This test mutates its flow log, so it uses a dedicated vnet. The
+        # c7n-vnet flow log must stay below 90 days for the retention filter test.
+        vnet_name = 'c7n-vnet-set-flowlog'
+        flow_log_name = 'c7n-vnet-set-flowlog-fl'
 
         session = Session()
         client = session.client('azure.mgmt.network.NetworkManagementClient')
 
-        vnet = next(v for v in client.virtual_networks.list_all() if v.name == 'c7n-vnet')
+        vnet = next(v for v in client.virtual_networks.list_all() if v.name == vnet_name)
         watcher = next(
             w for w in client.network_watchers.list_all()
             if w.location.lower() == vnet.location.lower()
@@ -228,7 +231,7 @@ class VnetSetFlowLogActionTest(BaseTest):
             'name': 'test-azure-vnet',
             'resource': 'azure.vnet',
             'filters': [
-                {'type': 'value', 'key': 'name', 'value': 'c7n-vnet'}
+                {'type': 'value', 'key': 'name', 'value': vnet_name}
             ],
             'actions': [
                 {

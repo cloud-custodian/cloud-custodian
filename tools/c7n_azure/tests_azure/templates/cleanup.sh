@@ -62,6 +62,7 @@ delete_resource() {
         watcher_rg=$(az network watcher list --query "[?location=='southcentralus'].resourceGroup" --output tsv)
         if [[ -n "${watcher_rg}" ]]; then
             az network watcher flow-log delete --location southcentralus --name c7n-vnet-flowlog --output None
+            az network watcher flow-log delete --location southcentralus --name c7n-vnet-set-flowlog-fl --output None
         fi
     fi
 
