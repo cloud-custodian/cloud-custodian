@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "SpendLimits": [
+            {
+                "Name": "TEXT_MESSAGE_MONTHLY_SPEND_LIMIT",
+                "EnforcedLimit": 1,
+                "MaxLimit": 1,
+                "Overridden": true
+            },
+            {
+                "Name": "VOICE_MESSAGE_MONTHLY_SPEND_LIMIT",
+                "EnforcedLimit": 1,
+                "MaxLimit": 1,
+                "Overridden": false
+            },
+            {
+                "Name": "MEDIA_MESSAGE_MONTHLY_SPEND_LIMIT",
+                "EnforcedLimit": 1,
+                "MaxLimit": 1,
+                "Overridden": false
+            },
+            {
+                "Name": "NOTIFY_MESSAGE_MONTHLY_SPEND_LIMIT",
+                "EnforcedLimit": 1,
+                "MaxLimit": 1,
+                "Overridden": false
+            },
+            {
+                "Name": "RCS_MESSAGE_MONTHLY_SPEND_LIMIT",
+                "EnforcedLimit": 1,
+                "MaxLimit": 1,
+                "Overridden": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

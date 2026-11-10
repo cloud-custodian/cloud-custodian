@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "c7n-log-class-deleted",
+                "creationTime": 1793652431900,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-deleted:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-deleted",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "c7n-log-class-standard",
+                "creationTime": 1793652431900,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-standard:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-standard",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

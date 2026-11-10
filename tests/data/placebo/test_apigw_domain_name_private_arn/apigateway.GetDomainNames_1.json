@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "domainName": "public.example.com",
+                "regionalDomainName": "d-o34butr3q7.execute-api.us-east-1.amazonaws.com",
+                "regionalHostedZoneId": "Z1UJRXOUMOOFQ8",
+                "endpointConfiguration": {
+                    "types": [
+                        "REGIONAL"
+                    ]
+                },
+                "domainNameStatus": "AVAILABLE",
+                "securityPolicy": "TLS_1_2"
+            },
+            {
+                "domainName": "private.example.com",
+                "domainNameId": "abcd1234",
+                "domainNameArn": "arn:aws:apigateway:us-east-1:644160558196:/domainnames/private.example.com+abcd1234",
+                "certificateArn": "arn:aws:acm:us-east-1:644160558196:certificate/9d7fca5a-5c58-4d43-b1df-7c7e31c2d47f",
+                "endpointConfiguration": {
+                    "types": [
+                        "PRIVATE"
+                    ]
+                },
+                "domainNameStatus": "AVAILABLE",
+                "securityPolicy": "TLS_1_2"
+            }
+        ]
+    }
+}

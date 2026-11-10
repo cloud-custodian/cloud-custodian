@@ -1,0 +1,210 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_caller_identity": {
+            "current": {
+                "account_id": "644160558196",
+                "arn": "arn:aws:sts::644160558196:assumed-role/c7n-test-role/c7n-test-user",
+                "id": "644160558196",
+                "user_id": "AROAEXAMPLEROLEID0000:c7n-test-user"
+            }
+        },
+        "aws_region": {
+            "current": {
+                "description": "US East (N. Virginia)",
+                "endpoint": "ec2.us-east-1.amazonaws.com",
+                "id": "us-east-1",
+                "name": "us-east-1",
+                "region": "us-east-1"
+            }
+        },
+        "aws_cloudtrail": {
+            "advanced": {
+                "advanced_event_selector": [],
+                "arn": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-advanced",
+                "cloud_watch_logs_group_arn": "",
+                "cloud_watch_logs_role_arn": "",
+                "enable_log_file_validation": false,
+                "enable_logging": false,
+                "event_selector": [
+                    {
+                        "data_resource": [],
+                        "exclude_management_event_sources": null,
+                        "include_management_events": true,
+                        "read_write_type": "All"
+                    }
+                ],
+                "home_region": "us-east-1",
+                "id": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-advanced",
+                "include_global_service_events": false,
+                "insight_selector": [],
+                "is_multi_region_trail": false,
+                "is_organization_trail": false,
+                "kms_key_id": "",
+                "name": "c7n-selectors-42695-advanced",
+                "region": "us-east-1",
+                "s3_bucket_name": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "s3_key_prefix": "",
+                "sns_topic_arn": "",
+                "sns_topic_name": "",
+                "tags": null,
+                "tags_all": {}
+            },
+            "basic": {
+                "advanced_event_selector": [],
+                "arn": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-basic",
+                "cloud_watch_logs_group_arn": "",
+                "cloud_watch_logs_role_arn": "",
+                "enable_log_file_validation": false,
+                "enable_logging": false,
+                "event_selector": [
+                    {
+                        "data_resource": [],
+                        "exclude_management_event_sources": null,
+                        "include_management_events": true,
+                        "read_write_type": "All"
+                    }
+                ],
+                "home_region": "us-east-1",
+                "id": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-basic",
+                "include_global_service_events": false,
+                "insight_selector": [],
+                "is_multi_region_trail": false,
+                "is_organization_trail": false,
+                "kms_key_id": "",
+                "name": "c7n-selectors-42695-basic",
+                "region": "us-east-1",
+                "s3_bucket_name": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "s3_key_prefix": "",
+                "sns_topic_arn": "",
+                "sns_topic_name": "",
+                "tags": null,
+                "tags_all": {}
+            },
+            "mismatch": {
+                "advanced_event_selector": [],
+                "arn": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-mismatch",
+                "cloud_watch_logs_group_arn": "",
+                "cloud_watch_logs_role_arn": "",
+                "enable_log_file_validation": false,
+                "enable_logging": false,
+                "event_selector": [
+                    {
+                        "data_resource": [],
+                        "exclude_management_event_sources": null,
+                        "include_management_events": true,
+                        "read_write_type": "All"
+                    }
+                ],
+                "home_region": "us-east-1",
+                "id": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-mismatch",
+                "include_global_service_events": false,
+                "insight_selector": [],
+                "is_multi_region_trail": false,
+                "is_organization_trail": false,
+                "kms_key_id": "",
+                "name": "c7n-selectors-42695-mismatch",
+                "region": "us-east-1",
+                "s3_bucket_name": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "s3_key_prefix": "",
+                "sns_topic_arn": "",
+                "sns_topic_name": "",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_s3_bucket": {
+            "trail": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "bucket": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "bucket_domain_name": "c7n-selectors9e65b1d1317aca1c22ad67cdf3.s3.amazonaws.com",
+                "bucket_namespace": "global",
+                "bucket_prefix": "c7n-selectors",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-selectors9e65b1d1317aca1c22ad67cdf3.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "aws_s3_bucket_policy": {
+            "trail": {
+                "bucket": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "id": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "policy": "{\"Statement\":[{\"Action\":\"s3:GetBucketAcl\",\"Condition\":{\"StringEquals\":{\"AWS:SourceArn\":[\"arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-advanced\",\"arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-basic\",\"arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-mismatch\"]}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::c7n-selectors9e65b1d1317aca1c22ad67cdf3\",\"Sid\":\"AWSCloudTrailAclCheck\"},{\"Action\":\"s3:PutObject\",\"Condition\":{\"StringEquals\":{\"AWS:SourceArn\":[\"arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-advanced\",\"arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-basic\",\"arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-mismatch\"],\"s3:x-amz-acl\":\"bucket-owner-full-control\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::c7n-selectors9e65b1d1317aca1c22ad67cdf3/*\",\"Sid\":\"AWSCloudTrailWrite\"}],\"Version\":\"2012-10-17\"}",
+                "region": "us-east-1"
+            }
+        },
+        "aws_s3_bucket_public_access_block": {
+            "trail": {
+                "block_public_acls": true,
+                "block_public_policy": true,
+                "bucket": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "id": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "ignore_public_acls": true,
+                "region": "us-east-1",
+                "restrict_public_buckets": true,
+                "skip_destroy": null
+            }
+        },
+        "random_integer": {
+            "trail": {
+                "id": "42695",
+                "keepers": null,
+                "max": 50000,
+                "min": 1,
+                "result": 42695,
+                "seed": null
+            }
+        }
+    }
+}

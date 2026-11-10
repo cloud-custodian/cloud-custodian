@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-basic",
+        "EventSelectors": [
+            {
+                "ReadWriteType": "WriteOnly",
+                "IncludeManagementEvents": true,
+                "DataResources": [
+                    {
+                        "Type": "AWS::S3::Object",
+                        "Values": [
+                            "arn:aws:s3:::c7n-selectors9e65b1d1317aca1c22ad67cdf3/"
+                        ]
+                    }
+                ],
+                "ExcludeManagementEventSources": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

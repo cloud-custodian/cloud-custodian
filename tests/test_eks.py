@@ -4,7 +4,12 @@ import time
 import pytest
 import os
 import json
+from datetime import datetime
+from unittest.mock import MagicMock
+
 from botocore.exceptions import ClientError
+from dateutil.tz import tzutc
+from freezegun import freeze_time
 from .common import BaseTest
 from c7n.exceptions import PolicyValidationError
 
@@ -552,3 +557,105 @@ class EKS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'serious-bluegrass-ladybug')
+
+    def test_version_support_filter(self):
+        # https://github.com/cloud-custodian/cloud-custodian/issues/10062
+        factory = self.replay_flight_data('test_eks_upgrade_available')
+        p = self.load_policy(
+            {
+                'name': 'test-eks-version-support',
+                'resource': 'aws.eks',
+                'filters': [
+                    {'type': 'version-support',
+                     'key': 'versionStatus',
+                     'value': 'UNSUPPORTED'}
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        support = resources[0]['c7n:VersionSupport']
+        self.assertEqual(support['clusterVersion'], resources[0]['version'])
+        self.assertIn('endOfStandardSupportDate', support)
+        self.assertIn('endOfExtendedSupportDate', support)
+
+        p = self.load_policy(
+            {
+                'name': 'test-eks-version-support-extended',
+                'resource': 'aws.eks',
+                'filters': [
+                    {'type': 'version-support',
+                     'key': 'versionStatus',
+                     'value': 'EXTENDED_SUPPORT'}
+                ]
+            },
+            session_factory=factory
+        )
+        self.assertEqual(len(p.run()), 0)
+
+    def _version_support(self, filter_data, clusters):
+        # local_session caches the first session within a test, so build the
+        # mocked api once and reuse it for every policy the test loads.
+        if not hasattr(self, '_vs_factory'):
+            def info(version, status, standard_end, extended_end):
+                return {
+                    'clusterVersion': version,
+                    'versionStatus': status,
+                    'endOfStandardSupportDate': datetime(*standard_end, tzinfo=tzutc()),
+                    'endOfExtendedSupportDate': datetime(*extended_end, tzinfo=tzutc()),
+                }
+
+            self._vs_factory = MagicMock()
+            self._vs_factory.region = 'us-east-1'
+            self._vs_paginator = self._vs_factory().client('eks').get_paginator.return_value
+            self._vs_paginator.paginate.return_value = [{'clusterVersions': [
+                info('1.34', 'STANDARD_SUPPORT', (2026, 12, 1), (2027, 12, 1)),
+                info('1.33', 'STANDARD_SUPPORT', (2026, 7, 28), (2027, 7, 28)),
+                info('1.32', 'EXTENDED_SUPPORT', (2026, 3, 22), (2027, 3, 22)),
+                info('1.28', 'UNSUPPORTED', (2024, 11, 25), (2025, 11, 25)),
+            ]}]
+        p = self.load_policy(
+            {'name': 'vs', 'resource': 'aws.eks',
+             'filters': [dict(filter_data, type='version-support')]},
+            session_factory=self._vs_factory)
+        resources = [{'name': 'c-' + v, 'version': v} for v in clusters]
+        matched = p.resource_manager.filters[0].process(resources)
+        self._vs_paginator.paginate.assert_called_with(includeAll=True)
+        return sorted(r['version'] for r in matched)
+
+    def test_version_support_status(self):
+        clusters = ['1.34', '1.33', '1.32', '1.28']
+        self.assertEqual(
+            self._version_support(
+                {'key': 'versionStatus', 'value': 'EXTENDED_SUPPORT'}, clusters),
+            ['1.32'])
+        self.assertEqual(
+            self._version_support(
+                {'key': 'versionStatus', 'op': 'in',
+                 'value': ['EXTENDED_SUPPORT', 'UNSUPPORTED']}, clusters),
+            ['1.28', '1.32'])
+
+    @freeze_time('2026-06-01')
+    def test_version_support_standard_support_ending(self):
+        # now + 90 days is 2026-08-30: 1.33 ends inside that window, 1.32's
+        # standard support has already ended, 1.34 ends well after it.
+        self.assertEqual(
+            self._version_support(
+                {'key': 'endOfStandardSupportDate', 'value_type': 'expiration',
+                 'op': 'lt', 'value': 90},
+                ['1.34', '1.33', '1.32']),
+            ['1.32', '1.33'])
+
+    def test_version_support_unknown_version(self):
+        # versions the api doesn't know about are annotated empty, so only
+        # absent / empty checks can match them.
+        clusters = ['1.33', '1.1']
+        self.assertEqual(
+            self._version_support(
+                {'key': 'versionStatus', 'value': 'absent'}, clusters),
+            ['1.1'])
+        self.assertEqual(
+            self._version_support(
+                {'key': 'versionStatus', 'value': 'STANDARD_SUPPORT'}, clusters),
+            ['1.33'])

@@ -36,16 +36,21 @@ class SetFirewallAction(AzureBaseAction):
         pass
 
     def _build_bypass_rules(self, existing_bypass, new_rules):
+        # 'None' is an exclusive value meaning "bypass nothing", not a set member.
+        # Azure returns the string comma-space separated, e.g. "Logging, Metrics".
+        rules = set(new_rules)
         if self.append:
-            without_duplicates = [r for r in existing_bypass if r not in new_rules]
-            new_rules.extend(without_duplicates)
-        return ','.join(new_rules or ['None'])
+            existing = {b.strip() for b in existing_bypass}
+            rules.update(existing - {'', 'None'})
+        return ','.join((sorted(rules) if self.append else new_rules) or ['None'])
 
     def _build_vnet_rules(self, existing_vnet, new_rules):
+        rules = list(new_rules)
         if self.append:
-            without_duplicates = [r for r in existing_vnet if r not in new_rules]
-            new_rules.extend(without_duplicates)
-        return new_rules
+            for rule in existing_vnet:
+                if rule not in rules:
+                    rules.append(rule)
+        return rules
 
     def _build_ip_rules(self, existing_ip, new_rules):
         rules = []

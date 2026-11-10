@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "c7n-selectors-42695-advanced",
+                "S3BucketName": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "IncludeGlobalServiceEvents": false,
+                "IsMultiRegionTrail": false,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-advanced",
+                "LogFileValidationEnabled": false,
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false,
+                "RecursiveLogging": true
+            },
+            {
+                "Name": "c7n-selectors-42695-basic",
+                "S3BucketName": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "IncludeGlobalServiceEvents": false,
+                "IsMultiRegionTrail": false,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-basic",
+                "LogFileValidationEnabled": false,
+                "HasCustomEventSelectors": false,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false,
+                "RecursiveLogging": true
+            },
+            {
+                "Name": "c7n-selectors-42695-mismatch",
+                "S3BucketName": "c7n-selectors9e65b1d1317aca1c22ad67cdf3",
+                "IncludeGlobalServiceEvents": false,
+                "IsMultiRegionTrail": false,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/c7n-selectors-42695-mismatch",
+                "LogFileValidationEnabled": false,
+                "HasCustomEventSelectors": false,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false,
+                "RecursiveLogging": true
+            },
+            {
+                "Name": "management-events",
+                "S3BucketName": "aws-cloudtrail-logs-644160558196-d55943b8",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-2",
+                "TrailARN": "arn:aws:cloudtrail:us-east-2:644160558196:trail/management-events",
+                "LogFileValidationEnabled": false,
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false,
+                "RecursiveLogging": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

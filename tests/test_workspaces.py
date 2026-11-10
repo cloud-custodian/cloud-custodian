@@ -5,13 +5,30 @@ import time
 from dateutil import parser
 from unittest.mock import patch
 
-from .common import BaseTest
+from .common import BaseTest, event_data
 from c7n import filters
 from c7n.executor import MainThreadExecutor
 from c7n.resources.workspaces import Workspace
 from c7n.exceptions import PolicyExecutionError
 from c7n.testing import mock_datetime_now
 from c7n.utils import annotation
+
+
+def test_workspaces_config_source(test):
+    p = test.load_policy({
+        'name': 'workspaces-config',
+        'resource': 'aws.workspaces',
+        'mode': {'type': 'config-rule'},
+        'filters': [{'or': [
+            {'tag:Owner': 'absent'},
+            {'tag:CostCenter': 'absent'}]}]})
+    item = event_data('workspace.json', 'config')
+    source = p.resource_manager.get_source('config')
+    resource = source.load_resource(item)
+    assert resource['WorkspaceId'] == 'ws-6yy6hvh8f'
+    assert 'Id' not in resource
+    resources = p.resource_manager.filter_resources([resource])
+    assert [r['WorkspaceId'] for r in resources] == ['ws-6yy6hvh8f']
 
 
 class WorkspacesTest(BaseTest):

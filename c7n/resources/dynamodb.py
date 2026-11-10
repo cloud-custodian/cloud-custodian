@@ -5,6 +5,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n import query
@@ -327,12 +328,37 @@ class TableContinuousBackupAction(BaseAction):
                 actions:
                   - type: set-continuous-backup
 
+    The point in time recovery period can also be set, in days (1 to 35).
+    When it isn't specified, DynamoDB uses its default of 35 days.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-continuous-backups-14-day-recovery
+                resource: aws.dynamodb-table
+                filters:
+                  - type: continuous-backup
+                    key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
+                    op: eq
+                    value: DISABLED
+                actions:
+                  - type: set-continuous-backup
+                    recovery-period: 14
+
     """
     valid_status = ('ACTIVE',)
     schema = type_schema(
         'set-continuous-backup',
-        state={'type': 'boolean', 'default': True})
+        state={'type': 'boolean', 'default': True},
+        **{'recovery-period': {'type': 'integer', 'minimum': 1, 'maximum': 35}})
     permissions = ('dynamodb:UpdateContinuousBackups',)
+
+    def validate(self):
+        if 'recovery-period' in self.data and not self.data.get('state', True):
+            raise PolicyValidationError(
+                "recovery-period can't be set when disabling continuous backups "
+                "(state: false) in %s" % (self.manager.data,))
+        return self
 
     def process(self, resources):
         resources = self.filter_resources(
@@ -340,13 +366,14 @@ class TableContinuousBackupAction(BaseAction):
         if not len(resources):
             return
         client = local_session(self.manager.session_factory).client('dynamodb')
+        spec = {'PointInTimeRecoveryEnabled': self.data.get('state', True)}
+        if 'recovery-period' in self.data:
+            spec['RecoveryPeriodInDays'] = self.data['recovery-period']
         for r in resources:
             try:
                 client.update_continuous_backups(
                     TableName=r['TableName'],
-                    PointInTimeRecoverySpecification={
-                        'PointInTimeRecoveryEnabled': self.data.get('state', True)
-                    })
+                    PointInTimeRecoverySpecification=dict(spec))
             except client.exceptions.TableNotFoundException:
                 continue
 

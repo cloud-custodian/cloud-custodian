@@ -18,6 +18,7 @@ import botocore.session
 from botocore.stub import Stubber
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
+from c7n import tags as c7n_tags
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
@@ -1482,6 +1483,74 @@ class IamInstanceProfileFilterUsage(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Arn"], "arn:aws:iam::644160558196:instance-profile/mandeep")
         self.assertEqual(resources[0]["InstanceProfileName"], "mandeep")
+
+
+class IamInstanceProfileTags(BaseTest):
+
+    def test_iam_profile_tag_filter(self):
+        session_factory = self.replay_flight_data("test_iam_profile_tag_filter")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-missing-owner",
+                "resource": "iam-profile",
+                "filters": [{"tag:Owner": "absent"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(
+            [r["InstanceProfileName"] for r in resources], ["untagged-profile"])
+        self.assertEqual(resources[0]["Tags"], [])
+
+        p = self.load_policy(
+            {
+                "name": "iam-profile-owner",
+                "resource": "iam-profile",
+                "filters": [{"tag:Owner": "platform"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        # pathed-profile has a non-root path, its arn carries the path
+        self.assertEqual(
+            [r["InstanceProfileName"] for r in resources],
+            ["app-profile", "pathed-profile"])
+        self.assertEqual(
+            {t["Key"]: t["Value"] for t in resources[0]["Tags"]},
+            {"Owner": "platform", "Environment": "dev"})
+
+    def test_iam_profile_tag_actions(self):
+        session_factory = self.replay_flight_data("test_iam_profile_tag_actions")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-tag",
+                "resource": "iam-profile",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [
+                    {"type": "tag", "key": "Owner", "value": "platform"},
+                    {"type": "remove-tag", "tags": ["Stale"]},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.assertIn("mark-for-op", p.resource_manager.action_registry)
+        self.assertIn("marked-for-op", p.resource_manager.filter_registry)
+        # placebo replay does not record request parameters, so spy on the
+        # tagging api calls made by the actions and assert what was sent.
+        with mock.patch.object(
+                c7n_tags, "universal_retry", wraps=c7n_tags.universal_retry) as retry:
+            resources = p.run()
+        self.assertEqual(
+            [r["InstanceProfileName"] for r in resources], ["app-profile"])
+        arn = "arn:aws:iam::123456789012:instance-profile/app-profile"
+        calls = {c.args[0].__name__: c.kwargs for c in retry.call_args_list}
+        self.assertEqual(sorted(calls), ["tag_resources", "untag_resources"])
+        self.assertEqual(
+            calls["tag_resources"],
+            {"ResourceARNList": [arn], "Tags": {"Owner": "platform"}})
+        self.assertEqual(
+            calls["untag_resources"],
+            {"ResourceARNList": [arn], "TagKeys": ["Stale"]})
 
 
 class IamInstanceProfileActions(BaseTest):
@@ -3135,6 +3204,122 @@ class CrossAccountChecker(TestCase):
 
         checker = PolicyChecker({"allowed_orgid": {"o-other"}})
         self.assertEqual(len(checker.check(policy)), 1)
+
+    def _public_statement_policy(self, condition):
+        return {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "s3:GetObject",
+                "Resource": "*",
+                "Condition": condition,
+            }]
+        }
+
+    def test_for_all_values_without_null_guard_is_not_restrictive(self):
+        """ForAllValues is true when the key is absent from the request, so
+        on its own it does not keep out principals outside the org or VPC
+        endpoint (#2392)."""
+        cases = [
+            ({"ForAllValues:StringEquals": {"aws:PrincipalOrgID": "o-allowed"}},
+             {"allowed_orgid": {"o-allowed"}}),
+            ({"ForAllValues:StringLike": {
+                "aws:PrincipalOrgPaths": ["o-allowed/r-ab12/*"]}},
+             {"allowed_orgid": {"o-allowed"}}),
+            ({"ForAllValues:StringEquals": {"aws:SourceVpce": "vpce-allowed"}},
+             {"allowed_vpce": {"vpce-allowed"}}),
+            ({"ForAllValues:StringEquals": {"aws:SourceAccount": "123456789012"}},
+             {"allowed_accounts": {"123456789012"}}),
+        ]
+        for condition, config in cases:
+            policy = self._public_statement_policy(condition)
+            checker = PolicyChecker(config)
+            self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
+            self.assertEqual(len(checker.check(policy)), 1, condition)
+
+    def test_for_all_values_with_null_guard_is_restrictive(self):
+        """A Null condition that requires the key makes ForAllValues match
+        only requests that carry an allowed value."""
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        for null_value in ("false", False, ["false"]):
+            policy = self._public_statement_policy({
+                "ForAllValues:StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+                "Null": {"aws:PrincipalOrgID": null_value},
+            })
+            self.assertEqual(
+                [c["key"] for c in checker.normalize_conditions(policy["Statement"][0])],
+                ["aws:principalorgid"])
+            self.assertEqual(len(checker.check(policy)), 0, null_value)
+
+        # The guard still needs an allowed value
+        checker = PolicyChecker({"allowed_orgid": {"o-other"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_for_all_values_null_guard_must_require_the_same_key(self):
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        for null_condition in (
+                {"aws:PrincipalOrgID": "true"},
+                {"aws:PrincipalOrgID": ["true", "false"]},
+                {"aws:SourceVpce": "false"}):
+            policy = self._public_statement_policy({
+                "ForAllValues:StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+                "Null": null_condition,
+            })
+            self.assertEqual(len(checker.check(policy)), 1, null_condition)
+
+    def test_negated_set_operators_are_not_restrictive(self):
+        """ForAnyValue:StringNotEquals matches every org except the listed
+        one, so it must not count as an org restriction."""
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        for operator in (
+                "ForAnyValue:StringNotEquals",
+                "ForAnyValue:StringNotLike",
+                "ForAllValues:StringNotEquals"):
+            policy = self._public_statement_policy({
+                operator: {"aws:PrincipalOrgID": "o-allowed"},
+                "Null": {"aws:PrincipalOrgID": "false"},
+            })
+            self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
+            self.assertEqual(len(checker.check(policy)), 1, operator)
+
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
+        policy = self._public_statement_policy({
+            "ForAnyValue:ArnNotLike": {
+                "aws:PrincipalArn": "arn:aws:iam::123456789012:root"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
+        # NotIpAddress is a supported plain operator, but not inside a set operator
+        checker = PolicyChecker({})
+        policy = self._public_statement_policy({
+            "ForAnyValue:NotIpAddress": {"aws:SourceIp": "10.0.0.0/8"}})
+        self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_if_exists_set_operators_are_not_restrictive(self):
+        """IfExists is true when the key is absent from the request."""
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        policy = self._public_statement_policy({
+            "ForAnyValue:StringLikeIfExists": {
+                "aws:PrincipalOrgPaths": "o-allowed/*"}})
+        self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_set_operator_conditions_still_combine_with_other_conditions(self):
+        """Skipping a non-restrictive condition must not hide a restrictive one
+        in the same statement, since conditions are ANDed."""
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        policy = self._public_statement_policy({
+            "ForAllValues:StringEquals": {"aws:TagKeys": ["team"]},
+            "StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+        })
+        self.assertEqual(len(checker.check(policy)), 0)
+
+        policy = self._public_statement_policy({
+            "ForAnyValue:StringEquals": {"aws:PrincipalOrgID": "o-allowed"},
+            "ForAnyValue:StringNotEquals": {"aws:PrincipalOrgID": "o-blocked"},
+        })
+        self.assertEqual(len(checker.check(policy)), 0)
 
     def test_org_id_with_specific_non_whitelisted_account(self):
         """Test that org ID doesn't save specific non-whitelisted account."""

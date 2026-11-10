@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-000000000001",
+        "SpaceArn": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-classic-selected-quail",
+        "SpaceName": "c7n-classic-selected-quail",
+        "HomeEfsFileSystemUid": "200010",
+        "Status": "InService",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 15,
+            "hour": 16,
+            "minute": 4,
+            "second": 37,
+            "microsecond": 417000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 15,
+            "hour": 16,
+            "minute": 4,
+            "second": 35,
+            "microsecond": 348000
+        },
+        "SpaceSettings": {
+            "KernelGatewayAppSettings": {
+                "DefaultResourceSpec": {
+                    "InstanceType": "ml.g4dn.xlarge"
+                }
+            }
+        },
+        "Url": "https://000000000000001.studio.us-east-1.sagemaker.aws",
+        "ResponseMetadata": {}
+    }
+}

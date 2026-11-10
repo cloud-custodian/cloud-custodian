@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "channelNamespace": {
+            "apiId": "st7ke6ruefclllukmr6efhujrm",
+            "name": "inherit",
+            "subscribeAuthModes": [],
+            "publishAuthModes": [],
+            "tags": {
+                "Env": "test"
+            },
+            "channelNamespaceArn": "arn:aws:appsync:us-east-1:644160558196:apis/st7ke6ruefclllukmr6efhujrm/channelNamespace/inherit",
+            "created": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 9,
+                "day": 24,
+                "hour": 1,
+                "minute": 18,
+                "second": 49,
+                "microsecond": 580000
+            },
+            "lastModified": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 9,
+                "day": 24,
+                "hour": 1,
+                "minute": 18,
+                "second": 49,
+                "microsecond": 580000
+            },
+            "handlerConfigs": {}
+        }
+    }
+}

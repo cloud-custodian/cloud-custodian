@@ -81,7 +81,7 @@ class LambdaInvoke(EventAction):
 
         params = dict(FunctionName=self.data['function'])
         if self.data.get('qualifier'):
-            params['Qualifier'] = self.data['Qualifier']
+            params['Qualifier'] = self.data['qualifier']
 
         if self.data.get('async', True):
             params['InvocationType'] = 'Event'

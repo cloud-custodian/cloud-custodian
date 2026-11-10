@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidRouteTableID.NotFound",
+            "Message": "Transit Gateway Route Table tgw-rtb-00000000000000002 was deleted or does not exist."
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,787 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 3AF01E96D1D243A480D2D22E4C61C57D Ref B: CHI261140514062 Ref C: 2026-09-29T20:56:45Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-length": [
+                        "12912"
+                    ],
+                    "date": [
+                        "Tue, 29 Sep 2026 20:56:45 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "",
+                        "",
+                        ""
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863",
+                                "name": "cctestmlworkspace299470296863",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "eastus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.Storage/storageAccounts/cctestml299470296863",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.Keyvault/vaults/cctestmlkv299470296863",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.insights/components/cctestmlai299470296863",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2026-09-29T20:55:26.7028901Z",
+                                    "notebookInfo": {
+                                        "resourceId": "3f25e776b89a4d8baabb3c3bb87d8120",
+                                        "fqdn": "ml-cctestmlworkspac-eastus-48c3feb7-e1c6-4b0c-8f0b-b92baacdcf04.eastus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "48c3feb7-e1c6-4b0c-8f0b-b92baacdcf04",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://eastus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://eastus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863",
+                                    "sdkTelemetryAppInsightsKey": "71fa86c2-fe23-49db-bb2e-8537edfb6ead",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "ed42de26-bd36-4cb2-9039-1e2ec3a18aa7",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-09-29T20:55:26.7028901Z",
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-09-29T20:55:26.7028901Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: CCF286338D85447DAE7B63026A1233A1 Ref B: CHI261140505042 Ref C: 2026-09-29T20:56:52Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-request-time": [
+                        "0.349"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "content-length": [
+                        "2744"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-01"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "date": [
+                        "Tue, 29 Sep 2026 20:56:52 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/cctest-env",
+                                "name": "cctest-env",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments",
+                                "properties": {
+                                    "description": "",
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "2",
+                                    "nextVersion": "3",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-09-29T20:55:44.8490067+00:00",
+                                    "createdBy": "Liam Callahan",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-09-29T20:55:44.8490067+00:00",
+                                    "lastModifiedBy": "Liam Callahan",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/cctest-archived-env",
+                                "name": "cctest-archived-env",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments",
+                                "properties": {
+                                    "description": "",
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-09-29T20:55:44.835229+00:00",
+                                    "createdBy": "Liam Callahan",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-09-29T20:55:44.835229+00:00",
+                                    "lastModifiedBy": "Liam Callahan",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu",
+                                "name": "AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments",
+                                "properties": {
+                                    "description": "",
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "10",
+                                    "nextVersion": "11",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-01-24T02:27:55.6397629+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-01-24T02:27:55.6397629+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/cctest-env/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 7CBBD0A5AB26477B9AA9CFD5A0169EE4 Ref B: CHI261140514031 Ref C: 2026-09-29T20:56:53Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-request-time": [
+                        "0.255"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "content-length": [
+                        "2315"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-02"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "date": [
+                        "Tue, 29 Sep 2026 20:56:53 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/cctest-env/versions/2",
+                                "name": "2",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {
+                                        "azureml.labels": "latest"
+                                    },
+                                    "isArchived": true,
+                                    "isAnonymous": false,
+                                    "environmentType": "UserCreated",
+                                    "image": "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:latest",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "Disabled",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Archived"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-09-29T20:55:46.7756266+00:00",
+                                    "createdBy": "Liam Callahan",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-09-29T20:55:46.7756266+00:00",
+                                    "lastModifiedBy": "Liam Callahan",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/cctest-env/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {
+                                        "azureml.labels": ""
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "UserCreated",
+                                    "image": "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:latest",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "Disabled",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-09-29T20:55:44.8833007+00:00",
+                                    "createdBy": "Liam Callahan",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-09-29T20:55:44.8833007+00:00",
+                                    "lastModifiedBy": "Liam Callahan",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/cctest-archived-env/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 45003D08C4D745428A4AD8263DB18674 Ref B: CH1AA2020603035 Ref C: 2026-09-29T20:56:53Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-request-time": [
+                        "0.210"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "content-length": [
+                        "1181"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-01"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "date": [
+                        "Tue, 29 Sep 2026 20:56:54 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/cctest-archived-env/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {
+                                        "azureml.labels": "latest"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "UserCreated",
+                                    "image": "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:latest",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "Disabled",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-09-29T20:55:44.8710568+00:00",
+                                    "createdBy": "Liam Callahan",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-09-29T20:55:44.8710568+00:00",
+                                    "lastModifiedBy": "Liam Callahan",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: B647204286C84A808AC6CFD6D3F76E85 Ref B: CH1AA2020610021 Ref C: 2026-09-29T20:56:54Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-request-time": [
+                        "0.877"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "content-length": [
+                        "13372"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-eastus-02"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ],
+                    "date": [
+                        "Tue, 29 Sep 2026 20:56:54 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions/10",
+                                "name": "10",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": "Recommended environment for Deep Learning in public preview with PyTorch on Azure containing the Azure ML SDK with the latest compatible versions of Ubuntu, Python, PyTorch, CUDA\\RocM, combined with optimizers like ORT Training,+DeepSpeed+MSCCL+ORT MoE and more.",
+                                    "tags": {
+                                        "PyTorch": "1.13.0",
+                                        "GPU": "Cuda11",
+                                        "OS": "Ubuntu20.04",
+                                        "Training": ""
+                                    },
+                                    "properties": {
+                                        "azureml.labels": "latest"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "Curated",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "OnBaseImageUpdate",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-09-13T01:54:26.1991188+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-09-13T01:54:26.1991188+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions/9",
+                                "name": "9",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": "Recommended environment for Deep Learning in public preview with PyTorch on Azure containing the Azure ML SDK with the latest compatible versions of Ubuntu, Python, PyTorch, CUDA\\RocM, combined with optimizers like ORT Training,+DeepSpeed+MSCCL+ORT MoE and more.",
+                                    "tags": {
+                                        "PyTorch": "1.13.0",
+                                        "GPU": "Cuda11",
+                                        "OS": "Ubuntu20.04",
+                                        "Training": ""
+                                    },
+                                    "properties": {
+                                        "azureml.labels": ""
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "Curated",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "OnBaseImageUpdate",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-08-24T06:17:57.9196535+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-08-24T06:17:57.9196535+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions/8",
+                                "name": "8",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": "Recommended environment for Deep Learning in public preview with PyTorch on Azure containing the Azure ML SDK with the latest compatible versions of Ubuntu, Python, PyTorch, CUDA\\RocM, combined with optimizers like ORT Training,+DeepSpeed+MSCCL+ORT MoE and more.",
+                                    "tags": {
+                                        "PyTorch": "1.13.0",
+                                        "GPU": "Cuda11",
+                                        "OS": "Ubuntu20.04",
+                                        "Training": ""
+                                    },
+                                    "properties": {
+                                        "azureml.labels": ""
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "Curated",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "OnBaseImageUpdate",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-08-18T19:34:13.026051+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-08-18T19:34:13.026051+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions/7",
+                                "name": "7",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": "Recommended environment for Deep Learning in public preview with PyTorch on Azure containing the Azure ML SDK with the latest compatible versions of Ubuntu, Python, PyTorch, CUDA\\RocM, combined with optimizers like ORT Training,+DeepSpeed+MSCCL+ORT MoE and more.",
+                                    "tags": {
+                                        "PyTorch": "1.13.0",
+                                        "GPU": "Cuda11",
+                                        "OS": "Ubuntu20.04",
+                                        "Training": ""
+                                    },
+                                    "properties": {
+                                        "azureml.labels": ""
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "Curated",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "OnBaseImageUpdate",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-07-26T04:07:35.2445597+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-07-26T04:07:35.2445597+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions/6",
+                                "name": "6",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": "Recommended environment for Deep Learning in public preview with PyTorch on Azure containing the Azure ML SDK with the latest compatible versions of Ubuntu, Python, PyTorch, CUDA\\RocM, combined with optimizers like ORT Training,+DeepSpeed+MSCCL+ORT MoE and more.",
+                                    "tags": {
+                                        "PyTorch": "1.13.0",
+                                        "GPU": "Cuda11",
+                                        "OS": "Ubuntu20.04",
+                                        "Training": ""
+                                    },
+                                    "properties": {
+                                        "azureml.labels": ""
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "Curated",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "OnBaseImageUpdate",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-06-22T17:45:42.4949246+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-06-22T17:45:42.4949246+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions/5",
+                                "name": "5",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": "Recommended environment for Deep Learning in public preview with PyTorch on Azure containing the Azure ML SDK with the latest compatible versions of Ubuntu, Python, PyTorch, CUDA\\RocM, combined with optimizers like ORT Training,+DeepSpeed+MSCCL+ORT MoE and more.",
+                                    "tags": {
+                                        "PyTorch": "1.13.0",
+                                        "GPU": "Cuda11",
+                                        "OS": "Ubuntu20.04",
+                                        "Training": ""
+                                    },
+                                    "properties": {
+                                        "azureml.labels": ""
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "Curated",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "OnBaseImageUpdate",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-06-02T17:24:07.3380232+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-06-02T17:24:07.3380232+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions/4",
+                                "name": "4",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": "Recommended environment for Deep Learning in public preview with PyTorch on Azure containing the Azure ML SDK with the latest compatible versions of Ubuntu, Python, PyTorch, CUDA\\RocM, combined with optimizers like ORT Training,+DeepSpeed+MSCCL+ORT MoE and more.",
+                                    "tags": {
+                                        "PyTorch": "1.13.0",
+                                        "GPU": "Cuda11",
+                                        "OS": "Ubuntu20.04",
+                                        "Training": ""
+                                    },
+                                    "properties": {
+                                        "azureml.labels": ""
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "Curated",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "OnBaseImageUpdate",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-04-21T03:58:31.3220762+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-04-21T03:58:31.3220762+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions/3",
+                                "name": "3",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": "Recommended environment for Deep Learning in public preview with PyTorch on Azure containing the Azure ML SDK with the latest compatible versions of Ubuntu, Python, PyTorch, CUDA\\RocM, combined with optimizers like ORT Training,+DeepSpeed+MSCCL+ORT MoE and more.",
+                                    "tags": {
+                                        "PyTorch": "1.13.0",
+                                        "GPU": "Cuda11",
+                                        "OS": "Ubuntu20.04",
+                                        "Training": ""
+                                    },
+                                    "properties": {
+                                        "azureml.labels": ""
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "Curated",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "OnBaseImageUpdate",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-02-26T04:25:41.3956691+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-02-26T04:25:41.3956691+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-environment-version/providers/Microsoft.MachineLearningServices/workspaces/cctestmlworkspace299470296863/environments/AzureML-ACPT-pytorch-1.13-py38-cuda11.7-gpu/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+                                "properties": {
+                                    "description": "Recommended environment for Deep Learning in public preview with PyTorch on Azure containing the Azure ML SDK with the latest compatible versions of Ubuntu, Python, PyTorch, CUDA\\RocM, combined with optimizers like ORT Training,+DeepSpeed+MSCCL+ORT MoE and more.",
+                                    "tags": {
+                                        "PyTorch": "1.13.0",
+                                        "GPU": "Cuda11",
+                                        "OS": "Ubuntu20.04",
+                                        "Training": ""
+                                    },
+                                    "properties": {
+                                        "azureml.labels": ""
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "environmentType": "Curated",
+                                    "condaFile": "",
+                                    "osType": "Linux",
+                                    "autoRebuild": "OnBaseImageUpdate",
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2023-01-24T02:27:55.6107431+00:00",
+                                    "createdBy": "Microsoft",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2023-01-24T02:27:55.6107431+00:00",
+                                    "lastModifiedBy": "Microsoft",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

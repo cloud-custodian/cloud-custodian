@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "api": {
+            "apiId": "st7ke6ruefclllukmr6efhujrm",
+            "name": "c7n-test-event-api",
+            "tags": {
+                "Env": "test"
+            },
+            "dns": {
+                "REALTIME": "ajjp75kv2zgyxh7g7x2amjdpgm.appsync-realtime-api.us-east-1.amazonaws.com",
+                "HTTP": "ajjp75kv2zgyxh7g7x2amjdpgm.appsync-api.us-east-1.amazonaws.com"
+            },
+            "apiArn": "arn:aws:appsync:us-east-1:644160558196:apis/st7ke6ruefclllukmr6efhujrm",
+            "created": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 9,
+                "day": 24,
+                "hour": 1,
+                "minute": 17,
+                "second": 28,
+                "microsecond": 391000
+            },
+            "eventConfig": {
+                "authProviders": [
+                    {
+                        "authType": "AWS_IAM"
+                    },
+                    {
+                        "authType": "API_KEY"
+                    }
+                ],
+                "connectionAuthModes": [
+                    {
+                        "authType": "AWS_IAM"
+                    },
+                    {
+                        "authType": "API_KEY"
+                    }
+                ],
+                "defaultPublishAuthModes": [
+                    {
+                        "authType": "AWS_IAM"
+                    },
+                    {
+                        "authType": "API_KEY"
+                    }
+                ],
+                "defaultSubscribeAuthModes": [
+                    {
+                        "authType": "AWS_IAM"
+                    },
+                    {
+                        "authType": "API_KEY"
+                    }
+                ]
+            }
+        }
+    }
+}
