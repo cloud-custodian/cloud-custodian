@@ -17,6 +17,16 @@ import c7n.filters.vpc as net_filters
 import json
 
 
+class ConfigWorkspace(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        # config uses the cloudformation schema, which names the id 'Id'
+        if 'Id' in resource:
+            resource['WorkspaceId'] = resource.pop('Id')
+        return resource
+
+
 @resources.register('workspaces')
 class Workspace(QueryResourceManager):
 
@@ -30,7 +40,7 @@ class Workspace(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeWithResourceTags,
-        'config': ConfigSource
+        'config': ConfigWorkspace
     }
 
 
