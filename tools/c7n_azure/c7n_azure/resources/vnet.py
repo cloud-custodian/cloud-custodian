@@ -122,10 +122,17 @@ class SetFlowLog(AzureBaseAction):
 
     def validate(self):
         storage_account = self.data.get('storage-account')
-        if storage_account is not None and not storage_account.startswith('/subscriptions/'):
-            raise PolicyValidationError(
-                "set-flow-log storage-account must be a full resource id, "
-                f"got: {storage_account}")
+        if storage_account is not None:
+            parsed = parse_resource_id(storage_account)
+            if not (
+                    parsed.get('subscription') and
+                    parsed.get('resource_group') and
+                    parsed.get('namespace', '').lower() == 'microsoft.storage' and
+                    parsed.get('type', '').lower() == 'storageaccounts' and
+                    parsed.get('resource_name')):
+                raise PolicyValidationError(
+                    "set-flow-log storage-account must be a full resource id, "
+                    f"got: {storage_account}")
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()
