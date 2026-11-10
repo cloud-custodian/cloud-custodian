@@ -152,18 +152,20 @@ class VnetSetFlowLogActionTest(BaseTest):
             self.assertTrue(p)
 
     def test_set_flow_log_requires_full_resource_id(self):
-        with self.sign_out_patch():
-            with self.assertRaises(PolicyValidationError):
-                self.load_policy({
-                    'name': 'test-azure-vnet',
-                    'resource': 'azure.vnet',
-                    'actions': [
-                        {
-                            'type': 'set-flow-log',
-                            'storage-account': 'cctestflowlogs'
-                        }
-                    ]
-                }, validate=True)
+        # An empty string must fail too, or the action would PUT an empty storageId.
+        for storage_account in ('cctestflowlogs', ''):
+            with self.subTest(storage_account=storage_account), self.sign_out_patch():
+                with self.assertRaises(PolicyValidationError):
+                    self.load_policy({
+                        'name': 'test-azure-vnet',
+                        'resource': 'azure.vnet',
+                        'actions': [
+                            {
+                                'type': 'set-flow-log',
+                                'storage-account': storage_account
+                            }
+                        ]
+                    }, validate=True)
 
     def test_set_flow_log_requires_existing_flow_log(self):
         # No live calls needed: a vnet with no existing flow log fails before
