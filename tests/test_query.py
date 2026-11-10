@@ -219,6 +219,7 @@ class QueryResourceManagerTest(BaseTest):
              "c7n:DeniedMethods": ["get_topic_attributes"],
              "Tags": []},
         )
+        self.assertEqual(readable["TopicArn"], "arn:aws:sns:us-east-1:644160558196:readable")
         self.assertNotIn("c7n:DeniedMethods", readable)
         self.assertIn(
             "Access denied: get_topic_attributes using "
