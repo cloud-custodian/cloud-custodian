@@ -12,7 +12,6 @@ from c7n.query import (
 )
 from c7n.tags import universal_augment
 from c7n.filters import ListItemFilter
-from c7n.filters.vpc import VpcFilter
 
 from c7n.utils import (
     local_session, type_schema
@@ -115,44 +114,6 @@ class SdNamespaceInstance(ListItemFilter):
                                               ServiceId=service["Id"])
                 service["Instances"] = response.get("Instances", [])
 
-        return super().process(resources, event)
-
-
-@ServiceDiscoveryNamespace.filter_registry.register('vpc')
-class NamespaceVpcFilter(VpcFilter):
-    """Filter private DNS namespaces by the VPCs associated with their hosted zone.
-
-    Only ``DNS_PRIVATE`` namespaces are evaluated.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: servicediscovery-namespace-unapproved-vpc
-            resource: aws.servicediscovery-namespace
-            filters:
-              - type: vpc
-                key: VpcId
-                op: not-in
-                value: [vpc-0123456789abcdef0]
-    """
-
-    RelatedIdsExpression = '"c7n:HostedZoneVpcs"[]'
-    vpc_annotation_key = 'c7n:HostedZoneVpcs'
-
-    def get_permissions(self):
-        return super().get_permissions() + ['route53:GetHostedZone']
-
-    def process(self, resources, event=None):
-        resources = [r for r in resources if r.get('Type') == 'DNS_PRIVATE']
-        client = local_session(self.manager.session_factory).client('route53')
-        for r in resources:
-            if self.vpc_annotation_key in r:
-                continue
-            zone = self.manager.retry(
-                client.get_hosted_zone, Id=r['Properties']['DnsProperties']['HostedZoneId'])
-            r[self.vpc_annotation_key] = [v['VPCId'] for v in zone.get('VPCs', [])]
         return super().process(resources, event)
 
 

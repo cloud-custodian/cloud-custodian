@@ -172,33 +172,7 @@ class ServiceNamespaceInstance(BaseTest):
                          'instance-id-1')
 
 
-class ServiceDiscoveryNamespaceFilters(BaseTest):
-
-    def test_namespace_vpc(self):
-        # Recording state: one DNS_PRIVATE namespace associated with a non-default VPC
-        # and one HTTP namespace.
-        # session_factory = self.record_flight_data('test_servicediscovery_namespace_vpc')
-        session_factory = self.replay_flight_data('test_servicediscovery_namespace_vpc')
-        p = self.load_policy(
-            {
-                "name": "servicediscovery-namespace-vpc",
-                "resource": "servicediscovery-namespace",
-                "filters": [
-                    {
-                        "type": "vpc",
-                        "key": "IsDefault",
-                        "value": False
-                    }
-                ]
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Type'], 'DNS_PRIVATE')
-        self.assertEqual(len(resources[0]['c7n:HostedZoneVpcs']), 1)
-        self.assertEqual(
-            resources[0]['c7n:matched-vpcs'], resources[0]['c7n:HostedZoneVpcs'])
+class ServiceDiscoveryNamespaceActions(BaseTest):
 
     def test_namespace_delete(self):
         # Recording state: an empty HTTP namespace named c7n-delete-test.
