@@ -3289,7 +3289,7 @@ class CrossAccountChecker(TestCase):
                 "aws:PrincipalArn": "arn:aws:iam::123456789012:root"}})
         self.assertEqual(len(checker.check(policy)), 1)
 
-        # NotIpAddress is a supported plain operator, but not inside a set operator
+        # NotIpAddress is not restrictive inside a set operator either
         checker = PolicyChecker({})
         policy = self._public_statement_policy({
             "ForAnyValue:NotIpAddress": {"aws:SourceIp": "10.0.0.0/8"}})
@@ -3304,6 +3304,52 @@ class CrossAccountChecker(TestCase):
                 "aws:PrincipalOrgPaths": "o-allowed/*"}})
         self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
         self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_not_ip_address_is_not_restrictive(self):
+        """NotIpAddress allows every address except the listed ones, and is
+        true when aws:SourceIp is absent (requests through a VPC endpoint)."""
+        checker = PolicyChecker({})
+        for value in ("203.0.113.0/24", ["203.0.113.0/24", "2001:db8::/32"]):
+            policy = self._public_statement_policy({
+                "NotIpAddress": {"aws:SourceIp": value}})
+            self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
+            self.assertEqual(len(checker.check(policy)), 1, value)
+
+    def test_ip_address_matching_every_address_is_not_restrictive(self):
+        """An IpAddress range of 0.0.0.0/0 or ::/0 matches every requester."""
+        checker = PolicyChecker({})
+        for value in (
+                "0.0.0.0/0",
+                "::/0",
+                ["203.0.113.0/24", "0.0.0.0/0"],
+                ["203.0.113.0/24", "::/0"]):
+            policy = self._public_statement_policy({
+                "IpAddress": {"aws:SourceIp": value}})
+            self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
+            self.assertEqual(len(checker.check(policy)), 1, value)
+
+        # a specific range still restricts the statement
+        for value in ("203.0.113.0/24", "2001:db8::/32", ["198.51.100.7/32"]):
+            policy = self._public_statement_policy({
+                "IpAddress": {"aws:SourceIp": value}})
+            self.assertEqual(len(checker.check(policy)), 0, value)
+
+    def test_open_ip_conditions_still_combine_with_other_conditions(self):
+        """Dropping an IP condition that restricts nothing must not hide a
+        restrictive condition in the same statement."""
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        for ip_condition in (
+                {"NotIpAddress": {"aws:SourceIp": "203.0.113.0/24"}},
+                {"IpAddress": {"aws:SourceIp": "0.0.0.0/0"}}):
+            policy = self._public_statement_policy(dict(
+                ip_condition,
+                StringEquals={"aws:PrincipalOrgID": "o-allowed"}))
+            self.assertEqual(len(checker.check(policy)), 0, ip_condition)
+
+            policy = self._public_statement_policy(dict(
+                ip_condition,
+                StringEquals={"aws:PrincipalOrgID": "o-other"}))
+            self.assertEqual(len(checker.check(policy)), 1, ip_condition)
 
     def test_set_operator_conditions_still_combine_with_other_conditions(self):
         """Skipping a non-restrictive condition must not hide a restrictive one

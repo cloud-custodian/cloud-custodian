@@ -27,6 +27,7 @@ References
 
 """
 import fnmatch
+import ipaddress
 import logging
 import json
 
@@ -36,6 +37,14 @@ from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema
 
 log = logging.getLogger('custodian.iamaccess')
+
+
+def _matches_any_address(value):
+    """Return True for a CIDR that covers every IPv4 or IPv6 address."""
+    try:
+        return ipaddress.ip_network(str(value).strip(), strict=False).prefixlen == 0
+    except ValueError:
+        return False
 
 
 def _account(arn):
@@ -255,8 +264,7 @@ class PolicyChecker:
             'StringLike',
             'ArnEquals',
             'ArnLike',
-            'IpAddress',
-            'NotIpAddress')
+            'IpAddress')
         set_conditions = ('ForAllValues', 'ForAnyValue')
         required_keys = self._required_condition_keys(s)
 
@@ -265,6 +273,10 @@ class PolicyChecker:
             # Set operators only restrict access when they wrap a supported
             # positive operator. Negated (StringNotEquals, NotIpAddress) and
             # IfExists variants match requests outside the listed values.
+            # The plain NotIpAddress operator is not supported for the same
+            # reason: it matches every address except the listed ones, and it
+            # is true when aws:SourceIp is absent (requests through a VPC
+            # endpoint).
             if set_op and (set_op not in set_conditions or base_op.startswith('Not')):
                 continue
             if base_op not in conditions:
@@ -278,9 +290,14 @@ class PolicyChecker:
                 # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-single-vs-multi-valued-context-keys.html
                 if set_op == 'ForAllValues' and key.lower() not in required_keys:
                     continue
+                values = (value,) if isinstance(value, str) else value
+                # An IpAddress condition that lists 0.0.0.0/0 or ::/0 matches
+                # every requester that has a source IP, so it restricts nothing.
+                if base_op == 'IpAddress' and any(map(_matches_any_address, values)):
+                    continue
                 cond = {'op': s_cond_op}
                 cond['key'] = key.lower()
-                cond['values'] = (value,) if isinstance(value, str) else value
+                cond['values'] = values
                 s_cond.append(cond)
 
         return s_cond
@@ -411,6 +428,11 @@ class CrossAccountAccessFilter(Filter):
     since ``ForAllValues`` is true when the key is absent from the request.
     Negated (``ForAnyValue:StringNotEquals``) and ``IfExists`` set operators
     never count as restricting access.
+
+    ``NotIpAddress`` conditions, and ``IpAddress`` conditions that include
+    ``0.0.0.0/0`` or ``::/0``, also never count as restricting access: they
+    match every source address except the excluded ones, or every source
+    address.
     """
 
     schema = type_schema(
