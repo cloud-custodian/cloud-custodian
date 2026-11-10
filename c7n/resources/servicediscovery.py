@@ -1,7 +1,6 @@
 """
 Service Discovery Communications
 """
-from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import (
     QueryResourceManager,
@@ -117,35 +116,6 @@ class SdNamespaceInstance(ListItemFilter):
         return super().process(resources, event)
 
 
-@ServiceDiscoveryNamespace.action_registry.register('delete')
-class DeleteNamespace(Action):
-    """Delete a namespace.
-
-    AWS rejects the request while the namespace still contains services.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: servicediscovery-delete-public-namespace
-            resource: aws.servicediscovery-namespace
-            filters:
-              - Type: DNS_PUBLIC
-            actions:
-              - delete
-    """
-
-    schema = type_schema('delete')
-    permissions = ('servicediscovery:DeleteNamespace',)
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('servicediscovery')
-        for r in resources:
-            self.manager.retry(
-                client.delete_namespace, Id=r['Id'], ignore_err_codes=('NamespaceNotFound',))
-
-
 @resources.register('servicediscovery-service')
 class ServiceDiscoveryService(QueryResourceManager):
     """AWS Cloud Map service.
@@ -173,32 +143,3 @@ class ServiceDiscoveryService(QueryResourceManager):
         date = 'CreateDate'
         cfn_type = 'AWS::ServiceDiscovery::Service'
         universal_taggable = object()
-
-
-@ServiceDiscoveryService.action_registry.register('delete')
-class DeleteService(Action):
-    """Delete a service.
-
-    AWS rejects the request while the service still has registered instances.
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: servicediscovery-delete-empty-service
-            resource: aws.servicediscovery-service
-            filters:
-              - InstanceCount: 0
-            actions:
-              - delete
-    """
-
-    schema = type_schema('delete')
-    permissions = ('servicediscovery:DeleteService',)
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('servicediscovery')
-        for r in resources:
-            self.manager.retry(
-                client.delete_service, Id=r['Id'], ignore_err_codes=('ServiceNotFound',))
