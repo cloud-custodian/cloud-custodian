@@ -755,10 +755,14 @@ def _scalar_augment(manager, model, detail_spec, client, resource_set):
             if is_not_found(e):
                 manager.log.warning("Resource not found: %s using %s" % (detail_op, kw))
                 continue
-            # A resource policy can deny a single resource; skip it rather
-            # than abort the policy for the whole account and region.
+            # A resource policy can deny a single resource; keep it with what
+            # the list call returned rather than abort the whole region.
             if is_access_denied(e):
                 manager.log.warning("Access denied: %s using %s" % (detail_op, kw))
+                if param_key is None:
+                    r = {model.id: r}
+                r.setdefault('c7n:DeniedMethods', []).append(detail_op)
+                results.append(r)
                 continue
             raise
         if detail_path:

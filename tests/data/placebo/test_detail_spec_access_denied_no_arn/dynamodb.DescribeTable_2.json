@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "TableName": "readable",
+            "TableStatus": "ACTIVE",
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/readable"
+        },
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RetryAttempts": 0
+        }
+    }
+}

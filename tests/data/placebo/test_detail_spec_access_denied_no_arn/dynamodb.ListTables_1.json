@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "TableNames": [
+            "denied",
+            "readable"
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RetryAttempts": 0
+        }
+    }
+}
