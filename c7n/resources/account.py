@@ -208,7 +208,9 @@ class MacieEnabled(ValueFilter):
 
     def process(self, resources, event=None):
 
-        if self.annotation_key not in resources[0]:
+        info = resources[0].get(self.annotation_key)
+        if info is None or (
+                self.data.get('automated-discovery') and 'automatedDiscovery' not in info):
             self.get_macie_info(resources[0])
 
         if super().process([resources[0][self.annotation_key]]):
@@ -239,7 +241,7 @@ class MacieEnabled(ValueFilter):
 
         if self.data.get('automated-discovery'):
             info['automatedDiscovery'] = {}
-            if info.get('status') == 'ENABLED':
+            if info.get('status') in ('ENABLED', 'PAUSED'):
                 info['automatedDiscovery'] = client.get_automated_discovery_configuration()
                 info['automatedDiscovery'].pop('ResponseMetadata')
         account[self.annotation_key] = info

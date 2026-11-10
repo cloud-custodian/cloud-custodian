@@ -85,6 +85,26 @@ class AccountTests(BaseTest):
             'status': 'ENABLED',
         }
 
+    def test_macie_automated_discovery_cached(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie_automated_discovery')
+        p = self.load_policy({
+            'name': 'macie-automated-discovery-cached',
+            'resource': 'aws.account',
+            'filters': [
+                {'type': 'check-macie',
+                 'key': 'status',
+                 'value': 'ENABLED'},
+                {'type': 'check-macie',
+                 'automated-discovery': True,
+                 'key': 'automatedDiscovery.status',
+                 'value': 'ENABLED'}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:macie']['automatedDiscovery']['status'], 'ENABLED')
+
     def test_macie_automated_discovery_disabled(self):
         factory = self.replay_flight_data(
             'test_account_check_macie_automated_discovery_disabled')
