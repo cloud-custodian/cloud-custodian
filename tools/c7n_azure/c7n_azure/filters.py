@@ -496,25 +496,34 @@ class FlowLogsFilter(ValueFilter, metaclass=ABCMeta):
     client = None
 
     def process(self, resources, event=None):
-        self.client = self.manager.get_client()
+        # Only the flow-log GETs run in parallel. Matching stays serial in
+        # ValueFilter.process, because ValueFilter.match keeps per-resource state
+        # on the filter (e.g. self.v for value_path) and isn't thread-safe. That
+        # also leaves resource_count, which needs no lookups, to ValueFilter.
+        if self.data.get('value_type') != 'resource_count':
+            self.client = self.manager.get_client()
 
-        result, exceptions = ThreadHelper.execute_in_parallel(
-            resources=resources,
-            event=event,
-            execution_method=self._check_resources,
-            executor_factory=self.executor_factory,
-            log=self.log
-        )
+            _, exceptions = ThreadHelper.execute_in_parallel(
+                resources=resources,
+                event=event,
+                execution_method=self._annotate_resources,
+                executor_factory=self.executor_factory,
+                log=self.log
+            )
 
-        # execute_in_parallel drops any chunk that raised. Re-raise so a failed
-        # lookup fails the policy instead of silently omitting resources.
-        if exceptions:
-            raise exceptions[0]
+            # execute_in_parallel drops any chunk that raised. Re-raise so a failed
+            # lookup fails the policy instead of silently omitting resources.
+            if exceptions:
+                raise exceptions[0]
 
-        return result
+        return super().process(resources, event)
 
-    def _check_resources(self, resources, event):
-        return [r for r in resources if self(r)]
+    def _annotate_resources(self, resources, event):
+        for resource in resources:
+            if self.annotation_key not in resource['properties']:
+                resource['properties'][self.annotation_key] = {
+                    'logs': self._get_flow_logs(resource)
+                }
 
     def _get_flow_logs(self, resource):
         parsed_ids = [
@@ -535,11 +544,8 @@ class FlowLogsFilter(ValueFilter, metaclass=ABCMeta):
         ]
 
     def __call__(self, resource):
-        if self.annotation_key not in resource['properties']:
-            resource['properties'][self.annotation_key] = {
-                'logs': self._get_flow_logs(resource)
-            }
-
+        # Already annotated when reached via process(); this covers direct calls.
+        self._annotate_resources([resource], None)
         return super().__call__(resource['properties'][self.annotation_key])
 
 
