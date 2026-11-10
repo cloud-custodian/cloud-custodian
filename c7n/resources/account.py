@@ -2877,10 +2877,10 @@ class AppStreamUsageReports(ValueFilter):
                 client.describe_usage_report_subscriptions).get(
                     'UsageReportSubscriptions', [])
             r[self.annotation_key] = subscriptions[0] if subscriptions else {}
-            
+
     def __call__(self, r):
         return super().__call__(r[self.annotation_key])
-      
+
 
 @filters.register('sms-voice-account-attributes')
 class SmsVoiceAccountAttributes(ValueFilter):
