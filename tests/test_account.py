@@ -1618,6 +1618,35 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_appstream_usage_reports_disabled(self):
+        factory = self.replay_flight_data('test_appstream_usage_reports_disabled')
+        p = self.load_policy({
+            'name': 'appstream-usage-reports-disabled',
+            'resource': 'account',
+            'filters': [{
+                'type': 'appstream-usage-reports',
+                'key': 'S3BucketName',
+                'value': 'absent'}]},
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:AppStreamUsageReports'], {})
+
+    def test_appstream_usage_reports_enabled(self):
+        factory = self.replay_flight_data('test_appstream_usage_reports_enabled')
+        p = self.load_policy({
+            'name': 'appstream-usage-reports-enabled',
+            'resource': 'account',
+            'filters': [{
+                'type': 'appstream-usage-reports',
+                'key': 'S3BucketName',
+                'value': 'absent'}]},
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_update_bedrock_model_invocation_logging(self):
         factory = self.replay_flight_data("test_update_bedrock_model_invocation_logging")
         p = self.load_policy(
