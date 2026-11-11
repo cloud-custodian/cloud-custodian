@@ -151,7 +151,10 @@ class DefenderAssessment(QueryResourceManager, metaclass=QueryMeta):
         def extra_args(cls, resource_manager):
             scope = '/subscriptions/{0}'\
                 .format(resource_manager.get_session().get_subscription_id())
-            return {'scope': scope}
+            return {
+                'scope': scope,
+                'api_version': '2025-05-04',
+            }
 
 
 @resources.register("defender-contact")

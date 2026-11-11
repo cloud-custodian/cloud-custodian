@@ -1,6 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from unittest.mock import Mock
+
 from ..azure_common import BaseTest
+from c7n_azure.query import ResourceQuery
+from c7n_azure.resources.defender import DefenderAssessment
 
 
 class DefenderTest(BaseTest):
@@ -59,6 +63,19 @@ class DefenderTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], '2a548cf9-6de3-491e-b24a-cf277fe36d4d')
+
+    def test_azure_defender_assessments_api_version(self):
+        manager = Mock()
+        manager.resource_type = DefenderAssessment.resource_type
+        manager.get_session.return_value.get_subscription_id.return_value = 'subscription-id'
+        manager.get_client.return_value.assessments.list.return_value = []
+
+        ResourceQuery(None).filter(manager)
+
+        manager.get_client.return_value.assessments.list.assert_called_once_with(
+            scope='/subscriptions/subscription-id',
+            api_version='2025-05-04'
+        )
 
     def test_azure_defender_contacts(self):
         p = self.load_policy({
