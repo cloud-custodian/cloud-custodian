@@ -1,0 +1,19 @@
+policies:
+  - name: c7n-%HOST%-event
+    description: Tests event policies on %HOST% 
+    resource: azure.resourcegroup
+    mode: 
+      type: container-event
+      events:
+        - resourceProvider: Microsoft.Resources/subscriptions/resourceGroups
+          event: write
+    filters:
+      - type: value
+        key: name
+        op: eq
+        value: "%RG_NAME%"
+      - tag:c7n-%HOST%-event: absent
+    actions:
+      - type: tag
+        tag: c7n-%HOST%-event
+        value: passed
