@@ -44,7 +44,7 @@
     "updateTime": "2026-11-11T18:46:29.081460Z",
     "error": {
       "code": 3,
-      "message": "The replica workerpool0-0 exited with a non-zero status of 1. Termination reason: Error. To find out more about why your job exited please check the logs: https://console.cloud.google.com/logs/viewer?project=400632884532&resource=ml_job%2Fjob_id%2F5002998160893673472&advancedFilter=resource.type%3D%22ml_job%22%0Aresource.labels.job_id%3D%225002998160893673472%22"
+      "message": "The replica workerpool0-0 exited with a non-zero status of 1. Termination reason: Error. To find out more about why your job exited please check the logs: https://console.cloud.google.com/logs/viewer?project=000000000000&resource=ml_job%2Fjob_id%2F5002998160893673472&advancedFilter=resource.type%3D%22ml_job%22%0Aresource.labels.job_id%3D%225002998160893673472%22"
     }
   }
 }
