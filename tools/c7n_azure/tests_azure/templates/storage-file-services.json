@@ -36,6 +36,7 @@
             },
             "protocolSettings": {
               "smb": {
+                "versions": "SMB2.1;SMB3.0;SMB3.1.1",
                 "channelEncryption": "AES-128-CCM;AES-128-GCM;AES-256-GCM"
               }
             },

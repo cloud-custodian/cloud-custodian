@@ -771,10 +771,10 @@ class RequireSecureTransferAction(AzureBaseAction):
 @Storage.action_registry.register('set-file-services')
 class SetFileServicesAction(AzureBaseAction):
     """Action that updates File Service Properties on Storage Accounts: the file
-    share soft-delete retention policy, allowed SMB channel encryption algorithms,
-    and CORS rules. Only the properties provided are changed; the rest of the
-    File Service Properties configuration (including any properties not listed
-    above) is left as-is.
+    share soft-delete retention policy, allowed SMB protocol versions, allowed SMB
+    channel encryption algorithms, and CORS rules. Only the properties provided
+    are changed; the rest of the File Service Properties configuration
+    (including any properties not listed above) is left as-is.
 
     :example:
 
@@ -815,15 +815,41 @@ class SetFileServicesAction(AzureBaseAction):
               actions:
                 - type: set-file-services
                   smb-channel-encryption: [AES-256-GCM]
+
+    :example:
+
+    Require SMB file shares to use SMB 3.1.1 only.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: storage-require-smb-3-1-1
+              resource: azure.storage
+              filters:
+                - type: file-services
+                  attrs:
+                    - type: value
+                      key: properties.protocolSettings.smb.versions
+                      op: not-equal
+                      value: "SMB3.1.1"
+              actions:
+                - type: set-file-services
+                  smb-versions: [SMB3.1.1]
     """
 
+    SMB_VERSIONS = ('SMB2.1', 'SMB3.0', 'SMB3.1.1')
     CHANNEL_ENCRYPTION_ALGORITHMS = ('AES-128-CCM', 'AES-128-GCM', 'AES-256-GCM')
 
     schema = type_schema(
         'set-file-services',
         **{
             'share-delete-retention-enabled': {'type': 'boolean'},
-            'share-delete-retention-days': {'type': 'number'},
+            'share-delete-retention-days': {'type': 'integer'},
+            'smb-versions': {
+                'type': 'array',
+                'minItems': 1,
+                'items': {'enum': list(SMB_VERSIONS)}
+            },
             'smb-channel-encryption': {
                 'type': 'array',
                 'items': {'enum': list(CHANNEL_ENCRYPTION_ALGORITHMS)}
@@ -838,7 +864,7 @@ class SetFileServicesAction(AzureBaseAction):
                     'properties': {
                         'allowed-origins': {'type': 'array', 'items': {'type': 'string'}},
                         'allowed-methods': {'type': 'array', 'items': {'type': 'string'}},
-                        'max-age-in-seconds': {'type': 'number'},
+                        'max-age-in-seconds': {'type': 'integer'},
                         'exposed-headers': {'type': 'array', 'items': {'type': 'string'}},
                         'allowed-headers': {'type': 'array', 'items': {'type': 'string'}},
                     }
@@ -871,10 +897,13 @@ class SetFileServicesAction(AzureBaseAction):
                 policy.days = self.data['share-delete-retention-days']
             current.share_delete_retention_policy = policy
 
-        if 'smb-channel-encryption' in self.data:
+        if 'smb-versions' in self.data or 'smb-channel-encryption' in self.data:
             protocol_settings = current.protocol_settings or ProtocolSettings()
             smb = protocol_settings.smb or SmbSetting()
-            smb.channel_encryption = ';'.join(self.data['smb-channel-encryption'])
+            if 'smb-versions' in self.data:
+                smb.versions = ';'.join(self.data['smb-versions'])
+            if 'smb-channel-encryption' in self.data:
+                smb.channel_encryption = ';'.join(self.data['smb-channel-encryption'])
             protocol_settings.smb = smb
             current.protocol_settings = protocol_settings
 

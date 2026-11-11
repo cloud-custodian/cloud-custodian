@@ -15,30 +15,31 @@
                 },
                 "headers": {
                     "content-length": [
-                        "7965"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 997A6FC6C9F147A1890E47BFE7CDFDC7 Ref B: CHI261140513060 Ref C: 2026-09-22T14:38:54Z"
-                    ],
-                    "x-ms-original-request-ids": [
-                        "a7346d26-d0b4-466b-abea-89934fb4976a",
-                        "d30020e1-cf52-4f0b-bca3-f76eba2fa052",
-                        "c81dfcb2-95f3-4900-be78-83139d7795f4"
+                        "8172"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
                     ],
+                    "x-ms-original-request-ids": [
+                        "ed8d49fc-fc82-4b7d-990a-2e426041ebb2",
+                        "654ba6ca-6640-4971-b6da-2f332c610a2d",
+                        "20a6abb8-1067-46e4-a12d-2ef9056a5684",
+                        "14775933-442a-4a6a-ac49-ed5e59e10779"
+                    ],
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
+                    "x-msedge-ref": [
+                        "Ref A: 341AAEACFE224EACAF6C728050484756 Ref B: CHI261140514054 Ref C: 2026-11-11T16:21:06Z"
+                    ],
                     "date": [
-                        "Tue, 22 Sep 2026 14:38:54 GMT"
+                        "Wed, 11 Nov 2026 16:21:07 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ]
                 },
                 "body": {
@@ -182,64 +183,6 @@
                                     "tier": "Standard"
                                 },
                                 "kind": "StorageV2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vnet/providers/Microsoft.Storage/storageAccounts/c7nvnetflowjylwxlqyxf34g",
-                                "name": "c7nvnetflowjylwxlqyxf34g",
-                                "type": "Microsoft.Storage/storageAccounts",
-                                "location": "southcentralus",
-                                "tags": {},
-                                "properties": {
-                                    "keyCreationTime": {
-                                        "key1": "2026-09-21T15:26:43.9330279Z",
-                                        "key2": "2026-09-21T15:26:43.9330279Z"
-                                    },
-                                    "allowCrossTenantReplication": false,
-                                    "privateEndpointConnections": [],
-                                    "minimumTlsVersion": "TLS1_0",
-                                    "allowBlobPublicAccess": false,
-                                    "networkAcls": {
-                                        "ipv6Rules": [],
-                                        "bypass": "None",
-                                        "virtualNetworkRules": [],
-                                        "ipRules": [],
-                                        "defaultAction": "Allow"
-                                    },
-                                    "supportsHttpsTrafficOnly": false,
-                                    "encryption": {
-                                        "services": {
-                                            "file": {
-                                                "keyType": "Account",
-                                                "enabled": true,
-                                                "lastEnabledTime": "2026-09-21T15:26:43.9433294Z"
-                                            },
-                                            "blob": {
-                                                "keyType": "Account",
-                                                "enabled": true,
-                                                "lastEnabledTime": "2026-09-21T15:26:43.9433294Z"
-                                            }
-                                        },
-                                        "keySource": "Microsoft.Storage"
-                                    },
-                                    "accessTier": "Hot",
-                                    "provisioningState": "Succeeded",
-                                    "creationTime": "2026-09-21T15:26:43.5940155Z",
-                                    "primaryEndpoints": {
-                                        "dfs": "https://c7nvnetflowjylwxlqyxf34g.dfs.core.windows.net/",
-                                        "web": "https://c7nvnetflowjylwxlqyxf34g.z21.web.core.windows.net/",
-                                        "blob": "https://c7nvnetflowjylwxlqyxf34g.blob.core.windows.net/",
-                                        "queue": "https://c7nvnetflowjylwxlqyxf34g.queue.core.windows.net/",
-                                        "table": "https://c7nvnetflowjylwxlqyxf34g.table.core.windows.net/",
-                                        "file": "https://c7nvnetflowjylwxlqyxf34g.file.core.windows.net/"
-                                    },
-                                    "primaryLocation": "southcentralus",
-                                    "statusOfPrimary": "available"
-                                }
-                            },
-                            {
-                                "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
-                                },
-                                "kind": "StorageV2",
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-file-services/providers/Microsoft.Storage/storageAccounts/ccfilesvc7l7vcpu5fmsd2",
                                 "name": "ccfilesvc7l7vcpu5fmsd2",
                                 "type": "Microsoft.Storage/storageAccounts",
@@ -247,8 +190,8 @@
                                 "tags": {},
                                 "properties": {
                                     "keyCreationTime": {
-                                        "key1": "2026-09-22T14:38:12.1363657Z",
-                                        "key2": "2026-09-22T14:38:12.1363657Z"
+                                        "key1": "2026-11-11T16:20:34.0459051Z",
+                                        "key2": "2026-11-11T16:20:34.0459051Z"
                                     },
                                     "allowCrossTenantReplication": false,
                                     "privateEndpointConnections": [],
@@ -267,19 +210,19 @@
                                             "file": {
                                                 "keyType": "Account",
                                                 "enabled": true,
-                                                "lastEnabledTime": "2026-09-22T14:38:12.1445686Z"
+                                                "lastEnabledTime": "2026-11-11T16:20:34.0541570Z"
                                             },
                                             "blob": {
                                                 "keyType": "Account",
                                                 "enabled": true,
-                                                "lastEnabledTime": "2026-09-22T14:38:12.1445686Z"
+                                                "lastEnabledTime": "2026-11-11T16:20:34.0541570Z"
                                             }
                                         },
                                         "keySource": "Microsoft.Storage"
                                     },
                                     "accessTier": "Hot",
                                     "provisioningState": "Succeeded",
-                                    "creationTime": "2026-09-22T14:38:11.7853128Z",
+                                    "creationTime": "2026-11-11T16:20:33.7764409Z",
                                     "primaryEndpoints": {
                                         "dfs": "https://ccfilesvc7l7vcpu5fmsd2.dfs.core.windows.net/",
                                         "web": "https://ccfilesvc7l7vcpu5fmsd2.z21.web.core.windows.net/",
@@ -298,15 +241,15 @@
                                     "tier": "Standard"
                                 },
                                 "kind": "StorageV2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.Storage/storageAccounts/cctestmlws970908088942",
-                                "name": "cctestmlws970908088942",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.Storage/storageAccounts/cctestmlws254523190822",
+                                "name": "cctestmlws254523190822",
                                 "type": "Microsoft.Storage/storageAccounts",
                                 "location": "southcentralus",
                                 "tags": {},
                                 "properties": {
                                     "keyCreationTime": {
-                                        "key1": "2026-08-25T13:02:56.7604334Z",
-                                        "key2": "2026-08-25T13:02:56.7604334Z"
+                                        "key1": "2026-09-30T19:24:21.2745245Z",
+                                        "key2": "2026-09-30T19:24:21.2745245Z"
                                     },
                                     "allowCrossTenantReplication": false,
                                     "privateEndpointConnections": [],
@@ -325,28 +268,98 @@
                                             "file": {
                                                 "keyType": "Account",
                                                 "enabled": true,
-                                                "lastEnabledTime": "2026-08-25T13:02:56.7808606Z"
+                                                "lastEnabledTime": "2026-09-30T19:24:21.2826978Z"
                                             },
                                             "blob": {
                                                 "keyType": "Account",
                                                 "enabled": true,
-                                                "lastEnabledTime": "2026-08-25T13:02:56.7808606Z"
+                                                "lastEnabledTime": "2026-09-30T19:24:21.2826978Z"
                                             }
                                         },
                                         "keySource": "Microsoft.Storage"
                                     },
                                     "accessTier": "Hot",
                                     "provisioningState": "Succeeded",
-                                    "creationTime": "2026-08-25T13:02:56.4223118Z",
+                                    "creationTime": "2026-09-30T19:24:21.0071043Z",
                                     "primaryEndpoints": {
-                                        "dfs": "https://cctestmlws970908088942.dfs.core.windows.net/",
-                                        "web": "https://cctestmlws970908088942.z21.web.core.windows.net/",
-                                        "blob": "https://cctestmlws970908088942.blob.core.windows.net/",
-                                        "queue": "https://cctestmlws970908088942.queue.core.windows.net/",
-                                        "table": "https://cctestmlws970908088942.table.core.windows.net/",
-                                        "file": "https://cctestmlws970908088942.file.core.windows.net/"
+                                        "dfs": "https://cctestmlws254523190822.dfs.core.windows.net/",
+                                        "web": "https://cctestmlws254523190822.z21.web.core.windows.net/",
+                                        "blob": "https://cctestmlws254523190822.blob.core.windows.net/",
+                                        "queue": "https://cctestmlws254523190822.queue.core.windows.net/",
+                                        "table": "https://cctestmlws254523190822.table.core.windows.net/",
+                                        "file": "https://cctestmlws254523190822.file.core.windows.net/"
                                     },
                                     "primaryLocation": "southcentralus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/c7n-azev-fix/providers/Microsoft.Storage/storageAccounts/c7nazevf166f6586",
+                                "name": "c7nazevf166f6586",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "centralus",
+                                "tags": {},
+                                "properties": {
+                                    "dnsEndpointType": "Standard",
+                                    "defaultToOAuthAuthentication": false,
+                                    "publicNetworkAccess": "Enabled",
+                                    "keyCreationTime": {
+                                        "key1": "2026-10-23T20:34:02.7963491Z",
+                                        "key2": "2026-10-23T20:34:02.7963491Z"
+                                    },
+                                    "allowCrossTenantReplication": false,
+                                    "privateEndpointConnections": [],
+                                    "isNfsV3Enabled": false,
+                                    "isLocalUserEnabled": true,
+                                    "isSftpEnabled": false,
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": false,
+                                    "allowSharedKeyAccess": true,
+                                    "isHnsEnabled": false,
+                                    "networkAcls": {
+                                        "ipv6Rules": [],
+                                        "resourceAccessRules": [],
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2026-10-23T20:34:02.8025902Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2026-10-23T20:34:02.8025902Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2026-10-23T20:34:02.4488448Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://c7nazevf166f6586.dfs.core.windows.net/",
+                                        "web": "https://c7nazevf166f6586.z19.web.core.windows.net/",
+                                        "blob": "https://c7nazevf166f6586.blob.core.windows.net/",
+                                        "queue": "https://c7nazevf166f6586.queue.core.windows.net/",
+                                        "table": "https://c7nazevf166f6586.table.core.windows.net/",
+                                        "file": "https://c7nazevf166f6586.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "centralus",
                                     "statusOfPrimary": "available"
                                 }
                             }
@@ -369,13 +382,7 @@
                 },
                 "headers": {
                     "content-length": [
-                        "640"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 4D235B3371A342ED8FA462BAA35C75D0 Ref B: CHI261140513060 Ref C: 2026-09-22T14:38:55Z"
+                        "676"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -383,11 +390,17 @@
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
+                    "x-msedge-ref": [
+                        "Ref A: A3E28848516B4401A8C6FE829A8D817C Ref B: CHI261140511054 Ref C: 2026-11-11T16:21:07Z"
+                    ],
                     "date": [
-                        "Tue, 22 Sep 2026 14:38:55 GMT"
+                        "Wed, 11 Nov 2026 16:21:07 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ]
                 },
                 "body": {
@@ -404,6 +417,7 @@
                                 "properties": {
                                     "protocolSettings": {
                                         "smb": {
+                                            "versions": "SMB2.1;SMB3.0;SMB3.1.1",
                                             "channelEncryption": "AES-128-CCM;AES-128-GCM;AES-256-GCM"
                                         }
                                     },
@@ -451,30 +465,31 @@
                 },
                 "headers": {
                     "content-length": [
-                        "7965"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: CAB62C4BAF76464CB0BDCB06B8AAFCF5 Ref B: CH1AA2030814042 Ref C: 2026-09-22T14:38:56Z"
-                    ],
-                    "x-ms-original-request-ids": [
-                        "80250ae2-166e-433c-bdac-dedeae887320",
-                        "95b3e9f0-1311-48c8-a757-3371234cc72b",
-                        "58060392-edc6-4feb-995c-22bd74390ef5"
+                        "8172"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
                     ],
+                    "x-ms-original-request-ids": [
+                        "c763afd3-3ab2-40a8-b9e9-4538bff4ccdc",
+                        "b6da5194-e880-431d-8269-da6e98305b7f",
+                        "1544a673-daf2-4d7e-932b-cd84bb0461c9",
+                        "310c40e5-9676-468c-b16e-5a313b20649a"
+                    ],
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
+                    "x-msedge-ref": [
+                        "Ref A: AE255E3E068B492799767C21BF10D6A1 Ref B: CHI261140505062 Ref C: 2026-11-11T16:21:08Z"
+                    ],
                     "date": [
-                        "Tue, 22 Sep 2026 14:38:55 GMT"
+                        "Wed, 11 Nov 2026 16:21:08 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ]
                 },
                 "body": {
@@ -618,64 +633,6 @@
                                     "tier": "Standard"
                                 },
                                 "kind": "StorageV2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vnet/providers/Microsoft.Storage/storageAccounts/c7nvnetflowjylwxlqyxf34g",
-                                "name": "c7nvnetflowjylwxlqyxf34g",
-                                "type": "Microsoft.Storage/storageAccounts",
-                                "location": "southcentralus",
-                                "tags": {},
-                                "properties": {
-                                    "keyCreationTime": {
-                                        "key1": "2026-09-21T15:26:43.9330279Z",
-                                        "key2": "2026-09-21T15:26:43.9330279Z"
-                                    },
-                                    "allowCrossTenantReplication": false,
-                                    "privateEndpointConnections": [],
-                                    "minimumTlsVersion": "TLS1_0",
-                                    "allowBlobPublicAccess": false,
-                                    "networkAcls": {
-                                        "ipv6Rules": [],
-                                        "bypass": "None",
-                                        "virtualNetworkRules": [],
-                                        "ipRules": [],
-                                        "defaultAction": "Allow"
-                                    },
-                                    "supportsHttpsTrafficOnly": false,
-                                    "encryption": {
-                                        "services": {
-                                            "file": {
-                                                "keyType": "Account",
-                                                "enabled": true,
-                                                "lastEnabledTime": "2026-09-21T15:26:43.9433294Z"
-                                            },
-                                            "blob": {
-                                                "keyType": "Account",
-                                                "enabled": true,
-                                                "lastEnabledTime": "2026-09-21T15:26:43.9433294Z"
-                                            }
-                                        },
-                                        "keySource": "Microsoft.Storage"
-                                    },
-                                    "accessTier": "Hot",
-                                    "provisioningState": "Succeeded",
-                                    "creationTime": "2026-09-21T15:26:43.5940155Z",
-                                    "primaryEndpoints": {
-                                        "dfs": "https://c7nvnetflowjylwxlqyxf34g.dfs.core.windows.net/",
-                                        "web": "https://c7nvnetflowjylwxlqyxf34g.z21.web.core.windows.net/",
-                                        "blob": "https://c7nvnetflowjylwxlqyxf34g.blob.core.windows.net/",
-                                        "queue": "https://c7nvnetflowjylwxlqyxf34g.queue.core.windows.net/",
-                                        "table": "https://c7nvnetflowjylwxlqyxf34g.table.core.windows.net/",
-                                        "file": "https://c7nvnetflowjylwxlqyxf34g.file.core.windows.net/"
-                                    },
-                                    "primaryLocation": "southcentralus",
-                                    "statusOfPrimary": "available"
-                                }
-                            },
-                            {
-                                "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
-                                },
-                                "kind": "StorageV2",
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage-file-services/providers/Microsoft.Storage/storageAccounts/ccfilesvc7l7vcpu5fmsd2",
                                 "name": "ccfilesvc7l7vcpu5fmsd2",
                                 "type": "Microsoft.Storage/storageAccounts",
@@ -683,8 +640,8 @@
                                 "tags": {},
                                 "properties": {
                                     "keyCreationTime": {
-                                        "key1": "2026-09-22T14:38:12.1363657Z",
-                                        "key2": "2026-09-22T14:38:12.1363657Z"
+                                        "key1": "2026-11-11T16:20:34.0459051Z",
+                                        "key2": "2026-11-11T16:20:34.0459051Z"
                                     },
                                     "allowCrossTenantReplication": false,
                                     "privateEndpointConnections": [],
@@ -703,19 +660,19 @@
                                             "file": {
                                                 "keyType": "Account",
                                                 "enabled": true,
-                                                "lastEnabledTime": "2026-09-22T14:38:12.1445686Z"
+                                                "lastEnabledTime": "2026-11-11T16:20:34.0541570Z"
                                             },
                                             "blob": {
                                                 "keyType": "Account",
                                                 "enabled": true,
-                                                "lastEnabledTime": "2026-09-22T14:38:12.1445686Z"
+                                                "lastEnabledTime": "2026-11-11T16:20:34.0541570Z"
                                             }
                                         },
                                         "keySource": "Microsoft.Storage"
                                     },
                                     "accessTier": "Hot",
                                     "provisioningState": "Succeeded",
-                                    "creationTime": "2026-09-22T14:38:11.7853128Z",
+                                    "creationTime": "2026-11-11T16:20:33.7764409Z",
                                     "primaryEndpoints": {
                                         "dfs": "https://ccfilesvc7l7vcpu5fmsd2.dfs.core.windows.net/",
                                         "web": "https://ccfilesvc7l7vcpu5fmsd2.z21.web.core.windows.net/",
@@ -734,15 +691,15 @@
                                     "tier": "Standard"
                                 },
                                 "kind": "StorageV2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.Storage/storageAccounts/cctestmlws970908088942",
-                                "name": "cctestmlws970908088942",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-job-cancel/providers/Microsoft.Storage/storageAccounts/cctestmlws254523190822",
+                                "name": "cctestmlws254523190822",
                                 "type": "Microsoft.Storage/storageAccounts",
                                 "location": "southcentralus",
                                 "tags": {},
                                 "properties": {
                                     "keyCreationTime": {
-                                        "key1": "2026-08-25T13:02:56.7604334Z",
-                                        "key2": "2026-08-25T13:02:56.7604334Z"
+                                        "key1": "2026-09-30T19:24:21.2745245Z",
+                                        "key2": "2026-09-30T19:24:21.2745245Z"
                                     },
                                     "allowCrossTenantReplication": false,
                                     "privateEndpointConnections": [],
@@ -761,28 +718,98 @@
                                             "file": {
                                                 "keyType": "Account",
                                                 "enabled": true,
-                                                "lastEnabledTime": "2026-08-25T13:02:56.7808606Z"
+                                                "lastEnabledTime": "2026-09-30T19:24:21.2826978Z"
                                             },
                                             "blob": {
                                                 "keyType": "Account",
                                                 "enabled": true,
-                                                "lastEnabledTime": "2026-08-25T13:02:56.7808606Z"
+                                                "lastEnabledTime": "2026-09-30T19:24:21.2826978Z"
                                             }
                                         },
                                         "keySource": "Microsoft.Storage"
                                     },
                                     "accessTier": "Hot",
                                     "provisioningState": "Succeeded",
-                                    "creationTime": "2026-08-25T13:02:56.4223118Z",
+                                    "creationTime": "2026-09-30T19:24:21.0071043Z",
                                     "primaryEndpoints": {
-                                        "dfs": "https://cctestmlws970908088942.dfs.core.windows.net/",
-                                        "web": "https://cctestmlws970908088942.z21.web.core.windows.net/",
-                                        "blob": "https://cctestmlws970908088942.blob.core.windows.net/",
-                                        "queue": "https://cctestmlws970908088942.queue.core.windows.net/",
-                                        "table": "https://cctestmlws970908088942.table.core.windows.net/",
-                                        "file": "https://cctestmlws970908088942.file.core.windows.net/"
+                                        "dfs": "https://cctestmlws254523190822.dfs.core.windows.net/",
+                                        "web": "https://cctestmlws254523190822.z21.web.core.windows.net/",
+                                        "blob": "https://cctestmlws254523190822.blob.core.windows.net/",
+                                        "queue": "https://cctestmlws254523190822.queue.core.windows.net/",
+                                        "table": "https://cctestmlws254523190822.table.core.windows.net/",
+                                        "file": "https://cctestmlws254523190822.file.core.windows.net/"
                                     },
                                     "primaryLocation": "southcentralus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/c7n-azev-fix/providers/Microsoft.Storage/storageAccounts/c7nazevf166f6586",
+                                "name": "c7nazevf166f6586",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "centralus",
+                                "tags": {},
+                                "properties": {
+                                    "dnsEndpointType": "Standard",
+                                    "defaultToOAuthAuthentication": false,
+                                    "publicNetworkAccess": "Enabled",
+                                    "keyCreationTime": {
+                                        "key1": "2026-10-23T20:34:02.7963491Z",
+                                        "key2": "2026-10-23T20:34:02.7963491Z"
+                                    },
+                                    "allowCrossTenantReplication": false,
+                                    "privateEndpointConnections": [],
+                                    "isNfsV3Enabled": false,
+                                    "isLocalUserEnabled": true,
+                                    "isSftpEnabled": false,
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": false,
+                                    "allowSharedKeyAccess": true,
+                                    "isHnsEnabled": false,
+                                    "networkAcls": {
+                                        "ipv6Rules": [],
+                                        "resourceAccessRules": [],
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2026-10-23T20:34:02.8025902Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2026-10-23T20:34:02.8025902Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2026-10-23T20:34:02.4488448Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://c7nazevf166f6586.dfs.core.windows.net/",
+                                        "web": "https://c7nazevf166f6586.z19.web.core.windows.net/",
+                                        "blob": "https://c7nazevf166f6586.blob.core.windows.net/",
+                                        "queue": "https://c7nazevf166f6586.queue.core.windows.net/",
+                                        "table": "https://c7nazevf166f6586.table.core.windows.net/",
+                                        "file": "https://c7nazevf166f6586.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "centralus",
                                     "statusOfPrimary": "available"
                                 }
                             }
@@ -805,13 +832,7 @@
                 },
                 "headers": {
                     "content-length": [
-                        "640"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 185186D0118C4CC38F3E21A04EB16BD9 Ref B: CHI261140504060 Ref C: 2026-09-22T14:38:56Z"
+                        "676"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -819,11 +840,17 @@
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
+                    "x-msedge-ref": [
+                        "Ref A: 29B171E557534735B1CF834E489E20AD Ref B: CH1AA2020620051 Ref C: 2026-11-11T16:21:08Z"
+                    ],
                     "date": [
-                        "Tue, 22 Sep 2026 14:38:57 GMT"
+                        "Wed, 11 Nov 2026 16:21:08 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ]
                 },
                 "body": {
@@ -840,6 +867,7 @@
                                 "properties": {
                                     "protocolSettings": {
                                         "smb": {
+                                            "versions": "SMB2.1;SMB3.0;SMB3.1.1",
                                             "channelEncryption": "AES-128-CCM;AES-128-GCM;AES-256-GCM"
                                         }
                                     },
@@ -887,13 +915,7 @@
                 },
                 "headers": {
                     "content-length": [
-                        "555"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: 870FB7595D0B467A8FFA3C1C9E394629 Ref B: CH1AA2020610045 Ref C: 2026-09-22T14:38:57Z"
+                        "577"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-writes": [
                         "2999"
@@ -901,14 +923,20 @@
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
+                    "x-msedge-ref": [
+                        "Ref A: 32DAE672DD1043DFB15A4E96DF182138 Ref B: CHI261140511052 Ref C: 2026-11-11T16:21:09Z"
+                    ],
                     "date": [
-                        "Tue, 22 Sep 2026 14:38:56 GMT"
+                        "Wed, 11 Nov 2026 16:21:09 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "199"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ]
                 },
                 "body": {
@@ -919,6 +947,7 @@
                         "properties": {
                             "protocolSettings": {
                                 "smb": {
+                                    "versions": "SMB3.1.1",
                                     "channelEncryption": "AES-256-GCM"
                                 }
                             },
@@ -964,13 +993,7 @@
                 },
                 "headers": {
                     "content-length": [
-                        "615"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-msedge-ref": [
-                        "Ref A: C280F8F160094D56B9FB67DEDB8DFF8F Ref B: CHI261140504060 Ref C: 2026-09-22T14:38:57Z"
+                        "637"
                     ],
                     "x-ms-ratelimit-remaining-subscription-global-reads": [
                         "3749"
@@ -978,11 +1001,17 @@
                     "x-cache": [
                         "CONFIG_NOCACHE"
                     ],
+                    "x-msedge-ref": [
+                        "Ref A: 99ED1E94B2514D61A7AF23A8EB43E5E8 Ref B: CHI261140513042 Ref C: 2026-11-11T16:21:10Z"
+                    ],
                     "date": [
-                        "Tue, 22 Sep 2026 14:38:58 GMT"
+                        "Wed, 11 Nov 2026 16:21:09 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ]
                 },
                 "body": {
@@ -999,6 +1028,7 @@
                                 "properties": {
                                     "protocolSettings": {
                                         "smb": {
+                                            "versions": "SMB3.1.1",
                                             "channelEncryption": "AES-256-GCM"
                                         }
                                     },
