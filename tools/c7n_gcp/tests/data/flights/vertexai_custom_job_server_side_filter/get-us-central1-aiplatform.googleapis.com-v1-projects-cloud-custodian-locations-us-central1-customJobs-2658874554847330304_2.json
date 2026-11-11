@@ -1,0 +1,46 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 11 Nov 2026 18:51:32 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "785",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/customJobs/2658874554847330304?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/customJobs/2658874554847330304",
+    "displayName": "c7n-filter-job-default-2828-works",
+    "jobSpec": {
+      "workerPoolSpecs": [
+        {
+          "machineSpec": {
+            "machineType": "n1-standard-4"
+          },
+          "replicaCount": "1",
+          "diskSpec": {
+            "bootDiskType": "pd-ssd",
+            "bootDiskSizeGb": 100
+          },
+          "containerSpec": {
+            "imageUri": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+            "command": [
+              "true"
+            ]
+          }
+        }
+      ]
+    },
+    "state": "JOB_STATE_SUCCEEDED",
+    "createTime": "2026-11-11T18:44:29.061501Z",
+    "startTime": "2026-11-11T18:46:26Z",
+    "endTime": "2026-11-11T18:46:26Z",
+    "updateTime": "2026-11-11T18:46:27.778952Z"
+  }
+}
