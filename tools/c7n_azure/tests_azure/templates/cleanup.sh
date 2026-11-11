@@ -106,8 +106,13 @@ delete_resource() {
         # exposes no property to wait on, so retry the delete. The conversion has
         # no SLA and can outlast these retries; if so, rerun this script later.
         for attempt in $(seq 1 24); do
-            if az group delete --name $rgName --yes --output None; then
+            if delete_output=$(az group delete --name $rgName --yes --output None 2>&1); then
                 break
+            fi
+            echo "$delete_output" >&2
+            if [[ "$delete_output" != *PendingTransactionAlreadyExists* ]]; then
+                echo "Failed to delete $rgName"
+                return 1
             fi
             if [[ $attempt -eq 24 ]]; then
                 echo "Failed to delete $rgName after 24 attempts; a geo-redundancy conversion may still be pending."
