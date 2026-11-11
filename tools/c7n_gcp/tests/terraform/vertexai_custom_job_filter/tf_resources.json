@@ -1,0 +1,23 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "job_display_name": {
+            "value": "c7n-filter-job-default-2828",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "random_id": {
+            "suffix": {
+                "b64_std": "KCg=",
+                "b64_url": "KCg",
+                "byte_length": 2,
+                "dec": "10280",
+                "hex": "2828",
+                "id": "KCg",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

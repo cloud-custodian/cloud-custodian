@@ -1,0 +1,54 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 11 Nov 2026 18:51:30 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1356",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/customJobs?filter=display_name%3A%22c7n-filter-job-default-2828%2A%22+AND+state%3D%22JOB_STATE_FAILED%22&alt=json"
+  },
+  "body": {
+    "customJobs": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/customJobs/5002998160893673472",
+        "displayName": "c7n-filter-job-default-2828-fails",
+        "jobSpec": {
+          "workerPoolSpecs": [
+            {
+              "machineSpec": {
+                "machineType": "n1-standard-4"
+              },
+              "replicaCount": "1",
+              "diskSpec": {
+                "bootDiskType": "pd-ssd",
+                "bootDiskSizeGb": 100
+              },
+              "containerSpec": {
+                "imageUri": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+                "command": [
+                  "false"
+                ]
+              }
+            }
+          ]
+        },
+        "state": "JOB_STATE_FAILED",
+        "createTime": "2026-11-11T18:44:28.232666Z",
+        "startTime": "2026-11-11T18:46:27Z",
+        "endTime": "2026-11-11T18:46:27Z",
+        "updateTime": "2026-11-11T18:46:29.081460Z",
+        "error": {
+          "code": 3,
+          "message": "The replica workerpool0-0 exited with a non-zero status of 1. Termination reason: Error. To find out more about why your job exited please check the logs: https://console.cloud.google.com/logs/viewer?project=400632884532&resource=ml_job%2Fjob_id%2F5002998160893673472&advancedFilter=resource.type%3D%22ml_job%22%0Aresource.labels.job_id%3D%225002998160893673472%22"
+        }
+      }
+    ]
+  }
+}

@@ -3,6 +3,7 @@
 
 import os
 import json
+import pickle
 import time
 import logging
 from datetime import datetime, timedelta, timezone
@@ -11,10 +12,17 @@ import pytest
 from google.api_core.client_options import ClientOptions
 from googleapiclient.errors import HttpError
 from pytest_terraform import terraform
+from google.auth.credentials import AnonymousCredentials
+from googleapiclient import discovery
+
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import FilterValidationError
 from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest
-from c7n_gcp.resources.vertexai import VertexAIEndpoint, VertexAIPublisherModel
+from c7n_gcp.provider import resources
+from c7n_gcp.resources.vertexai import (
+    VertexAIQueryManager,
+    VERTEXAI_REGION_DATA_PATH, VertexAIEndpoint, VertexAIPublisherModel)
 
 
 def _make_http_error(
@@ -2168,6 +2176,54 @@ def test_vertexai_custom_job_query(test, vertexai_custom_job, create_custom_job)
     assert ':custom-job/' in urns[0]
 
 
+@terraform('vertexai_custom_job_filter', scope='module')
+def test_vertexai_custom_job_server_side_filter(
+        test, vertexai_custom_job_filter, create_custom_job):
+    """The API applies the query filter, c7n only forwards it.
+
+    Creates one job that fails and one that succeeds, then asks for each
+    state in turn under the same display-name scope. The state term is the
+    only difference between the two calls, so the recorded responses show
+    the filter doing the work rather than c7n discarding everything else.
+    """
+    prefix = vertexai_custom_job_filter.outputs['job_display_name']['value']
+
+    test.session_factory = test.replay_flight_data(
+        'vertexai_custom_job_server_side_filter')
+
+    failing = create_custom_job(f'{prefix}-fails', 'false')
+    succeeding = create_custom_job(f'{prefix}-works', 'true')
+
+    client = test.session_factory().client(
+        'aiplatform', 'v1', 'projects.locations.customJobs',
+        client_options=ClientOptions(
+            api_endpoint='https://us-central1-aiplatform.googleapis.com'))
+    # A custom job spends minutes provisioning before it runs at all. Sleep
+    # through that while recording so the flight keeps one poll per job
+    # instead of dozens.
+    if test.recording:
+        time.sleep(420)
+
+    jobs = VertexAIJobs(test, 'projects.locations.customJobs')
+    assert jobs.poll_terminal_state(
+        client, failing['name'], attempts=30)['state'] == 'JOB_STATE_FAILED'
+    assert jobs.poll_terminal_state(
+        client, succeeding['name'], attempts=30)['state'] == 'JOB_STATE_SUCCEEDED'
+
+    def by_state(state):
+        policy = test.load_policy(
+            {'name': 'vertexai-custom-job-' + state.lower().replace('_', '-'),
+             'resource': 'gcp.vertex-ai-custom-job',
+             'query': [
+                 {'location': 'us-central1'},
+                 {'filter': f'display_name:"{prefix}*" AND state="{state}"'}]},
+            session_factory=test.session_factory)
+        return [r['displayName'] for r in policy.run()]
+
+    assert by_state('JOB_STATE_FAILED') == [f'{prefix}-fails']
+    assert by_state('JOB_STATE_SUCCEEDED') == [f'{prefix}-works']
+
+
 @terraform('vertexai_custom_job', scope='module')
 def test_vertexai_custom_job_cancel_and_delete(test, vertexai_custom_job, create_custom_job):
     """Test cancelling and deleting a Custom Job via the c7n actions.
@@ -2733,3 +2789,316 @@ def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_stor
     resources = policy.run()
     assert len(resources) == 1
     assert resources[0]['displayName'] == 'c7n-test-artifact-unlabeled'
+
+# The query block reaches the API as request parameters, and flight data
+# cannot see that. recorder.py keys its fixture on urlparse(uri).path and
+# stores only the response, keyed on method, host and path, so a replay
+# test passes whether or not a
+# parameter is sent. These tests capture the call instead.
+
+
+class _StubClient:
+
+    def __init__(self, calls, component=None, pages=None):
+        self.calls = calls
+        self.component = component
+        self.pages = pages or [{}]
+
+    def execute_paged_query(self, verb, params):
+        self.calls.append((self.component, verb, dict(params)))
+        yield from self.pages
+
+
+def _capture_calls(test, policy_data, pages_for=None):
+    """Run a policy against stub clients and return the calls it made.
+
+    Goes through resources() rather than _fetch_resources, so the real
+    location manager runs and the cache key and region fan-out are live.
+    """
+    calls = []
+    policy = test.load_policy(policy_data)
+
+    def client(session, location, component):
+        return _StubClient(calls, component, pages_for and pages_for(component))
+
+    with patch('c7n_gcp.resources.vertexai.local_session') as session:
+        session.return_value.get_default_project.return_value = 'test-project'
+        with patch.object(
+                policy.resource_manager, 'get_location_client', side_effect=client):
+            policy.resource_manager.resources()
+    return calls
+
+
+def test_vertexai_query_params_reach_the_api(test):
+    """Every key but location is a request parameter for the list call."""
+    calls = _capture_calls(
+        test,
+        {'name': 'vertexai-custom-job-params',
+         'resource': 'gcp.vertex-ai-custom-job',
+         'query': [
+             {'location': 'us-central1'},
+             {'filter': 'state="JOB_STATE_FAILED"'},
+             {'pageSize': 50}]})
+
+    assert len(calls) == 1
+    _, verb, params = calls[0]
+    assert verb == 'list'
+    assert params['filter'] == 'state="JOB_STATE_FAILED"'
+    assert params['pageSize'] == 50
+    assert params['parent'].endswith('/locations/us-central1')
+
+
+def test_vertexai_query_without_params_sends_only_parent(test):
+    calls = _capture_calls(
+        test,
+        {'name': 'vertexai-custom-job-no-params',
+         'resource': 'gcp.vertex-ai-custom-job',
+         'query': [{'location': 'us-central1'}]})
+
+    assert len(calls) == 1
+    assert set(calls[0][2]) == {'parent'}
+
+
+def test_vertexai_query_params_reach_every_location(test):
+    """A multi-region enumerator has to carry the query into each region,
+    otherwise the unfiltered ones quietly return everything.
+    """
+    calls = _capture_calls(
+        test,
+        {'name': 'vertexai-custom-job-every-location',
+         'resource': 'gcp.vertex-ai-custom-job',
+         'query': [
+             {'location': 'us-central1'},
+             {'location': 'us-east1'},
+             {'filter': 'state="JOB_STATE_FAILED"'}]})
+
+    assert len(calls) == 2
+    assert all(p['filter'] == 'state="JOB_STATE_FAILED"' for _, _, p in calls)
+    assert {p['parent'].rsplit('/', 1)[-1] for _, _, p in calls} == {
+        'us-central1', 'us-east1'}
+
+
+def test_vertexai_filter_only_query_reaches_all_regions(test):
+    """A query naming no location still enumerates every region, and each
+    one carries the filter.
+    """
+    with open(VERTEXAI_REGION_DATA_PATH) as fh:
+        region_count = len(json.load(fh))
+
+    calls = _capture_calls(
+        test,
+        {'name': 'vertexai-custom-job-filter-only',
+         'resource': 'gcp.vertex-ai-custom-job',
+         'query': [{'filter': 'state="JOB_STATE_FAILED"'}]})
+
+    assert len(calls) == region_count
+    assert all(p['filter'] == 'state="JOB_STATE_FAILED"' for _, _, p in calls)
+
+
+def test_vertexai_artifact_query_params_reach_the_artifact_call(test):
+    """Artifacts enumerate through their own fetch, and metadataStores.list
+    accepts none of these parameters.
+    """
+    store = {'name': 'projects/p/locations/us-central1/metadataStores/default'}
+
+    calls = _capture_calls(
+        test,
+        {'name': 'vertexai-artifact-filter',
+         'resource': 'gcp.vertex-ai-metadata-store-artifact',
+         'query': [
+             {'location': 'us-central1'},
+             {'filter': 'display_name="keep"'}]},
+        pages_for=lambda component: (
+            [{'metadataStores': [store]}]
+            if component.endswith('metadataStores') else [{}]))
+
+    stores = [p for c, _, p in calls if c.endswith('metadataStores')]
+    artifacts = [p for c, _, p in calls if c.endswith('artifacts')]
+
+    assert len(stores) == 1
+    assert set(stores[0]) == {'parent'}
+
+    assert len(artifacts) == 1
+    assert artifacts[0]['filter'] == 'display_name="keep"'
+
+
+def test_vertexai_query_cache_key_varies(test):
+    """get_cache_key carries no policy name and no region, so whatever the
+    query resolves to is the only thing separating two policies.
+    """
+
+    # c7n/cache.py keys on pickle bytes, not dict equality
+    def cache_key(query, **config):
+        policy = test.load_policy(
+            {'name': 'vertexai-custom-job-cache-key',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'query': query},
+            config=config or None)
+        manager = policy.resource_manager
+        return pickle.dumps(manager.get_cache_key(manager.get_resource_query()))
+
+    central = [{'location': 'us-central1'}]
+    east = [{'location': 'us-east1'}]
+    failed = 'state="JOB_STATE_FAILED"'
+    running = 'state="JOB_STATE_RUNNING"'
+
+    assert cache_key(central) == cache_key(central)
+    assert cache_key(central) != cache_key(east)
+    assert cache_key(central) != cache_key(central + [{'filter': failed}])
+
+    # the filter VALUE has to reach the key, not just its presence
+    assert (cache_key(central + [{'filter': failed}])
+            != cache_key(central + [{'filter': running}]))
+
+    # and so does a region that came from -r rather than from the query
+    only_filter = [{'filter': failed}]
+    assert (cache_key(only_filter, regions=['us-central1'])
+            != cache_key(only_filter, regions=['us-east1']))
+
+
+def test_vertexai_query_rejects_unknown_key(test):
+    """A misspelled key must fail at load time. Accepting it silently
+    widened the policy from one region to every region.
+    """
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-custom-job-typo',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'query': [{'locations': 'us-central1'}]})
+    assert 'locations' in str(caught.value)
+
+
+@pytest.mark.parametrize('query,expected', [
+    ([{'filter': None}], 'non-empty string'),
+    ([{'filter': ''}], 'non-empty string'),
+    ([{'filter': '   '}], 'non-empty string'),
+    ([{'filter': {'state': 'x'}}], 'non-empty string'),
+    ([{'filter': ['a', 'b']}], 'non-empty string'),
+    ([{'location': 'us-central-1'}], 'not a Vertex AI region'),
+    ([{'location': 'US-CENTRAL1'}], 'not a Vertex AI region'),
+    ([{'location': None}], 'non-empty string'),
+    ([{'location': ['us-central1']}], 'non-empty string'),
+    ([{'pageSize': 'ten'}], 'must be a number'),
+])
+def test_vertexai_query_rejects_bad_value(test, query, expected):
+    """A key the API accepts is not enough, the value has to survive too.
+
+    An unset or empty filter is the dangerous one. googleapiclient drops a
+    None parameter and the API reads an empty string as no filter, so the
+    policy quietly enumerates everything it was meant to narrow.
+    """
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-custom-job-bad-value',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'query': query})
+    assert expected in str(caught.value)
+
+
+def test_vertexai_query_accepts_good_values(test):
+    policy = test.load_policy(
+        {'name': 'vertexai-custom-job-good-values',
+         'resource': 'gcp.vertex-ai-custom-job',
+         'query': [
+             {'location': 'us-central1'},
+             {'filter': 'state="JOB_STATE_FAILED"'},
+             {'pageSize': 50}]})
+
+    assert policy.resource_manager.get_resource_query() == {
+        'filter': 'state="JOB_STATE_FAILED"', 'pageSize': 50}
+
+
+def test_vertexai_query_rejects_repeated_param(test):
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-custom-job-two-filters',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'query': [
+                 {'filter': 'state="JOB_STATE_FAILED"'},
+                 {'filter': 'display_name="x"'}]})
+    assert 'filter' in str(caught.value)
+
+
+def test_vertexai_query_param_rejected_in_event_mode(test):
+    """get_resource serves event modes and never sees the query, so a
+    filter there would silently apply in pull mode only.
+    """
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-custom-job-event-filter',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': [
+                     'google.cloud.aiplatform.v1.JobService.CreateCustomJob']},
+             'query': [{'filter': 'state="JOB_STATE_FAILED"'}]})
+    assert 'gcp-audit' in str(caught.value)
+
+
+def test_vertexai_location_only_query_allowed_in_event_mode(test):
+    """location is c7n's own key, not a request parameter, so it stays legal."""
+    policy = test.load_policy(
+        {'name': 'vertexai-custom-job-event-location',
+         'resource': 'gcp.vertex-ai-custom-job',
+         'mode': {
+             'type': 'gcp-audit',
+             'methods': ['google.cloud.aiplatform.v1.JobService.CreateCustomJob']},
+         'query': [{'location': 'us-central1'}]})
+
+    assert policy.resource_manager.get_resource_query() is None
+
+
+def test_vertexai_query_param_allowed_in_periodic_mode(test):
+    """gcp-periodic runs PullMode, so the query does reach the list call."""
+    policy = test.load_policy(
+        {'name': 'vertexai-custom-job-periodic-filter',
+         'resource': 'gcp.vertex-ai-custom-job',
+         'mode': {
+             'type': 'gcp-periodic',
+             'schedule': '0 * * * *',
+             'service-account': 'c7n@cloud-custodian.iam.gserviceaccount.com'},
+         'query': [{'filter': 'state="JOB_STATE_FAILED"'}]})
+
+    assert policy.resource_manager.get_resource_query() == {
+        'filter': 'state="JOB_STATE_FAILED"'}
+
+
+def test_vertexai_query_params_match_the_api():
+    """Every declared query param has to be one the client will accept.
+
+    The stub clients above accept any keyword, so nothing else catches a
+    resource declaring a parameter its list method does not take. That would
+    surface as a TypeError from googleapiclient part way through a real run.
+    A wrong value type raises ValueError, which still proves the name is good.
+    """
+    service = discovery.build(
+        'aiplatform', 'v1', static_discovery=True,
+        credentials=AnonymousCredentials(), cache_discovery=False)
+
+    for name, klass in sorted(resources.items()):
+        if not (isinstance(klass, type)
+                and issubclass(klass, VertexAIQueryManager)):
+            continue
+
+        segments = klass.resource_type.component.split('.')
+        component = service
+        for segment in segments:
+            component = getattr(component, segment)()
+
+        # each nesting level adds a segment to the parent, and the generated
+        # method checks it against a pattern before it checks anything else
+        parent = '/'.join(f'{segment}/x' for segment in segments[:-1])
+
+        declared = set(klass.resource_type.query_params)
+        assert not declared & {'parent', 'pageToken'}, (
+            f'gcp.{name} lets a policy set a parameter c7n owns')
+
+        for param in declared:
+            try:
+                component.list(parent=parent, **{param: 1})
+            except TypeError as error:
+                raise AssertionError(
+                    f'gcp.{name} declares {param!r}, which '
+                    f'{klass.resource_type.component}.list rejects') from error
+            except ValueError:
+                pass

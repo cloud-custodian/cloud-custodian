@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+from functools import lru_cache
 from pathlib import Path
 from collections import defaultdict
 
@@ -9,6 +10,7 @@ from google.cloud import storage
 from googleapiclient.errors import HttpError
 import yaml
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, jmespath_search, type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
@@ -19,6 +21,13 @@ from c7n_gcp.query import (
 REGION_DATA_PATH = Path(__file__).parent.parent / 'regions.json'
 VERTEXAI_REGION_DATA_PATH = Path(__file__).parent.parent / 'vertexai_regions.json'
 VERTEXAI_PUBLISHER_DATA_PATH = Path(__file__).parent.parent / 'vertexai_publishers.json'
+
+
+@lru_cache(maxsize=1)
+def vertexai_regions():
+    with open(VERTEXAI_REGION_DATA_PATH) as fh:
+        return frozenset(json.load(fh))
+
 
 # Job states a job can be cancelled from: the non-terminal JobState values.
 # The rest are either terminal (SUCCEEDED, FAILED, CANCELLED, EXPIRED,
@@ -73,6 +82,91 @@ class VertexAIQueryManager(QueryResourceManager):
         client = self.get_location_client(session, location, self.resource_type.component)
         return self.resource_type.get(client, resource_info)
 
+    def validate(self):
+        """Reject query keys the list call will not accept.
+
+        Catches them under `custodian validate`, otherwise googleapiclient
+        raises TypeError part way through enumeration.
+        """
+        allowed = set(self.resource_type.query_params) | {'location'}
+        params = []
+        for child in self.data.get('query', ()):
+            unknown = set(child) - allowed
+            if unknown:
+                raise PolicyValidationError(
+                    f"{self.type} query supports {sorted(allowed)}, "
+                    f"got {sorted(unknown)}")
+            for key, value in child.items():
+                self._validate_query_value(key, value)
+            params.extend(k for k in child if k != 'location')
+
+        repeated = sorted({k for k in params if params.count(k) > 1})
+        if repeated:
+            raise PolicyValidationError(
+                f"{self.type} query sets {repeated} more than once")
+
+        # gcp-audit and gcp-scc resolve through get_resource, which never sees
+        # the query, so a parameter would apply in pull mode only and the same
+        # policy file would mean two different things. gcp-periodic runs
+        # PullMode, so it keeps the query.
+        mode = self.data.get('mode', {}).get('type', 'pull')
+        if params and mode not in ('pull', 'gcp-periodic'):
+            raise PolicyValidationError(
+                f"{self.type} query {sorted(set(params))} applies to "
+                f"enumeration only, it has no effect in {mode} mode")
+        return self
+
+    def _validate_query_value(self, key, value):
+        """A key the API accepts is not enough, the value has to survive too.
+
+        An unset or empty filter is the dangerous one. googleapiclient drops a
+        None parameter and the API treats an empty string as no filter, so the
+        policy silently enumerates everything.
+        """
+        if key == 'pageSize':
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise PolicyValidationError(
+                    f"{self.type} query pageSize must be a number, "
+                    f"got {value!r}")
+            return
+
+        if not isinstance(value, str) or not value.strip():
+            raise PolicyValidationError(
+                f"{self.type} query {key} must be a non-empty string, "
+                f"got {value!r}")
+
+        if key == 'location' and value not in vertexai_regions():
+            raise PolicyValidationError(
+                f"{self.type} query location {value!r} is not a Vertex AI "
+                f"region")
+
+    def get_resource_query(self):
+        """location entries pick regions, every other key is a list parameter."""
+        query = {k: v for child in self.data.get('query', ())
+                 for k, v in child.items() if k != 'location'}
+        return query or None
+
+    def get_cache_key(self, query):
+        """Key on the regions actually enumerated, not the ones declared.
+
+        A query naming no location falls through to config.regions, so the
+        declared query alone does not determine the result set.
+        """
+        key = super().get_cache_key(query)
+        key['locations'] = sorted(
+            instance['name'] for instance in self._resolve_locations())
+        return key
+
+    def _resolve_locations(self):
+        """The regions this policy will enumerate, one source of truth for
+        both the cache key and the fetch.
+        """
+        location_query = self._get_location_query()
+        return self.get_resource_manager(
+            resource_type='vertex-ai-location',
+            data=({'query': location_query} if location_query else {})
+        ).resources()
+
     def _fetch_resources(self, query):
         """Override to handle location-specific API endpoints and multi-location enumeration.
 
@@ -85,18 +179,11 @@ class VertexAIQueryManager(QueryResourceManager):
         session = local_session(self.session_factory)
         project = session.get_default_project()
 
-        # Get locations to query
-        location_query = self._get_location_query()
-        location_manager = self.get_resource_manager(
-            resource_type='vertex-ai-location',
-            data=({'query': location_query} if location_query else {})
-        )
-
         all_resources = []
         annotation_key = 'c7n:location'
 
         # Enumerate resources in each location
-        for location_instance in location_manager.resources():
+        for location_instance in self._resolve_locations():
             location = location_instance['name']
 
             # Get client with location-specific endpoint
@@ -107,7 +194,7 @@ class VertexAIQueryManager(QueryResourceManager):
 
             # Execute the list operation for this location
             enum_op, path, _ = self.resource_type.enum_spec
-            params = {'parent': parent}
+            params = {**(query or {}), 'parent': parent}
 
             # Invoke the client enumeration (Vertex AI API supports pagination)
             location_resources = []
@@ -126,21 +213,10 @@ class VertexAIQueryManager(QueryResourceManager):
         return all_resources
 
     def _get_location_query(self):
-        """Get location query for multi-location enumeration.
-
-        Returns query to pass to vertex-ai-location resource manager.
-        If policy has 'query' specified, use that to filter locations.
-        Otherwise, return None to use default location logic.
-
-        Returns:
-            list or None: Location query list or None for defaults
+        """The policy's location entries, or None to fall through to the
+        default regions. A query naming none of them still enumerates all.
         """
-        # If policy has query specified, pass it through to location manager
-        if 'query' in self.data:
-            return self.data['query']
-
-        # Otherwise, let location manager use config.regions or config.region
-        return None
+        return [c for c in self.data.get('query', ()) if 'location' in c] or None
 
 
 class VertexAIMethodAction(MethodAction):
@@ -186,6 +262,10 @@ class VertexAITypeInfo(TypeInfo):
     version = 'v1'
     scope = 'project'
     scope_key = 'parent'
+    # Request parameters a policy may set through `query:`. parent and
+    # pageToken belong to c7n, so they are never accepted. A safe floor for
+    # a subclass that declares none of its own.
+    query_params = ('filter', 'pageSize')
     scope_template = None  # Handled dynamically per location
     name = id = 'name'
     urn_id_segments = (-1,)
@@ -289,6 +369,7 @@ class VertexAIEndpoint(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.endpoints'
+        query_params = ('filter', 'pageSize', 'orderBy', 'readMask', 'gdcZone')
         enum_spec = ('list', 'endpoints[]', None)
         default_report_fields = [
             'name', 'displayName', 'deployedModels[].displayName', 'createTime', 'updateTime'
@@ -719,6 +800,7 @@ class VertexAIDataset(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.datasets'
+        query_params = ('filter', 'pageSize', 'orderBy', 'readMask')
         enum_spec = ('list', 'datasets[]', None)
         default_report_fields = [
             'name', 'displayName', 'createTime', 'updateTime', 'metadataSchemaUri'
@@ -762,6 +844,7 @@ class VertexAIModel(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.models'
+        query_params = ('filter', 'pageSize', 'orderBy', 'readMask')
         enum_spec = ('list', 'models[]', None)
         default_report_fields = [
             'name', 'displayName', 'trainingPipeline', 'createTime', 'updateTime'
@@ -818,6 +901,7 @@ class VertexAIEvaluationRun(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.evaluationRuns'
+        query_params = ('filter', 'pageSize', 'orderBy')
         enum_spec = ('list', 'evaluationRuns[]', None)
         default_report_fields = [
             'name', 'displayName', 'state', 'createTime', 'completionTime'
@@ -851,6 +935,7 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.metadataStores.artifacts'
+        query_params = ('filter', 'pageSize', 'orderBy')
         enum_spec = ('list', 'artifacts[]', None)
         default_report_fields = ['name', 'displayName', 'createTime', 'updateTime']
         permissions = (
@@ -871,17 +956,11 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
         session = local_session(self.session_factory)
         project = session.get_default_project()
 
-        location_query = self._get_location_query()
-        location_manager = self.get_resource_manager(
-            resource_type='vertex-ai-location',
-            data=({'query': location_query} if location_query else {})
-        )
-
         all_resources = []
         location_annotation_key = 'c7n:location'
         enum_op, path, _ = self.resource_type.enum_spec
 
-        for location_instance in location_manager.resources():
+        for location_instance in self._resolve_locations():
             location = location_instance['name']
             store_client = self.get_location_client(
                 session, location, 'projects.locations.metadataStores')
@@ -896,10 +975,13 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
                         if artifact_client is None:
                             artifact_client = self.get_location_client(
                                 session, location, self.resource_type.component)
+                        # Query params describe artifacts, and
+                        # metadataStores.list accepts none of them anyway.
+                        artifact_params = {**(query or {}), 'parent': store['name']}
                         artifacts = []
                         with self._ignore_access_errors():
                             for artifact_page in artifact_client.execute_paged_query(
-                                    enum_op, {'parent': store['name']}):
+                                    enum_op, artifact_params):
                                 page_items = jmespath_search(path, artifact_page)
                                 if page_items:
                                     artifacts.extend(page_items)
@@ -968,6 +1050,7 @@ class VertexAIBatchPredictionJob(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.batchPredictionJobs'
+        query_params = ('filter', 'pageSize', 'readMask')
         enum_spec = ('list', 'batchPredictionJobs[]', None)
         default_report_fields = [
             'name', 'displayName', 'state', 'createTime', 'updateTime'
@@ -1095,6 +1178,21 @@ class VertexAICustomJob(VertexAIQueryManager):
 
     :example:
 
+    Narrow the enumeration itself, rather than filtering after the fact.
+    Keys other than `location` are passed to the Vertex AI list call, so
+    `filter` takes the API's own syntax:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-vertex-ai-custom-jobs-failed
+            resource: gcp.vertex-ai-custom-job
+            query:
+              - location: us-central1
+              - filter: 'state="JOB_STATE_FAILED"'
+
+    :example:
+
     Find running Custom Jobs:
 
     .. code-block:: yaml
@@ -1127,6 +1225,7 @@ class VertexAICustomJob(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.customJobs'
+        query_params = ('filter', 'pageSize', 'readMask')
         enum_spec = ('list', 'customJobs[]', None)
         default_report_fields = [
             'name', 'displayName', 'state', 'createTime', 'updateTime'
@@ -1266,6 +1365,7 @@ class VertexAIHyperparameterTuningJob(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.hyperparameterTuningJobs'
+        query_params = ('filter', 'pageSize', 'readMask')
         enum_spec = ('list', 'hyperparameterTuningJobs[]', None)
         default_report_fields = [
             'name', 'displayName', 'state', 'createTime', 'updateTime',
