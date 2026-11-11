@@ -21,7 +21,7 @@ from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest
 from c7n_gcp.provider import resources
 from c7n_gcp.resources.vertexai import (
-    VertexAIQueryManager,
+    VertexAIQueryManager, VertexAITypeInfo,
     VERTEXAI_REGION_DATA_PATH, VertexAIEndpoint, VertexAIPublisherModel)
 
 
@@ -2179,12 +2179,19 @@ def test_vertexai_custom_job_query(test, vertexai_custom_job, create_custom_job)
 @terraform('vertexai_custom_job_filter', scope='module')
 def test_vertexai_custom_job_server_side_filter(
         test, vertexai_custom_job_filter, create_custom_job):
-    """The API applies the query filter, c7n only forwards it.
+    """End to end over real recorded Vertex AI responses.
 
     Creates one job that fails and one that succeeds, then asks for each
-    state in turn under the same display-name scope. The state term is the
-    only difference between the two calls, so the recorded responses show
-    the filter doing the work rather than c7n discarding everything else.
+    state in turn under the same display-name scope. Recording this proved
+    the API honours the filter: the request URI is in each response's
+    content-location header, and the two calls differ only in the state term.
+
+    On replay it proves less than it looks. recorder.py names a fixture from
+    the URL path and drops the query string, so both calls here resolve to
+    the same path and are served in call order. Revert the fix and this test
+    still passes. What it does cover is the whole path the stubs cut out:
+    the real client, the location fan-out, paging and the record shape. The
+    filter reaching the API is pinned by the _capture_calls tests below.
     """
     prefix = vertexai_custom_job_filter.outputs['job_display_name']['value']
 
@@ -2833,18 +2840,18 @@ def test_vertexai_query_params_reach_the_api(test):
     """Every key but location is a request parameter for the list call."""
     calls = _capture_calls(
         test,
-        {'name': 'vertexai-custom-job-params',
-         'resource': 'gcp.vertex-ai-custom-job',
+        {'name': 'vertexai-model-params',
+         'resource': 'gcp.vertex-ai-model',
          'query': [
              {'location': 'us-central1'},
-             {'filter': 'state="JOB_STATE_FAILED"'},
-             {'pageSize': 50}]})
+             {'filter': 'labels.env="prod"'},
+             {'orderBy': 'create_time desc'}]})
 
     assert len(calls) == 1
     _, verb, params = calls[0]
     assert verb == 'list'
-    assert params['filter'] == 'state="JOB_STATE_FAILED"'
-    assert params['pageSize'] == 50
+    assert params['filter'] == 'labels.env="prod"'
+    assert params['orderBy'] == 'create_time desc'
     assert params['parent'].endswith('/locations/us-central1')
 
 
@@ -2899,7 +2906,10 @@ def test_vertexai_artifact_query_params_reach_the_artifact_call(test):
     """Artifacts enumerate through their own fetch, and metadataStores.list
     accepts none of these parameters.
     """
-    store = {'name': 'projects/p/locations/us-central1/metadataStores/default'}
+    # two stores, so forwarding the filter to only the first one fails here
+    stores_page = [{'metadataStores': [
+        {'name': 'projects/p/locations/us-central1/metadataStores/default'},
+        {'name': 'projects/p/locations/us-central1/metadataStores/second'}]}]
 
     calls = _capture_calls(
         test,
@@ -2909,8 +2919,7 @@ def test_vertexai_artifact_query_params_reach_the_artifact_call(test):
              {'location': 'us-central1'},
              {'filter': 'display_name="keep"'}]},
         pages_for=lambda component: (
-            [{'metadataStores': [store]}]
-            if component.endswith('metadataStores') else [{}]))
+            stores_page if component.endswith('metadataStores') else [{}]))
 
     stores = [p for c, _, p in calls if c.endswith('metadataStores')]
     artifacts = [p for c, _, p in calls if c.endswith('artifacts')]
@@ -2918,8 +2927,11 @@ def test_vertexai_artifact_query_params_reach_the_artifact_call(test):
     assert len(stores) == 1
     assert set(stores[0]) == {'parent'}
 
-    assert len(artifacts) == 1
-    assert artifacts[0]['filter'] == 'display_name="keep"'
+    assert len(artifacts) == 2
+    assert [a['filter'] for a in artifacts] == ['display_name="keep"'] * 2
+    assert sorted(a['parent'] for a in artifacts) == [
+        'projects/p/locations/us-central1/metadataStores/default',
+        'projects/p/locations/us-central1/metadataStores/second']
 
 
 def test_vertexai_query_cache_key_varies(test):
@@ -2965,7 +2977,7 @@ def test_vertexai_query_rejects_unknown_key(test):
             {'name': 'vertexai-custom-job-typo',
              'resource': 'gcp.vertex-ai-custom-job',
              'query': [{'locations': 'us-central1'}]})
-    assert 'locations' in str(caught.value)
+    assert "got ['locations']" in str(caught.value)
 
 
 @pytest.mark.parametrize('query,expected', [
@@ -2978,7 +2990,6 @@ def test_vertexai_query_rejects_unknown_key(test):
     ([{'location': 'US-CENTRAL1'}], 'not a Vertex AI region'),
     ([{'location': None}], 'non-empty string'),
     ([{'location': ['us-central1']}], 'non-empty string'),
-    ([{'pageSize': 'ten'}], 'must be a number'),
 ])
 def test_vertexai_query_rejects_bad_value(test, query, expected):
     """A key the API accepts is not enough, the value has to survive too.
@@ -2997,15 +3008,52 @@ def test_vertexai_query_rejects_bad_value(test, query, expected):
 
 def test_vertexai_query_accepts_good_values(test):
     policy = test.load_policy(
-        {'name': 'vertexai-custom-job-good-values',
-         'resource': 'gcp.vertex-ai-custom-job',
+        {'name': 'vertexai-model-good-values',
+         'resource': 'gcp.vertex-ai-model',
          'query': [
              {'location': 'us-central1'},
-             {'filter': 'state="JOB_STATE_FAILED"'},
-             {'pageSize': 50}]})
+             {'filter': 'labels.env="prod"'},
+             {'orderBy': 'create_time desc'}]})
 
     assert policy.resource_manager.get_resource_query() == {
-        'filter': 'state="JOB_STATE_FAILED"', 'pageSize': 50}
+        'filter': 'labels.env="prod"', 'orderBy': 'create_time desc'}
+
+
+@pytest.mark.parametrize('param,value', [
+    ('pageSize', 50),
+    ('readMask', 'displayName'),
+    ('gdcZone', 'us-central1-a'),
+])
+def test_vertexai_query_rejects_dropped_params(test, param, value):
+    """The list methods take these, and a policy still may not.
+
+    Every page is drained, so pageSize cannot narrow a result set, and a
+    readMask that omits `name` breaks every action and the urn. Both are
+    spelled correctly, so only the allowlist keeps them out.
+    """
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-endpoint-dropped-param',
+             'resource': 'gcp.vertex-ai-endpoint',
+             'query': [{param: value}]})
+    assert f"got ['{param}']" in str(caught.value)
+
+
+def test_vertexai_query_rejects_mixed_location_entry(test):
+    """A filter beside a location reads as scoping that one region.
+
+    It is not. get_resource_query flattens every entry into one dict, so the
+    filter goes to all of them. Reject the shape rather than honour a
+    reading the API cannot support.
+    """
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-custom-job-mixed-entry',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'query': [
+                 {'location': 'us-central1', 'filter': 'state="JOB_STATE_FAILED"'},
+                 {'location': 'us-east1'}]})
+    assert 'mixes location' in str(caught.value)
 
 
 def test_vertexai_query_rejects_repeated_param(test):
@@ -3016,7 +3064,7 @@ def test_vertexai_query_rejects_repeated_param(test):
              'query': [
                  {'filter': 'state="JOB_STATE_FAILED"'},
                  {'filter': 'display_name="x"'}]})
-    assert 'filter' in str(caught.value)
+    assert 'more than once' in str(caught.value)
 
 
 def test_vertexai_query_param_rejected_in_event_mode(test):
@@ -3075,10 +3123,15 @@ def test_vertexai_query_params_match_the_api():
         'aiplatform', 'v1', static_discovery=True,
         credentials=AnonymousCredentials(), cache_discovery=False)
 
+    assert not set(VertexAITypeInfo.query_params) & {'parent', 'pageToken'}, (
+        'the shared floor lets a policy set a parameter c7n owns')
+
+    checked = 0
     for name, klass in sorted(resources.items()):
         if not (isinstance(klass, type)
                 and issubclass(klass, VertexAIQueryManager)):
             continue
+        checked += 1
 
         segments = klass.resource_type.component.split('.')
         component = service
@@ -3102,3 +3155,6 @@ def test_vertexai_query_params_match_the_api():
                     f'{klass.resource_type.component}.list rejects') from error
             except ValueError:
                 pass
+
+    # an empty registry would walk the loop zero times and pass
+    assert checked == 8, f'expected 8 Vertex AI query managers, found {checked}'
