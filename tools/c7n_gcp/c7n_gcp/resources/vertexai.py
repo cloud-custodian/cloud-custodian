@@ -35,6 +35,17 @@ def vertexai_regions():
         return tuple(json.load(fh))
 
 
+# Parameters the Vertex AI list methods accept that a policy still may not
+# set. The reason travels with the key so a rejection explains itself, rather
+# than reading as c7n lagging the API.
+QUERY_PARAMS_WITHHELD = {
+    'parent': 'c7n builds it from the location',
+    'pageToken': 'c7n pages',
+    'readMask': 'it can omit name, which the actions and the urn read',
+    'pageSize': 'every page is drained, so it cannot narrow a result set',
+}
+
+
 # Job states a job can be cancelled from: the non-terminal JobState values.
 # The rest are either terminal (SUCCEEDED, FAILED, CANCELLED, EXPIRED,
 # PARTIALLY_SUCCEEDED) or already cancelling. The API reference doesn't
@@ -98,6 +109,12 @@ class VertexAIQueryManager(QueryResourceManager):
         params = []
         for child in self.data.get('query', ()):
             unknown = set(child) - allowed
+            withheld = sorted(unknown & QUERY_PARAMS_WITHHELD.keys())
+            if withheld:
+                raise PolicyValidationError(
+                    f"{self.type} query withholds " + ', '.join(
+                        f"{key} ({QUERY_PARAMS_WITHHELD[key]})"
+                        for key in withheld))
             if unknown:
                 raise PolicyValidationError(
                     f"{self.type} query supports {sorted(allowed)}, "
@@ -268,11 +285,12 @@ class VertexAITypeInfo(TypeInfo):
     scope = 'project'
     scope_key = 'parent'
     # Request parameters a policy may set through `query:`. A deliberate
-    # subset of what the list methods accept, not a transcription of them:
-    # parent and pageToken belong to c7n, pageSize cannot narrow a result set
-    # because every page is drained, and readMask can omit `name`, which the
-    # actions and the urn both need. A subclass adds orderBy where its own
-    # method takes it.
+    # subset of what the list methods accept, not a transcription of them,
+    # because nothing in c7n takes a prefix of a result set: every page is
+    # drained and max-resources aborts rather than truncates, so a parameter
+    # earns a place here only by narrowing what the API returns. See
+    # QUERY_PARAMS_WITHHELD for the ones held back and why. A subclass
+    # overrides this only if its own list method has no filter.
     query_params = ('filter',)
     scope_template = None  # Handled dynamically per location
     name = id = 'name'
@@ -374,7 +392,6 @@ class VertexAIEndpoint(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.endpoints'
-        query_params = ('filter', 'orderBy')
         enum_spec = ('list', 'endpoints[]', None)
         default_report_fields = [
             'name', 'displayName', 'deployedModels[].displayName', 'createTime', 'updateTime'
@@ -805,7 +822,6 @@ class VertexAIDataset(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.datasets'
-        query_params = ('filter', 'orderBy')
         enum_spec = ('list', 'datasets[]', None)
         default_report_fields = [
             'name', 'displayName', 'createTime', 'updateTime', 'metadataSchemaUri'
@@ -849,7 +865,6 @@ class VertexAIModel(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.models'
-        query_params = ('filter', 'orderBy')
         enum_spec = ('list', 'models[]', None)
         default_report_fields = [
             'name', 'displayName', 'trainingPipeline', 'createTime', 'updateTime'
@@ -906,7 +921,6 @@ class VertexAIEvaluationRun(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.evaluationRuns'
-        query_params = ('filter', 'orderBy')
         enum_spec = ('list', 'evaluationRuns[]', None)
         default_report_fields = [
             'name', 'displayName', 'state', 'createTime', 'completionTime'
@@ -940,7 +954,6 @@ class VertexAIMetadataStoreArtifact(VertexAIQueryManager):
 
     class resource_type(VertexAITypeInfo):
         component = 'projects.locations.metadataStores.artifacts'
-        query_params = ('filter', 'orderBy')
         enum_spec = ('list', 'artifacts[]', None)
         default_report_fields = ['name', 'displayName', 'createTime', 'updateTime']
         permissions = (

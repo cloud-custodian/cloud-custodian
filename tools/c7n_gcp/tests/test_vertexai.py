@@ -21,7 +21,7 @@ from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest
 from c7n_gcp.provider import resources
 from c7n_gcp.resources.vertexai import (
-    VertexAIQueryManager, VertexAITypeInfo,
+    VertexAIQueryManager, VertexAITypeInfo, QUERY_PARAMS_WITHHELD,
     VERTEXAI_REGION_DATA_PATH, VertexAIEndpoint, VertexAIPublisherModel)
 
 
@@ -2840,19 +2840,18 @@ def test_vertexai_query_params_reach_the_api(test):
     """Every key but location is a request parameter for the list call."""
     calls = _capture_calls(
         test,
-        {'name': 'vertexai-model-params',
-         'resource': 'gcp.vertex-ai-model',
+        {'name': 'vertexai-custom-job-params',
+         'resource': 'gcp.vertex-ai-custom-job',
          'query': [
              {'location': 'us-central1'},
-             {'filter': 'labels.env="prod"'},
-             {'orderBy': 'create_time desc'}]})
+             {'filter': 'state="JOB_STATE_FAILED"'}]})
 
     assert len(calls) == 1
     _, verb, params = calls[0]
     assert verb == 'list'
-    assert params['filter'] == 'labels.env="prod"'
-    assert params['orderBy'] == 'create_time desc'
+    assert params['filter'] == 'state="JOB_STATE_FAILED"'
     assert params['parent'].endswith('/locations/us-central1')
+    assert set(params) == {'filter', 'parent'}
 
 
 def test_vertexai_query_without_params_sends_only_parent(test):
@@ -3008,32 +3007,46 @@ def test_vertexai_query_rejects_bad_value(test, query, expected):
 
 def test_vertexai_query_accepts_good_values(test):
     policy = test.load_policy(
-        {'name': 'vertexai-model-good-values',
-         'resource': 'gcp.vertex-ai-model',
+        {'name': 'vertexai-custom-job-good-values',
+         'resource': 'gcp.vertex-ai-custom-job',
          'query': [
              {'location': 'us-central1'},
-             {'filter': 'labels.env="prod"'},
-             {'orderBy': 'create_time desc'}]})
+             {'filter': 'create_time>"2026-11-01T00:00:00Z"'}]})
 
     assert policy.resource_manager.get_resource_query() == {
-        'filter': 'labels.env="prod"', 'orderBy': 'create_time desc'}
+        'filter': 'create_time>"2026-11-01T00:00:00Z"'}
 
 
-@pytest.mark.parametrize('param,value', [
-    ('pageSize', 50),
-    ('readMask', 'displayName'),
-    ('gdcZone', 'us-central1-a'),
+@pytest.mark.parametrize('param,value,expected', [
+    ('pageSize', 50, 'every page is drained'),
+    ('readMask', 'displayName', 'which the actions and the urn read'),
+    ('parent', 'projects/p/locations/us-central1', 'c7n builds it'),
+    ('pageToken', 'abc', 'c7n pages'),
 ])
-def test_vertexai_query_rejects_dropped_params(test, param, value):
-    """The list methods take these, and a policy still may not.
-
-    Every page is drained, so pageSize cannot narrow a result set, and a
-    readMask that omits `name` breaks every action and the urn. Both are
-    spelled correctly, so only the allowlist keeps them out.
+def test_vertexai_query_withheld_params_say_why(test, param, value, expected):
+    """These are spelled right and the API takes them, so the message has
+    to carry the reason or it reads as c7n lagging the API.
     """
     with pytest.raises(PolicyValidationError) as caught:
         test.load_policy(
-            {'name': 'vertexai-endpoint-dropped-param',
+            {'name': 'vertexai-endpoint-withheld-param',
+             'resource': 'gcp.vertex-ai-endpoint',
+             'query': [{param: value}]})
+    assert 'withholds' in str(caught.value)
+    assert expected in str(caught.value)
+
+
+@pytest.mark.parametrize('param,value', [
+    ('orderBy', 'create_time desc'),
+    ('gdcZone', 'us-central1-a'),
+])
+def test_vertexai_query_rejects_unexposed_params(test, param, value):
+    """Accepted by the list method, no reason to withhold, still not
+    exposed. orderBy only reorders a set c7n drains whole.
+    """
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-endpoint-unexposed-param',
              'resource': 'gcp.vertex-ai-endpoint',
              'query': [{param: value}]})
     assert f"got ['{param}']" in str(caught.value)
@@ -3123,10 +3136,11 @@ def test_vertexai_query_params_match_the_api():
         'aiplatform', 'v1', static_discovery=True,
         credentials=AnonymousCredentials(), cache_discovery=False)
 
-    assert not set(VertexAITypeInfo.query_params) & {'parent', 'pageToken'}, (
-        'the shared floor lets a policy set a parameter c7n owns')
+    assert not set(VertexAITypeInfo.query_params) & QUERY_PARAMS_WITHHELD.keys(), (
+        'the shared floor allows a parameter that is also withheld')
 
     checked = 0
+    withheld_seen = set()
     for name, klass in sorted(resources.items()):
         if not (isinstance(klass, type)
                 and issubclass(klass, VertexAIQueryManager)):
@@ -3143,8 +3157,8 @@ def test_vertexai_query_params_match_the_api():
         parent = '/'.join(f'{segment}/x' for segment in segments[:-1])
 
         declared = set(klass.resource_type.query_params)
-        assert not declared & {'parent', 'pageToken'}, (
-            f'gcp.{name} lets a policy set a parameter c7n owns')
+        assert not declared & QUERY_PARAMS_WITHHELD.keys(), (
+            f'gcp.{name} allows a parameter that is also withheld')
 
         for param in declared:
             try:
@@ -3156,5 +3170,24 @@ def test_vertexai_query_params_match_the_api():
             except ValueError:
                 pass
 
+        for param in QUERY_PARAMS_WITHHELD:
+            # parent is the one the call always carries, so probing it
+            # separately would just pass it twice
+            kwargs = {'parent': parent}
+            if param != 'parent':
+                kwargs[param] = 1
+            try:
+                component.list(**kwargs)
+            except TypeError:
+                continue
+            except ValueError:
+                pass
+            withheld_seen.add(param)
+
     # an empty registry would walk the loop zero times and pass
     assert checked == 8, f'expected 8 Vertex AI query managers, found {checked}'
+
+    # a withheld parameter no method takes is a reason nobody will ever read
+    assert withheld_seen == QUERY_PARAMS_WITHHELD.keys(), (
+        'withheld but not accepted by any list method: '
+        f'{sorted(QUERY_PARAMS_WITHHELD.keys() - withheld_seen)}')
