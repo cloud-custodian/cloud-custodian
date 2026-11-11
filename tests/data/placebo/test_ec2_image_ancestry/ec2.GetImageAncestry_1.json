@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImageAncestryEntries": [
+            {
+                "ImageId": "ami-test123",
+                "CreationDate": "2025-01-01T00:00:00.000Z",
+                "SourceImageId": "ami-parent456",
+                "SourceImageRegion": "us-east-1"
+            },
+            {
+                "ImageId": "ami-parent456",
+                "CreationDate": "2024-12-01T00:00:00.000Z"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RequestId": "test-request-3"
+        }
+    }
+}
