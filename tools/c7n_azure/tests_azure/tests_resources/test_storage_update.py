@@ -39,6 +39,22 @@ class StorageUpdateSchemaTest(BaseTest):
         self.assertTrue(policy)
 
     @parameterized.expand([
+        ('sku_only', {'sku': {'name': 'Standard_GRS'}}),
+        ('sku_and_properties', {
+            'sku': {'name': 'Standard_RAGZRS'},
+            'properties': {'minimumTlsVersion': 'TLS1_2'},
+        }),
+    ])
+    def test_update_schema_sku(self, name: str, fields: dict) -> None:
+        with self.sign_out_patch():
+            policy = self.load_policy({
+                'name': 'storage-update',
+                'resource': 'azure.storage',
+                'actions': [{'type': 'update', **fields}],
+            }, validate=True)
+        assert policy
+
+    @parameterized.expand([
         ('missing', {}),
         ('empty', {'properties': {}}),
         ('unknown', {'properties': {'defaultToOauthAuthentication': True}}),
@@ -53,6 +69,11 @@ class StorageUpdateSchemaTest(BaseTest):
         ('encryption', {'properties': {'encryption': {'keySource': 'Microsoft.Storage'}}}),
         ('nested', {'properties': {'networkAcls': {'defaultAction': 'Deny'}}}),
         ('identity', {'identity': {'type': 'SystemAssigned'}}),
+        ('sku_empty', {'sku': {}}),
+        ('sku_unknown_name', {'sku': {'name': 'Standard_XRS'}}),
+        ('sku_v2', {'sku': {'name': 'StandardV2_GRS'}}),
+        ('sku_tier', {'sku': {'name': 'Standard_GRS', 'tier': 'Standard'}}),
+        ('sku_string', {'sku': 'Standard_GRS'}),
     ])
     def test_update_schema_rejects_invalid(self, name: str, fields: dict) -> None:
         with self.sign_out_patch(), self.assertRaises(exceptions.PolicyValidationError):
@@ -94,6 +115,31 @@ class StorageUpdateSchemaTest(BaseTest):
                 'allowedCopyScope': None,
             },
         })
+
+    def test_update_request_sends_sku_and_properties(self) -> None:
+        with self.sign_out_patch():
+            policy = self.load_policy({
+                'name': 'storage-update',
+                'resource': 'azure.storage',
+                'actions': [{
+                    'type': 'update',
+                    'sku': {'name': 'Standard_GRS'},
+                    'properties': {'minimumTlsVersion': 'TLS1_2'},
+                }],
+            }, validate=True)
+        action = policy.resource_manager.actions[0]
+        with mock.patch.object(policy.resource_manager, 'get_client') as get_client:
+            action._prepare_processing()
+            action._process_resource({
+                'resourceGroup': 'test_storage-update',
+                'name': 'test-account',
+            })
+        update = get_client.return_value.storage_accounts.update
+        update.assert_called_once()
+        assert json.loads(update.call_args.args[2]) == {
+            'sku': {'name': 'Standard_GRS'},
+            'properties': {'minimumTlsVersion': 'TLS1_2'},
+        }
 
 
 class StorageUpdateTest(BaseTest):
@@ -199,3 +245,28 @@ class StorageUpdateTest(BaseTest):
                 account['properties'].get('defaultToOAuthAuthentication'),
                 resource['properties'].get('defaultToOAuthAuthentication'),
             )
+
+    @arm_template('storage-update.json')
+    @strict_cassette('update_sku')
+    def test_update_sku(self) -> None:
+        policy = self.load_policy({
+            'name': 'storage-update-sku',
+            'resource': 'azure.storage',
+            'filters': [
+                {'resourceGroup': self.recording_resource_group},
+                {'tag:c7n-test': 'storage-update'},
+                {'tag:role': 'scalar'},
+                {'sku.name': 'Standard_LRS'},
+            ],
+            'actions': [{'type': 'update', 'sku': {'name': 'Standard_GRS'}}],
+        })
+        resources = policy.run()
+        assert len(resources) == 1
+        resource = resources[0]
+        client = policy.resource_manager.get_client()
+        account = client.storage_accounts.get_properties(
+            resource['resourceGroup'],
+            resource['name'],
+        )
+        assert account.sku.name == 'Standard_GRS'
+        assert account.minimum_tls_version == resource['properties']['minimumTlsVersion']
