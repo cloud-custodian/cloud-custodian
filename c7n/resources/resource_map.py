@@ -368,6 +368,7 @@ ResourceMap = {
   "aws.securityhub-finding": "c7n.resources.securityhub.SecurityhubFinding",
   "aws.serverless-app": "c7n.resources.sar.ServerlessApp",
   "aws.servicediscovery-namespace": "c7n.resources.servicediscovery.ServiceDiscoveryNamespace",
+  "aws.servicediscovery-service": "c7n.resources.servicediscovery.ServiceDiscoveryService",
   "aws.service-quota": "c7n.resources.quotas.ServiceQuota",
   "aws.service-quota-request": "c7n.resources.quotas.ServiceQuotaRequest",
   "aws.service-quota-service": "c7n.resources.quotas.ServiceQuotaService",
