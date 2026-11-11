@@ -100,7 +100,25 @@ delete_resource() {
         done
     fi
 
-    az group delete --name $rgName --yes --output None
+    if [[ "$fileName" == "storage-update.json" ]]; then
+        # test_update_sku starts a geo-redundancy conversion. Azure blocks deleting
+        # the account (PendingTransactionAlreadyExists) until it finishes, and
+        # exposes no property to wait on, so retry the delete. The conversion has
+        # no SLA and can outlast these retries; if so, rerun this script later.
+        for attempt in $(seq 1 24); do
+            if az group delete --name $rgName --yes --output None; then
+                break
+            fi
+            if [[ $attempt -eq 24 ]]; then
+                echo "Failed to delete $rgName after 24 attempts; a geo-redundancy conversion may still be pending."
+                return 1
+            fi
+            echo "Delete of $rgName failed (attempt $attempt/24); retrying in 5 minutes"
+            sleep 300
+        done
+    else
+        az group delete --name $rgName --yes --output None
+    fi
 
     # Purge the soft-deleted vault so the fixed vault name can be re-provisioned.
     if [[ "$fileName" == "keyvault.json" || "$fileName" == "keyvault-secret.json" ]] \

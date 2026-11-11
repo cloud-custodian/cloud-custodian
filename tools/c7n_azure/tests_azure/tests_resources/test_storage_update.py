@@ -249,6 +249,10 @@ class StorageUpdateTest(BaseTest):
     @arm_template('storage-update.json')
     @strict_cassette('update_sku')
     def test_update_sku(self) -> None:
+        # Recording starts a geo-redundancy conversion. Azure refuses to delete
+        # the account (PendingTransactionAlreadyExists) until the initial geo
+        # sync finishes, which has no SLA and can take hours. cleanup.sh retries
+        # the delete; rerun it later if it still fails.
         policy = self.load_policy({
             'name': 'storage-update-sku',
             'resource': 'azure.storage',
