@@ -60,8 +60,8 @@ class EmailDelivery:
                 email = email.strip()
                 if not email:
                     continue
-                if is_email(target):
-                    emails.append(target)
+                if is_email(email):
+                    emails.append(email)
                 # gcp doesn't support the '@' character in their label values so we
                 # allow users to specify an email_base_url to append to the end of their
                 # owner contact tags
@@ -128,7 +128,13 @@ class EmailDelivery:
         # resolve the contact info from ldap
         ldap_emails = []
         org_emails = []
-        non_email_ids = list(set(resource_owner_tag_values).difference(explicit_emails))
+        owner_ids = {
+            owner_id.strip()
+            for value in resource_owner_tag_values
+            for owner_id in value.split(":")
+            if owner_id.strip()
+        }
+        non_email_ids = list(owner_ids.difference(explicit_emails))
         if self.config.get("ldap_uri", False):
             ldap_emails = list(
                 chain.from_iterable(
