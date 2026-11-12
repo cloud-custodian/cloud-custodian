@@ -2597,6 +2597,9 @@ class TestEC2LaunchTemplate(BaseTest):
                 {'type': 'tag', 'key': 'Team', 'value': 'infra'},
                 {'type': 'remove-tag', 'tags': ['Environment']}]},
             session_factory=factory)
+        self.assertEqual(
+            sorted(p.get_permissions()),
+            ['ec2:CreateTags', 'ec2:DeleteTags', 'ec2:DescribeLaunchTemplates'])
         resources = p.run()
         self.assertEqual(
             [r['LaunchTemplateId'] for r in resources], ['lt-0aaaaaaaaaaaaaaa1'])
