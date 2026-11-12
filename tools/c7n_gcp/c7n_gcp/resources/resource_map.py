@@ -131,6 +131,7 @@ ResourceMap = {
     "gcp.vertex-ai-evaluation-run": "c7n_gcp.resources.vertexai.VertexAIEvaluationRun",
     "gcp.vertex-ai-hyperparameter-tuning-job": (
         "c7n_gcp.resources.vertexai.VertexAIHyperparameterTuningJob"),
+    "gcp.vertex-ai-index": "c7n_gcp.resources.vertexai.VertexAIIndex",
     "gcp.vertex-ai-location": "c7n_gcp.resources.vertexai.VertexAILocation",
     "gcp.vertex-ai-model": "c7n_gcp.resources.vertexai.VertexAIModel",
     "gcp.vertex-ai-metadata-store-artifact": (
