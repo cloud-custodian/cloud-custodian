@@ -1,0 +1,79 @@
+{
+    "status_code": 200,
+    "data": {
+        "ClusterSubnetGroups": [
+            {
+                "ClusterSubnetGroupName": "c7n-nl-rsg",
+                "Description": "c7n fixture",
+                "VpcId": "vpc-d2d616b5",
+                "SubnetGroupStatus": "Complete",
+                "Subnets": [
+                    {
+                        "SubnetIdentifier": "subnet-efbcccb7",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1b"
+                        },
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-044d9e3b66dccd75a",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1d"
+                        },
+                        "SubnetStatus": "Active"
+                    }
+                ],
+                "Tags": [],
+                "SupportedClusterIpAddressTypes": [
+                    "ipv4"
+                ]
+            },
+            {
+                "ClusterSubnetGroupName": "default",
+                "Description": "default",
+                "VpcId": "vpc-d2d616b5",
+                "SubnetGroupStatus": "Complete",
+                "Subnets": [
+                    {
+                        "SubnetIdentifier": "subnet-efbcccb7",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1b"
+                        },
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-e3b194de",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1e"
+                        },
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-914763e7",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1a"
+                        },
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-044d9e3b66dccd75a",
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1d"
+                        },
+                        "SubnetStatus": "Active"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "test"
+                    }
+                ],
+                "SupportedClusterIpAddressTypes": [
+                    "ipv4"
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
