@@ -3,7 +3,6 @@
 
 from azure.mgmt.resource.policy.models import PolicyAssignment
 from azure.mgmt.resource import SubscriptionClient
-from azure.mgmt.monitor import MonitorManagementClient
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -13,7 +12,7 @@ from c7n.manager import ResourceManager
 from c7n.utils import local_session, type_schema
 
 from c7n_azure.actions.tagging import Tag, RemoveTag, TagTrim, TagDelayedAction
-from c7n_azure.filters import TagActionFilter
+from c7n_azure.filters import DiagnosticSettingsFilter, TagActionFilter
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryMeta, TypeInfo
 
@@ -149,14 +148,10 @@ class SubscriptionDiagnosticSettingFilter(ValueFilter):
     )
 
     def _get_subscription_diagnostic_settings(self, session, subscription_id):
-        client = MonitorManagementClient(
-            session.get_credentials(),
-            subscription_id=subscription_id
-        )
-
-        query = client.subscription_diagnostic_settings.list(subscription_id)
-
-        settings = query.serialize(True).get('value', [])
+        client = session.client('azure.mgmt.resource.ResourceManagementClient')
+        # Kept in the raw shape (properties nested, camelCase), which policies key on.
+        settings = DiagnosticSettingsFilter.get_raw_settings(
+            client, f"/subscriptions/{subscription_id}")
 
         # put an empty item in when no diag settings so the absent operator can function
         if not settings:

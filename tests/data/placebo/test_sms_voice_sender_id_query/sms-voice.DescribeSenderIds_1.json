@@ -1,0 +1,56 @@
+{
+    "status_code": 200,
+    "data": {
+        "SenderIds": [
+            {
+                "SenderIdArn": "arn:aws:sms-voice:us-east-1:644160558196:sender-id/C7NSHARED/DE",
+                "SenderId": "C7NSHARED",
+                "IsoCountryCode": "DE",
+                "MessageTypes": [
+                    "Transactional"
+                ],
+                "MonthlyLeasingPrice": "0.00",
+                "DeletionProtectionEnabled": false,
+                "Registered": false,
+                "MessagingLimits": {
+                    "RateLimits": {
+                        "SMS": 10
+                    }
+                }
+            },
+            {
+                "SenderIdArn": "arn:aws:sms-voice:us-east-1:644160558196:sender-id/C7NQUERY/DE",
+                "SenderId": "C7NQUERY",
+                "IsoCountryCode": "DE",
+                "MessageTypes": [
+                    "Transactional"
+                ],
+                "MonthlyLeasingPrice": "0.00",
+                "DeletionProtectionEnabled": false,
+                "Registered": false,
+                "MessagingLimits": {
+                    "RateLimits": {
+                        "SMS": 10
+                    }
+                }
+            },
+            {
+                "SenderIdArn": "arn:aws:sms-voice:us-east-1:644160558196:sender-id/C7NPRODPOOL/DE",
+                "SenderId": "C7NPRODPOOL",
+                "IsoCountryCode": "DE",
+                "MessageTypes": [
+                    "Transactional"
+                ],
+                "MonthlyLeasingPrice": "0.00",
+                "DeletionProtectionEnabled": false,
+                "Registered": false,
+                "MessagingLimits": {
+                    "RateLimits": {
+                        "SMS": 10
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

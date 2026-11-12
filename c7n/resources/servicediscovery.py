@@ -6,6 +6,7 @@ from c7n.query import (
     QueryResourceManager,
     TypeInfo,
     DescribeSource,
+    DescribeWithResourceTags,
     ConfigSource,
 )
 from c7n.tags import universal_augment
@@ -113,3 +114,32 @@ class SdNamespaceInstance(ListItemFilter):
                 service["Instances"] = response.get("Instances", [])
 
         return super().process(resources, event)
+
+
+@resources.register('servicediscovery-service')
+class ServiceDiscoveryService(QueryResourceManager):
+    """AWS Cloud Map service.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: servicediscovery-service-http-health-check
+            resource: aws.servicediscovery-service
+            filters:
+              - HealthCheckConfig.Type: HTTP
+    """
+
+    source_mapping = {'describe': DescribeWithResourceTags}
+
+    class resource_type(TypeInfo):
+        service = 'servicediscovery'
+        enum_spec = ('list_services', 'Services', None)
+        detail_spec = ('get_service', 'Id', 'Id', 'Service')
+        id = 'Id'
+        name = 'Name'
+        arn = 'Arn'
+        date = 'CreateDate'
+        cfn_type = 'AWS::ServiceDiscovery::Service'
+        universal_taggable = object()

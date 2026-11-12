@@ -1,16 +1,21 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from unittest.mock import patch
+from unittest.mock import ANY, Mock, call, patch
 
 import pytest
-
-from ..azure_common import (
-    DEFAULT_SUBSCRIPTION_ID, BaseTest, arm_template, cassette_name, strict_cassette,
-)
-from c7n_azure.session import Session
+from azure.mgmt.resource import SubscriptionClient
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
-from azure.mgmt.resource import SubscriptionClient
+from c7n_azure.resources.subscription import SubscriptionDiagnosticSettingFilter
+from c7n_azure.session import Session
+
+from ..azure_common import (
+    DEFAULT_SUBSCRIPTION_ID,
+    BaseTest,
+    arm_template,
+    cassette_name,
+    strict_cassette,
+)
 
 
 class SubscriptionTest(BaseTest):
@@ -112,6 +117,30 @@ class SubscriptionDiagnosticSettingsFilterTest(BaseTest):
         }, validate=True)
 
         self.assertEqual(0, len(p.run()))
+
+    def test_filter_request(self):
+        """Verifies the filter requests an api-version that returns category groups, and
+        keeps Azure's raw layout that policies key on (properties.logs).
+
+        Cassettes ignore api-version, so this asserts the request directly.
+        """
+        setting = {'name': 'sec', 'properties': {
+            'logs': [{'category': None, 'categoryGroup': 'allLogs', 'enabled': True}]}}
+        session = Mock()
+        get_by_id = session.client.return_value.resources.get_by_id
+        get_by_id.side_effect = [{'value': [setting]}, {'value': []}, {'value': None}]
+        f = SubscriptionDiagnosticSettingFilter({'type': 'diagnostic-settings'}, manager=Mock())
+
+        self.assertEqual(f._get_subscription_diagnostic_settings(session, 'sub-1'), [setting])
+        self.assertEqual(f._get_subscription_diagnostic_settings(session, 'sub-2'), [{}])
+        self.assertEqual(f._get_subscription_diagnostic_settings(session, 'sub-3'), [{}])
+        session.client.assert_called_with('azure.mgmt.resource.ResourceManagementClient')
+        self.assertEqual(get_by_id.call_args_list, [
+            call(resource_id=f'/subscriptions/{sub}/providers/Microsoft.Insights'
+                             '/diagnosticSettings',
+                 api_version='2021-05-01-preview', cls=ANY)
+            for sub in ('sub-1', 'sub-2', 'sub-3')
+        ])
 
 
 class SubscriptionTaggingTest(BaseTest):

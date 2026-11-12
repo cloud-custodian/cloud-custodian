@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "Pools": [
+            {
+                "PoolArn": "arn:aws:sms-voice:us-east-1:644160558196:pool/pool-02822c0494f445829d18269f0a3022a4",
+                "PoolId": "pool-02822c0494f445829d18269f0a3022a4",
+                "Status": "ACTIVE",
+                "MessageType": "TRANSACTIONAL",
+                "TwoWayEnabled": false,
+                "SelfManagedOptOutsEnabled": false,
+                "OptOutListName": "Default",
+                "SharedRoutesEnabled": false,
+                "DeletionProtectionEnabled": false,
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 31,
+                    "microsecond": 0
+                }
+            },
+            {
+                "PoolArn": "arn:aws:sms-voice:us-east-1:644160558196:pool/pool-11c700d922ee467aa4f7d039f23b0275",
+                "PoolId": "pool-11c700d922ee467aa4f7d039f23b0275",
+                "Status": "ACTIVE",
+                "MessageType": "TRANSACTIONAL",
+                "TwoWayEnabled": false,
+                "SelfManagedOptOutsEnabled": false,
+                "OptOutListName": "Default",
+                "SharedRoutesEnabled": false,
+                "DeletionProtectionEnabled": false,
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 25,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

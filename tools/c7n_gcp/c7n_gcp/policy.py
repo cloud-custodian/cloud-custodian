@@ -148,6 +148,30 @@ class ApiAuditMode(FunctionMode):
     <https://cloud.google.com/logging/docs/audit/>`_ for more
     details.
 
+    Select which audit records reach the policy with ``first`` and ``last``.
+    ``first`` defaults to false; ``last`` defaults to the negation of ``first``.
+    At least one must be true. Records with neither ``operation.first`` nor
+    ``operation.last`` present are eligible for either selection, including
+    records without ``operation``.
+
+    For example, this mode selects last records and unmarked records:
+
+    .. code-block:: yaml
+
+        mode:
+          type: gcp-audit
+          methods: [v1.compute.instances.insert]
+
+    Add ``first: true`` to select first records instead, or set both
+    ``first: true`` and ``last: true`` to select both phases. Two records for
+    an operation are processed independently, without combining their data.
+    A single record marked both first and last matches only once.
+
+    First create records can arrive before a resource is available, and first
+    update records can expose pre-update state. Selection is applied by the
+    logging sink, not during direct function invocation. Redeploy policies to
+    update existing sinks; already queued messages are unaffected.
+
     Default region the function is deployed to is
     ``us-central1``. In case you want to change that, use the cli
     ``--region`` flag.
@@ -156,6 +180,8 @@ class ApiAuditMode(FunctionMode):
     schema = type_schema(
         'gcp-audit',
         methods={'type': 'array', 'items': {'type': 'string'}},
+        first={'type': 'boolean'},
+        last={'type': 'boolean'},
         required=['methods'],
         rinherit=FunctionMode.schema)
 
@@ -186,6 +212,12 @@ class ApiAuditMode(FunctionMode):
             raise PolicyValidationError(
                 "Resource:%s does not implement retrieval method" % (
                     self.policy.resource_type))
+
+        first, last = mu.get_audit_record_selection(self.policy.data['mode'])
+
+        if not (first or last):
+            raise PolicyValidationError(
+                f"policy:{self.policy.name} gcp-audit requires first or last to be true")
 
 
 @execution.register('gcp-scc')
