@@ -1,0 +1,70 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 04 Nov 2026 19:00:52 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=315",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1057",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwZfd/989PA=",
+    "bindings": [
+      {
+        "role": "roles/logging.viewer",
+        "members": [
+          "user:test-user@example.com"
+        ]
+      },
+      {
+        "role": "roles/monitoring.viewer",
+        "members": [
+          "user:test-user@example.com"
+        ]
+      },
+      {
+        "role": "roles/resourcemanager.folderAdmin",
+        "members": [
+          "user:test-user@example.com"
+        ]
+      },
+      {
+        "role": "roles/resourcemanager.folderEditor",
+        "members": [
+          "user:test-user@example.com"
+        ]
+      }
+    ],
+    "auditConfigs": [
+      {
+        "service": "storage.googleapis.com",
+        "auditLogConfigs": [
+          {
+            "logType": "DATA_READ",
+            "exemptedMembers": [
+              "user:test-user@example.com"
+            ]
+          }
+        ]
+      },
+      {
+        "service": "allServices",
+        "auditLogConfigs": [
+          {
+            "logType": "DATA_WRITE",
+            "exemptedMembers": [
+              "user:test-user@example.com"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1673,3 +1673,207 @@ def set_iam_policy_action(test, **data):
 def test_set_iam_policy_audit_configs_wildcard_validation(test, data, match):
     with pytest.raises(PolicyValidationError, match=match):
         set_iam_policy_action(test, **data)
+
+
+def test_folder_set_iam_policy_registration(test):
+    policy = test.load_policy({
+        'name': 'folder-set-iam-policy',
+        'resource': 'gcp.folder',
+        'query': [{'parent': 'organizations/111111111111'}],
+        'actions': [{
+            'type': 'set-iam-policy',
+            'add-bindings': [{
+                'role': 'roles/viewer',
+                'members': ['user:reader@example.com'],
+            }],
+        }],
+    }, validate=True)
+
+    action = policy.resource_manager.actions[0]
+    assert 'resourcemanager.folders.setIamPolicy' in action.get_permissions()
+    assert action._verb_arguments({'name': 'folders/222222222222'}) == {
+        'resource': 'folders/222222222222',
+        'body': {},
+    }
+
+
+# BEGIN folder IAM integration regressions
+
+
+def folder_iam_bindings(policy):
+    return {b['role']: set(b['members']) for b in policy.get('bindings', [])}
+
+
+def folder_iam_audit_configs(policy):
+    return {
+        (ac['service'], lc['logType']): set(lc.get('exemptedMembers', []))
+        for ac in policy.get('auditConfigs', [])
+        for lc in ac.get('auditLogConfigs', [])
+    }
+
+
+def folder_iam_read(test, client, name, predicate):
+    for _ in range(20):
+        policy = client.execute_query('getIamPolicy', {
+            'resource': name, 'body': {},
+        })
+        if predicate(policy):
+            return policy
+        if test.recording:
+            time.sleep(3)
+    raise AssertionError("Folder IAM policy did not reach the expected state")
+
+
+def folder_iam_run(test, factory, folder, action, suffix):
+    policy = test.load_policy({
+        'name': 'folder-iam-' + suffix,
+        'resource': 'gcp.folder',
+        'query': [{'parent': folder['parent']}],
+        'filters': [{'type': 'value', 'key': 'name', 'value': folder['name']}],
+        'actions': [dict({'type': 'set-iam-policy'}, **action)],
+    }, session_factory=factory, validate=True)
+    resources = policy.run()
+    assert [r['name'] for r in resources] == [folder['name']]
+
+
+def folder_iam_setup(test, fixture, flight):
+    folder = fixture.resources['google_folder']['test']
+    member = fixture.resources['google_folder_iam_member']['preserved']['member']
+    factory = test.replay_flight_data(flight)
+    client = factory().client('cloudresourcemanager', 'v2', 'folders')
+    baseline = folder_iam_read(test, client, folder['name'], lambda p: (
+        member in folder_iam_bindings(p).get('roles/viewer', set())
+        and member in folder_iam_bindings(p).get('roles/logging.viewer', set())
+        and member in folder_iam_audit_configs(p).get(('allServices', 'DATA_WRITE'), set())
+        and member in folder_iam_audit_configs(p).get(
+            ('storage.googleapis.com', 'DATA_READ'), set())
+    ))
+    return folder, member, factory, client, baseline
+
+
+@terraform('gcp_folder_iam_bindings')
+def test_folder_set_iam_policy_bindings(test, gcp_folder_iam_bindings):
+    folder, member, factory, client, baseline = folder_iam_setup(
+        test, gcp_folder_iam_bindings, 'folder-set-iam-policy-bindings')
+    expected = folder_iam_bindings(baseline)
+    expected['roles/viewer'].remove(member)
+    if not expected['roles/viewer']:
+        del expected['roles/viewer']
+    expected.setdefault('roles/monitoring.viewer', set()).add(member)
+    original_audit = folder_iam_audit_configs(baseline)
+    action = {
+        'add-bindings': [{'role': 'roles/monitoring.viewer', 'members': [member]}],
+        'remove-bindings': [{'role': 'roles/viewer', 'members': [member]}],
+    }
+    # Repeat the same remediation: it must not duplicate or restore members.
+    for suffix in ('first', 'repeat'):
+        folder_iam_run(test, factory, folder, action, suffix)
+        updated = folder_iam_read(test, client, folder['name'],
+                                  lambda p: folder_iam_bindings(p) == expected)
+        assert folder_iam_audit_configs(updated) == original_audit
+
+    folder_iam_run(test, factory, folder, {
+        'remove-bindings': [
+            {'role': 'roles/monitoring.viewer', 'members': [member]},
+        ],
+    }, 'remove-added')
+    expected['roles/monitoring.viewer'].remove(member)
+    if not expected['roles/monitoring.viewer']:
+        del expected['roles/monitoring.viewer']
+    updated = folder_iam_read(test, client, folder['name'],
+                              lambda p: folder_iam_bindings(p) == expected)
+    assert folder_iam_audit_configs(updated) == original_audit
+
+
+@terraform('gcp_folder_iam_audit')
+def test_folder_set_iam_policy_audit_exemptions(test, gcp_folder_iam_audit):
+    folder, member, factory, client, baseline = folder_iam_setup(
+        test, gcp_folder_iam_audit, 'folder-set-iam-policy-audit-exemptions')
+    original_bindings = baseline.get('bindings', [])
+    expected = {key: set() for key in folder_iam_audit_configs(baseline)}
+    action = {'remove-audit-configs': [{
+        'service': '*',
+        'audit-log-configs': [
+            {'log-type': log_type, 'exempted-members': '*'}
+            for log_type in ('ADMIN_READ', 'DATA_READ', 'DATA_WRITE')
+        ],
+    }]}
+    for suffix in ('audit-first', 'audit-repeat'):
+        folder_iam_run(test, factory, folder, action, suffix)
+        updated = folder_iam_read(test, client, folder['name'],
+                                  lambda p: folder_iam_audit_configs(p) == expected)
+        # Compare complete bindings so unrelated metadata is not silently lost.
+        assert updated.get('bindings', []) == original_bindings
+        assert ('allServices', 'DATA_WRITE') in folder_iam_audit_configs(updated)
+        assert ('storage.googleapis.com', 'DATA_READ') in folder_iam_audit_configs(updated)
+
+# END folder IAM integration regressions
+
+
+# Folder IAM request-body regression coverage
+
+
+@pytest.mark.parametrize('audit_only', [False, True])
+def test_folder_set_iam_policy_request_body(test, audit_only):
+    member = 'user:test-user@example.com'
+    baseline = {
+        'etag': 'test-policy-etag',
+        'version': 3,
+        'bindings': [
+            {'role': 'roles/viewer', 'members': [member]},
+            {
+                'role': 'roles/logging.viewer',
+                'members': ['user:retained@example.com'],
+                'condition': {
+                    'title': 'retained-condition',
+                    'expression': 'request.time < timestamp("2030-01-01T00:00:00Z")',
+                },
+            },
+        ],
+        'auditConfigs': [{
+            'service': 'allServices',
+            'auditLogConfigs': [{'logType': 'DATA_WRITE', 'exemptedMembers': [member]}],
+        }],
+    }
+    if audit_only:
+        data = {'remove-audit-configs': [{
+            'service': '*',
+            'audit-log-configs': [{'log-type': 'DATA_WRITE', 'exempted-members': '*'}],
+        }]}
+    else:
+        data = {
+            'add-bindings': [{'role': 'roles/monitoring.viewer', 'members': [member]}],
+            'remove-bindings': [{'role': 'roles/viewer', 'members': [member]}],
+        }
+    policy = test.load_policy({
+        'name': 'folder-iam-request-body',
+        'resource': 'gcp.folder',
+        'query': [{'parent': 'folders/111111111111'}],
+        'actions': [dict({'type': 'set-iam-policy'}, **data)],
+    }, validate=True)
+    action = policy.resource_manager.actions[0]
+    resource = {'name': 'folders/222222222222'}
+    model = policy.resource_manager.resource_type
+    with mock.patch.object(action, '_get_existing_policy', return_value=baseline) as read:
+        params = action.get_resource_params(model, resource)
+    read.assert_called_once_with(model, resource)
+    assert params['resource'] == resource['name']
+    sent = params['body']['policy']
+    assert sent['etag'] == baseline['etag']
+    assert sent['version'] == baseline['version']
+    if audit_only:
+        assert params['body']['updateMask'] == 'etag,auditConfigs'
+        assert 'bindings' not in sent
+        assert sent['auditConfigs'] == [{
+            'service': 'allServices',
+            'auditLogConfigs': [{'logType': 'DATA_WRITE'}],
+        }]
+    else:
+        assert 'updateMask' not in params['body']
+        assert sent['auditConfigs'] == baseline['auditConfigs']
+        assert folder_iam_bindings(sent) == {
+            'roles/logging.viewer': {'user:retained@example.com'},
+            'roles/monitoring.viewer': {member},
+        }
+        retained = next(b for b in sent['bindings'] if b['role'] == 'roles/logging.viewer')
+        assert retained['condition'] == baseline['bindings'][1]['condition']
