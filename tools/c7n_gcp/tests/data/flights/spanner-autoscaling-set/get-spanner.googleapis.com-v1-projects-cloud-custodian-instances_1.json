@@ -1,0 +1,47 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Nov 2026 23:30:13 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=482",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "843",
+    "-content-encoding": "gzip",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/instances/malamute-spanner-as",
+        "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+        "displayName": "malamute-spanner-as",
+        "nodeCount": 1,
+        "state": "READY",
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "env": "c7n-test"
+        },
+        "processingUnits": 1000,
+        "instanceType": "PROVISIONED",
+        "createTime": "2026-11-05T23:30:06.905978Z",
+        "updateTime": "2026-11-05T23:30:06.905978Z",
+        "replicaComputeCapacity": [
+          {
+            "replicaSelection": {
+              "location": "us-central1"
+            },
+            "nodeCount": 1
+          }
+        ],
+        "edition": "ENTERPRISE",
+        "resourceLocation": "us-central1",
+        "defaultBackupScheduleType": "AUTOMATIC"
+      }
+    ]
+  }
+}
