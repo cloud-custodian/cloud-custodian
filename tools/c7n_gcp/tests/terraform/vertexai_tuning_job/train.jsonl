@@ -1,0 +1,16 @@
+{"contents": [{"role": "user", "parts": [{"text": "What is 1 plus 2?"}]}, {"role": "model", "parts": [{"text": "3"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 3 plus 4?"}]}, {"role": "model", "parts": [{"text": "7"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 5 plus 6?"}]}, {"role": "model", "parts": [{"text": "11"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 7 plus 8?"}]}, {"role": "model", "parts": [{"text": "15"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 2 plus 9?"}]}, {"role": "model", "parts": [{"text": "11"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 4 plus 4?"}]}, {"role": "model", "parts": [{"text": "8"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 6 plus 1?"}]}, {"role": "model", "parts": [{"text": "7"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 8 plus 3?"}]}, {"role": "model", "parts": [{"text": "11"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 10 plus 5?"}]}, {"role": "model", "parts": [{"text": "15"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 12 plus 7?"}]}, {"role": "model", "parts": [{"text": "19"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 9 plus 9?"}]}, {"role": "model", "parts": [{"text": "18"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 11 plus 2?"}]}, {"role": "model", "parts": [{"text": "13"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 13 plus 6?"}]}, {"role": "model", "parts": [{"text": "19"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 14 plus 8?"}]}, {"role": "model", "parts": [{"text": "22"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 15 plus 3?"}]}, {"role": "model", "parts": [{"text": "18"}]}]}
+{"contents": [{"role": "user", "parts": [{"text": "What is 20 plus 1?"}]}, {"role": "model", "parts": [{"text": "21"}]}]}
