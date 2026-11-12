@@ -1887,3 +1887,86 @@ class BedrockMantleProject(BaseTest):
              'bedrock-mantle:ListTagsForResource',
              'cloudformation:ListResources',
              'tag:GetResources'])
+
+
+def test_bedrock_custom_model_deployment_query(test):
+
+    # point at the recorded json
+    session_factory = test.replay_flight_data(
+        'test_bedrock_custom_model_deployment_query', region='us-west-2'
+    )
+
+    # load the policy
+    p = test.load_policy(
+        {
+            'name': 'bedrock-custom-model-deployment',
+            'resource': 'aws.bedrock-custom-model-deployment',
+            'filters': []
+        },
+        session_factory=session_factory,
+        config={'region': 'us-west-2'}
+    )
+
+    # run the policy
+    resources = p.run()
+
+    assert len(resources) == 1
+    deployment_arn = (
+        'arn:aws:bedrock:us-west-2:644160558196:'
+        'custom-model-deployment/zboxrwysx8m7')
+
+    assert resources[0]['customModelDeploymentArn'] == deployment_arn
+    assert resources[0]['status'] == 'Active'
+
+
+def test_bedrock_custom_model_deployment_token_metrics(test):
+    session_factory = test.replay_flight_data(
+        'test_bedrock_custom_model_deployment_token_metrics', region='us-west-2')
+
+    def run_metric_policy(value):
+        policy = test.load_policy(
+            {
+                'name': 'bedrock-custom-model-deployment-token-metrics',
+                'resource': 'aws.bedrock-custom-model-deployment',
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': 'c7n:TotalTokenCount',
+                        'days': 1,
+                        'period': 300,
+                        'value': value,
+                        'op': 'greater-than',
+                    },
+                ],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        return policy, policy.run()
+
+    policy, resources = run_metric_policy(0)
+    assert len(resources) == 1
+    assert resources[0]['customModelDeploymentArn'] == (
+        'arn:aws:bedrock:us-west-2:644160558196:'
+        'custom-model-deployment/bznji3ybtrur')
+
+    total_key = 'AWS/Bedrock.c7n:TotalTokenCount.Sum.1'
+    assert total_key in resources[0]['c7n.metrics']
+    observed_total = max(
+        point['Sum'] for point in resources[0]['c7n.metrics'][total_key])
+    # 426 tokens across the three Converse calls recorded here: 94 + 222 + 110.
+    assert observed_total == 426.0
+
+    assert 'cloudwatch:GetMetricData' in policy.get_permissions()
+    assert 'cloudwatch:GetMetricStatistics' not in policy.get_permissions()
+
+    # Asserted directly: placebo replays a recorded response whatever request was
+    # sent, so replay alone cannot catch a wrong CloudWatch dimension. Bedrock
+    # attributes an invocation to the deployment ARN, not the model it serves.
+    metrics_filter = policy.resource_manager.filters[0]
+    assert metrics_filter.get_dimensions(resources[0]) == [
+        {'Name': 'ModelId',
+         'Value': resources[0]['customModelDeploymentArn']}]
+
+    _, resources = run_metric_policy(observed_total)
+    assert resources == []
