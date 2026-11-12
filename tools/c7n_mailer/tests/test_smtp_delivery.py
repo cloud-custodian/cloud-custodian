@@ -119,3 +119,30 @@ class SmtpDeliveryTest(unittest.TestCase):
         d = SmtpDelivery(config, MagicMock(), MagicMock())
         d._smtp_connection.quit.side_effect = smtplib.SMTPServerDisconnected
         del d
+
+    @patch("c7n_mailer.utils.decrypt", return_value="password")
+    @patch("smtplib.SMTP")
+    def test_login_failure_closes_connection(self, mock_smtp, decrypt_mock):
+        config = {
+            "smtp_server": "server",
+            "smtp_port": 25,
+            "smtp_ssl": False,
+            "smtp_username": "username",
+            "smtp_password": "password",
+        }
+        mock_smtp.return_value.login.side_effect = smtplib.SMTPAuthenticationError(535, b"bad")
+        with self.assertRaises(smtplib.SMTPAuthenticationError):
+            SmtpDelivery(config, MagicMock(), MagicMock())
+        mock_smtp.return_value.close.assert_called_once()
+        mock_smtp.return_value.quit.assert_not_called()
+
+    @patch("c7n_mailer.utils.decrypt", side_effect=ValueError("bad password"))
+    @patch("smtplib.SMTP")
+    def test_del_after_failed_setup(self, mock_smtp, decrypt_mock):
+        # A failed __init__ used to leave __del__ raising AttributeError.
+        config = {"smtp_server": "server", "smtp_password": "password"}
+        d = SmtpDelivery.__new__(SmtpDelivery)
+        with self.assertRaises(ValueError):
+            d.__init__(config, MagicMock(), MagicMock())
+        d.__del__()
+        mock_smtp.assert_not_called()

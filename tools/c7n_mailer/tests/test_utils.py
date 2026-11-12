@@ -320,6 +320,21 @@ class DecryptTests(unittest.TestCase):
         self.assertEqual(utils.decrypt({"queue_url": "asq://"}, Mock(), Mock(), "test"), None)
         self.assertEqual(utils.decrypt({"queue_url": "projects"}, Mock(), Mock(), "test"), None)
 
+    def test_kms_decrypt_text(self):
+        session = Mock()
+        session.client.return_value.decrypt.return_value = {"Plaintext": b"secret"}
+        config = {"smtp_password": "c2VjcmV0"}
+        self.assertEqual(utils.kms_decrypt(config, Mock(), session, "smtp_password"), "secret")
+
+    def test_kms_decrypt_not_text(self):
+        # AWS CLI v2 base64-decodes --plaintext, so a password that happens to be
+        # valid base64 gets encrypted as the decoded bytes, which aren't text.
+        session = Mock()
+        session.client.return_value.decrypt.return_value = {"Plaintext": b"\xb1\xe7\x2b\xad"}
+        config = {"smtp_password": "c2VjcmV0"}
+        with self.assertRaisesRegex(ValueError, "smtp_password .* isn't UTF-8 text"):
+            utils.kms_decrypt(config, Mock(), session, "smtp_password")
+
 
 class OtherTests(unittest.TestCase):
     def test_config_defaults(self):
