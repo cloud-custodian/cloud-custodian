@@ -238,6 +238,7 @@ ResourceMap = {
   "aws.lambda-layer": "c7n.resources.awslambda.LambdaLayerVersion",
   "aws.lambda-event-source-mapping": "c7n.resources.awslambda.LambdaEventSourceMapping",
   "aws.launch-config": "c7n.resources.asg.LaunchConfig",
+  "aws.launch-template": "c7n.resources.ec2.EC2LaunchTemplate",
   "aws.launch-template-version": "c7n.resources.ec2.LaunchTemplate",
   "aws.lex-bot": "c7n.resources.lex.LexBot",
   "aws.lexv2-bot": "c7n.resources.lex.LexV2Bot",

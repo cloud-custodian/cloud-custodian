@@ -2544,6 +2544,90 @@ class TestLaunchTemplate(BaseTest):
         self.assertEqual(resources[0]['LaunchTemplateId'], good_lt_id)
 
 
+class TestEC2LaunchTemplate(BaseTest):
+
+    def capture_params(self, factory, operation):
+        # placebo replays responses without checking the request, so hook
+        # the request to see what was sent.
+        sent = []
+        utils.local_session(factory).events.register(
+            'before-parameter-build.ec2.%s' % operation,
+            lambda params, **kw: sent.append(params))
+        return sent
+
+    def test_launch_template_query(self):
+        factory = self.replay_flight_data('test_launch_template_resource_query')
+        p = self.load_policy({
+            'name': 'lt-missing-owner',
+            'resource': 'aws.launch-template',
+            'filters': [{'tag:Owner': 'absent'}]}, session_factory=factory)
+        resources = p.run()
+        # one record per template, across both pages
+        self.assertEqual(
+            sorted(r['LaunchTemplateName'] for r in resources),
+            ['other-template', 'untagged-template'])
+        by_name = {r['LaunchTemplateName']: r for r in resources}
+        self.assertEqual(
+            by_name['other-template']['Tags'],
+            [{'Key': 'Environment', 'Value': 'prod'}])
+        self.assertNotIn('LaunchTemplateData', by_name['other-template'])
+
+    def test_launch_template_tag_filter(self):
+        factory = self.replay_flight_data('test_launch_template_resource_query')
+        p = self.load_policy({
+            'name': 'lt-owner',
+            'resource': 'aws.launch-template',
+            'filters': [{'tag:Owner': 'platform'}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LaunchTemplateId'], 'lt-0aaaaaaaaaaaaaaa1')
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Owner': 'platform', 'Environment': 'dev'})
+
+    def test_launch_template_tag_actions(self):
+        factory = self.replay_flight_data('test_launch_template_resource_tag')
+        created = self.capture_params(factory, 'CreateTags')
+        deleted = self.capture_params(factory, 'DeleteTags')
+        p = self.load_policy({
+            'name': 'lt-retag',
+            'resource': 'aws.launch-template',
+            'filters': [{'tag:Environment': 'dev'}],
+            'actions': [
+                {'type': 'tag', 'key': 'Team', 'value': 'infra'},
+                {'type': 'remove-tag', 'tags': ['Environment']}]},
+            session_factory=factory)
+        self.assertEqual(
+            sorted(p.get_permissions()),
+            ['ec2:CreateTags', 'ec2:DeleteTags', 'ec2:DescribeLaunchTemplates'])
+        resources = p.run()
+        self.assertEqual(
+            [r['LaunchTemplateId'] for r in resources], ['lt-0aaaaaaaaaaaaaaa1'])
+        self.assertEqual(
+            [(c['Resources'], c['Tags']) for c in created],
+            [(['lt-0aaaaaaaaaaaaaaa1'], [{'Key': 'Team', 'Value': 'infra'}])])
+        self.assertEqual(
+            [(d['Resources'], d['Tags']) for d in deleted],
+            [(['lt-0aaaaaaaaaaaaaaa1'], [{'Key': 'Environment'}])])
+
+    def test_launch_template_get_resources(self):
+        factory = self.replay_flight_data('test_launch_template_resource_get')
+        described = self.capture_params(factory, 'DescribeLaunchTemplates')
+        p = self.load_policy({
+            'name': 'lt-get',
+            'resource': 'aws.launch-template'}, session_factory=factory)
+        resources = p.resource_manager.get_resources(['lt-0aaaaaaaaaaaaaaa1'])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            described[0]['LaunchTemplateIds'], ['lt-0aaaaaaaaaaaaaaa1'])
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Owner': 'platform', 'Environment': 'dev'})
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:ec2:us-east-1:644160558196:launch-template/lt-0aaaaaaaaaaaaaaa1'])
+
+
 class TestReservedInstance(BaseTest):
 
     def test_reserved_instance_query(self):
