@@ -1,0 +1,1107 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/virtualNetworks/cctest-bastion-vnet/subnets/AzureBastionSubnet?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.1, etc"
+                    ],
+                    "etag": [
+                        "W/\"e8efda0a-6c58-4817-be2e-43953c431754\""
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: E184A3C0990549DE8389A54F3C46E1D2 Ref B: CHI261140509052 Ref C: 2026-10-28T13:40:57Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "8a74b3ec-f38c-4463-928d-6cc3e6050b8d"
+                    ],
+                    "content-length": [
+                        "528"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:40:57 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "AzureBastionSubnet",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/virtualNetworks/cctest-bastion-vnet/subnets/AzureBastionSubnet",
+                        "etag": "W/\"e8efda0a-6c58-4817-be2e-43953c431754\"",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "addressPrefix": "10.0.0.0/26",
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/publicIPAddresses/cctest-bastion-existing-pip?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "177f7fe3-64d2-4a00-9df8-3ed966cf8965"
+                    ],
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.1, etc"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:40:58 GMT"
+                    ],
+                    "etag": [
+                        "W/\"be8d64ac-beb9-4ee7-be2a-ead3a06591f7\""
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "696"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: EE8B6C2928D3407B8D1AF0D056FAC93A Ref B: CHI261140512036 Ref C: 2026-10-28T13:40:58Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctest-bastion-existing-pip",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/publicIPAddresses/cctest-bastion-existing-pip",
+                        "etag": "W/\"be8d64ac-beb9-4ee7-be2a-ead3a06591f7\"",
+                        "location": "southcentralus",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "resourceGuid": "62c55d38-4645-49ae-b32e-61b7d4a19998",
+                            "ipAddress": "4.151.144.194",
+                            "publicIPAddressVersion": "IPv4",
+                            "publicIPAllocationMethod": "Static",
+                            "idleTimeoutInMinutes": 4,
+                            "ipTags": [],
+                            "ddosSettings": {
+                                "protectionMode": "VirtualNetworkInherited"
+                            }
+                        },
+                        "type": "Microsoft.Network/publicIPAddresses",
+                        "sku": {
+                            "name": "Standard",
+                            "tier": "Regional"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:40:58 GMT"
+                    ],
+                    "content-length": [
+                        "263"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F15849D1A4944439BEEDD309CD8990A1 Ref B: CHI261140501023 Ref C: 2026-10-28T13:40:58Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-failure-cause": [
+                        "gateway"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "ResourceNotFound",
+                            "message": "The Resource 'Microsoft.Network/bastionHosts/cctest-bastion' under resource group 'test_subscription-bastion-host-existing-subnet' was not found. For more details please go to https://aka.ms/ARMResourceNotFoundFix"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:40:59 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "478"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 537D16633E2445D9BA4B6D6D481497C8 Ref B: CHI261140505036 Ref C: 2026-10-28T13:41:00Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [],
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "Stacklet Dev 2",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "PayAsYouGo_2014-09-01",
+                            "spendingLimit": "Off"
+                        },
+                        "promotions": [
+                            {
+                                "category": "freetier",
+                                "endDateTime": "2025-09-13T21:06:45.7634916Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion?api-version=2024-05-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationRatePct=0.1, operationConcurrencyPct=0.3, subscriptionWriteRatePct=0.3, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A2C630C95BEC40EA84FDF8324730FDAA Ref B: CHI261140506040 Ref C: 2026-10-28T13:41:00Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "2e5b7b07-c2ab-4012-92ff-23cfc311d835"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
+                    "content-length": [
+                        "1502"
+                    ],
+                    "azure-asyncnotification": [
+                        "Enabled"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:41:00 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctest-bastion",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion",
+                        "etag": "W/\"5157e561-47b7-4615-8fb5-e289063fb13c\"",
+                        "type": "Microsoft.Network/bastionHosts",
+                        "location": "southcentralus",
+                        "properties": {
+                            "provisioningState": "Updating",
+                            "scaleUnits": 2,
+                            "publicUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/publicIPAddresses/cctest-bastion-existing-pip",
+                            "ipConfigurations": [
+                                {
+                                    "name": "IpConf",
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion/bastionHostIpConfigurations/IpConf",
+                                    "etag": "W/\"5157e561-47b7-4615-8fb5-e289063fb13c\"",
+                                    "type": "Microsoft.Network/bastionHosts/bastionHostIpConfigurations",
+                                    "properties": {
+                                        "provisioningState": "Succeeded",
+                                        "privateIPAllocationMethod": "Dynamic",
+                                        "publicIPAddress": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/publicIPAddresses/cctest-bastion-existing-pip"
+                                        },
+                                        "subnet": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/virtualNetworks/cctest-bastion-vnet/subnets/AzureBastionSubnet"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "sku": {
+                            "name": "Basic"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.1, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1D6964C500174D1D95F43AA8069DD663 Ref B: CHI261140512040 Ref C: 2026-10-28T13:41:01Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "b769e148-10a0-4709-a4f9-43f2aa23cf4e"
+                    ],
+                    "content-length": [
+                        "23"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:41:01 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "InProgress"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationRatePct=0.2, operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: D28D7A1964654A95BA91120645A33341 Ref B: CHI261140505023 Ref C: 2026-10-28T13:41:11Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "3b7c2ed2-10cb-4eb5-ac6a-c5ed72bf22a8"
+                    ],
+                    "content-length": [
+                        "23"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:41:11 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "InProgress"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: C1434AEA368A495E99C19F50A00BD84E Ref B: CHI261140510042 Ref C: 2026-10-28T13:41:32Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "855c51b6-2a8b-4af7-a306-52311e8ae7af"
+                    ],
+                    "content-length": [
+                        "23"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:41:31 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "InProgress"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 36D6FDC54D484A259488A8ABF8B2B6A9 Ref B: CHI261140507040 Ref C: 2026-10-28T13:41:52Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "73b013e6-50dd-4c45-bde0-77756e9d9a69"
+                    ],
+                    "content-length": [
+                        "23"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:41:51 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "InProgress"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: E5E85BA46FAD453EAC7A1E7B6F0D89E1 Ref B: CHI261140501060 Ref C: 2026-10-28T13:42:32Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "ddf8cfc1-7c1b-49c9-87f0-f3ca61acfc5d"
+                    ],
+                    "content-length": [
+                        "23"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:42:32 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "InProgress"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 6790E51BC1BB40FFA4670AB325C21E03 Ref B: CHI261140503054 Ref C: 2026-10-28T13:43:13Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "88e55023-e2ab-431b-8366-8b80c85e7e8c"
+                    ],
+                    "content-length": [
+                        "23"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:43:13 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "InProgress"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.2, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 0D84820CA70E4DCA9A77B3ECC14A8E2C Ref B: CHI261140510062 Ref C: 2026-10-28T13:44:33Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "36df2619-84f4-494d-b171-096f5820dd04"
+                    ],
+                    "content-length": [
+                        "23"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:44:33 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "InProgress"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.1, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 3C5C3E6C97DF4ECF909B21B01A378AAC Ref B: CHI261140503060 Ref C: 2026-10-28T13:47:14Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "6e00ca2b-1960-46dc-83eb-17dc5fb41320"
+                    ],
+                    "content-length": [
+                        "23"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:47:14 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "InProgress"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, etc"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B98B2255FED7417BA8D69EF62E15E2EC Ref B: CHI261140501060 Ref C: 2026-10-28T13:48:54Z"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "00cd1fcb-a2ae-4ebb-8bb5-b4634d7bbc2e"
+                    ],
+                    "content-length": [
+                        "23"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:48:54 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "InProgress"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/cfd40ee5-7158-4d22-b1aa-7422199420a7?api-version=2024-05-01&t=639287916611171048&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "d042f81e-9952-4d08-8b92-38e761464f21"
+                    ],
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.1, etc"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:50:34 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "22"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 34D9FCB6DF4841FCA3D7B029968D28A0 Ref B: CHI261140508029 Ref C: 2026-10-28T13:50:35Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "Succeeded"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "1d646b56-4fa4-4fb1-a672-3cf7c2a5e6b9"
+                    ],
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.1, etc"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:50:35 GMT"
+                    ],
+                    "etag": [
+                        "W/\"857e3d8f-bb51-457f-9f41-ae71e253e759\""
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "1574"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 66A94443F98B410DB860FEC0A94C487A Ref B: CHI261140504062 Ref C: 2026-10-28T13:50:35Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctest-bastion",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion",
+                        "etag": "W/\"857e3d8f-bb51-457f-9f41-ae71e253e759\"",
+                        "type": "Microsoft.Network/bastionHosts",
+                        "location": "southcentralus",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "dnsName": "bst-f5049194-3884-4a80-97ca-b861a6c0d267.bastion.azure.com",
+                            "scaleUnits": 2,
+                            "publicUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/publicIPAddresses/cctest-bastion-existing-pip",
+                            "ipConfigurations": [
+                                {
+                                    "name": "IpConf",
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion/bastionHostIpConfigurations/IpConf",
+                                    "etag": "W/\"857e3d8f-bb51-457f-9f41-ae71e253e759\"",
+                                    "type": "Microsoft.Network/bastionHosts/bastionHostIpConfigurations",
+                                    "properties": {
+                                        "provisioningState": "Succeeded",
+                                        "privateIPAllocationMethod": "Dynamic",
+                                        "publicIPAddress": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/publicIPAddresses/cctest-bastion-existing-pip"
+                                        },
+                                        "subnet": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/virtualNetworks/cctest-bastion-vnet/subnets/AzureBastionSubnet"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "sku": {
+                            "name": "Basic"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "d9e53262-cb1f-42a4-b261-d66d20fdf050"
+                    ],
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=0.5, subscriptionReadRatePct=0.1, etc"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:50:35 GMT"
+                    ],
+                    "etag": [
+                        "W/\"857e3d8f-bb51-457f-9f41-ae71e253e759\""
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "1574"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F4229AE763974866A8F9BB0CA4B6E238 Ref B: CHI261140508031 Ref C: 2026-10-28T13:50:36Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctest-bastion",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion",
+                        "etag": "W/\"857e3d8f-bb51-457f-9f41-ae71e253e759\"",
+                        "type": "Microsoft.Network/bastionHosts",
+                        "location": "southcentralus",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "dnsName": "bst-f5049194-3884-4a80-97ca-b861a6c0d267.bastion.azure.com",
+                            "scaleUnits": 2,
+                            "publicUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/publicIPAddresses/cctest-bastion-existing-pip",
+                            "ipConfigurations": [
+                                {
+                                    "name": "IpConf",
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/bastionHosts/cctest-bastion/bastionHostIpConfigurations/IpConf",
+                                    "etag": "W/\"857e3d8f-bb51-457f-9f41-ae71e253e759\"",
+                                    "type": "Microsoft.Network/bastionHosts/bastionHostIpConfigurations",
+                                    "properties": {
+                                        "provisioningState": "Succeeded",
+                                        "privateIPAllocationMethod": "Dynamic",
+                                        "publicIPAddress": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/publicIPAddresses/cctest-bastion-existing-pip"
+                                        },
+                                        "subnet": {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/virtualNetworks/cctest-bastion-vnet/subnets/AzureBastionSubnet"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "sku": {
+                            "name": "Basic"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/virtualNetworks/cctest-bastion-vnet?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "18665901-0aa5-4d99-bd58-6efef6e921b6"
+                    ],
+                    "x-ms-throttle-levels": [
+                        "operationConcurrencyPct=2.0, subscriptionReadRatePct=0.1, etc"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:50:36 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "1870"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 33536B2D784A49E2B56D7A18AA1EB84D Ref B: CHI261140505052 Ref C: 2026-10-28T13:50:36Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctest-bastion-vnet",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/virtualNetworks/cctest-bastion-vnet",
+                        "etag": "W/\"95e3d074-def3-42c9-8411-6865df21e8e7\"",
+                        "type": "Microsoft.Network/virtualNetworks",
+                        "location": "southcentralus",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "resourceGuid": "976b3eca-60d7-47e4-aed6-05656a207ca4",
+                            "addressSpace": {
+                                "addressPrefixes": [
+                                    "10.0.0.0/16"
+                                ]
+                            },
+                            "privateEndpointVNetPolicies": "Disabled",
+                            "subnets": [
+                                {
+                                    "name": "AzureBastionSubnet",
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/virtualNetworks/cctest-bastion-vnet/subnets/AzureBastionSubnet",
+                                    "etag": "W/\"95e3d074-def3-42c9-8411-6865df21e8e7\"",
+                                    "properties": {
+                                        "provisioningState": "Succeeded",
+                                        "addressPrefix": "10.0.0.0/26",
+                                        "ipConfigurations": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_SUBSCRIPTION-BASTION-HOST-EXISTING-SUBNET/providers/Microsoft.Network/bastionHosts/CCTEST-BASTION/bastionHostIpConfigurations/IPCONF"
+                                            },
+                                            {
+                                                "id": "/subscriptions/b54acc37-608e-4fe5-be2f-79177c2d8e2e/resourceGroups/ARMRG-F5049194-3884-4A80-97CA-B861A6C0D267/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/BASTIONVMSS/VIRTUALMACHINES/0/NETWORKINTERFACES/CUSTNIC/ipConfigurations/IPCONFIG"
+                                            },
+                                            {
+                                                "id": "/subscriptions/b54acc37-608e-4fe5-be2f-79177c2d8e2e/resourceGroups/ARMRG-F5049194-3884-4A80-97CA-B861A6C0D267/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/BASTIONVMSS/VIRTUALMACHINES/1/NETWORKINTERFACES/CUSTNIC/ipConfigurations/IPCONFIG"
+                                            }
+                                        ],
+                                        "delegations": [],
+                                        "privateEndpointNetworkPolicies": "Disabled",
+                                        "privateLinkServiceNetworkPolicies": "Enabled"
+                                    },
+                                    "type": "Microsoft.Network/virtualNetworks/subnets"
+                                }
+                            ],
+                            "virtualNetworkPeerings": [],
+                            "enableDdosProtection": false
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-bastion-host-existing-subnet/providers/Microsoft.Network/publicIPAddresses/cctest-bastion-pip?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 13:50:36 GMT"
+                    ],
+                    "content-length": [
+                        "272"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A2CE4B75D76E4389A2C678E50D9B612F Ref B: CHI261140506052 Ref C: 2026-10-28T13:50:36Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-failure-cause": [
+                        "gateway"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "ResourceNotFound",
+                            "message": "The Resource 'Microsoft.Network/publicIPAddresses/cctest-bastion-pip' under resource group 'test_subscription-bastion-host-existing-subnet' was not found. For more details please go to https://aka.ms/ARMResourceNotFoundFix"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
