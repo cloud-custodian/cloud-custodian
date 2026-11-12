@@ -1,0 +1,22 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "status": "200",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/instances/spanner-instance-1",
+        "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+        "displayName": "Production Spanner",
+        "nodeCount": 1,
+        "state": "READY",
+        "processingUnits": 1000,
+        "instanceType": "PROVISIONED",
+        "createTime": "2026-09-28T14:02:11.418356Z",
+        "updateTime": "2026-09-28T14:04:37.903112Z"
+      }
+    ]
+  }
+}

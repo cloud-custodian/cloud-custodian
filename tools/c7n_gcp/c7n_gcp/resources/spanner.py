@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from c7n.utils import type_schema, local_session
+from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction, SetIamPolicy
 from c7n_gcp.filters import IamPolicyFilter, TimeRangeFilter
 from c7n_gcp.provider import resources
@@ -64,21 +64,13 @@ class SpannerInstanceBackup(ChildResourceManager):
         parent_spec = {
             'resource': 'spanner-instance',
             'child_enum_params': {
-                ('instances', 'parent')},
+                ('name', 'parent')},
             'use_child_query': True,
         }
         default_report_fields = ['name', 'expireTime']
         permissions = ('spanner.backups.list',)
         asset_type = 'spanner.googleapis.com/Backup'
         allow_metrics_filters = False
-
-    def _get_child_enum_args(self, parent_instance):
-        return {
-            'parent': 'projects/{}/instances/{}'.format(
-                local_session(self.session_factory).get_default_project(),
-                parent_instance['displayName'],
-            )
-        }
 
 
 @SpannerInstanceBackup.filter_registry.register('time-range')
