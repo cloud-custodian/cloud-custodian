@@ -532,6 +532,57 @@ PY
         az cosmosdb update -g $rgName -n cctestcosmosdb$suffix --ip-range-filter $allow_list
     fi
 
+    if [[ "$fileName" == "vnet.json" ]]; then
+        storage_account_id=$(az storage account list --resource-group $rgName --query "[0].id" --output tsv)
+        workspace_id=$(az monitor log-analytics workspace show --resource-group $rgName --workspace-name c7n-vnet-flowlog-la --query id --output tsv)
+        vnet_id=$(az network vnet show --resource-group $rgName --name c7n-vnet --query id --output tsv)
+        set_vnet_id=$(az network vnet show --resource-group $rgName --name c7n-vnet-set-flowlog --query id --output tsv)
+        watcher_name=$(az network watcher list --query "[?location=='southcentralus'].name" --output tsv)
+        watcher_rg=$(az network watcher list --query "[?location=='southcentralus'].resourceGroup" --output tsv)
+        if [[ -z "$watcher_name" || -z "$watcher_rg" ]]; then
+            echo "No network watcher found in southcentralus; cannot create vnet flow logs."
+            exit 1
+        fi
+
+        # Retention is deliberately below 90 days so the flow-logs retention
+        # filter test has a non-compliant flow log to match. The set-flow-log
+        # action test never touches this flow log, so it stays non-compliant.
+        echo "Creating vnet flow log for c7n-vnet using network watcher ${watcher_name} (${watcher_rg})..."
+        if ! az network watcher flow-log create \
+            --resource-group "$watcher_rg" \
+            --location southcentralus \
+            --name c7n-vnet-flowlog \
+            --vnet "$vnet_id" \
+            --storage-account "$storage_account_id" \
+            --enabled true \
+            --retention 30 \
+            --output None; then
+            echo "Failed to create flow log for c7n-vnet."
+            exit 1
+        fi
+
+        # Dedicated flow log for the set-flow-log action test, which mutates it.
+        # Traffic Analytics and tags are set so the test can verify the action
+        # preserves settings it doesn't manage.
+        echo "Creating vnet flow log for c7n-vnet-set-flowlog using network watcher ${watcher_name} (${watcher_rg})..."
+        if ! az network watcher flow-log create \
+            --resource-group "$watcher_rg" \
+            --location southcentralus \
+            --name c7n-vnet-set-flowlog-fl \
+            --vnet "$set_vnet_id" \
+            --storage-account "$storage_account_id" \
+            --enabled true \
+            --retention 30 \
+            --workspace "$workspace_id" \
+            --traffic-analytics true \
+            --interval 10 \
+            --tags c7n-test=flowlog \
+            --output None; then
+            echo "Failed to create flow log for c7n-vnet-set-flowlog."
+            exit 1
+        fi
+    fi
+
     echo "Deployment for ${filenameNoExtension} complete"
 }
 

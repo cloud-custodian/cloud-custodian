@@ -1,0 +1,71 @@
+{
+    "status_code": 200,
+    "data": {
+        "Pools": [
+            {
+                "PoolArn": "arn:aws:sms-voice:us-east-1:644160558196:pool/pool-0c499753316a494cb3af398d7061be83",
+                "PoolId": "pool-0c499753316a494cb3af398d7061be83",
+                "Status": "ACTIVE",
+                "MessageType": "TRANSACTIONAL",
+                "TwoWayEnabled": false,
+                "SelfManagedOptOutsEnabled": false,
+                "OptOutListName": "Default",
+                "SharedRoutesEnabled": false,
+                "DeletionProtectionEnabled": false,
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 6,
+                    "hour": 14,
+                    "minute": 20,
+                    "second": 4,
+                    "microsecond": 0
+                }
+            },
+            {
+                "PoolArn": "arn:aws:sms-voice:us-east-1:644160558196:pool/pool-812d30eae66149a98277087dbff86b58",
+                "PoolId": "pool-812d30eae66149a98277087dbff86b58",
+                "Status": "ACTIVE",
+                "MessageType": "TRANSACTIONAL",
+                "TwoWayEnabled": false,
+                "SelfManagedOptOutsEnabled": false,
+                "OptOutListName": "Default",
+                "SharedRoutesEnabled": false,
+                "DeletionProtectionEnabled": false,
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 6,
+                    "hour": 14,
+                    "minute": 19,
+                    "second": 57,
+                    "microsecond": 0
+                }
+            },
+            {
+                "PoolArn": "arn:aws:sms-voice:us-east-1:644160558196:pool/pool-ce26e13d806540c9894e16b5696c6a52",
+                "PoolId": "pool-ce26e13d806540c9894e16b5696c6a52",
+                "Status": "ACTIVE",
+                "MessageType": "TRANSACTIONAL",
+                "TwoWayEnabled": false,
+                "SelfManagedOptOutsEnabled": false,
+                "OptOutListName": "Default",
+                "SharedRoutesEnabled": false,
+                "DeletionProtectionEnabled": false,
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 6,
+                    "hour": 14,
+                    "minute": 20,
+                    "second": 4,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

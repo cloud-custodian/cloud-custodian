@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:appstream:us-east-1:644160558196:fleet/c7n-test-fleet",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "c7n"
+                    },
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "private"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

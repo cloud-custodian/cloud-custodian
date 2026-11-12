@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "Applications": [
+            {
+                "Name": "c7n-test-app",
+                "LaunchPath": "C:\\Windows\\System32\\notepad.exe",
+                "Enabled": true,
+                "Metadata": {
+                    "WORKING_DIRECTORY": null
+                },
+                "Arn": "arn:aws:appstream:us-east-1:644160558196:application/c7n-test-app",
+                "AppBlockArn": "arn:aws:appstream:us-east-1:644160558196:app-block/c7n-test-app-block",
+                "IconS3Location": {
+                    "S3Bucket": "c7n-appstream-placebo-644160558196-us-east-1",
+                    "S3Key": "icon.png"
+                },
+                "Platforms": [
+                    "WINDOWS_SERVER_2022"
+                ],
+                "InstanceFamilies": [
+                    "GENERAL_PURPOSE"
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 14,
+                    "second": 11,
+                    "microsecond": 848000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

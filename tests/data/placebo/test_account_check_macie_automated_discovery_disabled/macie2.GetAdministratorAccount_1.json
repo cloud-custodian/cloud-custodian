@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "The request failed because there isn't a delegated Macie administrator account for your account",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "The request failed because there isn't a delegated Macie administrator account for your account"
+    }
+}

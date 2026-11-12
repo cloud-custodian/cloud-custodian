@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "subscriptionFilters": [
+            {
+                "filterName": "c7n-log-class-sub",
+                "logGroupName": "c7n-log-class-standard",
+                "filterPattern": "",
+                "destinationArn": "arn:aws:kinesis:us-east-1:644160558196:stream/c7n-log-class-stream",
+                "roleArn": "arn:aws:iam::644160558196:role/c7n-log-class-logs-role",
+                "distribution": "ByLogStream",
+                "applyOnTransformedLogs": false,
+                "creationTime": 1793652459082
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
