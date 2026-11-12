@@ -1,0 +1,1765 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 8A764F49580A4D5AB58DCE6E48F8522E Ref B: CHI261140505042 Ref C: 2026-10-28T16:16:54Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "5971"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:16:53 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                                "name": "VirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P29DT23H20M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServers",
+                                "name": "SqlServers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:38.0304712Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AppServices",
+                                "name": "AppServices",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/StorageAccounts",
+                                "name": "StorageAccounts",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServerVirtualMachines",
+                                "name": "SqlServerVirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:11.7813995Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KubernetesService",
+                                "name": "KubernetesService",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/ContainerRegistry",
+                                "name": "ContainerRegistry",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KeyVaults",
+                                "name": "KeyVaults",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P29DT23H10M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Dns",
+                                "name": "Dns",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "VirtualMachines"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Arm",
+                                "name": "Arm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/OpenSourceRelationalDatabases",
+                                "name": "OpenSourceRelationalDatabases",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:03.1479215Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CosmosDbs",
+                                "name": "CosmosDbs",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:40.0869645Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Containers",
+                                "name": "Containers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CloudPosture",
+                                "name": "CloudPosture",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "extensions": [
+                                        {
+                                            "name": "SensitiveDataDiscovery",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ContainerRegistriesVulnerabilityAssessments",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessDiscoveryForKubernetes",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessVmScanning",
+                                            "isEnabled": "True",
+                                            "additionalExtensionProperties": {
+                                                "ExclusionTags": "[]"
+                                            }
+                                        },
+                                        {
+                                            "name": "EntraPermissionsManagement",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ApiPosture",
+                                            "isEnabled": "True"
+                                        },
+                                        {
+                                            "name": "AgentlessServerlessPosture",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ServerlessContainers",
+                                            "isEnabled": "False"
+                                        }
+                                    ],
+                                    "enablementTime": "2025-08-25T20:16:55.4139906Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Api",
+                                "name": "Api",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AI",
+                                "name": "AI",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Discovery",
+                                "name": "Discovery",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/FoundationalCspm",
+                                "name": "FoundationalCspm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 2F685F885F184F118BEA5D613636779F Ref B: CHI261140511036 Ref C: 2026-10-28T16:16:54Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "5971"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:16:53 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                                "name": "VirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P29DT23H20M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServers",
+                                "name": "SqlServers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:38.0304712Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AppServices",
+                                "name": "AppServices",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/StorageAccounts",
+                                "name": "StorageAccounts",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServerVirtualMachines",
+                                "name": "SqlServerVirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:11.7813995Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KubernetesService",
+                                "name": "KubernetesService",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/ContainerRegistry",
+                                "name": "ContainerRegistry",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KeyVaults",
+                                "name": "KeyVaults",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P29DT23H10M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Dns",
+                                "name": "Dns",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "VirtualMachines"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Arm",
+                                "name": "Arm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/OpenSourceRelationalDatabases",
+                                "name": "OpenSourceRelationalDatabases",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:03.1479215Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CosmosDbs",
+                                "name": "CosmosDbs",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:40.0869645Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Containers",
+                                "name": "Containers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CloudPosture",
+                                "name": "CloudPosture",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "extensions": [
+                                        {
+                                            "name": "SensitiveDataDiscovery",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ContainerRegistriesVulnerabilityAssessments",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessDiscoveryForKubernetes",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessVmScanning",
+                                            "isEnabled": "True",
+                                            "additionalExtensionProperties": {
+                                                "ExclusionTags": "[]"
+                                            }
+                                        },
+                                        {
+                                            "name": "EntraPermissionsManagement",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ApiPosture",
+                                            "isEnabled": "True"
+                                        },
+                                        {
+                                            "name": "AgentlessServerlessPosture",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ServerlessContainers",
+                                            "isEnabled": "False"
+                                        }
+                                    ],
+                                    "enablementTime": "2025-08-25T20:16:55.4139906Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Api",
+                                "name": "Api",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AI",
+                                "name": "AI",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Discovery",
+                                "name": "Discovery",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/FoundationalCspm",
+                                "name": "FoundationalCspm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: BAEE35B5F58640359A40D6C97A59B335 Ref B: CHI261140508040 Ref C: 2026-10-28T16:16:54Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "290"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:16:54 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                        "name": "VirtualMachines",
+                        "type": "Microsoft.Security/pricings",
+                        "properties": {
+                            "resourcesCoverageStatus": "NotCovered",
+                            "pricingTier": "Free",
+                            "freeTrialRemainingTime": "P29DT23H20M"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines?api-version=2024-01-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B2DA2C3DEEF84F0CAE67CA6EE20F754D Ref B: CHI261140504023 Ref C: 2026-10-28T16:16:55Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "431"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:16:59 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "99"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                        "name": "VirtualMachines",
+                        "type": "Microsoft.Security/pricings",
+                        "properties": {
+                            "resourcesCoverageStatus": "FullyCovered",
+                            "extensions": [
+                                {
+                                    "name": "MdeDesignatedSubscription",
+                                    "isEnabled": "False"
+                                }
+                            ],
+                            "enablementTime": "2026-10-28T16:16:55.9138472Z",
+                            "subPlan": "P1",
+                            "pricingTier": "Standard",
+                            "freeTrialRemainingTime": "P29DT23H20M"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A5481B45883A4A2A9C59172A47D48F83 Ref B: CHI261140506040 Ref C: 2026-10-28T16:16:59Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "6112"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:16:59 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                                "name": "VirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "extensions": [
+                                        {
+                                            "name": "MdeDesignatedSubscription",
+                                            "isEnabled": "False"
+                                        }
+                                    ],
+                                    "enablementTime": "2026-10-28T16:16:55.9138472Z",
+                                    "subPlan": "P1",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "P29DT23H20M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServers",
+                                "name": "SqlServers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:38.0304712Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AppServices",
+                                "name": "AppServices",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/StorageAccounts",
+                                "name": "StorageAccounts",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServerVirtualMachines",
+                                "name": "SqlServerVirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:11.7813995Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KubernetesService",
+                                "name": "KubernetesService",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/ContainerRegistry",
+                                "name": "ContainerRegistry",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KeyVaults",
+                                "name": "KeyVaults",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P29DT23H10M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Dns",
+                                "name": "Dns",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "VirtualMachines"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Arm",
+                                "name": "Arm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/OpenSourceRelationalDatabases",
+                                "name": "OpenSourceRelationalDatabases",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:03.1479215Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CosmosDbs",
+                                "name": "CosmosDbs",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:40.0869645Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Containers",
+                                "name": "Containers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CloudPosture",
+                                "name": "CloudPosture",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "extensions": [
+                                        {
+                                            "name": "SensitiveDataDiscovery",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ContainerRegistriesVulnerabilityAssessments",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessDiscoveryForKubernetes",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessVmScanning",
+                                            "isEnabled": "True",
+                                            "additionalExtensionProperties": {
+                                                "ExclusionTags": "[]"
+                                            }
+                                        },
+                                        {
+                                            "name": "EntraPermissionsManagement",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ApiPosture",
+                                            "isEnabled": "True"
+                                        },
+                                        {
+                                            "name": "AgentlessServerlessPosture",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ServerlessContainers",
+                                            "isEnabled": "False"
+                                        }
+                                    ],
+                                    "enablementTime": "2025-08-25T20:16:55.4139906Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Api",
+                                "name": "Api",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AI",
+                                "name": "AI",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Discovery",
+                                "name": "Discovery",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/FoundationalCspm",
+                                "name": "FoundationalCspm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 25D169C8DAEF4FD8A91D87F1F29D540F Ref B: CHI261140512023 Ref C: 2026-10-28T16:17:00Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "431"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:17:00 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "248"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                        "name": "VirtualMachines",
+                        "type": "Microsoft.Security/pricings",
+                        "properties": {
+                            "resourcesCoverageStatus": "FullyCovered",
+                            "extensions": [
+                                {
+                                    "name": "MdeDesignatedSubscription",
+                                    "isEnabled": "False"
+                                }
+                            ],
+                            "enablementTime": "2026-10-28T16:16:55.9138472Z",
+                            "subPlan": "P1",
+                            "pricingTier": "Standard",
+                            "freeTrialRemainingTime": "P29DT23H20M"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines?api-version=2024-01-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 4787A2B4FD5A428696737F7D2F9C9976 Ref B: CHI261140509031 Ref C: 2026-10-28T16:17:00Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "431"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:17:02 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "99"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                        "name": "VirtualMachines",
+                        "type": "Microsoft.Security/pricings",
+                        "properties": {
+                            "resourcesCoverageStatus": "FullyCovered",
+                            "extensions": [
+                                {
+                                    "name": "MdeDesignatedSubscription",
+                                    "isEnabled": "False"
+                                }
+                            ],
+                            "enablementTime": "2026-10-28T16:16:55.9138472Z",
+                            "subPlan": "P1",
+                            "pricingTier": "Standard",
+                            "freeTrialRemainingTime": "P29DT23H20M"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 4BFA987EA24A4601A013449E8C455A04 Ref B: CHI261140507034 Ref C: 2026-10-28T16:17:03Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "6112"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:17:02 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                                "name": "VirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "extensions": [
+                                        {
+                                            "name": "MdeDesignatedSubscription",
+                                            "isEnabled": "False"
+                                        }
+                                    ],
+                                    "enablementTime": "2026-10-28T16:16:55.9138472Z",
+                                    "subPlan": "P1",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "P29DT23H20M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServers",
+                                "name": "SqlServers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:38.0304712Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AppServices",
+                                "name": "AppServices",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/StorageAccounts",
+                                "name": "StorageAccounts",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServerVirtualMachines",
+                                "name": "SqlServerVirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:11.7813995Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KubernetesService",
+                                "name": "KubernetesService",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/ContainerRegistry",
+                                "name": "ContainerRegistry",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KeyVaults",
+                                "name": "KeyVaults",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P29DT23H10M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Dns",
+                                "name": "Dns",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "VirtualMachines"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Arm",
+                                "name": "Arm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/OpenSourceRelationalDatabases",
+                                "name": "OpenSourceRelationalDatabases",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:03.1479215Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CosmosDbs",
+                                "name": "CosmosDbs",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:40.0869645Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Containers",
+                                "name": "Containers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CloudPosture",
+                                "name": "CloudPosture",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "extensions": [
+                                        {
+                                            "name": "SensitiveDataDiscovery",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ContainerRegistriesVulnerabilityAssessments",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessDiscoveryForKubernetes",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessVmScanning",
+                                            "isEnabled": "True",
+                                            "additionalExtensionProperties": {
+                                                "ExclusionTags": "[]"
+                                            }
+                                        },
+                                        {
+                                            "name": "EntraPermissionsManagement",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ApiPosture",
+                                            "isEnabled": "True"
+                                        },
+                                        {
+                                            "name": "AgentlessServerlessPosture",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ServerlessContainers",
+                                            "isEnabled": "False"
+                                        }
+                                    ],
+                                    "enablementTime": "2025-08-25T20:16:55.4139906Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Api",
+                                "name": "Api",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AI",
+                                "name": "AI",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Discovery",
+                                "name": "Discovery",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/FoundationalCspm",
+                                "name": "FoundationalCspm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: BE4BE935C7474A56B991BFE6368B7B1B Ref B: CH1AA2030813060 Ref C: 2026-10-28T16:17:03Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "431"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:17:04 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                        "name": "VirtualMachines",
+                        "type": "Microsoft.Security/pricings",
+                        "properties": {
+                            "resourcesCoverageStatus": "FullyCovered",
+                            "extensions": [
+                                {
+                                    "name": "MdeDesignatedSubscription",
+                                    "isEnabled": "False"
+                                }
+                            ],
+                            "enablementTime": "2026-10-28T16:16:55.9138472Z",
+                            "subPlan": "P1",
+                            "pricingTier": "Standard",
+                            "freeTrialRemainingTime": "P29DT23H20M"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines?api-version=2024-01-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DA836F6627C54DDD9F186F04937709C8 Ref B: CHI261140511023 Ref C: 2026-10-28T16:17:04Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "290"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:17:07 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "99"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                        "name": "VirtualMachines",
+                        "type": "Microsoft.Security/pricings",
+                        "properties": {
+                            "resourcesCoverageStatus": "NotCovered",
+                            "pricingTier": "Free",
+                            "freeTrialRemainingTime": "P29DT23H20M"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings?api-version=2024-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 30B57F11D6854C7F931DC8AF091714FE Ref B: CHI261140509052 Ref C: 2026-10-28T16:17:08Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "5971"
+                    ],
+                    "date": [
+                        "Wed, 28 Oct 2026 16:17:07 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/VirtualMachines",
+                                "name": "VirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P29DT23H20M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServers",
+                                "name": "SqlServers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:38.0304712Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AppServices",
+                                "name": "AppServices",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/StorageAccounts",
+                                "name": "StorageAccounts",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/SqlServerVirtualMachines",
+                                "name": "SqlServerVirtualMachines",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:11.7813995Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KubernetesService",
+                                "name": "KubernetesService",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/ContainerRegistry",
+                                "name": "ContainerRegistry",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "Containers"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/KeyVaults",
+                                "name": "KeyVaults",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P29DT23H10M"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Dns",
+                                "name": "Dns",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D",
+                                    "deprecated": true,
+                                    "replacedBy": [
+                                        "VirtualMachines"
+                                    ]
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Arm",
+                                "name": "Arm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/OpenSourceRelationalDatabases",
+                                "name": "OpenSourceRelationalDatabases",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:17:03.1479215Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CosmosDbs",
+                                "name": "CosmosDbs",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "enablementTime": "2025-08-25T20:16:40.0869645Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Containers",
+                                "name": "Containers",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/CloudPosture",
+                                "name": "CloudPosture",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "extensions": [
+                                        {
+                                            "name": "SensitiveDataDiscovery",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ContainerRegistriesVulnerabilityAssessments",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessDiscoveryForKubernetes",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "AgentlessVmScanning",
+                                            "isEnabled": "True",
+                                            "additionalExtensionProperties": {
+                                                "ExclusionTags": "[]"
+                                            }
+                                        },
+                                        {
+                                            "name": "EntraPermissionsManagement",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ApiPosture",
+                                            "isEnabled": "True"
+                                        },
+                                        {
+                                            "name": "AgentlessServerlessPosture",
+                                            "isEnabled": "False"
+                                        },
+                                        {
+                                            "name": "ServerlessContainers",
+                                            "isEnabled": "False"
+                                        }
+                                    ],
+                                    "enablementTime": "2025-08-25T20:16:55.4139906Z",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Api",
+                                "name": "Api",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/AI",
+                                "name": "AI",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "NotCovered",
+                                    "pricingTier": "Free",
+                                    "freeTrialRemainingTime": "P30D"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/Discovery",
+                                "name": "Discovery",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/pricings/FoundationalCspm",
+                                "name": "FoundationalCspm",
+                                "type": "Microsoft.Security/pricings",
+                                "properties": {
+                                    "resourcesCoverageStatus": "FullyCovered",
+                                    "pricingTier": "Standard",
+                                    "freeTrialRemainingTime": "PT0S"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
