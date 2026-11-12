@@ -704,9 +704,17 @@ class StorageSettingsUtilities:
                        .format(storage_type))(logging=logging_settings)
 
 
+# Storage account SKU names in the default API version (2024-01-01), excluding
+# the V2 SKUs, which apply only to provisioned v2 file storage accounts.
+SKU_NAMES = [
+    'Standard_LRS', 'Standard_GRS', 'Standard_RAGRS', 'Standard_ZRS',
+    'Standard_GZRS', 'Standard_RAGZRS', 'Premium_LRS', 'Premium_ZRS',
+]
+
+
 @Storage.action_registry.register('update')
 class StorageUpdateAction(AzureBaseAction):
-    """Update scalar storage account settings.
+    """Update scalar storage account settings and the account SKU.
 
     :example:
 
@@ -733,11 +741,42 @@ class StorageUpdateAction(AzureBaseAction):
 
     Enabling ``isSftpEnabled`` requires hierarchical namespace to be enabled
     on the account and incurs SFTP charges while enabled.
+
+    Change the account's redundancy by setting ``sku.name``. ``sku`` can be
+    used alone or together with ``properties``. Azure rejects changes it does
+    not support, such as moving between Standard and Premium SKUs.
+    The conversion runs asynchronously, and Azure rejects another SKU update
+    on the account (``SkuConversionInProgress``) until it finishes.
+    Geo-redundant SKUs cost more than locally redundant ones.
+
+    :example:
+
+    Use geo-redundant storage for accounts that are not geo-redundant:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-geo-redundant
+            resource: azure.storage
+            filters:
+              - type: value
+                key: sku.name
+                op: in
+                value: [Standard_LRS, Standard_ZRS]
+            actions:
+              - type: update
+                sku:
+                  name: Standard_GRS
     """
 
     schema = type_schema(
         'update',
-        required=['properties'],
+        sku={
+            'type': 'object',
+            'required': ['name'],
+            'additionalProperties': False,
+            'properties': {'name': {'enum': SKU_NAMES}},
+        },
         properties={
             'type': 'object',
             'minProperties': 1,
@@ -760,6 +799,7 @@ class StorageUpdateAction(AzureBaseAction):
             },
         },
     )
+    schema['anyOf'] = [{'required': ['properties']}, {'required': ['sku']}]
     permissions = ('Microsoft.Storage/storageAccounts/write',)
 
     def _prepare_processing(self) -> None:
@@ -767,7 +807,9 @@ class StorageUpdateAction(AzureBaseAction):
 
     def _process_resource(self, resource: dict) -> None:
         # SDK model serialization drops explicit nulls, so send the validated JSON.
-        body = json.dumps({'properties': self.data['properties']}).encode()
+        body = json.dumps({
+            key: self.data[key] for key in ('sku', 'properties') if key in self.data
+        }).encode()
         self.client.storage_accounts.update(
             resource['resourceGroup'],
             resource['name'],
