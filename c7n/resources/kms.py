@@ -251,6 +251,11 @@ class KMSPolicyChecker(PolicyChecker):
 class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
     """Filter KMS keys which have cross account permissions
 
+    Keys whose policy cannot be read (``GetKeyPolicy`` returns
+    ``AccessDeniedException``) cannot be evaluated, so this filter does not
+    return them. It does annotate them with ``c7n:PolicyAccessDenied: true``,
+    so they can be surfaced without fetching the policy a second time.
+
     :example:
 
     .. code-block:: yaml
@@ -260,8 +265,32 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
                 resource: kms-key
                 filters:
                   - type: cross-account
+
+    To also report keys whose policy could not be read, match the annotation
+    inside an ``or`` block, after ``cross-account``. A ``value`` filter placed
+    after ``cross-account`` at the top level never sees those keys, because
+    ``cross-account`` has already filtered them out; inside ``or`` every
+    filter receives the full set, in order.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kms-key-cross-account-or-policy-unreadable
+                resource: kms-key
+                filters:
+                  - or:
+                      - type: cross-account
+                      - type: value
+                        key: '"c7n:PolicyAccessDenied"'
+                        value: true
+
+    The key is a JMESPath expression, so the annotation name must be quoted
+    as shown because it contains a colon.
     """
     permissions = ('kms:GetKeyPolicy',)
+    access_denied_annotation = 'c7n:PolicyAccessDenied'
 
     checker_factory = KMSPolicyChecker
 
@@ -279,8 +308,10 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
                 if e.response['Error']['Code'] == 'AccessDeniedException':
                     self.log.warning(
                         "Access denied when getting policy on key:%s", key_id)
+                    r[self.access_denied_annotation] = True
                     return None
                 raise
+            r.pop(self.access_denied_annotation, None)
             return r
 
         self.log.debug("fetching policy for %d kms keys" % len(resources))
