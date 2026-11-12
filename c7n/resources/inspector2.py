@@ -6,14 +6,14 @@ from c7n.utils import merge_dict_list
 
 
 class DescribeInspector2Finding(query.DescribeSource):
-    def resources(self, query):
+    def get_query_params(self, query):
         """Only show active Inspector V2 findings by default
 
         Unless overridden by policy, use this default filter:
 
         - FindingStatus: ACTIVE
         """
-        query = merge_dict_list(
+        return merge_dict_list(
             [
                 {
                     "filterCriteria": {
@@ -26,10 +26,9 @@ class DescribeInspector2Finding(query.DescribeSource):
                     }
                 },
                 *self.manager.data.get("query", []),
-                query,
+                query or {},
             ]
         )
-        return super().resources(query=query)
 
 
 @resources.register("inspector2-finding")
@@ -85,10 +84,3 @@ class Inspector2Finding(query.QueryResourceManager):
     source_mapping = {
         "describe": DescribeInspector2Finding,
     }
-
-    def get_cache_key(self, query):
-        # The policy's query is merged into the request by the source, so it
-        # has to be part of the key or policies would share cached findings.
-        key = super().get_cache_key(query)
-        key['policy-query'] = self.data.get('query')
-        return key
