@@ -118,6 +118,8 @@ def get_required_permissions_for_endpoint(endpoint, method='GET'):
             return ['Group.ReadWrite.All']
         elif 'authentication' in normalized_endpoint:
             return ['UserAuthenticationMethod.ReadWrite.All']
+        elif normalized_endpoint == 'policies/authorizationPolicy':
+            return ['Policy.ReadWrite.Authorization']
 
     # Check for exact match first
     if normalized_endpoint in GRAPH_ENDPOINT_PERMISSIONS:
@@ -222,6 +224,9 @@ class GraphResourceManager(QueryResourceManager):
                 response = requests.request(method, url, headers=headers, json=data, timeout=30)
 
             response.raise_for_status()
+            # Successful PATCH/DELETE return 204 No Content, which has no JSON body
+            if response.status_code == 204:
+                return None
             return response.json()
         except requests.exceptions.RequestException as e:
             log.error(f"Microsoft Graph API request failed for {endpoint}: {e}")
