@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 31 Mar 2026 16:23:05 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "229",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigtableadmin.googleapis.com/v2/projects/cloud-custodian/instances/c7n-gc-rule-602ee4da/tables/c7n-gc-table?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/instances/c7n-gc-rule-602ee4da/tables/c7n-gc-table",
+    "columnFamilies": {
+      "cf_with_gc": {
+        "gcRule": {
+          "maxAge": "86400s"
+        }
+      }
+    },
+    "granularity": "MILLIS"
+  }
+}

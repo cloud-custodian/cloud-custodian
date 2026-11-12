@@ -173,18 +173,44 @@ class MacieEnabled(ValueFilter):
 
     Gets the macie session info for the account, and
     the macie adminstrator account for the current account if
-    configured.
+    configured. With ``automated-discovery: true`` the automated
+    sensitive data discovery configuration is also fetched into
+    ``automatedDiscovery`` (empty when macie is not enabled).
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: macie-automated-discovery-disabled
+                resource: aws.account
+                filters:
+                  - type: check-macie
+                    automated-discovery: true
+                    key: automatedDiscovery.status
+                    value: ENABLED
+                    op: ne
     """
 
-    schema = type_schema('check-macie', rinherit=ValueFilter.schema)
+    schema = type_schema(
+        'check-macie', rinherit=ValueFilter.schema,
+        **{'automated-discovery': {'type': 'boolean'}})
     schema_alias = False
     annotation_key = 'c7n:macie'
     annotate = False
     permissions = ('macie2:GetMacieSession', 'macie2:GetAdministratorAccount',)
 
+    def get_permissions(self):
+        perms = list(self.permissions)
+        if self.data.get('automated-discovery'):
+            perms.append('macie2:GetAutomatedDiscoveryConfiguration')
+        return perms
+
     def process(self, resources, event=None):
 
-        if self.annotation_key not in resources[0]:
+        info = resources[0].get(self.annotation_key)
+        if info is None or (
+                self.data.get('automated-discovery') and 'automatedDiscovery' not in info):
             self.get_macie_info(resources[0])
 
         if super().process([resources[0][self.annotation_key]]):
@@ -210,6 +236,12 @@ class MacieEnabled(ValueFilter):
         else:
             info['master'] = minfo
         info['administrator'] = info['master']
+
+        if self.data.get('automated-discovery'):
+            info['automatedDiscovery'] = {}
+            if info.get('status') in ('ENABLED', 'PAUSED'):
+                info['automatedDiscovery'] = client.get_automated_discovery_configuration()
+                info['automatedDiscovery'].pop('ResponseMetadata')
         account[self.annotation_key] = info
 
 
@@ -2799,6 +2831,173 @@ class SetBedrockModelInvocationLogging(BaseAction):
             client.put_model_invocation_logging_configuration(loggingConfig=params)
         else:
             client.delete_model_invocation_logging_configuration()
+
+
+@filters.register('bedrock-data-retention')
+class BedrockDataRetention(ValueFilter):
+    """Filter on the account level Bedrock data retention mode in the current region.
+
+    Valid modes are default, none, aws_review, provider_data_share and inherit.
+    An account where the mode has never been set returns inherit.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: bedrock-data-retention-not-zero
+                resource: account
+                filters:
+                  - type: bedrock-data-retention
+                    key: mode
+                    op: ne
+                    value: none
+    """
+    annotation_key = 'c7n:BedrockDataRetention'
+    annotate = False
+    schema = type_schema('bedrock-data-retention', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('bedrock:GetAccountDataRetention',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        for r in resources:
+            retention = self.manager.retry(client.get_account_data_retention)
+            retention.pop('ResponseMetadata', None)
+            r[self.annotation_key] = retention
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
+@filters.register('appstream-usage-reports')
+class AppStreamUsageReports(ValueFilter):
+    """Filter on the AppStream usage report subscription in the current region.
+
+    An account without a subscription is annotated with an empty object.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: appstream-usage-reports-disabled
+                resource: account
+                filters:
+                  - type: appstream-usage-reports
+                    key: S3BucketName
+                    value: absent
+    """
+    annotation_key = 'c7n:AppStreamUsageReports'
+    annotate = False
+    schema = type_schema('appstream-usage-reports', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('appstream:DescribeUsageReportSubscriptions',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('appstream')
+        for r in resources:
+            subscriptions = self.manager.retry(
+                client.describe_usage_report_subscriptions).get(
+                    'UsageReportSubscriptions', [])
+            r[self.annotation_key] = subscriptions[0] if subscriptions else {}
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
+@filters.register('sms-voice-account-attributes')
+class SmsVoiceAccountAttributes(ValueFilter):
+    """Filter on End User Messaging SMS account attributes for the region,
+    as a mapping of attribute name to value (``ACCOUNT_TIER``,
+    ``DEFAULT_PROTECT_CONFIGURATION_ID``).
+
+    :example:
+
+    Find accounts without a default protect configuration
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sms-voice-no-default-protect-configuration
+                resource: account
+                filters:
+                  - type: sms-voice-account-attributes
+                    key: DEFAULT_PROTECT_CONFIGURATION_ID
+                    value: empty
+    """
+
+    annotation_key = 'c7n:SmsVoiceAccountAttributes'
+    annotate = False
+    schema = type_schema('sms-voice-account-attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('sms-voice:DescribeAccountAttributes',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
+        for r in resources:
+            if self.annotation_key not in r:
+                attrs = self.manager.retry(
+                    client.describe_account_attributes).get('AccountAttributes', [])
+                r[self.annotation_key] = {a['Name']: a['Value'] for a in attrs}
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
+@filters.register('sms-voice-spend-limits')
+class SmsVoiceSpendLimits(ValueFilter):
+    """Filter on End User Messaging monthly spend limits for the region, keyed
+    by limit name (eg. ``TEXT_MESSAGE_MONTHLY_SPEND_LIMIT``), each with
+    ``EnforcedLimit``, ``MaxLimit`` and ``Overridden``.
+
+    :example:
+
+    Find accounts that haven't overridden the SMS, MMS and voice spend limits
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sms-voice-spend-limits-not-overridden
+                resource: account
+                filters:
+                  - or:
+                    - type: sms-voice-spend-limits
+                      key: TEXT_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+                    - type: sms-voice-spend-limits
+                      key: MEDIA_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+                    - type: sms-voice-spend-limits
+                      key: VOICE_MESSAGE_MONTHLY_SPEND_LIMIT.Overridden
+                      value: false
+    """
+
+    annotation_key = 'c7n:SmsVoiceSpendLimits'
+    annotate = False
+    schema = type_schema('sms-voice-spend-limits', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('sms-voice:DescribeSpendLimits',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('pinpoint-sms-voice-v2')
+        for r in resources:
+            if self.annotation_key not in r:
+                limits = self.manager.retry(client.describe_spend_limits).get('SpendLimits', [])
+                r[self.annotation_key] = {lim['Name']: lim for lim in limits}
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
 
 
 @filters.register('ec2-metadata-defaults')

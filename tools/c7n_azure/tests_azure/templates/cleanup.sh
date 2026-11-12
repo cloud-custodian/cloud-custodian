@@ -57,9 +57,59 @@ delete_resource() {
         dbid=$(az sql db list --ids $sqlid --query [0].id --output tsv)
         az lock delete --ids "${dbid}/providers/Microsoft.Authorization/locks/dblock"
         sleep 10s
+    elif [[ "$fileName" == "vnet.json" ]]; then
+        # The flow log lives in the network watcher's resource group, not test_vnet
+        watcher_rg=$(az network watcher list --query "[?location=='southcentralus'].resourceGroup" --output tsv)
+        if [[ -n "${watcher_rg}" ]]; then
+            for flow_log_name in c7n-vnet-flowlog c7n-vnet-set-flowlog-fl; do
+                az network watcher flow-log delete --location southcentralus --name "$flow_log_name" --output None \
+                    || echo "Failed to delete flow log ${flow_log_name}; it is left behind in network watcher resource group ${watcher_rg}."
+            done
+        fi
+    elif [[ "$fileName" == "keyvault.json" || "$fileName" == "keyvault-secret.json" ]]; then
+        vault_name=$(az keyvault list --resource-group $rgName --query [0].name --output tsv)
+    fi
+
+    # Deleting the resource group only soft-deletes ML workspaces, which then
+    # stay listed by the ML provider and break child enumeration. Purge them first.
+    if [[ "$fileName" == machine-learning*.json ]]; then
+        # A workspace can't be purged while it has online endpoints. Deleting
+        # an endpoint also deletes its deployments.
+        for endpoint in $(az resource list --resource-group $rgName \
+            --resource-type Microsoft.MachineLearningServices/workspaces/onlineEndpoints \
+            --query "[].id" --output tsv); do
+            az rest --method delete \
+                --url "https://management.azure.com${endpoint}?api-version=2025-06-01"
+            az resource wait --deleted --ids "$endpoint" --timeout 1800
+        done
+        if ! workspaces=$(az resource list --resource-group "$rgName" \
+            --resource-type Microsoft.MachineLearningServices/workspaces \
+            --query "[].id" --output tsv); then
+            echo "Failed to list Machine Learning workspaces; skipping delete of resource group $rgName"
+            return 1
+        fi
+        for ws in $workspaces; do
+            # Never fall back to the group delete if the purge fails, since
+            # that soft-deletes the workspace instead.
+            if ! az rest --method delete \
+                    --url "https://management.azure.com${ws}?api-version=2025-06-01&forceToPurge=true" \
+                || ! az resource wait --deleted --ids "$ws" --timeout 900; then
+                echo "Failed to purge ${ws}; skipping delete of resource group $rgName"
+                return 1
+            fi
+        done
     fi
 
     az group delete --name $rgName --yes --output None
+
+    # Purge the soft-deleted vault so the fixed vault name can be re-provisioned.
+    if [[ "$fileName" == "keyvault.json" || "$fileName" == "keyvault-secret.json" ]] \
+            && [[ -n "${vault_name}" ]]; then
+        az keyvault purge --name $vault_name --output None || {
+            echo "Failed to purge soft-deleted Key Vault '${vault_name}'; the name stays reserved until it is purged."
+            exit 1
+        }
+    fi
 
     echo "Delete for $filenameNoExtension complete"
 }
@@ -103,6 +153,8 @@ function should_cleanup() {
 }
 
 # Delete RG's for each template file
+pids=()
+jobs=()
 for file in "$templateDirectory"/*.json; do
     fileName=${file##*/}
     filenameNoExtension=${fileName%.*}
@@ -110,6 +162,8 @@ for file in "$templateDirectory"/*.json; do
     should_cleanup "$filenameNoExtension"
     if [[ $? -eq 1 ]]; then
         delete_resource ${file} &
+        pids+=($!)
+        jobs+=("${filenameNoExtension}")
     fi
 done
 
@@ -117,19 +171,37 @@ done
 should_cleanup "containerservice"
 if [[ $? -eq 1 ]]; then
     delete_acs &
+    pids+=($!)
+    jobs+=("containerservice")
 fi
 
 should_cleanup "policy"
 # Destroy Azure Policy Assignment
 if [[ $? -eq 1 ]]; then
     delete_policy_assignment &
+    pids+=($!)
+    jobs+=("policy")
 fi
 
 should_cleanup "cognitive-service"
 # Destroy Azure Cog Services Soft Delete
 if [[ $? -eq 1 ]]; then
     delete_cognitive_services &
+    pids+=($!)
+    jobs+=("cognitive-service")
 fi
 
 # Wait until all cleanup is finished
-wait
+failed=0
+for i in "${!pids[@]}"; do
+    pid="${pids[$i]}"
+    job_name="${jobs[$i]}"
+    if ! wait "$pid"; then
+        echo "Cleanup job failed: ${job_name}"
+        failed=1
+    fi
+done
+
+if [[ "$failed" -ne 0 ]]; then
+    exit 1
+fi

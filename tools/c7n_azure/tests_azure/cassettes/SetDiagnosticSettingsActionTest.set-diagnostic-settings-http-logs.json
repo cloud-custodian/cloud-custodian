@@ -1,0 +1,565 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Web/sites?api-version=2021-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "58b42049-170a-42db-a228-a8e98860cb26"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: BCF7F77E9AC0439B8E2BD54382CDCCA8 Ref B: CH1AA2020610051 Ref C: 2026-10-14T18:16:41Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "8680"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 18:16:41 GMT"
+                    ],
+                    "etag": [
+                        "\"1DD5C081741D3AB\""
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-action/providers/Microsoft.Web/sites/cctestdiagaction744778383113",
+                                "name": "cctestdiagaction744778383113",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "app",
+                                "location": "South Central US",
+                                "properties": {
+                                    "name": "cctestdiagaction744778383113",
+                                    "state": "Running",
+                                    "hostNames": [
+                                        "cctestdiagaction744778383113.azurewebsites.net"
+                                    ],
+                                    "webSpace": "test_diagnostic-settings-action-SouthCentralUSwebspace",
+                                    "selfLink": "https://waws-prod-sn1-017.api.azurewebsites.windows.net:455/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/webspaces/test_diagnostic-settings-action-SouthCentralUSwebspace/sites/cctestdiagaction744778383113",
+                                    "repositorySiteName": "cctestdiagaction744778383113",
+                                    "owner": null,
+                                    "usageState": "Normal",
+                                    "enabled": true,
+                                    "adminEnabled": true,
+                                    "siteScopedCertificatesEnabled": false,
+                                    "afdEnabled": false,
+                                    "enabledHostNames": [
+                                        "cctestdiagaction744778383113.azurewebsites.net",
+                                        "cctestdiagaction744778383113.scm.azurewebsites.net"
+                                    ],
+                                    "siteProperties": {
+                                        "metadata": null,
+                                        "properties": [
+                                            {
+                                                "name": "LinuxFxVersion",
+                                                "value": ""
+                                            },
+                                            {
+                                                "name": "WindowsFxVersion",
+                                                "value": null
+                                            }
+                                        ],
+                                        "appSettings": null
+                                    },
+                                    "availabilityState": "Normal",
+                                    "sslCertificates": null,
+                                    "csrs": [],
+                                    "cers": null,
+                                    "siteMode": null,
+                                    "hostNameSslStates": [
+                                        {
+                                            "name": "cctestdiagaction744778383113.azurewebsites.net",
+                                            "sslState": "Disabled",
+                                            "ipBasedSslResult": null,
+                                            "virtualIP": null,
+                                            "virtualIPv6": null,
+                                            "thumbprint": null,
+                                            "certificateResourceId": null,
+                                            "toUpdate": null,
+                                            "toUpdateIpBasedSsl": null,
+                                            "ipBasedSslState": "NotConfigured",
+                                            "hostType": "Standard"
+                                        },
+                                        {
+                                            "name": "cctestdiagaction744778383113.scm.azurewebsites.net",
+                                            "sslState": "Disabled",
+                                            "ipBasedSslResult": null,
+                                            "virtualIP": null,
+                                            "virtualIPv6": null,
+                                            "thumbprint": null,
+                                            "certificateResourceId": null,
+                                            "toUpdate": null,
+                                            "toUpdateIpBasedSsl": null,
+                                            "ipBasedSslState": "NotConfigured",
+                                            "hostType": "Repository"
+                                        }
+                                    ],
+                                    "hostNamePrivateStates": [],
+                                    "computeMode": null,
+                                    "serverFarm": null,
+                                    "serverFarmId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-action/providers/Microsoft.Web/serverfarms/cctest-diag-action-plan",
+                                    "reserved": false,
+                                    "isXenon": false,
+                                    "hyperV": false,
+                                    "sandboxType": null,
+                                    "lastModifiedTimeUtc": "2026-10-14T18:16:11.0666667",
+                                    "storageRecoveryDefaultState": "Running",
+                                    "contentAvailabilityState": "Normal",
+                                    "runtimeAvailabilityState": "Normal",
+                                    "secretsCollection": [],
+                                    "dnsConfiguration": {},
+                                    "vnetRouteAllEnabled": false,
+                                    "containerAllocationSubnet": null,
+                                    "useContainerLocalhostBindings": null,
+                                    "vnetImagePullEnabled": false,
+                                    "vnetContentShareEnabled": false,
+                                    "outboundVnetRouting": {
+                                        "allTraffic": false,
+                                        "applicationTraffic": false,
+                                        "contentShareTraffic": false,
+                                        "imagePullTraffic": false,
+                                        "backupRestoreTraffic": false,
+                                        "managedIdentityTraffic": false
+                                    },
+                                    "legacyServiceEndpointTrafficEvaluation": false,
+                                    "siteConfig": {
+                                        "numberOfWorkers": 1,
+                                        "defaultDocuments": null,
+                                        "netFrameworkVersion": null,
+                                        "phpVersion": null,
+                                        "pythonVersion": null,
+                                        "nodeVersion": null,
+                                        "powerShellVersion": null,
+                                        "linuxFxVersion": "",
+                                        "windowsFxVersion": null,
+                                        "sandboxType": null,
+                                        "windowsConfiguredStacks": null,
+                                        "requestTracingEnabled": null,
+                                        "remoteDebuggingEnabled": null,
+                                        "remoteDebuggingVersion": null,
+                                        "httpLoggingEnabled": null,
+                                        "azureMonitorLogCategories": null,
+                                        "acrUseManagedIdentityCreds": false,
+                                        "acrUserManagedIdentityID": null,
+                                        "logsDirectorySizeLimit": null,
+                                        "detailedErrorLoggingEnabled": null,
+                                        "publishingUsername": null,
+                                        "publishingPassword": null,
+                                        "appSettings": null,
+                                        "metadata": null,
+                                        "connectionStrings": null,
+                                        "machineKey": null,
+                                        "handlerMappings": null,
+                                        "documentRoot": null,
+                                        "scmType": null,
+                                        "use32BitWorkerProcess": null,
+                                        "webSocketsEnabled": null,
+                                        "alwaysOn": false,
+                                        "javaVersion": null,
+                                        "javaContainer": null,
+                                        "javaContainerVersion": null,
+                                        "appCommandLine": null,
+                                        "managedPipelineMode": null,
+                                        "virtualApplications": null,
+                                        "winAuthAdminState": null,
+                                        "winAuthTenantState": null,
+                                        "customAppPoolIdentityAdminState": null,
+                                        "customAppPoolIdentityTenantState": null,
+                                        "runtimeADUser": null,
+                                        "runtimeADUserPassword": null,
+                                        "loadBalancing": null,
+                                        "routingRules": null,
+                                        "experiments": null,
+                                        "limits": null,
+                                        "autoHealEnabled": null,
+                                        "autoHealRules": null,
+                                        "tracingOptions": null,
+                                        "vnetName": null,
+                                        "vnetRouteAllEnabled": null,
+                                        "vnetPrivatePortsCount": null,
+                                        "publicNetworkAccess": null,
+                                        "cors": null,
+                                        "push": null,
+                                        "apiDefinition": null,
+                                        "apiManagementConfig": null,
+                                        "autoSwapSlotName": null,
+                                        "localMySqlEnabled": null,
+                                        "managedServiceIdentityId": null,
+                                        "xManagedServiceIdentityId": null,
+                                        "keyVaultReferenceIdentity": null,
+                                        "ipSecurityRestrictions": null,
+                                        "ipSecurityRestrictionsDefaultAction": null,
+                                        "scmIpSecurityRestrictions": null,
+                                        "scmIpSecurityRestrictionsDefaultAction": null,
+                                        "scmIpSecurityRestrictionsUseMain": null,
+                                        "http20Enabled": false,
+                                        "minTlsVersion": null,
+                                        "minTlsCipherSuite": null,
+                                        "scmMinTlsCipherSuite": null,
+                                        "supportedTlsCipherSuites": null,
+                                        "scmSupportedTlsCipherSuites": null,
+                                        "scmMinTlsVersion": null,
+                                        "ftpsState": null,
+                                        "preWarmedInstanceCount": null,
+                                        "functionAppScaleLimit": 0,
+                                        "elasticWebAppScaleLimit": null,
+                                        "healthCheckPath": null,
+                                        "fileChangeAuditEnabled": null,
+                                        "functionsRuntimeScaleMonitoringEnabled": null,
+                                        "websiteTimeZone": null,
+                                        "minimumElasticInstanceCount": 0,
+                                        "azureStorageAccounts": null,
+                                        "http20ProxyFlag": null,
+                                        "sitePort": null,
+                                        "antivirusScanEnabled": null,
+                                        "storageType": null,
+                                        "sitePrivateLinkHostEnabled": null,
+                                        "clusteringEnabled": false,
+                                        "webJobsEnabled": false
+                                    },
+                                    "functionAppConfig": null,
+                                    "daprConfig": null,
+                                    "aiIntegration": null,
+                                    "deploymentId": "cctestdiagaction744778383113",
+                                    "slotName": null,
+                                    "trafficManagerHostNames": null,
+                                    "sku": "Basic",
+                                    "scmSiteAlsoStopped": false,
+                                    "targetSwapSlot": null,
+                                    "hostingEnvironment": null,
+                                    "hostingEnvironmentProfile": null,
+                                    "clientAffinityEnabled": true,
+                                    "clientAffinityProxyEnabled": false,
+                                    "useQueryStringAffinity": false,
+                                    "blockPathTraversal": false,
+                                    "jA4Forwarding": false,
+                                    "clientCertEnabled": false,
+                                    "clientCertMode": "Required",
+                                    "clientCertExclusionPaths": null,
+                                    "clientCertExclusionEndPoints": null,
+                                    "hostNamesDisabled": false,
+                                    "ipMode": "IPv4",
+                                    "vnetBackupRestoreEnabled": false,
+                                    "domainVerificationIdentifiers": null,
+                                    "customDomainVerificationId": "0000000000000000000000000000000000000000000000000000000000000000",
+                                    "kind": "app",
+                                    "managedEnvironmentId": null,
+                                    "workloadProfileName": null,
+                                    "resourceConfig": null,
+                                    "inboundIpAddress": "",
+                                    "possibleInboundIpAddresses": "104.214.20.19,20.97.35.18,40.84.232.28",
+                                    "inboundIpv6Address": "2603:1030:807:3::467",
+                                    "possibleInboundIpv6Addresses": "2603:1030:807:3::467",
+                                    "ftpUsername": "cctestdiagaction744778383113\\$cctestdiagaction744778383113",
+                                    "ftpsHostName": "ftps://waws-prod-sn1-017.ftp.azurewebsites.windows.net/site/wwwroot",
+                                    "outboundIpAddresses": "40.84.237.20,40.84.238.55,40.84.237.25,40.84.236.152,",
+                                    "possibleOutboundIpAddresses": "40.84.237.20,40.84.238.55,40.84.237.25,40.84.236.152,172.202.240.231,104.210.146.18,104.210.146.241,104.214.112.21,104.210.146.158,104.210.147.19,20.88.237.174,20.97.96.187,20.97.96.227,20.97.97.111,20.97.97.115,20.97.97.117,20.97.85.117,20.97.85.155,20.97.85.181,20.97.85.192,20.97.85.200,20.97.85.206",
+                                    "outboundIpv6Addresses": "2603:1030:805:e::8f,2603:1030:805:a::35,2603:1030:805:a::b1,2603:1030:805:b::a8,2603:1030:807:3::467,2603:10e1:100:2::2854:e81c,2603:1030:807:3::478,2603:10e1:100:2::1461:2312",
+                                    "possibleOutboundIpv6Addresses": "2603:1030:805:e::8f,2603:1030:805:a::35,2603:1030:805:a::b1,2603:1030:805:b::a8,2603:1030:803:d::44,2603:1030:803:8::7f,2603:1030:803:9::a7,2603:1030:803:13::4f,2603:1030:803:10::50,2603:1030:803:9::a8,2603:1030:803:13::8f,2603:1030:803:12::c9,2603:1030:805:d::45,2603:1030:803:13::96,2603:1030:803:11::4,2603:1030:805:e::80,2603:1030:805:e::81,2603:1030:803:14::43,2603:1030:803:e::3b,2603:1030:803:e::76,2603:1030:805:a::1c,2603:1030:807:3::467,2603:10e1:100:2::2854:e81c,2603:1030:807:3::478,2603:10e1:100:2::1461:2312",
+                                    "containerSize": 0,
+                                    "dailyMemoryTimeQuota": 0,
+                                    "suspendedTill": null,
+                                    "siteDisabledReason": 0,
+                                    "functionExecutionUnitsCache": null,
+                                    "maxNumberOfWorkers": null,
+                                    "homeStamp": "waws-prod-sn1-017",
+                                    "cloningInfo": null,
+                                    "hostingEnvironmentId": null,
+                                    "tags": null,
+                                    "resourceGroup": "test_diagnostic-settings-action",
+                                    "defaultHostName": "cctestdiagaction744778383113.azurewebsites.net",
+                                    "slotSwapStatus": null,
+                                    "httpsOnly": true,
+                                    "endToEndEncryptionEnabled": false,
+                                    "functionsRuntimeAdminIsolationEnabled": false,
+                                    "redundancyMode": "None",
+                                    "inProgressOperationId": null,
+                                    "geoDistributions": null,
+                                    "privateEndpointConnections": null,
+                                    "publicNetworkAccess": null,
+                                    "buildVersion": null,
+                                    "targetBuildVersion": null,
+                                    "migrationState": null,
+                                    "eligibleLogCategories": "AppServiceAppLogs,AppServiceConsoleLogs,AppServiceHTTPLogs,AppServicePlatformLogs,ScanLogs,AppServiceAuthenticationLogs,AppServiceAuditLogs,AppServiceIPSecAuditLogs",
+                                    "inFlightFeatures": null,
+                                    "platformVersion": null,
+                                    "storageAccountRequired": false,
+                                    "virtualNetworkSubnetId": null,
+                                    "keyVaultReferenceIdentity": "SystemAssigned",
+                                    "autoGeneratedDomainNameLabelScope": null,
+                                    "privateLinkIdentifiers": null,
+                                    "sshEnabled": null,
+                                    "maintenanceEnabled": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-action/providers/Microsoft.Web/sites/cctestdiagaction744778383113/providers/Microsoft.Insights/diagnosticSettings?api-version=2021-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: CD7741C2DAFD4012AD47218FA4BA9A4D Ref B: CHI261140507031 Ref C: 2026-10-14T18:16:42Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 18:16:43 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-action/providers/Microsoft.Web/sites/cctestdiagaction744778383113/providers/Microsoft.Insights/diagnosticSettings/cctest-http-logs?api-version=2021-05-01-preview",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 982E9F07B43749C4B41A0E4B0BEF2DDB Ref B: CHI261140514034 Ref C: 2026-10-14T18:16:44Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "845"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 18:17:01 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "99"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_diagnostic-settings-action/providers/microsoft.web/sites/cctestdiagaction744778383113/providers/microsoft.insights/diagnosticSettings/cctest-http-logs",
+                        "type": "Microsoft.Insights/diagnosticSettings",
+                        "name": "cctest-http-logs",
+                        "location": null,
+                        "kind": null,
+                        "tags": null,
+                        "properties": {
+                            "storageAccountId": null,
+                            "serviceBusRuleId": null,
+                            "workspaceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-action/providers/Microsoft.OperationalInsights/workspaces/cctest-diag-action-workspace",
+                            "eventHubAuthorizationRuleId": null,
+                            "eventHubName": null,
+                            "metrics": [],
+                            "logs": [
+                                {
+                                    "category": "AppServiceHTTPLogs",
+                                    "categoryGroup": null,
+                                    "enabled": true,
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                }
+                            ],
+                            "logAnalyticsDestinationType": null
+                        },
+                        "identity": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-action/providers/Microsoft.Web/sites/cctestdiagaction744778383113/providers/Microsoft.Insights/diagnosticSettings/cctest-http-logs?api-version=2021-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B25C2AFC707A4BE58D27454EBF8FC237 Ref B: CHI261140513042 Ref C: 2026-10-14T18:17:02Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1662"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 18:17:02 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_diagnostic-settings-action/providers/microsoft.web/sites/cctestdiagaction744778383113/providers/microsoft.insights/diagnosticSettings/cctest-http-logs",
+                        "type": "Microsoft.Insights/diagnosticSettings",
+                        "name": "cctest-http-logs",
+                        "location": "southcentralus",
+                        "kind": null,
+                        "tags": null,
+                        "properties": {
+                            "storageAccountId": null,
+                            "serviceBusRuleId": null,
+                            "workspaceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-action/providers/Microsoft.OperationalInsights/workspaces/cctest-diag-action-workspace",
+                            "eventHubAuthorizationRuleId": null,
+                            "eventHubName": null,
+                            "metrics": [
+                                {
+                                    "category": "AllMetrics",
+                                    "enabled": false,
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                }
+                            ],
+                            "logs": [
+                                {
+                                    "category": "AppServiceHTTPLogs",
+                                    "categoryGroup": null,
+                                    "enabled": true,
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                },
+                                {
+                                    "category": "AppServiceConsoleLogs",
+                                    "categoryGroup": null,
+                                    "enabled": false,
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                },
+                                {
+                                    "category": "AppServiceAppLogs",
+                                    "categoryGroup": null,
+                                    "enabled": false,
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                },
+                                {
+                                    "category": "AppServiceAuditLogs",
+                                    "categoryGroup": null,
+                                    "enabled": false,
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                },
+                                {
+                                    "category": "AppServiceIPSecAuditLogs",
+                                    "categoryGroup": null,
+                                    "enabled": false,
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                },
+                                {
+                                    "category": "AppServicePlatformLogs",
+                                    "categoryGroup": null,
+                                    "enabled": false,
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                },
+                                {
+                                    "category": "AppServiceAuthenticationLogs",
+                                    "categoryGroup": null,
+                                    "enabled": false,
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                }
+                            ],
+                            "logAnalyticsDestinationType": null
+                        },
+                        "identity": null
+                    }
+                }
+            }
+        }
+    ]
+}

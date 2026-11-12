@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImageBuilders": [
+            {
+                "Name": "c7n-test-image-builder",
+                "Arn": "arn:aws:appstream:us-east-1:644160558196:image-builder/c7n-test-image-builder",
+                "ImageArn": "arn:aws:appstream:us-east-1::image/AppStream-WinServer2022-08-31-2026",
+                "VpcConfig": {
+                    "SubnetIds": [
+                        "subnet-00577da7461ff5a4c"
+                    ],
+                    "SecurityGroupIds": [
+                        "sg-0ae85023b20e10ca7"
+                    ]
+                },
+                "InstanceType": "stream.standard.medium",
+                "Platform": "WINDOWS_SERVER_2022",
+                "State": "STOPPED",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 9,
+                    "second": 58,
+                    "microsecond": 565000
+                },
+                "EnableDefaultInternetAccess": false,
+                "NetworkAccessConfiguration": {
+                    "EniPrivateIpAddress": "10.0.148.195",
+                    "EniId": "eni-016bf75fe06486d68"
+                },
+                "ImageBuilderErrors": [],
+                "AppstreamAgentVersion": "10-25-2026",
+                "RootVolumeConfig": {
+                    "VolumeSizeInGb": 200
+                },
+                "LatestAppstreamAgentVersion": "TRUE",
+                "DisableIMDSV1": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

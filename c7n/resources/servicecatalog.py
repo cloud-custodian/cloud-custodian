@@ -70,6 +70,8 @@ class CatalogPortfolioDeleteAction(BaseAction):
 class CatalogPortfolioCrossAccount(CrossAccountAccessFilter):
     """Check for account ids that the service catalog portfolio is shared with
 
+    Only the ``whitelist`` and ``whitelist_from`` options are supported.
+
     :example:
 
     .. code-block:: yaml
