@@ -1,10 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import universal_augment
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
 
 
 class DescribeBackup(DescribeSource):
@@ -59,6 +60,80 @@ class BackupPlan(QueryResourceManager):
     }
 
 
+@BackupPlan.action_registry.register('delete')
+class BackupPlanDeleteAction(BaseAction):
+    """
+    Action to delete a backup plan.
+
+    Only works against empty Backup Plans (unless `remove-selections` is
+    provided, which will empty them out for you).
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: backup-plan-removal
+            resource: aws.backup-plan
+            filters:
+              - type: value
+                key: "BackupPlanName"
+                value: "test-backup-plan"
+                op: eq
+            actions:
+              - type: delete
+                # If there are any selections still in the plan, remove them first.
+                remove-selections: true
+    """
+
+    schema = type_schema('delete', **{'remove-selections': {'type': 'boolean'}})
+    permissions = (
+        "backup:ListBackupSelections",
+        "backup:DeleteBackupSelection",
+        "backup:DeleteBackupPlan",
+    )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service
+        )
+
+        for r in resources:
+            self.process_resource(client, r)
+
+    def get_selections_for_plan(self, client, backup_plan_id):
+        selections = []
+        paginator = client.get_paginator('list_backup_selections')
+
+        result = self.manager.retry(
+            paginator.paginate(BackupPlanId=backup_plan_id).build_full_result
+        )
+        for selection_data in result.get("BackupSelectionsList", []):
+            selections.append(selection_data['SelectionId'])
+
+        return selections
+
+    def process_resource(self, client, resource):
+        backup_plan_id = resource['BackupPlanId']
+
+        # Without `remove-selections`, a non-empty plan makes the delete call
+        # raise, which is surfaced to the user.
+        if self.data.get("remove-selections", False):
+            for selection_id in self.get_selections_for_plan(client, backup_plan_id):
+                self.manager.retry(
+                    client.delete_backup_selection,
+                    BackupPlanId=backup_plan_id,
+                    SelectionId=selection_id,
+                    ignore_err_codes=('ResourceNotFoundException',),
+                )
+
+        self.manager.retry(
+            client.delete_backup_plan,
+            BackupPlanId=backup_plan_id,
+            ignore_err_codes=('ResourceNotFoundException',),
+        )
+
+
 class DescribeVault(DescribeSource):
 
     def augment(self, resources):
@@ -98,3 +173,78 @@ class BackupVault(QueryResourceManager):
 class KmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = 'EncryptionKeyArn'
+
+
+@BackupVault.action_registry.register('delete')
+class BackupVaultDeleteAction(BaseAction):
+    """
+    Action to delete a backup vault.
+
+    Only works against empty Backup Vaults (unless `remove-recovery-points` is
+    provided, which will empty them out for you).
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: backup-vault-removal
+            resource: aws.backup-vault
+            filters:
+              - type: value
+                key: "BackupVaultName"
+                value: "test-vault"
+            actions:
+              - type: delete
+                # If there are any recovery points still in the vault, remove them first.
+                remove-recovery-points: true
+    """
+
+    schema = type_schema('delete', **{'remove-recovery-points': {'type': 'boolean'}})
+    permissions = (
+        "backup:ListRecoveryPointsByBackupVault",
+        "backup:DeleteRecoveryPoint",
+        "backup:DeleteBackupVault",
+    )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service
+        )
+
+        for r in resources:
+            self.process_resource(client, r)
+
+    def get_recovery_points_for_vault(self, client, backup_vault_name):
+        recovery_points = []
+        paginator = client.get_paginator('list_recovery_points_by_backup_vault')
+
+        result = self.manager.retry(
+            paginator.paginate(BackupVaultName=backup_vault_name).build_full_result
+        )
+        for recovery_point_data in result.get("RecoveryPoints", []):
+            recovery_points.append(recovery_point_data['RecoveryPointArn'])
+
+        return recovery_points
+
+    def process_resource(self, client, resource):
+        backup_vault_name = resource['BackupVaultName']
+
+        # Without `remove-recovery-points`, a non-empty vault makes the delete
+        # call raise, which is surfaced to the user.
+        if self.data.get("remove-recovery-points", False):
+            for recovery_point_arn in self.get_recovery_points_for_vault(
+                client, backup_vault_name
+            ):
+                self.manager.retry(
+                    client.delete_recovery_point,
+                    BackupVaultName=backup_vault_name,
+                    RecoveryPointArn=recovery_point_arn,
+                    ignore_err_codes=('ResourceNotFoundException',),
+                )
+
+        self.manager.retry(
+            client.delete_backup_vault,
+            BackupVaultName=backup_vault_name,
+            ignore_err_codes=('ResourceNotFoundException',),
+        )
