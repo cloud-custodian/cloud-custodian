@@ -969,6 +969,7 @@ class KMSCrossAccount(BaseTest):
             results = f.process([denied_key])
 
         self.assertEqual(results, [])
+        self.assertTrue(denied_key["c7n:PolicyAccessDenied"])
         mock_client.get_key_policy.assert_called_once_with(
             KeyId="denied-key-id", PolicyName="default"
         )
@@ -1027,6 +1028,8 @@ class KMSCrossAccount(BaseTest):
         # Denied key is dropped; readable key has cross-account access so it is returned.
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["KeyId"], "readable-key-id")
+        self.assertTrue(denied_key["c7n:PolicyAccessDenied"])
+        self.assertNotIn("c7n:PolicyAccessDenied", readable_key)
 
     def test_kms_cross_account_other_error_reraises(self):
         # Non-AccessDenied ClientErrors must still propagate (issue #10962).
@@ -1056,91 +1059,97 @@ class KMSCrossAccount(BaseTest):
                 f.process([bad_key])
 
 
-class KMSPolicyAccessDeniedTest(BaseTest):
+class KMSCrossAccountPolicyAccessDeniedTest(BaseTest):
+    """cross-account annotates keys whose policy it cannot read with
+    c7n:PolicyAccessDenied, so they can be surfaced with a value filter
+    without a second GetKeyPolicy call."""
 
-    def _make_filter(self, name="kms-policy-access-denied"):
-        from c7n.executor import MainThreadExecutor
-        p = self.load_policy(
-            {"name": name, "resource": "kms-key",
-             "filters": [{"type": "policy-access-denied"}]}
-        )
-        f = p.resource_manager.filters[0]
-        self.patch(f, "executor_factory", MainThreadExecutor)
-        return f
+    public_policy = json.dumps({
+        "Version": "2012-10-17",
+        "Statement": [{
+            "Effect": "Allow",
+            "Principal": {"AWS": "*"},
+            "Action": "kms:*",
+            "Resource": "*",
+        }],
+    })
+    private_policy = json.dumps({
+        "Version": "2012-10-17",
+        "Statement": [{
+            "Effect": "Allow",
+            "Principal": {"AWS": "arn:aws:iam::123456789012:root"},
+            "Action": "kms:*",
+            "Resource": "*",
+        }],
+    })
 
-    def test_policy_access_denied_matches_inaccessible_key(self):
+    def _keys(self):
+        return [
+            {"KeyId": "denied", "KeyArn": "arn:aws:kms:us-east-1:123456789012:key/denied"},
+            {"KeyId": "public", "KeyArn": "arn:aws:kms:us-east-1:123456789012:key/public"},
+            {"KeyId": "private", "KeyArn": "arn:aws:kms:us-east-1:123456789012:key/private"},
+        ]
+
+    def _run(self, filters):
         from unittest import mock
         from botocore.exceptions import ClientError
         from c7n.resources import kms as kms_module
 
-        f = self._make_filter()
-        key = {"KeyId": "denied-key", "KeyArn": "arn:aws:kms:us-east-1:123:key/denied"}
-        mock_client = mock.MagicMock()
-        mock_client.get_key_policy.side_effect = ClientError(
-            {"Error": {"Code": "AccessDeniedException", "Message": "Denied"}},
-            "GetKeyPolicy",
+        self.patch(CrossAccountAccessFilter, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {"name": "kms-cross-account-denied", "resource": "kms-key",
+             "filters": filters},
         )
-        with mock.patch.object(kms_module, "local_session") as ls:
-            ls.return_value.client.return_value = mock_client
-            results = f.process([key])
+        own_account = p.options.account_id
+        private_policy = self.private_policy.replace("123456789012", own_account)
+        policies = {
+            "public": {"Policy": self.public_policy},
+            "private": {"Policy": private_policy},
+        }
 
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["KeyId"], "denied-key")
-        self.assertTrue(results[0]["c7n:PolicyAccessDenied"])
+        def get_key_policy(KeyId, PolicyName):
+            if KeyId == "denied":
+                raise ClientError(
+                    {"Error": {"Code": "AccessDeniedException", "Message": "Denied"}},
+                    "GetKeyPolicy")
+            return policies[KeyId]
 
-    def test_policy_access_denied_excludes_accessible_key(self):
-        from unittest import mock
-        from c7n.resources import kms as kms_module
-
-        f = self._make_filter()
-        key = {"KeyId": "ok-key", "KeyArn": "arn:aws:kms:us-east-1:123:key/ok"}
         mock_client = mock.MagicMock()
-        mock_client.get_key_policy.return_value = {"Policy": "{}"}
+        mock_client.get_key_policy.side_effect = get_key_policy
         with mock.patch.object(kms_module, "local_session") as ls:
             ls.return_value.client.return_value = mock_client
-            results = f.process([key])
+            results = p.resource_manager.filter_resources(self._keys())
+        return results, mock_client
 
+    def test_or_block_surfaces_denied_and_cross_account_keys(self):
+        results, client = self._run([
+            {"or": [
+                {"type": "cross-account"},
+                {"type": "value", "key": '"c7n:PolicyAccessDenied"', "value": True},
+            ]},
+        ])
+        self.assertEqual(sorted(r["KeyId"] for r in results), ["denied", "public"])
+        by_id = {r["KeyId"]: r for r in results}
+        self.assertTrue(by_id["denied"]["c7n:PolicyAccessDenied"])
+        self.assertNotIn("c7n:PolicyAccessDenied", by_id["public"])
+        self.assertIn("CrossAccountViolations", by_id["public"])
+        # One GetKeyPolicy call per key: the value filter reuses the
+        # annotation instead of fetching the policy again.
+        self.assertEqual(client.get_key_policy.call_count, 3)
+
+    def test_top_level_value_after_cross_account_never_sees_denied_keys(self):
+        # Documented limitation: cross-account drops keys it cannot evaluate,
+        # so a value filter chained after it at the top level gets nothing.
+        results, _ = self._run([
+            {"type": "cross-account"},
+            {"type": "value", "key": '"c7n:PolicyAccessDenied"', "value": True},
+        ])
         self.assertEqual(results, [])
 
-    def test_policy_access_denied_other_error_reraises(self):
-        from unittest import mock
-        from botocore.exceptions import ClientError
-        from c7n.resources import kms as kms_module
-
-        f = self._make_filter()
-        key = {"KeyId": "bad-key", "KeyArn": "arn:aws:kms:us-east-1:123:key/bad"}
-        mock_client = mock.MagicMock()
-        mock_client.get_key_policy.side_effect = ClientError(
-            {"Error": {"Code": "InternalFailure", "Message": "Boom"}},
-            "GetKeyPolicy",
-        )
-        with mock.patch.object(kms_module, "local_session") as ls:
-            ls.return_value.client.return_value = mock_client
-            with self.assertRaises(ClientError):
-                f.process([key])
-
-    def test_policy_access_denied_mixed_batch(self):
-        # Denied keys are returned; accessible keys are excluded.
-        from unittest import mock
-        from botocore.exceptions import ClientError
-        from c7n.resources import kms as kms_module
-
-        f = self._make_filter()
-        denied = {"KeyId": "denied", "KeyArn": "arn:aws:kms:us-east-1:123:key/denied"}
-        accessible = {"KeyId": "ok", "KeyArn": "arn:aws:kms:us-east-1:123:key/ok"}
-        access_denied = ClientError(
-            {"Error": {"Code": "AccessDeniedException", "Message": "Denied"}},
-            "GetKeyPolicy",
-        )
-        mock_client = mock.MagicMock()
-        mock_client.get_key_policy.side_effect = [access_denied, {"Policy": "{}"}]
-        with mock.patch.object(kms_module, "local_session") as ls:
-            ls.return_value.client.return_value = mock_client
-            results = f.process([denied, accessible])
-
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["KeyId"], "denied")
-        self.assertEqual(mock_client.get_key_policy.call_count, 2)
+    def test_cross_account_alone_unchanged(self):
+        results, client = self._run(["cross-account"])
+        self.assertEqual([r["KeyId"] for r in results], ["public"])
+        self.assertEqual(client.get_key_policy.call_count, 3)
 
 
 class KMSMotoTests(BaseTest):
