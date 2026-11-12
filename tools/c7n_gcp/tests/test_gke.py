@@ -1,11 +1,16 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import time
-import pytest
 import logging
+import re
+import time
+from unittest import mock
+
+import pytest
+from pytest_terraform import terraform
 
 from gcp_common import BaseTest, event_data
 from c7n.config import Config
+from c7n_gcp.actions import MethodAction
 
 
 class KubernetesClusterTest(BaseTest):
@@ -364,3 +369,56 @@ class KubernetesClusterNodePoolTest(BaseTest):
         self.assertEqual(1, len(resources))
         self.assertEqual('c7nnode-node-pool-1',
                         resources[0]['name'])
+
+    @terraform('gke_nodepool')
+    def test_nodepool_delete(self):
+        project_id = "cloud-custodian"
+        nodepool_name = "custodian-nodepool-delete-test"
+
+        factory = self.replay_flight_data("gke-nodepool-delete", project_id)
+        p = self.load_policy(
+            {
+                "name": "delete-gke-nodepool",
+                "resource": "gcp.gke-nodepool",
+                "filters": [{"name": nodepool_name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        with mock.patch.object(
+            MethodAction, "invoke_api", autospec=True, side_effect=MethodAction.invoke_api
+        ) as invoke_api:
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # The DELETE request itself was issued, for the right nodepool.
+        invoke_api.assert_called_once()
+        op_name, params = invoke_api.call_args.args[2:]
+        self.assertEqual(op_name, "delete")
+        self.assertTrue(params["name"].endswith("/nodePools/" + nodepool_name))
+
+        if self.recording:
+            time.sleep(3)
+
+        client = p.resource_manager.get_client()
+        # Extract cluster info from the resource
+        project_param_re = re.compile(
+            '.*?/projects/(.*?)/(?:zones|locations)/(.*?)/clusters/(.*?)/nodePools/(.*?)'
+        )
+        match = re.match(project_param_re, resources[0]['selfLink'])
+        _, location, cluster_name, _ = match.groups()
+
+        result = client.execute_query(
+            'list',
+            {
+                'parent': 'projects/{}/locations/{}/clusters/{}'.format(
+                    project_id, location, cluster_name
+                )
+            },
+        )
+
+        # Check that the nodepool is either deleted or in STOPPING status
+        nodepools = result.get('nodePools', [])
+        target_pool = [np for np in nodepools if np['name'] == nodepool_name]
+        if target_pool:
+            self.assertEqual(target_pool[0]['status'], 'STOPPING')

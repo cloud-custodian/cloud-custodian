@@ -1,0 +1,39 @@
+{
+  "body": {
+    "name": "organizations/111111111111/roles/customAccessContextManagerAdmin",
+    "title": "Custom Access Context Manager Admin",
+    "description": "Custom role for testing Cloud Custodian delete action",
+    "includedPermissions": [
+      "accesscontextmanager.accessLevels.create",
+      "accesscontextmanager.accessLevels.delete",
+      "accesscontextmanager.accessLevels.get",
+      "accesscontextmanager.accessLevels.list",
+      "accesscontextmanager.accessLevels.update",
+      "accesscontextmanager.accessPolicies.create",
+      "accesscontextmanager.accessPolicies.delete",
+      "accesscontextmanager.accessPolicies.get",
+      "accesscontextmanager.accessPolicies.list",
+      "accesscontextmanager.accessPolicies.update",
+      "resourcemanager.projects.get",
+      "resourcemanager.projects.list"
+    ],
+    "stage": "GA",
+    "etag": "BwYGhFMnKpS=",
+    "deleted": true
+  },
+  "headers": {
+    "status": "200",
+    "content-length": "892",
+    "x-xss-protection": "0",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, X-Origin, Referer",
+    "server": "ESF",
+    "-content-encoding": "gzip",
+    "cache-control": "private",
+    "date": "Mon, 12 Jan 2026 23:35:01 GMT",
+    "x-frame-options": "SAMEORIGIN",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
