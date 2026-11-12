@@ -35,6 +35,19 @@ class TestSlackDelivery(unittest.TestCase):
         self.message["resources"] = [self.resource]
         self.target_channel = "test-channel"
 
+    @patch("c7n_mailer.slack_delivery.Redis")
+    def test_cache_uses_redis_url(self, redis_mock):
+        config = dict(
+            self.config, cache_engine="redis", redis_url="rediss://redis.example.com:6380/0"
+        )
+        SlackDelivery(config, self.logger, self.email_delivery)
+        redis_mock.assert_called_once_with(
+            redis_host=None,
+            redis_port=6379,
+            db=0,
+            redis_url="rediss://redis.example.com:6380/0",
+        )
+
     def test_map_sending_to_channel(self):
         slack = SlackDelivery(self.config, self.logger, self.email_delivery)
         result = slack.get_to_addrs_slack_messages_map(self.message)
