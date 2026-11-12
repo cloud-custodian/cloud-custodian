@@ -39,12 +39,24 @@ from c7n.utils import type_schema
 log = logging.getLogger('custodian.iamaccess')
 
 
-def _matches_any_address(value):
-    """Return True for a CIDR that covers every IPv4 or IPv6 address."""
-    try:
-        return ipaddress.ip_network(str(value).strip(), strict=False).prefixlen == 0
-    except ValueError:
-        return False
+def _covers_every_address(values):
+    """Return True if the given ranges together cover every IPv4 or every
+    IPv6 address, e.g. ``0.0.0.0/0`` or ``["0.0.0.0/1", "128.0.0.0/1"]``.
+
+    Values that don't parse as an address or network are ignored.
+    """
+    networks = []
+    for value in values:
+        try:
+            networks.append(ipaddress.ip_network(str(value).strip(), strict=False))
+        except ValueError:
+            continue
+    for version in (4, 6):
+        collapsed = ipaddress.collapse_addresses(
+            n for n in networks if n.version == version)
+        if any(n.prefixlen == 0 for n in collapsed):
+            return True
+    return False
 
 
 def _account(arn):
@@ -264,7 +276,8 @@ class PolicyChecker:
             'StringLike',
             'ArnEquals',
             'ArnLike',
-            'IpAddress')
+            'IpAddress',
+            'NotIpAddress')
         set_conditions = ('ForAllValues', 'ForAnyValue')
         required_keys = self._required_condition_keys(s)
 
@@ -273,10 +286,6 @@ class PolicyChecker:
             # Set operators only restrict access when they wrap a supported
             # positive operator. Negated (StringNotEquals, NotIpAddress) and
             # IfExists variants match requests outside the listed values.
-            # The plain NotIpAddress operator is not supported for the same
-            # reason: it matches every address except the listed ones, and it
-            # is true when aws:SourceIp is absent (requests through a VPC
-            # endpoint).
             if set_op and (set_op not in set_conditions or base_op.startswith('Not')):
                 continue
             if base_op not in conditions:
@@ -290,10 +299,12 @@ class PolicyChecker:
                 # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-single-vs-multi-valued-context-keys.html
                 if set_op == 'ForAllValues' and key.lower() not in required_keys:
                     continue
-                values = (value,) if isinstance(value, str) else value
-                # An IpAddress condition that lists 0.0.0.0/0 or ::/0 matches
-                # every requester that has a source IP, so it restricts nothing.
-                if base_op == 'IpAddress' and any(map(_matches_any_address, values)):
+                values = value if isinstance(value, (list, tuple)) else (value,)
+                # Drop aws:SourceIp conditions that keep no requester out, unless
+                # the user explicitly trusts the key via whitelist_conditions.
+                if (key.lower() == 'aws:sourceip'
+                        and key.lower() not in self.whitelist_conditions
+                        and not self._source_ip_restricts(s_cond_op, values)):
                     continue
                 cond = {'op': s_cond_op}
                 cond['key'] = key.lower()
@@ -327,7 +338,20 @@ class PolicyChecker:
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     def handle_aws_sourceip(self, s, c):
-        return False
+        return not self._source_ip_restricts(c['op'], c['values'])
+
+    @staticmethod
+    def _source_ip_restricts(op, values):
+        """Return True if an aws:SourceIp condition keeps any requester out.
+
+        NotIpAddress allows every address except the listed ones, and is true
+        when aws:SourceIp is absent from the request (requests through a VPC
+        endpoint), so it never restricts access. IpAddress restricts access
+        unless its ranges together cover every IPv4 or every IPv6 address.
+        """
+        if op.rpartition(':')[2] != 'IpAddress':
+            return False
+        return not _covers_every_address(values)
 
     def handle_aws_sourcevpce(self, s, c):
         if not self.allowed_vpce:
@@ -429,10 +453,10 @@ class CrossAccountAccessFilter(Filter):
     Negated (``ForAnyValue:StringNotEquals``) and ``IfExists`` set operators
     never count as restricting access.
 
-    ``NotIpAddress`` conditions, and ``IpAddress`` conditions that include
-    ``0.0.0.0/0`` or ``::/0``, also never count as restricting access: they
-    match every source address except the excluded ones, or every source
-    address.
+    ``aws:SourceIp`` conditions using ``NotIpAddress``, or ``IpAddress``
+    ranges that together cover every IPv4 or IPv6 address (e.g. ``0.0.0.0/0``
+    or ``0.0.0.0/1`` plus ``128.0.0.0/1``), also never count as restricting
+    access, unless ``aws:SourceIp`` is listed in ``whitelist_conditions``.
     """
 
     schema = type_schema(

@@ -3322,14 +3322,27 @@ class CrossAccountChecker(TestCase):
                 "0.0.0.0/0",
                 "::/0",
                 ["203.0.113.0/24", "0.0.0.0/0"],
-                ["203.0.113.0/24", "::/0"]):
+                ["203.0.113.0/24", "::/0"],
+                # ranges that only cover every address together
+                ["0.0.0.0/1", "128.0.0.0/1"],
+                ["::/1", "8000::/1"]):
             policy = self._public_statement_policy({
                 "IpAddress": {"aws:SourceIp": value}})
             self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
             self.assertEqual(len(checker.check(policy)), 1, value)
 
-        # a specific range still restricts the statement
-        for value in ("203.0.113.0/24", "2001:db8::/32", ["198.51.100.7/32"]):
+        policy = self._public_statement_policy({
+            "ForAnyValue:IpAddress": {"aws:SourceIp": "0.0.0.0/0"}})
+        self.assertEqual(checker.normalize_conditions(policy["Statement"][0]), [])
+        self.assertEqual(len(checker.check(policy)), 1)
+
+        # a specific range still restricts the statement, including ranges of
+        # both versions that don't cover all of either one
+        for value in (
+                "203.0.113.0/24",
+                "2001:db8::/32",
+                ["198.51.100.7/32"],
+                ["0.0.0.0/1", "::/1"]):
             policy = self._public_statement_policy({
                 "IpAddress": {"aws:SourceIp": value}})
             self.assertEqual(len(checker.check(policy)), 0, value)
@@ -3350,6 +3363,48 @@ class CrossAccountChecker(TestCase):
                 ip_condition,
                 StringEquals={"aws:PrincipalOrgID": "o-other"}))
             self.assertEqual(len(checker.check(policy)), 1, ip_condition)
+
+    def test_source_ip_handler_matches_normalization(self):
+        """handle_aws_sourceip gives the same answer when called directly."""
+        checker = PolicyChecker({})
+        statement = self._public_statement_policy({})["Statement"][0]
+        for op, values, restrictive in (
+                ("IpAddress", ("203.0.113.0/24",), True),
+                ("IpAddress", ("0.0.0.0/0",), False),
+                ("IpAddress", ("0.0.0.0/1", "128.0.0.0/1"), False),
+                ("ForAnyValue:IpAddress", ("::/0",), False),
+                ("NotIpAddress", ("203.0.113.0/24",), False)):
+            condition = {"op": op, "key": "aws:sourceip", "values": values}
+            self.assertEqual(checker.handle_condition(statement, condition), restrictive, op)
+
+    def test_whitelisted_source_ip_conditions_are_kept(self):
+        """whitelist_conditions: [aws:SourceIp] trusts every aws:SourceIp
+        condition, including ones that don't restrict access."""
+        checker = PolicyChecker({"whitelist_conditions": ["aws:SourceIp"]})
+        for condition in (
+                {"NotIpAddress": {"aws:SourceIp": "203.0.113.0/24"}},
+                {"IpAddress": {"aws:SourceIp": "0.0.0.0/0"}}):
+            policy = self._public_statement_policy(condition)
+            self.assertEqual(len(checker.check(policy)), 0, condition)
+
+    def test_other_ip_keys_are_not_dropped(self):
+        """Only aws:SourceIp has a handler. Other IP keys such as
+        aws:VpcSourceIp keep falling through to the conservative no-handler
+        path, even with a range covering every address."""
+        checker = PolicyChecker({"allowed_orgid": {"o-allowed"}})
+        policy = self._public_statement_policy({
+            "IpAddress": {"aws:VpcSourceIp": "0.0.0.0/0"},
+            "StringEquals": {"aws:PrincipalOrgID": "o-allowed"}})
+        self.assertEqual(len(checker.check(policy)), 1)
+
+    def test_source_ip_values_that_are_not_strings_or_lists(self):
+        """Malformed values don't raise, and keep counting as restrictive as
+        before."""
+        checker = PolicyChecker({})
+        for value in (None, 5):
+            policy = self._public_statement_policy({
+                "IpAddress": {"aws:SourceIp": value}})
+            self.assertEqual(len(checker.check(policy)), 0, value)
 
     def test_set_operator_conditions_still_combine_with_other_conditions(self):
         """Skipping a non-restrictive condition must not hide a restrictive one
