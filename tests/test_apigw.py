@@ -1179,6 +1179,24 @@ class TestCustomDomainName(BaseTest):
             [dict(domainName="a", endpointAccessMode="STRICT", **regional)])
         self.assertEqual(self._ops(client)["/endpointAccessMode"], "STRICT")
 
+        # an explicit mode is applied, over a domain's current non-STRICT mode
+        client, exc = self._update_security(
+            {"securityPolicy": policy, "endpointAccessMode": "STRICT"},
+            [dict(domainName="a", endpointAccessMode="BASIC", **regional)])
+        self.assertEqual(self._ops(client)["/endpointAccessMode"], "STRICT")
+
+        # no explicit mode: a current BASIC mode stays BASIC
+        client, exc = self._update_security(
+            {"securityPolicy": policy},
+            [dict(domainName="a", endpointAccessMode="BASIC", **regional)])
+        self.assertEqual(self._ops(client)["/endpointAccessMode"], "BASIC")
+
+        # no explicit mode: a current STRICT mode is kept
+        client, exc = self._update_security(
+            {"securityPolicy": policy},
+            [dict(domainName="a", endpointAccessMode="STRICT", **regional)])
+        self.assertEqual(self._ops(client)["/endpointAccessMode"], "STRICT")
+
         # legacy policies keep the single-operation behaviour
         client, exc = self._update_security(
             {"securityPolicy": "TLS_1_2"}, [dict(domainName="a", **regional)])
@@ -1254,6 +1272,19 @@ class TestCustomDomainName(BaseTest):
         self.assertEqual(
             set(DomainNameRemediateTls.schema["properties"]["endpointAccessMode"]["enum"]),
             set(model.shape_for("EndpointAccessMode").enum))
+        # endpointAccessMode is rejected with a legacy policy rather than ignored
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy({
+                "name": "bad-mode", "resource": "apigw-domain-name",
+                "actions": [{"type": "update-security", "securityPolicy": "TLS_1_2",
+                             "endpointAccessMode": "STRICT"}],
+            }, validate=True)
+        self.load_policy({
+            "name": "good-mode", "resource": "apigw-domain-name",
+            "actions": [{"type": "update-security",
+                         "securityPolicy": "SecurityPolicy_TLS13_1_3_2025_09",
+                         "endpointAccessMode": "STRICT"}],
+        }, validate=True)
         with self.assertRaises(PolicyValidationError):
             self.load_policy({
                 "name": "bad-policy", "resource": "apigw-domain-name",

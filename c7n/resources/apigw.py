@@ -1181,6 +1181,14 @@ class DomainNameRemediateTls(BaseAction):
 
     permissions = ('apigateway:PATCH',)
 
+    def validate(self):
+        if (self.data.get('endpointAccessMode') and
+                self.data['securityPolicy'] in self.LEGACY_POLICIES):
+            raise PolicyValidationError(
+                'update-security: endpointAccessMode requires an enhanced '
+                'securityPolicy, not %s' % self.data['securityPolicy'])
+        return self
+
     def get_skip_reason(self, r, policy):
         types = (r.get('endpointConfiguration') or {}).get('types') or []
         if len(types) > 1:
