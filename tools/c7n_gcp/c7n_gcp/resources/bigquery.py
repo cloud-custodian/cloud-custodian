@@ -286,3 +286,155 @@ class UpdateDataSet(MethodAction):
             'datasetId': r['datasetReference']['datasetId'],
             'body': body
         }
+
+
+@DataSet.action_registry.register('set-access')
+class SetDataSetAccess(MethodAction):
+    """Add or remove entries in a BigQuery dataset's access list.
+
+    The BigQuery datasets.patch API replaces the entire ``access`` array, so
+    this action reads each dataset's current ``access`` entries, applies the
+    ``add`` and ``remove`` lists, and patches the dataset with the result.
+    Existing entries not affected by either list are kept.
+
+    ``add`` entries are appended unless an equal entry already exists.
+    ``remove`` entries are match criteria: an existing entry is removed when
+    every key in a criterion equals the entry's value for that key. An ``add``
+    entry that also matches a ``remove`` criterion fails validation.
+
+    Roles may be given in either the legacy form (``READER``) or the IAM form
+    (``roles/bigquery.dataViewer``); BigQuery returns only the legacy form.
+
+    Datasets whose access list would not change are not patched.
+
+    :example:
+
+    Remove public access from datasets (CIS GCP Foundations 7.1)
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bq-dataset-remove-public-access
+            resource: gcp.bq-dataset
+            filters:
+              - or:
+                - type: value
+                  key: access[].iamMember
+                  op: contains
+                  value: allUsers
+                - type: value
+                  key: access[].specialGroup
+                  op: contains
+                  value: allAuthenticatedUsers
+            actions:
+              - type: set-access
+                remove:
+                  - iamMember: allUsers
+                  - specialGroup: allAuthenticatedUsers
+
+    :example:
+
+    Grant a group read access to datasets
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bq-dataset-grant-analysts
+            resource: gcp.bq-dataset
+            actions:
+              - type: set-access
+                add:
+                  - role: READER
+                    groupByEmail: analysts@example.com
+    """
+
+    member_fields = (
+        'specialGroup',
+        'iamMember',
+        'userByEmail',
+        'groupByEmail',
+        'domain',
+    )
+    legacy_roles = {
+        'roles/bigquery.dataOwner': 'OWNER',
+        'roles/bigquery.dataEditor': 'WRITER',
+        'roles/bigquery.dataViewer': 'READER',
+    }
+    entry_properties = {field: {'type': 'string'} for field in ('role',) + member_fields}
+
+    schema = type_schema(
+        'set-access',
+        add={
+            'type': 'array',
+            'minItems': 1,
+            'items': {
+                'type': 'object',
+                'required': ['role'],
+                'additionalProperties': False,
+                'properties': entry_properties,
+                'oneOf': [{'required': [field]} for field in member_fields],
+            },
+        },
+        remove={
+            'type': 'array',
+            'minItems': 1,
+            'items': {
+                'type': 'object',
+                'minProperties': 1,
+                'additionalProperties': False,
+                'properties': entry_properties,
+            },
+        },
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    permissions = ('bigquery.datasets.get', 'bigquery.datasets.update')
+
+    def validate(self):
+        super().validate()
+        if 'add' not in self.data and 'remove' not in self.data:
+            raise PolicyValidationError(
+                f"policy:{self.manager.ctx.policy.name} action:{self.type} "
+                "requires at least one of add or remove"
+            )
+        conflicts = [entry for entry in self.data.get('add', ()) if self.is_removed(entry)]
+        if conflicts:
+            raise PolicyValidationError(
+                f"policy:{self.manager.ctx.policy.name} action:{self.type} "
+                f"add entries also match remove: {conflicts}"
+            )
+        return self
+
+    def process(self, resources):
+        resources = [r for r in resources if self.get_access(r) != r.get('access', [])]
+        if resources:
+            super().process(resources)
+
+    def normalize(self, entry):
+        entry = dict(entry)
+        if 'role' in entry:
+            entry['role'] = self.legacy_roles.get(entry['role'], entry['role'])
+        return entry
+
+    def is_removed(self, entry):
+        entry = self.normalize(entry)
+        return any(
+            all(entry.get(k) == v for k, v in self.normalize(criterion).items())
+            for criterion in self.data.get('remove', ())
+        )
+
+    def get_access(self, r):
+        access = list(r.get('access', []))
+        existing = [self.normalize(entry) for entry in access]
+        for entry in self.data.get('add', ()):
+            if self.normalize(entry) not in existing:
+                access.append(entry)
+                existing.append(self.normalize(entry))
+        return [entry for entry in access if not self.is_removed(entry)]
+
+    def get_resource_params(self, model, r):
+        return {
+            'projectId': r['datasetReference']['projectId'],
+            'datasetId': r['datasetReference']['datasetId'],
+            'body': {'access': self.get_access(r)},
+        }

@@ -5,11 +5,12 @@ from c7n.utils import type_schema
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ChildArmResourceManager
+from c7n_azure.resources.machine_learning import MachineLearningWorkspaceChildMixin
 from c7n_azure.utils import ResourceIdParser
 
 
 @resources.register('machine-learning-job')
-class MachineLearningJob(ChildArmResourceManager):
+class MachineLearningJob(MachineLearningWorkspaceChildMixin, ChildArmResourceManager):
     """Azure Machine Learning Job Resource
 
     Jobs are child resources of a Machine Learning workspace
@@ -39,6 +40,7 @@ class MachineLearningJob(ChildArmResourceManager):
     class resource_type(ChildArmResourceManager.resource_type):
         doc_groups = ['AI + Machine Learning']
         service = 'azure.mgmt.machinelearningservices'
+        raise_on_exception = False
         client = 'MachineLearningServicesMgmtClient'
         enum_spec = ('jobs', 'list', None)
         parent_manager_name = 'machine-learning-workspace'

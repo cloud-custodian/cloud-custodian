@@ -1,0 +1,94 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_bigquery_dataset": {
+            "dataset": {
+                "access": [
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "OWNER",
+                        "routine": [],
+                        "special_group": "projectOwners",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "READER",
+                        "routine": [],
+                        "special_group": "allAuthenticatedUsers",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "",
+                        "role": "READER",
+                        "routine": [],
+                        "special_group": "projectReaders",
+                        "user_by_email": "",
+                        "view": []
+                    },
+                    {
+                        "condition": [],
+                        "dataset": [],
+                        "domain": "",
+                        "group_by_email": "",
+                        "iam_member": "allUsers",
+                        "role": "READER",
+                        "routine": [],
+                        "special_group": "",
+                        "user_by_email": "",
+                        "view": []
+                    }
+                ],
+                "creation_time": 1792081035071,
+                "dataset_id": "c7n_bq_set_access",
+                "default_collation": "",
+                "default_encryption_configuration": [],
+                "default_partition_expiration_ms": 0,
+                "default_table_expiration_ms": 0,
+                "delete_contents_on_destroy": false,
+                "deletion_policy": "DELETE",
+                "description": "c7n set-access test",
+                "effective_labels": {
+                    "c7n_test": "bq_dataset_set_access",
+                    "goog-terraform-provisioned": "true"
+                },
+                "etag": "EGowgmiPhESAY500kzZrsg==",
+                "external_catalog_dataset_options": [],
+                "external_dataset_reference": [],
+                "friendly_name": "",
+                "id": "projects/cloud-custodian/datasets/c7n_bq_set_access",
+                "is_case_insensitive": false,
+                "labels": {
+                    "c7n_test": "bq_dataset_set_access"
+                },
+                "last_modified_time": 1792081035071,
+                "location": "US",
+                "max_time_travel_hours": "168",
+                "project": "cloud-custodian",
+                "resource_tags": null,
+                "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/c7n_bq_set_access",
+                "storage_billing_model": "",
+                "terraform_labels": {
+                    "c7n_test": "bq_dataset_set_access",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        }
+    }
+}

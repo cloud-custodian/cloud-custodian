@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Oct 2026 19:34:21 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "148",
+    "-content-encoding": "gzip",
+    "content-location": "https://appengine.googleapis.com/v1/apps/cloud-custodian/services/default?alt=json"
+  },
+  "body": {
+    "name": "apps/cloud-custodian/services/default",
+    "id": "default",
+    "split": {
+      "allocations": {
+        "c7n-always-c5a1": 1
+      }
+    }
+  }
+}

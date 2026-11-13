@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import logging
 import isodate
 import operator
@@ -17,6 +18,7 @@ from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil.parser import parse
 from azure.core.exceptions import HttpResponseError
+from msrestazure.tools import parse_resource_id
 
 from c7n_azure.provider import resources
 from c7n.filters import Filter, FilterValidationError, ValueFilter
@@ -285,7 +287,7 @@ class MetricFilter(Filter):
             metrics_data = self.client.metrics.list(
                 self.get_resource_id(resource),
                 timespan=self.timespan,
-                interval=self.interval,
+                interval=isodate.duration_isoformat(self.interval),
                 metricnames=self.metric,
                 aggregation=self.aggregation,
                 metricnamespace=self.metricnamespace,
@@ -480,6 +482,74 @@ class TagActionFilter(Filter):
             action_date - timedelta(days=self.skew, hours=self.skew_hours))
 
 
+class FlowLogsFilter(ValueFilter, metaclass=ABCMeta):
+    """Base filter for resources that reference flow logs via a list of
+    ``properties.flowLogs`` references (e.g. Network Security Groups and
+    Virtual Networks). The Azure API only returns a reference (``id``) to
+    each flow log, so this filter resolves each one to its full properties
+    (including ``retentionPolicy``) before evaluating the subfilter.
+    """
+
+    schema = type_schema('flow-logs', rinherit=ValueFilter.schema)
+
+    annotation_key = 'c7n:flow-logs'
+    log = logging.getLogger('custodian.azure.filters.FlowLogsFilter')
+    client = None
+
+    def process(self, resources, event=None):
+        # Only the flow-log GETs run in parallel. Matching stays serial in
+        # ValueFilter.process, because ValueFilter.match keeps per-resource state
+        # on the filter (e.g. self.v for value_path) and isn't thread-safe. That
+        # also leaves resource_count, which needs no lookups, to ValueFilter.
+        if self.data.get('value_type') != 'resource_count':
+            self.client = self.manager.get_client()
+
+            _, exceptions = ThreadHelper.execute_in_parallel(
+                resources=resources,
+                event=event,
+                execution_method=self._annotate_resources,
+                executor_factory=self.executor_factory,
+                log=self.log
+            )
+
+            # execute_in_parallel drops any chunk that raised. Re-raise so a failed
+            # lookup fails the policy instead of silently omitting resources.
+            if exceptions:
+                raise exceptions[0]
+
+        return super().process(resources, event)
+
+    def _annotate_resources(self, resources, event):
+        for resource in resources:
+            if self.annotation_key not in resource['properties']:
+                resource['properties'][self.annotation_key] = {
+                    'logs': self._get_flow_logs(resource)
+                }
+
+    def _get_flow_logs(self, resource):
+        parsed_ids = [
+            parse_resource_id(log['id'])
+            for log in resource['properties'].get('flowLogs', [])
+        ]
+
+        if self.client is None:
+            self.client = self.manager.get_client()
+
+        return [
+            self.client.flow_logs.get(
+                parsed_id['resource_group'],
+                parsed_id['name'],
+                parsed_id['resource_name']
+            ).serialize(True).get('properties')
+            for parsed_id in parsed_ids
+        ]
+
+    def __call__(self, resource):
+        # Already annotated when reached via process(); this covers direct calls.
+        self._annotate_resources([resource], None)
+        return super().__call__(resource['properties'][self.annotation_key])
+
+
 class DiagnosticSettingsFilter(ValueFilter):
     """The diagnostic settings filter is implicitly just the ValueFilter
     on the diagnostic settings for an azure resource.
@@ -523,11 +593,33 @@ class DiagnosticSettingsFilter(ValueFilter):
                 value: True
                 op: in
                 value_type: swap
+
+    :example:
+
+    Find KeyVaults that don't send AuditEvent logs anywhere. A log entry that uses a
+    category group has ``category_group`` set instead of ``category``. On a Key Vault
+    both the ``audit`` and ``allLogs`` groups include AuditEvent, so either one counts.
+    The filter matches a resource when any one of its settings matches, and Azure may
+    list unconfigured groups such as ``audit`` as disabled.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-keyvaults-without-audit-logs
+            resource: azure.keyvault
+            filters:
+              - not:
+                - type: diagnostic-settings
+                  key: >-
+                    logs[?(category == 'AuditEvent' || category_group == 'audit'
+                    || category_group == 'allLogs') && enabled]
+                  value: not-null
     """
 
     schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
     schema_alias = True
     log = logging.getLogger('custodian.azure.filters.DiagnosticSettingsFilter')
+    api_version = '2021-05-01-preview'
 
     def process(self, resources, event=None):
         futures = []
@@ -548,12 +640,11 @@ class DiagnosticSettingsFilter(ValueFilter):
             return results
 
     def process_resource_set(self, resources):
-        #: :type: azure.mgmt.monitor.MonitorManagementClient
-        client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        #: :type: azure.mgmt.resource.ResourceManagementClient
+        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
         matched = []
         for resource in resources:
-            settings = client.diagnostic_settings.list(resource['id'])
-            settings = [s.as_dict() for s in settings.value]
+            settings = [self._normalize(s) for s in self.get_raw_settings(client, resource['id'])]
             # put an empty item in when no diag settings, so the absent operator can function
             if not settings:
                 settings = [{}]
@@ -563,6 +654,45 @@ class DiagnosticSettingsFilter(ValueFilter):
                 matched.append(resource)
 
         return matched
+
+    @classmethod
+    def get_raw_settings(cls, client, scope_id):
+        """List the diagnostic settings on a resource or subscription id, in the shape
+        Azure's REST API returns them: properties nested, camelCase keys.
+
+        Not the monitor SDK: azure-mgmt-monitor 7.0 has no diagnostic settings, and older
+        releases list at 2017-05-01-preview, where Azure leaves out any setting that uses
+        a category group such as allLogs.
+        """
+        response = client.resources.get_by_id(
+            # Named arguments: azure-mgmt-resource 26 makes api_version keyword-only.
+            resource_id=f"{scope_id}/providers/Microsoft.Insights/diagnosticSettings",
+            api_version=cls.api_version,
+            # The response is a list, not one resource, so keep the raw JSON.
+            # text(), not json(): older azure-mgmt-resource releases return
+            # responses that have no json() method.
+            cls=lambda pipeline_response, deserialized, headers: json.loads(
+                pipeline_response.http_response.text()))
+        return response.get('value') or []
+
+    @classmethod
+    def _normalize(cls, setting):
+        """Shape a raw diagnostic setting the way the monitor SDK's as_dict() did, which
+        existing policies are written against: properties flattened, snake_case keys,
+        nulls dropped. Fields that model didn't know, such as category_group, are kept.
+        """
+        setting = dict(setting)
+        setting.update(setting.pop('properties', None) or {})
+        return cls._snake_case_keys(setting)
+
+    @classmethod
+    def _snake_case_keys(cls, value):
+        if isinstance(value, dict):
+            return {StringUtils.camel_to_snake(k): cls._snake_case_keys(v)
+                    for k, v in value.items() if v is not None}
+        if isinstance(value, list):
+            return [cls._snake_case_keys(v) for v in value]
+        return value
 
 
 class PolicyCompliantFilter(Filter):
@@ -1080,11 +1210,9 @@ class CostFilter(ValueFilter):
         query_filter = None
         if not is_resource_group:
             query_filter = QueryFilter(
-                dimension=QueryComparisonExpression(name='ResourceType',
-                                                    operator='In',
-                                                    values=[manager.resource_type.resource_type]))
-            if 'dimension' in query_filter._attribute_map:
-                query_filter._attribute_map['dimension']['key'] = 'dimensions'
+                dimensions=QueryComparisonExpression(name='ResourceType',
+                                                     operator='In',
+                                                     values=[manager.resource_type.resource_type]))
 
         dataset = QueryDataset(grouping=grouping, aggregation=aggregation, filter=query_filter)
 

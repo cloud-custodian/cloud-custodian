@@ -1,0 +1,427 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_policy_document": {
+            "assume_role": {
+                "id": "1147345228",
+                "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"sagemaker.amazonaws.com\"\n      }\n    }\n  ]\n}",
+                "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}]}",
+                "override_json": null,
+                "override_policy_documents": null,
+                "policy_id": null,
+                "source_json": null,
+                "source_policy_documents": null,
+                "statement": [
+                    {
+                        "actions": [
+                            "sts:AssumeRole"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [
+                            {
+                                "identifiers": [
+                                    "sagemaker.amazonaws.com"
+                                ],
+                                "type": "Service"
+                            }
+                        ],
+                        "resources": [],
+                        "sid": ""
+                    }
+                ],
+                "version": "2012-10-17"
+            }
+        },
+        "aws_subnets": {
+            "default": {
+                "filter": [
+                    {
+                        "name": "vpc-id",
+                        "values": [
+                            "vpc-00000000000000001"
+                        ]
+                    }
+                ],
+                "id": "us-east-1",
+                "ids": [
+                    "subnet-00000000000000001",
+                    "subnet-00000000000000002",
+                    "subnet-00000000000000003",
+                    "subnet-00000000000000004",
+                    "subnet-00000000000000005",
+                    "subnet-00000000000000006"
+                ],
+                "region": "us-east-1",
+                "tags": null,
+                "timeouts": null
+            }
+        },
+        "aws_vpc": {
+            "default": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-00000000000000001",
+                "cidr_block": "172.31.0.0/16",
+                "cidr_block_associations": [
+                    {
+                        "association_id": "vpc-cidr-assoc-00000000000000001",
+                        "cidr_block": "172.31.0.0/16",
+                        "state": "associated"
+                    }
+                ],
+                "default": true,
+                "dhcp_options_id": "dopt-00000000000000001",
+                "enable_dns_hostnames": true,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "filter": null,
+                "id": "vpc-00000000000000001",
+                "instance_tenancy": "default",
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_associations": [],
+                "main_route_table_id": "rtb-00000000000000001",
+                "owner_id": "644160558196",
+                "region": "us-east-1",
+                "state": null,
+                "tags": {},
+                "timeouts": null
+            }
+        },
+        "aws_iam_role": {
+            "execution": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-space-update-selected-quail",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-10-15T20:02:28Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-space-update-selected-quail",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-space-update-selected-quail",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAZL6XWCR2L6C7NSPCE"
+            }
+        },
+        "aws_sagemaker_domain": {
+            "main": {
+                "app_network_access_type": "PublicInternetOnly",
+                "app_security_group_management": "",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:domain/d-000000000001",
+                "auth_mode": "IAM",
+                "default_space_settings": [
+                    {
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-space-update-selected-quail",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "security_groups": null,
+                        "space_storage_settings": []
+                    }
+                ],
+                "default_user_settings": [
+                    {
+                        "auto_mount_home_efs": "Enabled",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "studio::",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-space-update-selected-quail",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "ENABLED",
+                        "studio_web_portal_settings": [
+                            {
+                                "hidden_app_types": null,
+                                "hidden_instance_types": null,
+                                "hidden_ml_tools": null
+                            }
+                        ],
+                        "tensor_board_app_settings": []
+                    }
+                ],
+                "domain_name": "c7n-space-update-selected-quail",
+                "domain_settings": [],
+                "home_efs_file_system_id": "fs-00000000000000001",
+                "id": "d-000000000001",
+                "kms_key_id": "",
+                "region": "us-east-1",
+                "retention_policy": [
+                    {
+                        "home_efs_file_system": "Delete"
+                    }
+                ],
+                "security_group_id_for_domain_boundary": "",
+                "single_sign_on_application_arn": "",
+                "single_sign_on_managed_application_instance_id": "",
+                "subnet_ids": [
+                    "subnet-00000000000000001"
+                ],
+                "tag_propagation": "DISABLED",
+                "tags": null,
+                "tags_all": {},
+                "url": "https://d-000000000001.studio.us-east-1.sagemaker.aws",
+                "vpc_id": "vpc-00000000000000001"
+            }
+        },
+        "aws_sagemaker_space": {
+            "classic": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-classic-selected-quail",
+                "domain_id": "d-000000000001",
+                "home_efs_file_system_uid": "200010",
+                "id": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-classic-selected-quail",
+                "ownership_settings": [],
+                "region": "us-east-1",
+                "space_display_name": "",
+                "space_name": "c7n-classic-selected-quail",
+                "space_settings": [
+                    {
+                        "app_type": "",
+                        "code_editor_app_settings": [],
+                        "custom_file_system": [],
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [
+                            {
+                                "custom_image": [],
+                                "default_resource_spec": [
+                                    {
+                                        "instance_type": "ml.g4dn.xlarge",
+                                        "lifecycle_config_arn": "",
+                                        "sagemaker_image_arn": "",
+                                        "sagemaker_image_version_alias": "",
+                                        "sagemaker_image_version_arn": ""
+                                    }
+                                ],
+                                "lifecycle_config_arns": null
+                            }
+                        ],
+                        "space_storage_settings": []
+                    }
+                ],
+                "space_sharing_settings": [],
+                "tags": null,
+                "tags_all": {},
+                "url": "https://000000000000001.studio.us-east-1.sagemaker.aws"
+            },
+            "codeeditor": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-codeeditor-selected-quail",
+                "domain_id": "d-000000000001",
+                "home_efs_file_system_uid": "",
+                "id": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-codeeditor-selected-quail",
+                "ownership_settings": [
+                    {
+                        "owner_user_profile_name": "c7n-owner-selected-quail"
+                    }
+                ],
+                "region": "us-east-1",
+                "space_display_name": "",
+                "space_name": "c7n-codeeditor-selected-quail",
+                "space_settings": [
+                    {
+                        "app_type": "CodeEditor",
+                        "code_editor_app_settings": [
+                            {
+                                "app_lifecycle_management": [],
+                                "default_resource_spec": [
+                                    {
+                                        "instance_type": "ml.g4dn.xlarge",
+                                        "lifecycle_config_arn": "",
+                                        "sagemaker_image_arn": "",
+                                        "sagemaker_image_version_alias": "",
+                                        "sagemaker_image_version_arn": ""
+                                    }
+                                ]
+                            }
+                        ],
+                        "custom_file_system": [],
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "space_storage_settings": [
+                            {
+                                "ebs_storage_settings": [
+                                    {
+                                        "ebs_volume_size_in_gb": 5
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "space_sharing_settings": [
+                    {
+                        "sharing_type": "Private"
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "url": "https://000000000000002.studio.us-east-1.sagemaker.aws/codeeditor/default"
+            },
+            "cpu": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-cpu-selected-quail",
+                "domain_id": "d-000000000001",
+                "home_efs_file_system_uid": "",
+                "id": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-cpu-selected-quail",
+                "ownership_settings": [
+                    {
+                        "owner_user_profile_name": "c7n-owner-selected-quail"
+                    }
+                ],
+                "region": "us-east-1",
+                "space_display_name": "",
+                "space_name": "c7n-cpu-selected-quail",
+                "space_settings": [
+                    {
+                        "app_type": "JupyterLab",
+                        "code_editor_app_settings": [],
+                        "custom_file_system": [],
+                        "jupyter_lab_app_settings": [
+                            {
+                                "app_lifecycle_management": [],
+                                "code_repository": [],
+                                "default_resource_spec": [
+                                    {
+                                        "instance_type": "ml.t3.large",
+                                        "lifecycle_config_arn": "",
+                                        "sagemaker_image_arn": "",
+                                        "sagemaker_image_version_alias": "",
+                                        "sagemaker_image_version_arn": ""
+                                    }
+                                ]
+                            }
+                        ],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "space_storage_settings": [
+                            {
+                                "ebs_storage_settings": [
+                                    {
+                                        "ebs_volume_size_in_gb": 5
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "space_sharing_settings": [
+                    {
+                        "sharing_type": "Private"
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "url": "https://000000000000003.studio.us-east-1.sagemaker.aws/jupyterlab/default"
+            },
+            "jupyterlab": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-jupyterlab-selected-quail",
+                "domain_id": "d-000000000001",
+                "home_efs_file_system_uid": "",
+                "id": "arn:aws:sagemaker:us-east-1:644160558196:space/d-000000000001/c7n-jupyterlab-selected-quail",
+                "ownership_settings": [
+                    {
+                        "owner_user_profile_name": "c7n-owner-selected-quail"
+                    }
+                ],
+                "region": "us-east-1",
+                "space_display_name": "",
+                "space_name": "c7n-jupyterlab-selected-quail",
+                "space_settings": [
+                    {
+                        "app_type": "JupyterLab",
+                        "code_editor_app_settings": [
+                            {
+                                "app_lifecycle_management": [],
+                                "default_resource_spec": [
+                                    {
+                                        "instance_type": "ml.g4dn.xlarge",
+                                        "lifecycle_config_arn": "",
+                                        "sagemaker_image_arn": "",
+                                        "sagemaker_image_version_alias": "",
+                                        "sagemaker_image_version_arn": ""
+                                    }
+                                ]
+                            }
+                        ],
+                        "custom_file_system": [],
+                        "jupyter_lab_app_settings": [
+                            {
+                                "app_lifecycle_management": [],
+                                "code_repository": [],
+                                "default_resource_spec": [
+                                    {
+                                        "instance_type": "ml.g4dn.xlarge",
+                                        "lifecycle_config_arn": "",
+                                        "sagemaker_image_arn": "",
+                                        "sagemaker_image_version_alias": "",
+                                        "sagemaker_image_version_arn": ""
+                                    }
+                                ]
+                            }
+                        ],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "space_storage_settings": [
+                            {
+                                "ebs_storage_settings": [
+                                    {
+                                        "ebs_volume_size_in_gb": 5
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "space_sharing_settings": [
+                    {
+                        "sharing_type": "Private"
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "url": "https://000000000000004.studio.us-east-1.sagemaker.aws/jupyterlab/default"
+            }
+        },
+        "aws_sagemaker_user_profile": {
+            "owner": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-000000000001/c7n-owner-selected-quail",
+                "domain_id": "d-000000000001",
+                "home_efs_file_system_uid": "200005",
+                "id": "d-000000000001/c7n-owner-selected-quail",
+                "region": "us-east-1",
+                "single_sign_on_user_identifier": "",
+                "single_sign_on_user_value": "",
+                "tags": null,
+                "tags_all": {},
+                "user_profile_name": "c7n-owner-selected-quail",
+                "user_settings": []
+            }
+        },
+        "random_pet": {
+            "space": {
+                "id": "selected-quail",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

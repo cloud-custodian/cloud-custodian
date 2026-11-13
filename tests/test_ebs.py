@@ -717,6 +717,32 @@ class ResizeTest(BaseTest):
              "('vol-mutation', 1), ('vol-type', 1)]")
         )
 
+    def test_resize_filter_attachment_without_instance_id(self):
+        # volumes attached to something other than an ec2 instance (ie. ecs
+        # managed volumes) have no InstanceId in their attachment.
+        p = self.load_policy(
+            {"name": "resizable", "resource": "ebs", "filters": ["modifyable"]},
+        )
+        volumes = [
+            {
+                "VolumeId": "vol-0123456789abcdef0",
+                "VolumeType": "gp3",
+                "Attachments": [
+                    {
+                        "AttachTime": parser.parse("2025-01-01T00:00:00+00:00"),
+                        "VolumeId": "vol-0123456789abcdef0",
+                        "State": "attached",
+                    }
+                ],
+            }
+        ]
+        client = mock.MagicMock()
+        client.describe_volumes_modifications.return_value = {}
+        with mock.patch("c7n.resources.ebs.local_session") as local_session:
+            local_session.return_value.client.return_value = client
+            resources = p.resource_manager.filters[0].process(volumes)
+        self.assertEqual([r["VolumeId"] for r in resources], ["vol-0123456789abcdef0"])
+
 
 class CopyInstanceTagsTest(BaseTest):
 

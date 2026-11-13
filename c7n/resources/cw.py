@@ -478,8 +478,30 @@ class LastWriteDays(Filter):
         return self.date_threshold > last_write
 
 
+def _supports_subscription_filters(group):
+    return group.get("logGroupClass", "STANDARD") == "STANDARD"
+
+
 @LogGroup.filter_registry.register('cross-account')
 class LogCrossAccountFilter(CrossAccountAccessFilter):
+    """Find log groups with subscription filters that deliver to accounts that are not in
+    the allowed accounts.
+
+    Only the ``whitelist`` and ``whitelist_from`` options are supported.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: log-group-cross-account
+            resource: aws.log-group
+            filters:
+              - type: cross-account
+                whitelist:
+                  - "123456789012"
+    """
+
     schema = type_schema(
         'cross-account',
         # white list accounts
@@ -510,10 +532,14 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
     def process_resource_set(self, client, accounts, resources):
         results = []
         for r in resources:
+            if not _supports_subscription_filters(r):
+                continue
             found = False
-            filters = self.manager.retry(
+            response = self.manager.retry(
                 client.describe_subscription_filters,
-                logGroupName=r['logGroupName']).get('subscriptionFilters', ())
+                logGroupName=r['logGroupName'],
+                ignore_err_codes=('ResourceNotFoundException',)) or {}
+            filters = response.get('subscriptionFilters', ())
             for f in filters:
                 if 'destinationArn' not in f:
                     continue
@@ -551,9 +577,13 @@ class LogSubscriptionFilter(ValueFilter):
         client = local_session(self.manager.session_factory).client('logs')
         results = []
         for r in resources:
-            filters = self.manager.retry(
+            if not _supports_subscription_filters(r):
+                continue
+            response = self.manager.retry(
                 client.describe_subscription_filters,
-                logGroupName=r['logGroupName']).get('subscriptionFilters', ())
+                logGroupName=r['logGroupName'],
+                ignore_err_codes=('ResourceNotFoundException',)) or {}
+            filters = response.get('subscriptionFilters', ())
             if not any(filters):
                 continue
             for f in filters:

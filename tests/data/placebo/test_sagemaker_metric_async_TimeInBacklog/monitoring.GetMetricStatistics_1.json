@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "TimeInBacklog",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 16,
+                    "minute": 15,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Average": 472.4,
+                "Unit": "Milliseconds"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

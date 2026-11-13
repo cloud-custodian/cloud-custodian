@@ -7,6 +7,7 @@ from c7n_gcp.client import get_default_project
 from c7n_gcp.filters.recommender import RecommenderFilter
 from unittest.mock import patch
 import time
+import pytest
 from pytest_terraform import terraform
 
 
@@ -282,6 +283,119 @@ def test_dataset_update(test, bigquery):
         if 'specialGroup' in entry
     }
     test.assertEqual(actual_access, expected_access)
+
+
+@pytest.mark.parametrize('action', [
+    {'type': 'set-access'},
+    {'type': 'set-access', 'remove': [{'notAField': 'x'}]},
+    {'type': 'set-access', 'add': [{'specialGroup': 'projectWriters'}]},
+    {'type': 'set-access', 'add': [{'role': 'READER'}]},
+    {
+        'type': 'set-access',
+        'add': [{'role': 'READER', 'iamMember': 'allUsers'}],
+        'remove': [{'iamMember': 'allUsers'}],
+    },
+    {
+        'type': 'set-access',
+        'add': [{'role': 'roles/bigquery.dataViewer', 'specialGroup': 'projectReaders'}],
+        'remove': [{'role': 'READER', 'specialGroup': 'projectReaders'}],
+    },
+])
+def test_dataset_set_access_validation_error(test, action):
+    with pytest.raises(PolicyValidationError):
+        test.load_policy(
+            {
+                'name': 'bq-dataset-set-access-invalid',
+                'resource': 'gcp.bq-dataset',
+                'actions': [action]
+            },
+            validate=True
+        )
+
+
+def test_dataset_set_access_merge(test):
+    policy = test.load_policy(
+        {
+            'name': 'bq-dataset-set-access-merge',
+            'resource': 'gcp.bq-dataset',
+            'actions': [{
+                'type': 'set-access',
+                'add': [
+                    # already present in legacy role form, so not duplicated
+                    {'role': 'roles/bigquery.dataViewer', 'specialGroup': 'projectReaders'},
+                    # new entry, appended
+                    {'role': 'WRITER', 'domain': 'example.com'},
+                ],
+                # allAuthenticatedUsers removes an existing entry
+                'remove': [{'iamMember': 'allUsers'}, {'specialGroup': 'allAuthenticatedUsers'}],
+            }]
+        }
+    )
+    action = policy.resource_manager.actions[0]
+    resource = {'access': [
+        {'role': 'OWNER', 'specialGroup': 'projectOwners'},
+        {'role': 'READER', 'specialGroup': 'projectReaders'},
+        {'role': 'READER', 'specialGroup': 'allAuthenticatedUsers'},
+    ]}
+    assert action.get_access(resource) == [
+        {'role': 'OWNER', 'specialGroup': 'projectOwners'},
+        {'role': 'READER', 'specialGroup': 'projectReaders'},
+        {'role': 'WRITER', 'domain': 'example.com'},
+    ]
+
+
+@terraform("bq_dataset_set_access")
+def test_dataset_set_access(test, bq_dataset_set_access):
+    project_id = get_default_project()
+    dataset_id = bq_dataset_set_access['google_bigquery_dataset.dataset.dataset_id']
+
+    session_factory = test.replay_flight_data(
+        'bq-dataset-set-access', project_id=project_id)
+
+    policy = test.load_policy(
+        {
+            'name': 'bq-dataset-set-access',
+            'resource': 'gcp.bq-dataset',
+            'query': [{'filter': 'labels.c7n_test:bq_dataset_set_access'}],
+            'filters': [{
+                'type': 'value',
+                'key': 'access[].specialGroup',
+                'op': 'contains',
+                'value': 'allAuthenticatedUsers'
+            }],
+            'actions': [{
+                'type': 'set-access',
+                'add': [{'role': 'WRITER', 'specialGroup': 'projectWriters'}],
+                'remove': [
+                    {'iamMember': 'allUsers'},
+                    {'specialGroup': 'allAuthenticatedUsers'}
+                ]
+            }]
+        },
+        session_factory=session_factory
+    )
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    client = policy.resource_manager.get_client()
+    result = client.execute_query(
+        'get',
+        {'projectId': project_id, 'datasetId': dataset_id}
+    )
+    members = {
+        (entry.get('role'), entry.get('specialGroup') or entry.get('iamMember'))
+        for entry in result['access']
+        if 'specialGroup' in entry or 'iamMember' in entry
+    }
+    assert members == {
+        ('OWNER', 'projectOwners'),
+        ('READER', 'projectReaders'),
+        ('WRITER', 'projectWriters'),
+    }
+    # patch only replaces access; untouched sibling fields survive
+    assert result['description'] == 'c7n set-access test'
+    assert result['labels']['c7n_test'] == 'bq_dataset_set_access'
 
 
 @terraform("bigquery")

@@ -9,11 +9,13 @@
 #
 # kind names a variety of the resource, for metrics only some varieties
 # publish; leave it out when every variety publishes the section's metrics.
-# Endpoints come in two kinds: a "classic" endpoint attaches a model to each
+# Endpoints come in three kinds: a "classic" endpoint attaches a model to each
 # production variant, while an "inference-component" endpoint carries an
 # execution role and hosts models as components placed on a variant. The two
 # report invocations under different dimensions, which the documentation
-# lists together without saying which applies when.
+# lists together without saying which applies when. An "async" endpoint
+# carries an AsyncInferenceConfig; its metrics have a page of their own:
+# https://docs.aws.amazon.com/sagemaker/latest/dg/async-inference-monitor.html
 #
 # Only the metrics of resources c7n filters on are listed; the page also
 # covers jobs, Ground Truth, Feature Store and pipelines.
@@ -117,5 +119,53 @@
   namespace: /aws/sagemaker/Endpoints
   metrics:
     - LoadedModelCount
+  dimensions:
+    - EndpointName, VariantName
+
+# The only real-time invocation metrics an async endpoint publishes. The page
+# gives them no dimensions; the error counts' are by analogy with ModelLatency,
+# since they weren't observed.
+- title: Common Endpoint Metrics
+  resource: sagemaker-endpoint
+  kind: async
+  namespace: AWS/SageMaker
+  metrics:
+    - Invocation4XXErrors
+    - Invocation5XXErrors
+    - ModelLatency
+  dimensions:
+    - EndpointName, VariantName
+
+# The queue belongs to the endpoint rather than to a variant.
+- title: Asynchronous Inference Endpoint Metrics
+  resource: sagemaker-endpoint
+  kind: async
+  namespace: AWS/SageMaker
+  metrics:
+    - ApproximateBacklogSize
+    - ApproximateBacklogSizePerInstance
+    - ApproximateAgeOfOldestRequest
+    - HasBacklogWithoutCapacity
+  dimensions:
+    - EndpointName
+
+# The page misspells InvocationsProcessed as InvocationsProcesssed.
+# NotificationFailures and ExpiredRequests weren't observed, so their
+# dimensions are the page's.
+- title: Asynchronous Inference Endpoint Metrics
+  resource: sagemaker-endpoint
+  kind: async
+  namespace: AWS/SageMaker
+  metrics:
+    - RequestDownloadFailures
+    - ResponseUploadFailures
+    - NotificationFailures
+    - RequestDownloadLatency
+    - ResponseUploadLatency
+    - ExpiredRequests
+    - InvocationFailures
+    - InvocationsProcessed
+    - TimeInBacklog
+    - TotalProcessingTime
   dimensions:
     - EndpointName, VariantName

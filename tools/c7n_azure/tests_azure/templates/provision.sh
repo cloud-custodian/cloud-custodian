@@ -182,6 +182,27 @@ deploy_resource() {
         az keyvault storage add --vault-name ${vault_name} -n storage1 --active-key-name key1 --resource-id ${storage_id} --auto-regenerate-key True --regeneration-period P720D  --output None
         az keyvault storage add --vault-name ${vault_name} -n storage2 --active-key-name key2 --resource-id ${storage_id} --auto-regenerate-key False --output None
 
+    elif [[ "$fileName" == "keyvault-secret.json" ]]; then
+
+        az deployment group create --resource-group $rgName --template-file $file --output None || {
+            echo "Failed to deploy Key Vault secret fixture in resource group '${rgName}'."
+            print_failed_group_deployment "$rgName"
+            exit 1
+        }
+
+        # The vault uses RBAC authorization; grant Key Vault Secrets Officer for data-plane access.
+        principal_type="ServicePrincipal"
+        if [[ ${is_user} -eq 1 ]]; then
+            principal_type="User"
+        fi
+        if ! ensure_role_for_active_principal \
+            "$rgName" \
+            "b86a8fe4-44ce-4948-aee5-eccb2c155cd7" \
+            "$principal_type"; then
+            echo "Required role assignment check failed; cannot continue with Key Vault secret fixture."
+            exit 1
+        fi
+
     elif [[ "$fileName" == "aks.json" ]]; then
 
         az deployment group create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --mode Complete --output None
@@ -509,6 +530,57 @@ PY
         suffix="${sub_id:${#sub_id} - 12}"
         echo "Adding local external IP (${ip}) and azure portals to cosmos firewall allow list..."
         az cosmosdb update -g $rgName -n cctestcosmosdb$suffix --ip-range-filter $allow_list
+    fi
+
+    if [[ "$fileName" == "vnet.json" ]]; then
+        storage_account_id=$(az storage account list --resource-group $rgName --query "[0].id" --output tsv)
+        workspace_id=$(az monitor log-analytics workspace show --resource-group $rgName --workspace-name c7n-vnet-flowlog-la --query id --output tsv)
+        vnet_id=$(az network vnet show --resource-group $rgName --name c7n-vnet --query id --output tsv)
+        set_vnet_id=$(az network vnet show --resource-group $rgName --name c7n-vnet-set-flowlog --query id --output tsv)
+        watcher_name=$(az network watcher list --query "[?location=='southcentralus'].name" --output tsv)
+        watcher_rg=$(az network watcher list --query "[?location=='southcentralus'].resourceGroup" --output tsv)
+        if [[ -z "$watcher_name" || -z "$watcher_rg" ]]; then
+            echo "No network watcher found in southcentralus; cannot create vnet flow logs."
+            exit 1
+        fi
+
+        # Retention is deliberately below 90 days so the flow-logs retention
+        # filter test has a non-compliant flow log to match. The set-flow-log
+        # action test never touches this flow log, so it stays non-compliant.
+        echo "Creating vnet flow log for c7n-vnet using network watcher ${watcher_name} (${watcher_rg})..."
+        if ! az network watcher flow-log create \
+            --resource-group "$watcher_rg" \
+            --location southcentralus \
+            --name c7n-vnet-flowlog \
+            --vnet "$vnet_id" \
+            --storage-account "$storage_account_id" \
+            --enabled true \
+            --retention 30 \
+            --output None; then
+            echo "Failed to create flow log for c7n-vnet."
+            exit 1
+        fi
+
+        # Dedicated flow log for the set-flow-log action test, which mutates it.
+        # Traffic Analytics and tags are set so the test can verify the action
+        # preserves settings it doesn't manage.
+        echo "Creating vnet flow log for c7n-vnet-set-flowlog using network watcher ${watcher_name} (${watcher_rg})..."
+        if ! az network watcher flow-log create \
+            --resource-group "$watcher_rg" \
+            --location southcentralus \
+            --name c7n-vnet-set-flowlog-fl \
+            --vnet "$set_vnet_id" \
+            --storage-account "$storage_account_id" \
+            --enabled true \
+            --retention 30 \
+            --workspace "$workspace_id" \
+            --traffic-analytics true \
+            --interval 10 \
+            --tags c7n-test=flowlog \
+            --output None; then
+            echo "Failed to create flow log for c7n-vnet-set-flowlog."
+            exit 1
+        fi
     fi
 
     echo "Deployment for ${filenameNoExtension} complete"
