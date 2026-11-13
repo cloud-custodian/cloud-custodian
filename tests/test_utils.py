@@ -1096,3 +1096,18 @@ def test_get_human_size_beyond_largest_suffix():
     # suffix rather than raising IndexError
     assert utils.get_human_size(1024 ** 9) == '1024.00 YB'
     assert utils.get_human_size(1024 ** 5 * 2000) == '1.95 EB'
+
+
+@pytest.mark.parametrize("code,expected", [
+    ('AccessDenied', True),
+    ('AccessDeniedException', True),
+    # SNS reports a resource policy deny with this code
+    ('AuthorizationError', True),
+    ('Throttling', False),
+    ('NoSuchEntity', False),
+    # EC2 identity policy denial, deliberately not treated as skippable
+    ('UnauthorizedOperation', False),
+])
+def test_is_access_denied(code, expected):
+    err = ClientError({"Error": {"Code": code, "Message": ""}}, "GetSomething")
+    assert utils.is_access_denied(err) is expected

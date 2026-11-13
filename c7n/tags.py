@@ -248,8 +248,20 @@ def universal_augment(self, resources):
 
     rfetch = [r for r in resources if 'Tags' not in r]
 
-    for arn_resource_set in utils.chunks(
-            zip(self.get_arns(rfetch), rfetch), 100):
+    # A resource whose detail call was denied may lack its arn, so it is
+    # tagged only when the list call returned one.
+    denied = [r for r in rfetch if 'c7n:DeniedMethods' in r]
+    rfetch = [r for r in rfetch if 'c7n:DeniedMethods' not in r]
+    pairs = list(zip(self.get_arns(rfetch), rfetch))
+    for r in denied:
+        try:
+            arn = self.get_arns([r])[0]
+        except KeyError:
+            continue
+        if arn:
+            pairs.append((arn, r))
+
+    for arn_resource_set in utils.chunks(pairs, 100):
         arn_resource_map = dict(arn_resource_set)
         resource_tag_results = client.get_resources(
             ResourceARNList=list(arn_resource_map.keys())).get(
