@@ -1,0 +1,230 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_vertex_ai_index": {
+            "default": {
+                "create_time": "2026-11-04T14:08:43.951467Z",
+                "deletion_policy": "DELETE",
+                "deployed_indexes": [],
+                "description": "",
+                "display_name": "c7n-test-index-e35b5fc3",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "etag": null,
+                "id": "projects/cloud-custodian/locations/us-central1/indexes/2000000000000000001",
+                "index_stats": [
+                    {
+                        "shards_count": 1,
+                        "vectors_count": ""
+                    }
+                ],
+                "index_update_method": "STREAM_UPDATE",
+                "labels": null,
+                "metadata": [
+                    {
+                        "config": [
+                            {
+                                "algorithm_config": [
+                                    {
+                                        "brute_force_config": [
+                                            {}
+                                        ],
+                                        "tree_ah_config": []
+                                    }
+                                ],
+                                "approximate_neighbors_count": 0,
+                                "dimensions": 2,
+                                "distance_measure_type": "DOT_PRODUCT_DISTANCE",
+                                "feature_norm_type": "NONE",
+                                "shard_size": "SHARD_SIZE_SMALL"
+                            }
+                        ],
+                        "contents_delta_uri": "",
+                        "is_complete_overwrite": false
+                    }
+                ],
+                "metadata_schema_uri": "gs://google-cloud-aiplatform/schema/matchingengine/metadata/nearest_neighbor_search_1.0.0.yaml",
+                "name": "2000000000000000001",
+                "project": "cloud-custodian",
+                "region": "us-central1",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-11-04T14:09:08.375659Z"
+            }
+        },
+        "google_vertex_ai_index_endpoint": {
+            "busy": {
+                "create_time": "2026-11-04T14:08:43.964241Z",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "display_name": "c7n-test-busy-e35b5fc3",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "etag": null,
+                "id": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000001",
+                "labels": null,
+                "name": "1000000000000000001",
+                "network": "",
+                "private_service_connect_config": [
+                    {
+                        "enable_private_service_connect": false,
+                        "project_allowlist": [],
+                        "psc_automation_configs": []
+                    }
+                ],
+                "project": "cloud-custodian",
+                "public_endpoint_domain_name": "100000001.us-central1-000000000000.vdb.vertexai.goog",
+                "public_endpoint_enabled": true,
+                "region": "us-central1",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-11-04T14:08:44.743452Z"
+            },
+            "empty": {
+                "create_time": "2026-11-04T14:08:44.200135Z",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "display_name": "c7n-test-empty-e35b5fc3",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "etag": null,
+                "id": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000003",
+                "labels": null,
+                "name": "1000000000000000003",
+                "network": "",
+                "private_service_connect_config": [
+                    {
+                        "enable_private_service_connect": false,
+                        "project_allowlist": [],
+                        "psc_automation_configs": []
+                    }
+                ],
+                "project": "cloud-custodian",
+                "public_endpoint_domain_name": "100000003.us-central1-000000000000.vdb.vertexai.goog",
+                "public_endpoint_enabled": true,
+                "region": "us-central1",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-11-04T14:08:45.405573Z"
+            },
+            "idle": {
+                "create_time": "2026-11-04T14:08:44.219714Z",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "display_name": "c7n-test-idle-e35b5fc3",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "etag": null,
+                "id": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000002",
+                "labels": null,
+                "name": "1000000000000000002",
+                "network": "",
+                "private_service_connect_config": [
+                    {
+                        "enable_private_service_connect": false,
+                        "project_allowlist": [],
+                        "psc_automation_configs": []
+                    }
+                ],
+                "project": "cloud-custodian",
+                "public_endpoint_domain_name": "100000002.us-central1-000000000000.vdb.vertexai.goog",
+                "public_endpoint_enabled": true,
+                "region": "us-central1",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-11-04T14:08:45.059226Z"
+            }
+        },
+        "google_vertex_ai_index_endpoint_deployed_index": {
+            "busy": {
+                "automatic_resources": [],
+                "create_time": "2026-11-04T14:09:15.254949Z",
+                "dedicated_resources": [
+                    {
+                        "machine_spec": [
+                            {
+                                "machine_type": "e2-standard-2"
+                            }
+                        ],
+                        "max_replica_count": 1,
+                        "min_replica_count": 1
+                    }
+                ],
+                "deletion_policy": "DELETE",
+                "deployed_index_auth_config": [],
+                "deployed_index_id": "c7n_test_busy_e35b5fc3",
+                "deployment_group": "default",
+                "display_name": "",
+                "enable_access_logging": false,
+                "id": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000001/deployedIndex/c7n_test_busy_e35b5fc3",
+                "index": "projects/cloud-custodian/locations/us-central1/indexes/2000000000000000001",
+                "index_endpoint": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000001",
+                "index_sync_time": "2026-11-04T14:47:35.180631Z",
+                "name": "",
+                "private_endpoints": [],
+                "region": "us-central1",
+                "reserved_ip_ranges": null,
+                "timeouts": null
+            },
+            "idle": {
+                "automatic_resources": [],
+                "create_time": "2026-11-04T14:09:15.223534Z",
+                "dedicated_resources": [
+                    {
+                        "machine_spec": [
+                            {
+                                "machine_type": "e2-standard-2"
+                            }
+                        ],
+                        "max_replica_count": 1,
+                        "min_replica_count": 1
+                    }
+                ],
+                "deletion_policy": "DELETE",
+                "deployed_index_auth_config": [],
+                "deployed_index_id": "c7n_test_idle_e35b5fc3",
+                "deployment_group": "default",
+                "display_name": "",
+                "enable_access_logging": false,
+                "id": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000002/deployedIndex/c7n_test_idle_e35b5fc3",
+                "index": "projects/cloud-custodian/locations/us-central1/indexes/2000000000000000001",
+                "index_endpoint": "projects/cloud-custodian/locations/us-central1/indexEndpoints/1000000000000000002",
+                "index_sync_time": "2026-11-04T14:09:15.223534Z",
+                "name": "",
+                "private_endpoints": [],
+                "region": "us-central1",
+                "reserved_ip_ranges": null,
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "41tfww==",
+                "b64_url": "41tfww",
+                "byte_length": 4,
+                "dec": "3814416323",
+                "hex": "e35b5fc3",
+                "id": "41tfww",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}
