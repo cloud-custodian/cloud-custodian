@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "GroupId": "sg-0ae85023b20e10ca7",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "UserIdGroupPairs": [],
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "private"
+                    }
+                ],
+                "VpcId": "vpc-0b876ccff795def31",
+                "SecurityGroupArn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0ae85023b20e10ca7",
+                "OwnerId": "644160558196",
+                "GroupName": "c7n-appstream",
+                "Description": "c7n appstream placebo recording",
+                "IpPermissions": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

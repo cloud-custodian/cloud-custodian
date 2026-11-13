@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "Stacks": [
+            {
+                "Arn": "arn:aws:appstream:us-east-1:644160558196:stack/c7n-test-stack",
+                "Name": "c7n-test-stack",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 7,
+                    "second": 34,
+                    "microsecond": 893000
+                },
+                "StackErrors": [],
+                "UserSettings": [
+                    {
+                        "Action": "CLIPBOARD_COPY_FROM_LOCAL_DEVICE",
+                        "Permission": "ENABLED"
+                    },
+                    {
+                        "Action": "CLIPBOARD_COPY_TO_LOCAL_DEVICE",
+                        "Permission": "ENABLED"
+                    },
+                    {
+                        "Action": "FILE_UPLOAD",
+                        "Permission": "ENABLED"
+                    },
+                    {
+                        "Action": "FILE_DOWNLOAD",
+                        "Permission": "ENABLED"
+                    },
+                    {
+                        "Action": "PRINTING_TO_LOCAL_DEVICE",
+                        "Permission": "ENABLED"
+                    },
+                    {
+                        "Action": "DOMAIN_PASSWORD_SIGNIN",
+                        "Permission": "ENABLED"
+                    },
+                    {
+                        "Action": "DOMAIN_SMART_CARD_SIGNIN",
+                        "Permission": "DISABLED"
+                    },
+                    {
+                        "Action": "AUTO_TIME_ZONE_REDIRECTION",
+                        "Permission": "DISABLED"
+                    }
+                ],
+                "ApplicationSettings": {
+                    "Enabled": false
+                },
+                "StreamingExperienceSettings": {
+                    "PreferredProtocol": "TCP"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

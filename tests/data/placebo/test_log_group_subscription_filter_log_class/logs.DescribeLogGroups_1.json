@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "c7n-log-class-infrequent",
+                "creationTime": 1793652432799,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-infrequent:*",
+                "storedBytes": 0,
+                "logGroupClass": "INFREQUENT_ACCESS",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-infrequent",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            },
+            {
+                "logGroupName": "c7n-log-class-standard",
+                "creationTime": 1793652431900,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-standard:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-log-class-standard",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

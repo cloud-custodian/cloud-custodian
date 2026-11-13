@@ -18,6 +18,7 @@ from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil.parser import parse
 from azure.core.exceptions import HttpResponseError
+from msrestazure.tools import parse_resource_id
 
 from c7n_azure.provider import resources
 from c7n.filters import Filter, FilterValidationError, ValueFilter
@@ -479,6 +480,74 @@ class TagActionFilter(Filter):
 
         return current_date >= (
             action_date - timedelta(days=self.skew, hours=self.skew_hours))
+
+
+class FlowLogsFilter(ValueFilter, metaclass=ABCMeta):
+    """Base filter for resources that reference flow logs via a list of
+    ``properties.flowLogs`` references (e.g. Network Security Groups and
+    Virtual Networks). The Azure API only returns a reference (``id``) to
+    each flow log, so this filter resolves each one to its full properties
+    (including ``retentionPolicy``) before evaluating the subfilter.
+    """
+
+    schema = type_schema('flow-logs', rinherit=ValueFilter.schema)
+
+    annotation_key = 'c7n:flow-logs'
+    log = logging.getLogger('custodian.azure.filters.FlowLogsFilter')
+    client = None
+
+    def process(self, resources, event=None):
+        # Only the flow-log GETs run in parallel. Matching stays serial in
+        # ValueFilter.process, because ValueFilter.match keeps per-resource state
+        # on the filter (e.g. self.v for value_path) and isn't thread-safe. That
+        # also leaves resource_count, which needs no lookups, to ValueFilter.
+        if self.data.get('value_type') != 'resource_count':
+            self.client = self.manager.get_client()
+
+            _, exceptions = ThreadHelper.execute_in_parallel(
+                resources=resources,
+                event=event,
+                execution_method=self._annotate_resources,
+                executor_factory=self.executor_factory,
+                log=self.log
+            )
+
+            # execute_in_parallel drops any chunk that raised. Re-raise so a failed
+            # lookup fails the policy instead of silently omitting resources.
+            if exceptions:
+                raise exceptions[0]
+
+        return super().process(resources, event)
+
+    def _annotate_resources(self, resources, event):
+        for resource in resources:
+            if self.annotation_key not in resource['properties']:
+                resource['properties'][self.annotation_key] = {
+                    'logs': self._get_flow_logs(resource)
+                }
+
+    def _get_flow_logs(self, resource):
+        parsed_ids = [
+            parse_resource_id(log['id'])
+            for log in resource['properties'].get('flowLogs', [])
+        ]
+
+        if self.client is None:
+            self.client = self.manager.get_client()
+
+        return [
+            self.client.flow_logs.get(
+                parsed_id['resource_group'],
+                parsed_id['name'],
+                parsed_id['resource_name']
+            ).serialize(True).get('properties')
+            for parsed_id in parsed_ids
+        ]
+
+    def __call__(self, resource):
+        # Already annotated when reached via process(); this covers direct calls.
+        self._annotate_resources([resource], None)
+        return super().__call__(resource['properties'][self.annotation_key])
 
 
 class DiagnosticSettingsFilter(ValueFilter):
