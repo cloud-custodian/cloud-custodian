@@ -656,7 +656,7 @@ class RevisionServiceTest(BaseTest):
             'resource': 'gcp.cloud-run-revision',
             'mode': {
                 'type': 'gcp-audit',
-                'methods': ['google.cloud.run.v1.Revisions.DeleteRevision']
+                'methods': ['google.cloud.run.v1.Revisions.GetRevision']
             }
         })
         p.validate()
@@ -677,7 +677,17 @@ class RevisionServiceTest(BaseTest):
         assert res['metadata']['name'] == 'rev-1'
         assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/revisions/rev-1'})
 
-        # Test projects/ resourceName conversion
+        # Test 8-segment projects/ resourceName conversion
+        rev_8seg_name = (
+            'projects/cloud-custodian/locations/us-central1/services/hello/revisions/rev-1'
+        )
+        res = CloudRunRevision.resource_type.get(
+            client, {'resourceName': rev_8seg_name}
+        )
+        assert res['metadata']['name'] == 'rev-1'
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/revisions/rev-1'})
+
+        # Test 6-segment projects/ resourceName conversion
         rev_proj_name = (
             'projects/cloud-custodian/locations/us-central1/revisions/rev-1'
         )
@@ -709,7 +719,7 @@ class RevisionServiceTest(BaseTest):
             'resource': 'gcp.cloud-run-revision',
             'mode': {
                 'type': 'gcp-audit',
-                'methods': ['google.cloud.run.v1.Revisions.DeleteRevision']
+                'methods': ['google.cloud.run.v1.Revisions.GetRevision']
             }
         })
         p.resource_manager.get_client = lambda: StubClient()
@@ -717,14 +727,20 @@ class RevisionServiceTest(BaseTest):
         event = {
             'protoPayload': {
                 'serviceName': 'run.googleapis.com',
-                'methodName': 'google.cloud.run.v1.Revisions.DeleteRevision',
-                'resourceName': 'namespaces/cloud-custodian/revisions/rev-1'
+                'methodName': 'google.cloud.run.v1.Revisions.GetRevision',
+                'resourceName': (
+                    'projects/cloud-custodian/locations/us-central1/'
+                    'services/hello/revisions/rev-1'
+                )
             },
             'resource': {
                 'type': 'cloud_run_revision',
                 'labels': {
                     'project_id': 'cloud-custodian',
-                    'revision_name': 'rev-1'
+                    'service_name': 'hello',
+                    'revision_name': 'rev-1',
+                    'location': 'us-central1',
+                    'configuration_name': 'hello'
                 }
             }
         }

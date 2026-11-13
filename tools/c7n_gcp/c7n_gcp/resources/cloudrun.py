@@ -260,9 +260,11 @@ class CloudRunRevision(QueryResourceManager):
                 )
                 if not (namespace and revision) and name:
                     parts = name.strip('/').split('/')
-                    if len(parts) >= 6 and parts[0] == 'projects' and parts[4] == 'revisions':
-                        namespace = parts[1]
-                        revision = parts[5]
+                    if parts and parts[0] == 'projects' and 'revisions' in parts:
+                        idx = parts.index('revisions')
+                        if idx + 1 < len(parts):
+                            namespace = parts[1]
+                            revision = parts[idx + 1]
                 if namespace and revision:
                     name = f'namespaces/{namespace}/revisions/{revision}'
                 elif not name and revision:
