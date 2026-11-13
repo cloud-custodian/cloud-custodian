@@ -1131,6 +1131,166 @@ class TestCustomDomainName(BaseTest):
         result = client.get_domain_name(domainName="bad.example.com")
         self.assertEqual(result['securityPolicy'], 'TLS_1_2')
 
+    def _update_security(self, action, resources, errors=()):
+        """Run update-security against a stubbed client, return (client, exc)."""
+        from unittest import mock
+        from c7n.resources.apigw import DomainNameRemediateTls
+
+        class Client:
+            def __init__(self):
+                self.calls, self.errors = [], list(errors)
+
+            def update_domain_name(self, **kw):
+                self.calls.append(kw)
+                if self.errors:
+                    raise self.errors.pop(0)
+
+        client = Client()
+        act = DomainNameRemediateTls(
+            dict(type="update-security", **action), mock.MagicMock())
+        exc = None
+        with patch("c7n.resources.apigw.utils.local_session") as ls, \
+                patch("c7n.utils.time.sleep"):
+            ls.return_value.client.return_value = client
+            try:
+                act.process(resources)
+            except Exception as e:  # noqa: B902
+                exc = e
+        return client, exc
+
+    @staticmethod
+    def _ops(client, idx=0):
+        return {o["path"]: o["value"] for o in client.calls[idx]["patchOperations"]}
+
+    def test_action_update_security_enhanced_policy(self):
+        regional = {"endpointConfiguration": {"types": ["REGIONAL"]}}
+        policy = "SecurityPolicy_TLS13_1_2_PFS_PQ_2025_09"
+
+        client, exc = self._update_security(
+            {"securityPolicy": policy}, [dict(domainName="a", **regional)])
+        self.assertIsNone(exc)
+        self.assertEqual(
+            self._ops(client),
+            {"/securityPolicy": policy, "/endpointAccessMode": "BASIC"})
+
+        # an existing STRICT mode is never lowered
+        client, exc = self._update_security(
+            {"securityPolicy": policy, "endpointAccessMode": "BASIC"},
+            [dict(domainName="a", endpointAccessMode="STRICT", **regional)])
+        self.assertEqual(self._ops(client)["/endpointAccessMode"], "STRICT")
+
+        # an explicit mode is applied, over a domain's current non-STRICT mode
+        client, exc = self._update_security(
+            {"securityPolicy": policy, "endpointAccessMode": "STRICT"},
+            [dict(domainName="a", endpointAccessMode="BASIC", **regional)])
+        self.assertEqual(self._ops(client)["/endpointAccessMode"], "STRICT")
+
+        # no explicit mode: a current BASIC mode stays BASIC
+        client, exc = self._update_security(
+            {"securityPolicy": policy},
+            [dict(domainName="a", endpointAccessMode="BASIC", **regional)])
+        self.assertEqual(self._ops(client)["/endpointAccessMode"], "BASIC")
+
+        # no explicit mode: a current STRICT mode is kept
+        client, exc = self._update_security(
+            {"securityPolicy": policy},
+            [dict(domainName="a", endpointAccessMode="STRICT", **regional)])
+        self.assertEqual(self._ops(client)["/endpointAccessMode"], "STRICT")
+
+        # legacy policies keep the single-operation behaviour
+        client, exc = self._update_security(
+            {"securityPolicy": "TLS_1_2"}, [dict(domainName="a", **regional)])
+        self.assertEqual(self._ops(client), {"/securityPolicy": "TLS_1_2"})
+
+    def test_action_update_security_skips_unsupported_domains(self):
+        regional = {"endpointConfiguration": {"types": ["REGIONAL"]}}
+        edge = {"endpointConfiguration": {"types": ["EDGE"]}}
+        both = {"endpointConfiguration": {"types": ["REGIONAL", "EDGE"]}}
+        mtls = {"mutualTlsAuthentication": {"truststoreUri": "s3://b/k"}}
+        regional_policy = "SecurityPolicy_TLS13_1_3_2025_09"
+        edge_policy = "SecurityPolicy_TLS12_PFS_2025_EDGE"
+
+        for policy, resource in [
+            (regional_policy, dict(domainName="a", **both)),
+            ("TLS_1_2", dict(domainName="a", **both)),
+            (regional_policy, dict(domainName="a", **mtls, **regional)),
+            (regional_policy, dict(domainName="a", **edge)),
+            (edge_policy, dict(domainName="a", **regional)),
+        ]:
+            client, exc = self._update_security({"securityPolicy": policy}, [resource])
+            self.assertIsNone(exc)
+            self.assertEqual(client.calls, [], (policy, resource))
+
+        # mTLS only blocks enhanced policies
+        client, _ = self._update_security(
+            {"securityPolicy": "TLS_1_2"}, [dict(domainName="a", **mtls, **regional)])
+        self.assertEqual(len(client.calls), 1)
+
+    def test_action_update_security_surfaces_errors(self):
+        from c7n.exceptions import PolicyExecutionError
+        regional = {"endpointConfiguration": {"types": ["REGIONAL"]}}
+        policy = "SecurityPolicy_TLS13_1_2_PFS_PQ_2025_09"
+
+        def error(code):
+            return ClientError(
+                {"Error": {"Code": code, "Message": code}}, "UpdateDomainName")
+
+        # a non-retryable failure is raised after every domain was attempted
+        client, exc = self._update_security(
+            {"securityPolicy": policy},
+            [dict(domainName="d1", **regional), dict(domainName="d2", **regional)],
+            errors=[error("BadRequestException")])
+        self.assertIsInstance(exc, PolicyExecutionError)
+        self.assertIn("d1", str(exc))
+        self.assertNotIn("d2", str(exc))
+        self.assertEqual(len(client.calls), 2)
+
+        # a non-ClientError botocore failure does not abort the remaining domains
+        from botocore.exceptions import EndpointConnectionError
+        client, exc = self._update_security(
+            {"securityPolicy": policy},
+            [dict(domainName="d1", **regional), dict(domainName="d2", **regional)],
+            errors=[EndpointConnectionError(endpoint_url="https://example.invalid")])
+        self.assertIsInstance(exc, PolicyExecutionError)
+        self.assertEqual(len(client.calls), 2)
+
+        # retryable errors are retried and then succeed
+        client, exc = self._update_security(
+            {"securityPolicy": policy}, [dict(domainName="d1", **regional)],
+            errors=[error("TooManyRequestsException"), error("ConflictException")])
+        self.assertIsNone(exc)
+        self.assertEqual(len(client.calls), 3)
+
+    def test_action_update_security_schema(self):
+        import botocore.session
+        from c7n.resources.apigw import DomainNameRemediateTls
+
+        model = botocore.session.get_session().get_service_model("apigateway")
+        self.assertEqual(
+            set(DomainNameRemediateTls.schema["properties"]["securityPolicy"]["enum"]),
+            set(model.shape_for("SecurityPolicy").enum))
+        self.assertEqual(
+            set(DomainNameRemediateTls.schema["properties"]["endpointAccessMode"]["enum"]),
+            set(model.shape_for("EndpointAccessMode").enum))
+        # endpointAccessMode is rejected with a legacy policy rather than ignored
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy({
+                "name": "bad-mode", "resource": "apigw-domain-name",
+                "actions": [{"type": "update-security", "securityPolicy": "TLS_1_2",
+                             "endpointAccessMode": "STRICT"}],
+            }, validate=True)
+        self.load_policy({
+            "name": "good-mode", "resource": "apigw-domain-name",
+            "actions": [{"type": "update-security",
+                         "securityPolicy": "SecurityPolicy_TLS13_1_3_2025_09",
+                         "endpointAccessMode": "STRICT"}],
+        }, validate=True)
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy({
+                "name": "bad-policy", "resource": "apigw-domain-name",
+                "actions": [{"type": "update-security", "securityPolicy": "SecurityPolicy_Nope"}],
+            }, validate=True)
+
     def test_arn_format(self):
         factory = self.replay_flight_data("test_apigw_domain_name_filter_check_tls")
         p = self.load_policy(
