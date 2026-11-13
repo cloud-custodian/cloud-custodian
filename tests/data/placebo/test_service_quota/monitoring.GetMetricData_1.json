@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "MetricDataResults": [
+            {
+                "Id": "m0",
+                "Label": "ResourceCount",
+                "Timestamps": [
+                    {
+                        "__class__": "datetime",
+                        "year": 2019,
+                        "month": 10,
+                        "day": 30,
+                        "hour": 17,
+                        "minute": 52,
+                        "second": 0,
+                        "microsecond": 0
+                    }
+                ],
+                "Values": [
+                    1000.0
+                ],
+                "StatusCode": "Complete"
+            },
+            {
+                "Id": "m1",
+                "Label": "ResourceCount",
+                "Timestamps": [
+                    {
+                        "__class__": "datetime",
+                        "year": 2019,
+                        "month": 10,
+                        "day": 30,
+                        "hour": 17,
+                        "minute": 52,
+                        "second": 0,
+                        "microsecond": 0
+                    }
+                ],
+                "Values": [
+                    1000.0
+                ],
+                "StatusCode": "Complete"
+            }
+        ],
+        "Messages": [],
+        "ResponseMetadata": {
+            "RequestId": "aa43d827-3432-4b2a-a0e1-f54aff753492",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {},
+            "RetryAttempts": 0
+        }
+    }
+}
