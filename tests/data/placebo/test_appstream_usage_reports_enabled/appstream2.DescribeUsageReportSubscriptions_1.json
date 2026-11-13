@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "UsageReportSubscriptions": [
+            {
+                "S3BucketName": "appstream-logs-us-east-1-644160558196-vlh94qy3",
+                "Schedule": "DAILY",
+                "SubscriptionErrors": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

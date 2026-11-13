@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserPoolClients": [
+            {
+                "ClientId": "7dsvbn6inn2c5b0p2elggdr4ks",
+                "UserPoolId": "us-east-1_zysSpToLN",
+                "ClientName": "c7n-implicit-password-client"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
