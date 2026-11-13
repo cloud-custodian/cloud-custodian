@@ -253,6 +253,7 @@ class SubscriptionSetDiagnosticSettings(SetDiagnosticSettingsAction):
     )
     # The schema differs from the ARM resources' one, so it can't share their alias
     schema_alias = False
+    permissions = ('Microsoft.Insights/diagnosticSettings/write',)
 
     PROPERTIES = ('workspaceId', 'storageAccountId', 'eventHubAuthorizationRuleId',
                   'eventHubName', 'logs')
