@@ -4,6 +4,7 @@
 
 from datetime import timedelta
 
+from c7n.exceptions import PolicyExecutionError
 from c7n.executor import MainThreadExecutor
 from c7n.resources import quotas
 from c7n.resources.quotas import ServiceQuota, UsageFilter
@@ -437,6 +438,17 @@ class TestQuotas(BaseTest):
             f.process([self._quota(1)], None)
         self.assertIn('svc', str(e.exception))
         self.assertIsInstance(e.exception.__cause__, ValueError)
+
+    def test_usage_filter_get_metric_data_failed_query(self):
+        def pages_for(queries):
+            return [{'MetricDataResults': [
+                {'Id': 'm0', 'Values': [], 'StatusCode': 'InternalError',
+                 'Messages': [{'Code': 'InternalError', 'Value': 'boom'}]}]}]
+
+        f, _ = self._usage_filter_with_pages(pages_for)
+        with self.assertRaises(PolicyExecutionError) as e:
+            f.process([self._quota(1)], None)
+        self.assertIn('InternalError collecting usage of svc L-00000001', str(e.exception))
 
     def test_usage_filter_round_up(self):
         filter = UsageFilter({})

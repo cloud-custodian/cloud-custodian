@@ -335,10 +335,12 @@ class UsageFilter(MetricsFilter):
                 for res in response.get('MetricDataResults', ()):
                     if res.get('StatusCode') in ('InternalError', 'Forbidden'):
                         r = batch[int(res['Id'][1:])][0]
-                        self.log.warning(
+                        raise PolicyExecutionError(
                             f'{res["StatusCode"]} collecting usage of {r.get("ServiceCode")}'
                             f' {r.get("QuotaCode")}: {res.get("Messages")}')
                     values.setdefault(res['Id'], []).extend(res.get('Values', ()))
+        except PolicyExecutionError:
+            raise
         except Exception as e:
             services = sorted({r.get('ServiceCode', '') for r, *_ in batch})
             raise Exception(
