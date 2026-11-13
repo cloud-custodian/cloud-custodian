@@ -10,7 +10,12 @@ from c7n.exceptions import PolicyExecutionError
 from c7n.utils import yaml_load
 
 from c7n_gcp.actions.core import MethodAction
-from c7n_gcp.resources.cloudrun import CloudRunJob, CloudRunService, knative_body
+from c7n_gcp.resources.cloudrun import (
+    CloudRunJob,
+    CloudRunRevision,
+    CloudRunService,
+    knative_body,
+)
 
 # The root fields the api accepts, independent of the module under test.
 SCHEMA_FIELDS = {'apiVersion', 'kind', 'metadata', 'spec', 'status'}
@@ -285,6 +290,127 @@ class RunServiceTest(BaseTest):
         self.assertEqual('run-1',
                          resources[0]["metadata"]['name'])
 
+    def test_audit_validation(self):
+        p = self.load_policy({
+            'name': 'cloudrun-unauthenticated',
+            'resource': 'gcp.cloud-run-service',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.run.v1.Services.ReplaceService']
+            }
+        })
+        p.validate()
+
+    def test_get_resource_and_get_method(self):
+        calls = []
+
+        class StubClient:
+            def execute_query(self, verb, params):
+                calls.append((verb, params))
+                return {
+                    'apiVersion': 'serving.knative.dev/v1',
+                    'kind': 'Service',
+                    'metadata': {
+                        'name': 'hello',
+                        'namespace': 'cloud-custodian',
+                        'labels': {'cloud.googleapis.com/location': 'us-central1', 'env': 'prod'}
+                    }
+                }
+
+        client = StubClient()
+        svc_name = 'projects/cloud-custodian/locations/us-central1/services/hello'
+
+        # Test full projects/ resourceName
+        res = CloudRunService.resource_type.get(
+            client, {'resourceName': svc_name}
+        )
+        assert res['metadata']['name'] == 'hello'
+        assert calls[-1] == ('get', {'name': svc_name})
+
+        # Test namespaces/ resourceName with location label
+        res = CloudRunService.resource_type.get(
+            client, {
+                'resourceName': 'namespaces/cloud-custodian/services/hello',
+                'location': 'us-central1',
+            }
+        )
+        assert calls[-1] == ('get', {'name': svc_name})
+
+        # Test discrete labels
+        res = CloudRunService.resource_type.get(
+            client, {
+                'project_id': 'cloud-custodian',
+                'location': 'us-central1',
+                'service_name': 'hello',
+            }
+        )
+        assert calls[-1] == ('get', {'name': svc_name})
+
+        # Test manager get_resource with augment
+        p = self.load_policy({
+            'name': 'cloudrun-svc-mgr-get',
+            'resource': 'gcp.cloud-run-service'
+        })
+        mgr = p.resource_manager
+        mgr.get_client = lambda: client
+        resource = mgr.get_resource({'resourceName': svc_name})
+        assert resource['metadata']['name'] == 'hello'
+        assert resource['labels'] == {
+            'cloud.googleapis.com/location': 'us-central1',
+            'env': 'prod',
+        }
+
+    def test_audit_execution(self):
+        calls = []
+
+        class StubClient:
+            def execute_query(self, verb, params):
+                calls.append((verb, params))
+                return {
+                    'apiVersion': 'serving.knative.dev/v1',
+                    'kind': 'Service',
+                    'metadata': {
+                        'name': 'hello',
+                        'namespace': 'cloud-custodian',
+                        'labels': {'cloud.googleapis.com/location': 'us-central1'}
+                    }
+                }
+
+        p = self.load_policy({
+            'name': 'cloudrun-audit-exec',
+            'resource': 'gcp.cloud-run-service',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.run.v1.Services.ReplaceService']
+            }
+        })
+        p.resource_manager.get_client = lambda: StubClient()
+        exec_mode = p.get_execution_mode()
+        event = {
+            'protoPayload': {
+                'serviceName': 'run.googleapis.com',
+                'methodName': 'google.cloud.run.v1.Services.ReplaceService',
+                'resourceName': 'projects/cloud-custodian/locations/us-central1/services/hello'
+            },
+            'resource': {
+                'type': 'cloud_run_service',
+                'labels': {
+                    'project_id': 'cloud-custodian',
+                    'location': 'us-central1',
+                    'service_name': 'hello'
+                }
+            }
+        }
+        resources = exec_mode.run(event, None)
+        assert len(resources) == 1
+        assert resources[0]['metadata']['name'] == 'hello'
+        assert resources[0]['labels'] == {'cloud.googleapis.com/location': 'us-central1'}
+        assert len(calls) == 1
+        assert calls[-1] == (
+            'get',
+            {'name': 'projects/cloud-custodian/locations/us-central1/services/hello'}
+        )
+
 
 class JobServiceTest(BaseTest):
     def test_query(self):
@@ -336,6 +462,111 @@ class JobServiceTest(BaseTest):
             'cloud.googleapis.com/location': 'us-central1',
             'environment': 'test',
         })
+
+    def test_audit_validation(self):
+        p = self.load_policy({
+            'name': 'cloudrun-job-audit',
+            'resource': 'gcp.cloud-run-job',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.run.v1.Jobs.ReplaceJob']
+            }
+        })
+        p.validate()
+
+    def test_get_resource_and_get_method(self):
+        calls = []
+
+        class StubClient:
+            def execute_query(self, verb, params):
+                calls.append((verb, params))
+                return {
+                    'apiVersion': 'run.googleapis.com/v1',
+                    'kind': 'Job',
+                    'metadata': {
+                        'name': 'job',
+                        'namespace': 'cloud-custodian',
+                        'labels': {'cloud.googleapis.com/location': 'us-central1'}
+                    }
+                }
+
+        client = StubClient()
+        # Test namespaces/ resourceName
+        res = CloudRunJob.resource_type.get(
+            client, {'resourceName': 'namespaces/cloud-custodian/jobs/job'}
+        )
+        assert res['metadata']['name'] == 'job'
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/jobs/job'})
+
+        # Test projects/ resourceName conversion
+        res = CloudRunJob.resource_type.get(
+            client, {'resourceName': 'projects/cloud-custodian/locations/us-central1/jobs/job'}
+        )
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/jobs/job'})
+
+        # Test discrete labels
+        res = CloudRunJob.resource_type.get(
+            client, {'project_id': 'cloud-custodian', 'job_name': 'job'}
+        )
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/jobs/job'})
+
+        # Test manager get_resource with augment
+        p = self.load_policy({
+            'name': 'cloudrun-job-mgr-get',
+            'resource': 'gcp.cloud-run-job'
+        })
+        mgr = p.resource_manager
+        mgr.get_client = lambda: client
+        resource = mgr.get_resource({'resourceName': 'namespaces/cloud-custodian/jobs/job'})
+        assert resource['metadata']['name'] == 'job'
+        assert resource['labels'] == {'cloud.googleapis.com/location': 'us-central1'}
+
+    def test_audit_execution(self):
+        calls = []
+
+        class StubClient:
+            def execute_query(self, verb, params):
+                calls.append((verb, params))
+                return {
+                    'apiVersion': 'run.googleapis.com/v1',
+                    'kind': 'Job',
+                    'metadata': {
+                        'name': 'job',
+                        'namespace': 'cloud-custodian',
+                        'labels': {'cloud.googleapis.com/location': 'us-central1'}
+                    }
+                }
+
+        p = self.load_policy({
+            'name': 'cloudrun-job-audit-exec',
+            'resource': 'gcp.cloud-run-job',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.run.v1.Jobs.ReplaceJob']
+            }
+        })
+        p.resource_manager.get_client = lambda: StubClient()
+        exec_mode = p.get_execution_mode()
+        event = {
+            'protoPayload': {
+                'serviceName': 'run.googleapis.com',
+                'methodName': 'google.cloud.run.v1.Jobs.ReplaceJob',
+                'resourceName': 'namespaces/cloud-custodian/jobs/job'
+            },
+            'resource': {
+                'type': 'cloud_run_job',
+                'labels': {
+                    'project_id': 'cloud-custodian',
+                    'job_name': 'job'
+                }
+            }
+        }
+        resources = exec_mode.run(event, None)
+        assert len(resources) == 1
+        assert resources[0]['metadata']['name'] == 'job'
+        assert resources[0]['labels'] == {'cloud.googleapis.com/location': 'us-central1'}
+        assert len(calls) == 1
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/jobs/job'})
 
 
 class RevisionServiceTest(BaseTest):
@@ -431,3 +662,106 @@ class RevisionServiceTest(BaseTest):
         self.assertIsNotNone(result)
         self.assertEqual(result, 'test-revision-abc-123')
         self.assertNotEqual(result, 'None')
+
+    def test_audit_validation(self):
+        p = self.load_policy({
+            'name': 'cloudrun-rev-audit',
+            'resource': 'gcp.cloud-run-revision',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.run.v1.Revisions.GetRevision']
+            }
+        })
+        p.validate()
+
+    def test_get(self):
+        calls = []
+
+        class StubClient:
+            def execute_query(self, verb, params):
+                calls.append((verb, params))
+                return {'metadata': {'name': 'rev-1'}}
+
+        client = StubClient()
+        # Test namespaces/ resourceName
+        res = CloudRunRevision.resource_type.get(
+            client, {'resourceName': 'namespaces/cloud-custodian/revisions/rev-1'}
+        )
+        assert res['metadata']['name'] == 'rev-1'
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/revisions/rev-1'})
+
+        # Test 8-segment projects/ resourceName conversion
+        rev_8seg_name = (
+            'projects/cloud-custodian/locations/us-central1/services/hello/revisions/rev-1'
+        )
+        res = CloudRunRevision.resource_type.get(
+            client, {'resourceName': rev_8seg_name}
+        )
+        assert res['metadata']['name'] == 'rev-1'
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/revisions/rev-1'})
+
+        # Test 6-segment projects/ resourceName conversion
+        rev_proj_name = (
+            'projects/cloud-custodian/locations/us-central1/revisions/rev-1'
+        )
+        res = CloudRunRevision.resource_type.get(
+            client, {'resourceName': rev_proj_name}
+        )
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/revisions/rev-1'})
+
+        # Test discrete labels
+        res = CloudRunRevision.resource_type.get(
+            client, {'project_id': 'cloud-custodian', 'revision_name': 'rev-1'}
+        )
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/revisions/rev-1'})
+
+    def test_audit_execution(self):
+        calls = []
+
+        class StubClient:
+            def execute_query(self, verb, params):
+                calls.append((verb, params))
+                return {
+                    'apiVersion': 'serving.knative.dev/v1',
+                    'kind': 'Revision',
+                    'metadata': {
+                        'name': 'rev-1',
+                        'namespace': 'cloud-custodian'
+                    }
+                }
+
+        p = self.load_policy({
+            'name': 'cloudrun-rev-audit-exec',
+            'resource': 'gcp.cloud-run-revision',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.run.v1.Revisions.GetRevision']
+            }
+        })
+        p.resource_manager.get_client = lambda: StubClient()
+        exec_mode = p.get_execution_mode()
+        event = {
+            'protoPayload': {
+                'serviceName': 'run.googleapis.com',
+                'methodName': 'google.cloud.run.v1.Revisions.GetRevision',
+                'resourceName': (
+                    'projects/cloud-custodian/locations/us-central1/'
+                    'services/hello/revisions/rev-1'
+                )
+            },
+            'resource': {
+                'type': 'cloud_run_revision',
+                'labels': {
+                    'project_id': 'cloud-custodian',
+                    'service_name': 'hello',
+                    'revision_name': 'rev-1',
+                    'location': 'us-central1',
+                    'configuration_name': 'hello'
+                }
+            }
+        }
+        resources = exec_mode.run(event, None)
+        assert len(resources) == 1
+        assert resources[0]['metadata']['name'] == 'rev-1'
+        assert len(calls) == 1
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/revisions/rev-1'})
