@@ -361,8 +361,11 @@ class RunServiceTest(BaseTest):
         }
 
     def test_audit_execution(self):
+        calls = []
+
         class StubClient:
             def execute_query(self, verb, params):
+                calls.append((verb, params))
                 return {
                     'apiVersion': 'serving.knative.dev/v1',
                     'kind': 'Service',
@@ -402,6 +405,11 @@ class RunServiceTest(BaseTest):
         assert len(resources) == 1
         assert resources[0]['metadata']['name'] == 'hello'
         assert resources[0]['labels'] == {'cloud.googleapis.com/location': 'us-central1'}
+        assert len(calls) == 1
+        assert calls[-1] == (
+            'get',
+            {'name': 'projects/cloud-custodian/locations/us-central1/services/hello'}
+        )
 
 
 class JobServiceTest(BaseTest):
@@ -514,8 +522,11 @@ class JobServiceTest(BaseTest):
         assert resource['labels'] == {'cloud.googleapis.com/location': 'us-central1'}
 
     def test_audit_execution(self):
+        calls = []
+
         class StubClient:
             def execute_query(self, verb, params):
+                calls.append((verb, params))
                 return {
                     'apiVersion': 'run.googleapis.com/v1',
                     'kind': 'Job',
@@ -554,6 +565,8 @@ class JobServiceTest(BaseTest):
         assert len(resources) == 1
         assert resources[0]['metadata']['name'] == 'job'
         assert resources[0]['labels'] == {'cloud.googleapis.com/location': 'us-central1'}
+        assert len(calls) == 1
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/jobs/job'})
 
 
 class RevisionServiceTest(BaseTest):
@@ -703,8 +716,11 @@ class RevisionServiceTest(BaseTest):
         assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/revisions/rev-1'})
 
     def test_audit_execution(self):
+        calls = []
+
         class StubClient:
             def execute_query(self, verb, params):
+                calls.append((verb, params))
                 return {
                     'apiVersion': 'serving.knative.dev/v1',
                     'kind': 'Revision',
@@ -747,3 +763,5 @@ class RevisionServiceTest(BaseTest):
         resources = exec_mode.run(event, None)
         assert len(resources) == 1
         assert resources[0]['metadata']['name'] == 'rev-1'
+        assert len(calls) == 1
+        assert calls[-1] == ('get', {'name': 'namespaces/cloud-custodian/revisions/rev-1'})
