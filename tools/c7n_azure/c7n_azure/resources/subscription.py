@@ -3,6 +3,7 @@
 
 from azure.mgmt.resource.policy.models import PolicyAssignment
 from azure.mgmt.resource import SubscriptionClient
+from azure.mgmt.resource.resources.models import GenericResource
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -11,6 +12,7 @@ from c7n.filters.core import ValueFilter
 from c7n.manager import ResourceManager
 from c7n.utils import local_session, type_schema
 
+from c7n_azure.actions.diagnostic_settings import SetDiagnosticSettingsAction
 from c7n_azure.actions.tagging import Tag, RemoveTag, TagTrim, TagDelayedAction
 from c7n_azure.filters import DiagnosticSettingsFilter, TagActionFilter
 from c7n_azure.provider import resources
@@ -181,6 +183,216 @@ class SubscriptionDiagnosticSettingFilter(ValueFilter):
                 matched.append(resource)
 
         return matched
+
+
+def _subscription_scope(subscription):
+    return f"/subscriptions/{subscription['subscriptionId']}"
+
+
+@Subscription.action_registry.register('set-diagnostic-settings')
+class SubscriptionSetDiagnosticSettings(SetDiagnosticSettingsAction):
+    """Create or update a diagnostic setting on the subscription.
+
+    The subscription's diagnostic settings export its activity log. The setting
+    called ``name`` is written whole, so an existing setting with that name is
+    replaced. Other settings on the subscription are left alone. To turn on
+    categories in settings that already exist, use ``update-diagnostic-settings``.
+
+    Set at least one destination (``workspaceId``, ``storageAccountId``, or
+    ``eventHubAuthorizationRuleId`` with an optional ``eventHubName``) and
+    ``logs``. Each ``logs`` entry names either a ``category``, such as
+    ``Administrative`` or ``Security``, or a ``categoryGroup``. Subscription
+    settings carry no metrics and have no ``logAnalyticsDestinationType``, so
+    neither is accepted here.
+
+    Azure rejects a setting that sends a category to a destination another
+    setting on the subscription already sends it to.
+
+    The caller needs ``Microsoft.Insights/diagnosticSettings/write`` on the
+    subscription.
+
+    :example:
+
+    Export the activity log to a Log Analytics workspace on any subscription
+    that has no diagnostic setting:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: subscription-export-activity-log
+           resource: azure.subscription
+           filters:
+             - type: diagnostic-settings
+               key: name
+               value: absent
+           actions:
+             - type: set-diagnostic-settings
+               name: c7n-activity-log
+               workspaceId: >-
+                 /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/logging-rg/providers/Microsoft.OperationalInsights/workspaces/security-logs
+               logs:
+                 - category: Administrative
+                   enabled: true
+                 - category: Alert
+                   enabled: true
+                 - category: Policy
+                   enabled: true
+                 - category: Security
+                   enabled: true
+    """
+
+    schema = type_schema(
+        'set-diagnostic-settings',
+        required=['name', 'logs'],
+        name=SetDiagnosticSettingsAction.schema['properties']['name'],
+        workspaceId={'type': 'string'},
+        storageAccountId={'type': 'string'},
+        eventHubAuthorizationRuleId={'type': 'string'},
+        eventHubName={'type': 'string'},
+        logs=SetDiagnosticSettingsAction.schema['properties']['logs'],
+    )
+    # The schema differs from the ARM resources' one, so it can't share their alias
+    schema_alias = False
+
+    PROPERTIES = ('workspaceId', 'storageAccountId', 'eventHubAuthorizationRuleId',
+                  'eventHubName', 'logs')
+
+    def _prepare_processing(self):
+        # Subscription isn't an ARM resource manager, so it has no get_client.
+        # Its id, /subscriptions/{id}, is the scope the parent writes under.
+        self.client = self.manager.get_session().client(
+            'azure.mgmt.resource.ResourceManagementClient')
+
+
+@Subscription.action_registry.register('update-diagnostic-settings')
+class SubscriptionUpdateDiagnosticSettings(BaseAction):
+    """Turn log categories on or off in every diagnostic setting the subscription has.
+
+    Each existing setting is read, the ``logs`` entries are merged into it, and
+    the setting is written back. Its destinations, its name, and any log entries
+    the policy doesn't name are kept as they were. An entry matches an existing
+    one by ``category`` or ``categoryGroup``, ignoring case. An entry with no
+    match is added. A setting that already has every entry as requested is not
+    written.
+
+    This action doesn't create a setting, so a subscription with none is left
+    alone. Use ``set-diagnostic-settings`` for that.
+
+    Azure rejects a setting that sends a category to a destination another
+    setting on the subscription already sends it to, so two settings that share
+    a destination can't both send the same category. If a write fails, the
+    remaining settings are still processed, then the action raises.
+
+    The caller needs ``Microsoft.Insights/diagnosticSettings/read`` and
+    ``Microsoft.Insights/diagnosticSettings/write`` on the subscription.
+
+    :example:
+
+    Make every diagnostic setting on the subscription capture the
+    Administrative, Alert, Policy and Security categories:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: subscription-diagnostic-categories
+           resource: azure.subscription
+           filters:
+             - type: diagnostic-settings
+               key: "properties.logs[?enabled].category"
+               op: difference
+               value_type: swap
+               value: [Administrative, Alert, Policy, Security]
+           actions:
+             - type: update-diagnostic-settings
+               logs:
+                 - category: Administrative
+                   enabled: true
+                 - category: Alert
+                   enabled: true
+                 - category: Policy
+                   enabled: true
+                 - category: Security
+                   enabled: true
+    """
+
+    schema = type_schema(
+        'update-diagnostic-settings',
+        required=['logs'],
+        logs={**SetDiagnosticSettingsAction.schema['properties']['logs'], 'minItems': 1},
+    )
+    permissions = ('Microsoft.Insights/diagnosticSettings/read',
+                   'Microsoft.Insights/diagnosticSettings/write')
+
+    def validate(self):
+        for entry in self.data['logs']:
+            if ('category' in entry) == ('categoryGroup' in entry):
+                raise PolicyValidationError(
+                    "update-diagnostic-settings: each logs entry needs exactly one of "
+                    f"category or categoryGroup, got {entry}")
+        return self
+
+    @staticmethod
+    def _entry_key(entry):
+        if entry.get('category'):
+            return ('category', entry['category'].lower())
+        return ('categoryGroup', (entry.get('categoryGroup') or '').lower())
+
+    def merge_properties(self, properties):
+        """Return ``properties`` with the policy's logs merged in, or None when
+        the setting already has every entry as requested.
+        """
+        # Azure lists the unused one of category/categoryGroup, and unset
+        # destinations, as null. Leave nulls out of the write.
+        merged = {k: v for k, v in properties.items() if v is not None}
+        logs = [{k: v for k, v in entry.items() if v is not None}
+                for entry in merged.get('logs') or []]
+        changed = False
+        for wanted in self.data['logs']:
+            key = self._entry_key(wanted)
+            existing = next((e for e in logs if self._entry_key(e) == key), None)
+            if existing is None:
+                logs.append(dict(wanted))
+                changed = True
+            elif existing.get('enabled') != wanted['enabled']:
+                existing['enabled'] = wanted['enabled']
+                changed = True
+        if not changed:
+            return None
+        merged['logs'] = logs
+        return merged
+
+    def process(self, subscriptions):
+        client = self.manager.get_session().client(
+            'azure.mgmt.resource.ResourceManagementClient')
+        failures = []
+        for subscription in subscriptions:
+            scope = _subscription_scope(subscription)
+            settings = DiagnosticSettingsFilter.get_raw_settings(client, scope)
+            if not settings:
+                self.log.info("Subscription %s has no diagnostic settings to update",
+                              subscription['subscriptionId'])
+            for setting in settings:
+                properties = self.merge_properties(setting.get('properties') or {})
+                if properties is None:
+                    continue
+                try:
+                    # PUT replaces the setting, so the body carries everything it had
+                    client.resources.begin_create_or_update_by_id(
+                        resource_id=(f"{scope}/providers/Microsoft.Insights"
+                                     f"/diagnosticSettings/{setting['name']}"),
+                        api_version=DiagnosticSettingsFilter.api_version,
+                        parameters=GenericResource(properties=properties),
+                    ).result()
+                except Exception as e:
+                    self.log.error(
+                        "Updating diagnostic setting '%s' on subscription %s failed: %s",
+                        setting['name'], subscription['subscriptionId'], e, exc_info=True)
+                    failures.append(e)
+                    continue
+                self.log.info("Updated diagnostic setting '%s' on subscription %s",
+                              setting['name'], subscription['subscriptionId'])
+        if failures:
+            raise failures[0]
 
 
 @Subscription.action_registry.register('add-policy')
