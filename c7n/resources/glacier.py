@@ -5,9 +5,11 @@ from botocore.exceptions import ClientError
 import json
 
 from c7n.actions import RemovePolicyBase
+from c7n import deprecated
 from c7n.filters import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
+from c7n import tags as tagmod
 from c7n.utils import get_retry, local_session, type_schema
 
 
@@ -26,6 +28,47 @@ class Glacier(QueryResourceManager):
         # list_tags_for_vault and the tag/untag calls now raise
         # NoLongerSupportedException, so vaults are no longer taggable.
         universal_taggable = False
+
+
+class DeprecatedVaultTagAction:
+    """AWS has retired the Glacier vault tagging API entirely (see #10998),
+    so vault tag mutation is a no-op. Kept registered - rather than removed
+    from the schema - so existing policies referencing these actions
+    continue to validate and run instead of hard failing with a confusing
+    "not valid under any given schemas" error. Logs a warning instead of
+    calling the dead API.
+    """
+
+    deprecations = (
+        deprecated.action(
+            "AWS has retired the Glacier vault tagging API; this action "
+            "is now a no-op and will be removed"),
+    )
+
+    def process(self, resources):
+        self.log.warning(
+            "aws.glacier '%s' action is a no-op: AWS has retired the "
+            "Glacier vault tagging API, so %d vault(s) were not modified. "
+            "See https://github.com/cloud-custodian/cloud-custodian/issues/10998",
+            self.data.get('type'), len(resources))
+
+
+@Glacier.action_registry.register('mark')
+@Glacier.action_registry.register('tag')
+class DeprecatedVaultTag(DeprecatedVaultTagAction, tagmod.UniversalTag):
+    pass
+
+
+@Glacier.action_registry.register('unmark')
+@Glacier.action_registry.register('untag')
+@Glacier.action_registry.register('remove-tag')
+class DeprecatedVaultRemoveTag(DeprecatedVaultTagAction, tagmod.UniversalUntag):
+    pass
+
+
+@Glacier.action_registry.register('mark-for-op')
+class DeprecatedVaultMarkForOp(DeprecatedVaultTagAction, tagmod.UniversalTagDelayedAction):
+    pass
 
 
 @Glacier.filter_registry.register('cross-account')
