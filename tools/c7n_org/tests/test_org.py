@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
+from concurrent.futures import ThreadPoolExecutor
 from unittest import mock
 import os
 
@@ -185,6 +186,48 @@ class OrgTest(TestUtils):
         self.assertEqual(
             log_output.getvalue().strip(),
             "Policy resource counts Counter({'compute': 96, 'serverless': 48})")
+
+    def run_with_thread_workers(self, run_account):
+        # Workers run on threads so the patched run_account reaches them, and
+        # without --debug, which re-raises instead of exiting non-zero.
+        run_dir = self.setup_run_dir()
+        self.patch(org, 'run_account', run_account)
+        self.patch(org, 'ProcessPoolExecutor', ThreadPoolExecutor)
+        self.change_cwd(run_dir)
+        log_output = self.capture_logging('c7n_org')
+        result = CliRunner().invoke(
+            org.cli,
+            ['run', '-c', 'accounts.yml', '-u', 'policies.yml',
+             '-s', 'output', '--cache-path', 'cache'],
+            catch_exceptions=False)
+        return result, log_output.getvalue()
+
+    def test_cli_run_worker_error_exits_nonzero(self):
+        # https://github.com/cloud-custodian/cloud-custodian/issues/10460
+        # A worker that raises (ie. a process pool worker killed by the OOM
+        # killer) was only logged, so c7n-org still exited 0.
+        run_account = mock.MagicMock(side_effect=RuntimeError('worker died'))
+        result, log_output = self.run_with_thread_workers(run_account)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn('Error running policy in dev', log_output)
+        self.assertIn('worker died', log_output)
+
+    def test_cli_run_one_worker_error_exits_nonzero(self):
+        # the other accounts still run and report, but the run is a failure
+        ran = []
+
+        def run_account(account, region, *args, **kw):
+            if account['name'] == 'dev':
+                raise RuntimeError('worker died')
+            ran.append((account['name'], region))
+            return {'compute': 1}, True
+
+        result, log_output = self.run_with_thread_workers(run_account)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn('Error running policy in dev', log_output)
+        self.assertTrue(ran)
+        self.assertIn(
+            "Policy resource counts Counter({'compute': %d})" % len(ran), log_output)
 
     def test_filter_policies(self):
         d = {'policies': [
