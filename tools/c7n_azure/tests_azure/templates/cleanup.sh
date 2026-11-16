@@ -78,9 +78,12 @@ delete_resource() {
         for endpoint in $(az resource list --resource-group $rgName \
             --resource-type Microsoft.MachineLearningServices/workspaces/onlineEndpoints \
             --query "[].id" --output tsv); do
-            az rest --method delete \
-                --url "https://management.azure.com${endpoint}?api-version=2025-06-01"
-            az resource wait --deleted --ids "$endpoint" --timeout 1800
+            if ! az rest --method delete \
+                    --url "https://management.azure.com${endpoint}?api-version=2025-06-01" \
+                || ! az resource wait --deleted --ids "$endpoint" --timeout 1800; then
+                echo "Failed to delete ${endpoint}; skipping delete of resource group $rgName"
+                return 1
+            fi
         done
         if ! workspaces=$(az resource list --resource-group "$rgName" \
             --resource-type Microsoft.MachineLearningServices/workspaces \
@@ -100,7 +103,12 @@ delete_resource() {
         done
     fi
 
-    az group delete --name $rgName --yes --output None
+    if [[ "$(az group exists --name "$rgName")" == "true" ]]; then
+        if ! az group delete --name "$rgName" --yes --output None; then
+            echo "Failed to delete resource group $rgName"
+            return 1
+        fi
+    fi
 
     # Purge the soft-deleted vault so the fixed vault name can be re-provisioned.
     if [[ "$fileName" == "keyvault.json" || "$fileName" == "keyvault-secret.json" ]] \
@@ -117,19 +125,33 @@ delete_resource() {
 delete_acs() {
     echo "Delete for ACS started"
     rgName=test_containerservice
-    az group delete --name $rgName --yes --no-wait
+    if [[ "$(az group exists --name "$rgName")" == "true" ]]; then
+        if ! az group delete --name "$rgName" --yes --no-wait; then
+            echo "Failed to delete resource group $rgName"
+            return 1
+        fi
+    fi
     echo "Delete for ACS complete"
 }
 
 delete_policy_assignment() {
     echo "Delete for policy assignment started"
-    az policy assignment delete --name cctestpolicy
+    if ! az policy assignment delete --name cctestpolicy; then
+        echo "Failed to delete policy assignment cctestpolicy"
+        return 1
+    fi
     echo "Delete for policy assignment complete"
 }
 
 delete_cognitive_services() {
     echo "Delete for cog services started"
-    az resource delete --ids /subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.CognitiveServices/locations/global/resourceGroups/test_cognitive-service/deletedAccounts/cctest-cog-serv
+    deleted_account_id="/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.CognitiveServices/locations/global/resourceGroups/test_cognitive-service/deletedAccounts/cctest-cog-serv"
+    if az resource show --ids "$deleted_account_id" --output None 2>/dev/null; then
+        if ! az resource delete --ids "$deleted_account_id"; then
+            echo "Failed to purge soft-deleted cognitive services account cctest-cog-serv"
+            return 1
+        fi
+    fi
     echo "Delete for cog services complete"
 }
 
