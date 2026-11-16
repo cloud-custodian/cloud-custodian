@@ -851,6 +851,122 @@ class StorageFileServicesFilterTest(BaseTest):
         self.assertEqual(len(resources[0]['c7n:FileServices']), 1)
 
 
+class StorageSetFileServicesActionTest(BaseTest):
+    def test_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-set-file-services',
+                'resource': 'azure.storage',
+                'actions': [{
+                    'type': 'set-file-services',
+                    'share-delete-retention-enabled': True,
+                    'share-delete-retention-days': 7,
+                    'smb-versions': ['SMB3.1.1'],
+                    'smb-channel-encryption': ['AES-256-GCM'],
+                }]
+            }, validate=True)
+            assert p
+
+    def test_schema_rejects_fractional_retention_days(self):
+        with self.sign_out_patch():
+            with pytest.raises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-set-file-services-fractional-days',
+                    'resource': 'azure.storage',
+                    'actions': [{
+                        'type': 'set-file-services',
+                        'share-delete-retention-days': 1.5,
+                    }]
+                }, validate=True)
+
+    def test_schema_rejects_unknown_smb_version(self):
+        with self.sign_out_patch():
+            with pytest.raises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-set-file-services-unknown-smb-version',
+                    'resource': 'azure.storage',
+                    'actions': [{
+                        'type': 'set-file-services',
+                        'smb-versions': ['SMB1'],
+                    }]
+                }, validate=True)
+
+    def test_validate_share_delete_retention_days_out_of_range(self):
+        with self.sign_out_patch():
+            with self.assertRaises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-set-file-services-invalid-days',
+                    'resource': 'azure.storage',
+                    'actions': [{
+                        'type': 'set-file-services',
+                        'share-delete-retention-days': 400,
+                    }]
+                }, validate=True)
+
+    @arm_template('storage-file-services.json')
+    def test_set_file_services(self):
+        discovery_policy = self.load_policy({
+            'name': 'test-set-file-services-discovery',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccfilesvc*'}
+            ]
+        })
+        resources = discovery_policy.run()
+        self.assertEqual(len(resources), 1)
+
+        resource = resources[0]
+        rg = resource['resourceGroup']
+        name = resource['name']
+
+        client = self.session.client('azure.mgmt.storage.StorageManagementClient')
+
+        # Baseline set explicitly by storage-file-services.json: soft delete off,
+        # all three SMB versions and channel encryption algorithms allowed, one
+        # CORS rule.
+        before = client.file_services.list(rg, name).value[0]
+        assert not before.share_delete_retention_policy.enabled
+        assert before.protocol_settings.smb.versions == 'SMB2.1;SMB3.0;SMB3.1.1'
+        assert before.protocol_settings.smb.channel_encryption == (
+            'AES-128-CCM;AES-128-GCM;AES-256-GCM')
+        assert len(before.cors.cors_rules) == 1
+
+        p = self.load_policy({
+            'name': 'test-set-file-services',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccfilesvc*'}
+            ],
+            'actions': [{
+                'type': 'set-file-services',
+                'share-delete-retention-enabled': True,
+                'share-delete-retention-days': 7,
+                'smb-versions': ['SMB3.1.1'],
+                'smb-channel-encryption': ['AES-256-GCM'],
+            }]
+        })
+        p.run()
+
+        after = client.file_services.list(rg, name).value[0]
+        assert after.share_delete_retention_policy.enabled
+        assert after.share_delete_retention_policy.days == 7
+        assert after.protocol_settings.smb.versions == 'SMB3.1.1'
+        assert after.protocol_settings.smb.channel_encryption == 'AES-256-GCM'
+
+        # cors-rules wasn't part of this action's data, so the merge in
+        # SetFileServicesAction._process_resource must have preserved it.
+        self.assertEqual(len(after.cors.cors_rules), 1)
+        self.assertEqual(after.cors.cors_rules[0].allowed_origins, ['https://example.com'])
+
+
 class StorageMetricsFilterTest(BaseTest):
     """Tests for the StorageMetricsFilter class"""
 

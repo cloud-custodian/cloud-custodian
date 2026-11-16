@@ -5,7 +5,9 @@ import json
 import logging
 
 from azure.cosmosdb.table import TableService
-from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
+from azure.mgmt.storage.models import (CorsRule, CorsRules, DeleteRetentionPolicy,
+                                       IPRule, NetworkRuleSet,
+                                       ProtocolSettings, SmbSetting,
                                        StorageAccountUpdateParameters,
                                        VirtualNetworkRule)
 from azure.storage.blob import BlobServiceClient
@@ -932,6 +934,162 @@ class SetBlobPublicAccessAction(AzureBaseAction):
             resource['name'],
             update_params,
         )
+
+
+@Storage.action_registry.register('set-file-services')
+class SetFileServicesAction(AzureBaseAction):
+    """Action that updates File Service Properties on Storage Accounts: the file
+    share soft-delete retention policy, allowed SMB protocol versions, allowed SMB
+    channel encryption algorithms, and CORS rules. Only the properties provided
+    are changed; the rest of the File Service Properties configuration
+    (including any properties not listed above) is left as-is.
+
+    :example:
+
+    Enable soft delete for file shares with a 7 day retention period.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: storage-enable-file-share-soft-delete
+              resource: azure.storage
+              filters:
+                - type: file-services
+                  attrs:
+                    - type: value
+                      key: properties.shareDeleteRetentionPolicy.enabled
+                      value: false
+              actions:
+                - type: set-file-services
+                  share-delete-retention-enabled: true
+                  share-delete-retention-days: 7
+
+    :example:
+
+    Require SMB file shares to use AES-256-GCM channel encryption only.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: storage-require-aes256gcm-smb-encryption
+              resource: azure.storage
+              filters:
+                - type: file-services
+                  attrs:
+                    - type: value
+                      key: properties.protocolSettings.smb.channelEncryption
+                      op: not-equal
+                      value: "AES-256-GCM"
+              actions:
+                - type: set-file-services
+                  smb-channel-encryption: [AES-256-GCM]
+
+    :example:
+
+    Require SMB file shares to use SMB 3.1.1 only.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: storage-require-smb-3-1-1
+              resource: azure.storage
+              filters:
+                - type: file-services
+                  attrs:
+                    - type: value
+                      key: properties.protocolSettings.smb.versions
+                      op: not-equal
+                      value: "SMB3.1.1"
+              actions:
+                - type: set-file-services
+                  smb-versions: [SMB3.1.1]
+    """
+
+    SMB_VERSIONS = ('SMB2.1', 'SMB3.0', 'SMB3.1.1')
+    CHANNEL_ENCRYPTION_ALGORITHMS = ('AES-128-CCM', 'AES-128-GCM', 'AES-256-GCM')
+
+    schema = type_schema(
+        'set-file-services',
+        **{
+            'share-delete-retention-enabled': {'type': 'boolean'},
+            'share-delete-retention-days': {'type': 'integer'},
+            'smb-versions': {
+                'type': 'array',
+                'minItems': 1,
+                'items': {'enum': list(SMB_VERSIONS)}
+            },
+            'smb-channel-encryption': {
+                'type': 'array',
+                'items': {'enum': list(CHANNEL_ENCRYPTION_ALGORITHMS)}
+            },
+            'cors-rules': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'required': ['allowed-origins', 'allowed-methods',
+                                 'max-age-in-seconds', 'exposed-headers',
+                                 'allowed-headers'],
+                    'properties': {
+                        'allowed-origins': {'type': 'array', 'items': {'type': 'string'}},
+                        'allowed-methods': {'type': 'array', 'items': {'type': 'string'}},
+                        'max-age-in-seconds': {'type': 'integer'},
+                        'exposed-headers': {'type': 'array', 'items': {'type': 'string'}},
+                        'allowed-headers': {'type': 'array', 'items': {'type': 'string'}},
+                    }
+                }
+            }
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.storage.SetFileServicesAction')
+
+    def validate(self):
+        days = self.data.get('share-delete-retention-days')
+        if days is not None and not (1 <= days <= 365):
+            raise PolicyValidationError(
+                'attribute: share-delete-retention-days must be between 1 and 365')
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        current = self.client.file_services.list(
+            resource['resourceGroup'], resource['name']).value[0]
+
+        if ('share-delete-retention-enabled' in self.data
+                or 'share-delete-retention-days' in self.data):
+            policy = current.share_delete_retention_policy or DeleteRetentionPolicy()
+            if 'share-delete-retention-enabled' in self.data:
+                policy.enabled = self.data['share-delete-retention-enabled']
+            if 'share-delete-retention-days' in self.data:
+                policy.days = self.data['share-delete-retention-days']
+            current.share_delete_retention_policy = policy
+
+        if 'smb-versions' in self.data or 'smb-channel-encryption' in self.data:
+            protocol_settings = current.protocol_settings or ProtocolSettings()
+            smb = protocol_settings.smb or SmbSetting()
+            if 'smb-versions' in self.data:
+                smb.versions = ';'.join(self.data['smb-versions'])
+            if 'smb-channel-encryption' in self.data:
+                smb.channel_encryption = ';'.join(self.data['smb-channel-encryption'])
+            protocol_settings.smb = smb
+            current.protocol_settings = protocol_settings
+
+        if 'cors-rules' in self.data:
+            current.cors = CorsRules(cors_rules=[
+                CorsRule(
+                    allowed_origins=r['allowed-origins'],
+                    allowed_methods=r['allowed-methods'],
+                    max_age_in_seconds=r['max-age-in-seconds'],
+                    exposed_headers=r['exposed-headers'],
+                    allowed_headers=r['allowed-headers'],
+                ) for r in self.data['cors-rules']
+            ])
+
+        self.client.file_services.set_service_properties(
+            resource['resourceGroup'], resource['name'], parameters=current)
+
+        return 'Updated file service properties.'
 
 
 @Storage.filter_registry.register('blob-services')
