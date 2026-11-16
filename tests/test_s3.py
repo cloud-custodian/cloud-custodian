@@ -250,10 +250,13 @@ def test_s3_directory_set_inventory(test):
     assert sorted(matching[0]['OptionalFields']) == ['LastModifiedDate', 'Size']
 
 
-def test_s3_directory_set_inventory_partial_failure(test):
+def test_s3_directory_set_inventory_client_region(test):
+    # this test ensures that clients for directory buckets don't carry
+    # region info since directory buckets don't have a 'Location' field
+    # but general purpose buckets do.
     p = test.load_policy(
         {
-            'name': 's3-directory-set-inventory-partial-failure',
+            'name': 's3-directory-set-inventory-region',
             'resource': 's3-directory',
             'actions': [
                 {
@@ -267,33 +270,12 @@ def test_s3_directory_set_inventory_partial_failure(test):
         config={'account_id': ACCOUNT_ID},
     )
     action = p.resource_manager.actions[0]
-    buckets = [
-        {'Name': 'c7n-test-inventory-ok--use1-az4--x-s3'},
-        {'Name': 'c7n-test-inventory-denied--use1-az4--x-s3'},
-    ]
-
-    client = mock.MagicMock()
-    client.list_bucket_inventory_configurations.return_value = {
-        'InventoryConfigurationList': []}
-
-    def fake_put_bucket_inventory_configuration(Bucket, **kwargs):
-        if Bucket == 'c7n-test-inventory-denied--use1-az4--x-s3':
-            raise ClientError(
-                {'Error': {'Code': 'AccessDenied', 'Message': 'not authorized'}},
-                'PutBucketInventoryConfiguration')
-
-    client.put_bucket_inventory_configuration.side_effect = (
-        fake_put_bucket_inventory_configuration)
+    bucket = {'Name': 'c7n-test-inventory--usw2-az1--x-s3'}
 
     with mock.patch.object(s3, 'local_session') as ls:
-        ls.return_value.client.return_value = client
-        with pytest.raises(PolicyExecutionError):
-            action.process(buckets)
+        action.get_client(bucket)
 
-    put_calls = {
-        c.kwargs['Bucket'] for c in
-        client.put_bucket_inventory_configuration.call_args_list}
-    assert put_calls == {b['Name'] for b in buckets}
+    ls.return_value.client.assert_called_once_with('s3')
 
 
 def test_s3_directory_cross_account_no_policy(test):

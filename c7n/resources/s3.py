@@ -2943,9 +2943,12 @@ class Inventory(ValueFilter):
                     results.append(b)
         return results
 
+    def get_client(self, bucket):
+        return bucket_client(local_session(self.manager.session_factory), bucket)
+
     def process_bucket(self, b):
         if 'c7n:inventories' not in b:
-            client = bucket_client(local_session(self.manager.session_factory), b)
+            client = self.get_client(b)
             inventories = client.list_bucket_inventory_configurations(
                 Bucket=b['Name']).get('InventoryConfigurationList', [])
             b['c7n:inventories'] = inventories
@@ -2990,6 +2993,9 @@ class SetInventory(BucketActionBase):
                 except Exception as e:
                     self.log.error('Message: %s Bucket: %s', e, bucket['Name'])
 
+    def get_client(self, bucket):
+        return bucket_client(local_session(self.manager.session_factory), bucket)
+
     def process_bucket(self, b):
         inventory_name = self.data.get('name')
         destination = self.data.get('destination')
@@ -3004,7 +3010,7 @@ class SetInventory(BucketActionBase):
         if not prefix:
             prefix = "Inventories/%s" % (self.manager.config.account_id)
 
-        client = bucket_client(local_session(self.manager.session_factory), b)
+        client = self.get_client(b)
         if state == 'absent':
             try:
                 client.delete_bucket_inventory_configuration(
@@ -4165,7 +4171,7 @@ class S3Directory(query.QueryResourceManager):
         dimension = 'BucketName'
         cfn_type = 'AWS::S3Express::DirectoryBucket'
         permissions_enum = ("s3express:ListAllMyDirectoryBuckets",)
-        permissions_augment = ("s3express:GetBucketPolicy", "s3express:ListTagsForResource")
+        permissions_augment = ("s3express:ListTagsForResource",)
 
     source_mapping = {'describe': DescribeS3Directory}
 
@@ -4175,31 +4181,11 @@ class S3DirectoryInventory(Inventory):
     permissions = ('s3express:GetInventoryConfiguration',)
     schema_alias = False
 
-    def process(self, buckets, event=None):
-        # directory buckets are subject to a low per-account quota,
-        # so thread-pool concurrency here doesnt seem necessary
-        results = []
-        for b in buckets:
-            try:
-                matched = self.process_bucket(b)
-            except ClientError as e:
-                b.setdefault('c7n:DeniedMethods', []).append('GetInventoryConfiguration')
-                self.log.error(
-                    "Error processing bucket: %s error: %s", b['Name'], e)
-                continue
-            if matched:
-                results.append(b)
-        return results
-
-    def process_bucket(self, b):
-        if 'c7n:inventories' not in b:
-            client = local_session(self.manager.session_factory).client('s3')
-            inventories = client.list_bucket_inventory_configurations(
-                Bucket=b['Name']).get('InventoryConfigurationList', [])
-            b['c7n:inventories'] = inventories
-        for i in b['c7n:inventories']:
-            if self.match(i):
-                return True
+    def get_client(self, bucket):
+        # directory buckets never populate 'Location', so get_region()
+        # would otherwise silently default to us-east-1. list_directory_buckets
+        # is already region-scoped, so the session's own region is correct.
+        return local_session(self.manager.session_factory).client('s3')
 
 
 @S3Directory.action_registry.register('set-inventory')
@@ -4224,10 +4210,25 @@ class S3DirectorySetInventory(SetInventory):
                 destination: some-bucket
                 state: enabled
     """
+    # directory buckets only support a subset of the optional fields
+    # available on general purpose buckets. passing an unsupported field
+    # raises MalformedXML from the API, so narrow the schema to catch it
+    # at policy validation time instead.
+    schema = type_schema(
+        'set-inventory',
+        rinherit=SetInventory.schema,
+        required=['name', 'destination'],
+        fields={'type': 'array', 'items': {'enum': [
+            'Size', 'LastModifiedDate', 'StorageClass', 'ETag',
+            'IsMultipartUploaded', 'EncryptionStatus', 'BucketKeyStatus',
+            'ChecksumAlgorithm', 'LifecycleExpirationDate']}})
     permissions = ('s3express:PutInventoryConfiguration', 's3express:GetInventoryConfiguration')
 
-    def process(self, buckets):
-        return self._process_with_futures(buckets)
+    def get_client(self, bucket):
+        # directory buckets never populate 'Location', so get_region()
+        # would otherwise silently default to us-east-1. list_directory_buckets
+        # is already region-scoped, so the session's own region is correct.
+        return local_session(self.manager.session_factory).client('s3')
 
 
 @S3Directory.filter_registry.register('cross-account')
