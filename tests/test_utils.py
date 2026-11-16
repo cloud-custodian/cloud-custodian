@@ -493,6 +493,29 @@ class UtilTest(BaseTest):
         self.assertEqual(
             "{:-7d}".format(utils.FormatDate(d)), "2018-01-26 12:00:00")
 
+    def test_format_date_literal_hyphen(self):
+        # an increment only counts at the start of the spec, so a hyphen
+        # later in one stays literal instead of shifting the date.
+        d = parse_date("2018-02-02 12:00")
+        for spec in ("%Y-7d", "retain-30d_%Y%m%d", "%Y-%m-%dT%H:%M:%SZ"):
+            self.assertEqual(
+                f"{{:{spec}}}".format(utils.FormatDate(d)),
+                d.__format__(spec), spec)
+
+        # and a default doesn't get applied to one either, since the spec
+        # isn't empty once the leading run is taken off.
+        self.assertEqual(
+            "{:%Y-7d}".format(utils.FormatDate(d, "%Y-%m-%dT%H:%M:%SZ")),
+            "2018-7d")
+
+    def test_format_date_multiple_increments(self):
+        d = parse_date("2018-02-02 12:00")
+        self.assertEqual(
+            "{:-1d+2h%Y-%m-%dT%H}".format(utils.FormatDate(d)), "2018-02-01T14")
+        self.assertEqual(
+            "{:-1d+2h}".format(utils.FormatDate(d, "%Y-%m-%dT%H:%M:%SZ")),
+            "2018-02-01T14:00:00Z")
+
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
         self.assertEqual(list(utils.group_by(items, "Type").keys()), [None, "a", "b"])
