@@ -195,8 +195,9 @@ class SpannerInstanceSetAutoscaling(MethodAction):
 
     The maximum can be at most 10 times the minimum.
 
-    The whole ``autoscalingConfig`` is replaced, except that any existing
-    ``asymmetricAutoscalingOptions`` on the instance are kept.
+    The autoscaling limits are replaced. Targets not given in the policy keep
+    their current values, and any existing ``asymmetricAutoscalingOptions`` on
+    the instance are kept.
 
     Managed autoscaling requires the ENTERPRISE or ENTERPRISE_PLUS edition,
     so instances on any other edition are skipped with a warning.
@@ -230,6 +231,11 @@ class SpannerInstanceSetAutoscaling(MethodAction):
     """
     node_limits = ('minNodes', 'maxNodes')
     processing_unit_limits = ('minProcessingUnits', 'maxProcessingUnits')
+    target_keys = (
+        'highPriorityCpuUtilizationPercent',
+        'totalCpuUtilizationPercent',
+        'storageUtilizationPercent',
+    )
 
     schema = type_schema(
         'set-autoscaling',
@@ -272,13 +278,11 @@ class SpannerInstanceSetAutoscaling(MethodAction):
         limits = {k: self.data[k]
                   for k in self.node_limits + self.processing_unit_limits
                   if k in self.data}
-        targets = {k: self.data[k]
-                   for k in ('highPriorityCpuUtilizationPercent',
-                             'totalCpuUtilizationPercent',
-                             'storageUtilizationPercent')
-                   if k in self.data}
+        existing = resource.get('autoscalingConfig', {})
+        targets = dict(existing.get('autoscalingTargets', {}))
+        targets.update({k: self.data[k] for k in self.target_keys if k in self.data})
         config = {'autoscalingLimits': limits, 'autoscalingTargets': targets}
-        asymmetric = resource.get('autoscalingConfig', {}).get('asymmetricAutoscalingOptions')
+        asymmetric = existing.get('asymmetricAutoscalingOptions')
         if asymmetric:
             config['asymmetricAutoscalingOptions'] = asymmetric
         return {'name': resource['name'],

@@ -623,7 +623,7 @@ def test_spanner_autoscaling_processing_units_params(test):
     }
 
 
-def test_spanner_autoscaling_keeps_asymmetric_options(test):
+def test_spanner_autoscaling_keeps_existing_settings(test):
     policy = _load_set_autoscaling(
         test, minProcessingUnits=1000, maxProcessingUnits=3000, storageUtilizationPercent=90)
     action = policy.resource_manager.actions[0]
@@ -633,7 +633,8 @@ def test_spanner_autoscaling_keeps_asymmetric_options(test):
         'name': name,
         'autoscalingConfig': {
             'autoscalingLimits': {'minNodes': 1, 'maxNodes': 2},
-            'autoscalingTargets': {'storageUtilizationPercent': 95},
+            'autoscalingTargets': {
+                'totalCpuUtilizationPercent': 80, 'storageUtilizationPercent': 95},
             'asymmetricAutoscalingOptions': asymmetric,
         },
     })
@@ -645,7 +646,8 @@ def test_spanner_autoscaling_keeps_asymmetric_options(test):
                 'autoscalingConfig': {
                     'autoscalingLimits': {
                         'minProcessingUnits': 1000, 'maxProcessingUnits': 3000},
-                    'autoscalingTargets': {'storageUtilizationPercent': 90},
+                    'autoscalingTargets': {
+                        'totalCpuUtilizationPercent': 80, 'storageUtilizationPercent': 90},
                     'asymmetricAutoscalingOptions': asymmetric,
                 },
             },
