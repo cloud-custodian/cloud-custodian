@@ -1,0 +1,117 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueId": {
+            "type": "string"
+        },
+        "deployModels": {
+            "type": "bool",
+            "defaultValue": false
+        }
+    },
+    "variables": {
+        "workspaceName": "[concat('cctest-ml-update-', parameters('uniqueId'))]",
+        "storageAccountName": "[concat('cctestml', parameters('uniqueId'))]",
+        "keyVaultName": "[concat('cctestmlkv', parameters('uniqueId'))]",
+        "fields": [
+            "description",
+            "tags",
+            "properties",
+            "isArchived",
+            "stage"
+        ],
+        "appInsightsName": "[concat('cctestmlai', parameters('uniqueId'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-09-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2"
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2021-10-01",
+            "name": "[variables('keyVaultName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "accessPolicies": []
+            }
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[variables('appInsightsName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            }
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces",
+            "apiVersion": "2023-04-01",
+            "name": "[variables('workspaceName')]",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "keyVault": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "applicationInsights": "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/cctest-update-{1}/1', variables('workspaceName'), toLower(variables('fields')[copyIndex()]))]",
+            "copy": {
+                "name": "models",
+                "count": "[length(variables('fields'))]"
+            },
+            "properties": {
+                "modelUri": "[format('azureml://subscriptions/{0}/resourceGroups/{1}/workspaces/{2}/datastores/workspaceblobstore/paths/models/original/', subscription().subscriptionId, resourceGroup().name, variables('workspaceName'))]",
+                "modelType": "custom_model",
+                "description": "Original description",
+                "tags": {
+                    "owner": "original",
+                    "remove": "yes"
+                },
+                "properties": {
+                    "reviewed": "false",
+                    "retain": "yes"
+                },
+                "flavors": {
+                    "python_function": {
+                        "data": {
+                            "loader_module": "original"
+                        }
+                    }
+                },
+                "stage": "Development",
+                "isAnonymous": false,
+                "isArchived": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ],
+            "condition": "[parameters('deployModels')]"
+        }
+    ]
+}

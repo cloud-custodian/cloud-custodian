@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sms-voice:us-east-1:644160558196:configuration-set/c7n-query",
+                "Tags": [
+                    {
+                        "Key": "c7n-recording",
+                        "Value": "smsvoice"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "query"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
