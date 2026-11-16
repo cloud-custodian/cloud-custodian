@@ -1,0 +1,23 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sat, 24 Oct 2026 15:58:47 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "152",
+    "-content-encoding": "gzip",
+    "content-location": "https://pubsub.googleapis.com/v1/projects/cloud-custodian/topics/custodian-auto-audit-c7n-selection-380a8d93?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/topics/custodian-auto-audit-c7n-selection-380a8d93",
+    "labels": {
+      "goog-terraform-provisioned": "true"
+    }
+  }
+}

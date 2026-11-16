@@ -1,0 +1,91 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+        {
+            "type": "Microsoft.Compute/disks",
+            "apiVersion": "2024-03-02",
+            "name": "cctest-snapshot-limit-a",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "tags": {
+                "tag01": "value",
+                "tag02": "value",
+                "tag03": "value",
+                "tag04": "value",
+                "tag05": "value",
+                "tag06": "value",
+                "tag07": "value",
+                "tag08": "value",
+                "tag09": "value",
+                "tag10": "value",
+                "tag11": "value",
+                "tag12": "value",
+                "tag13": "value",
+                "tag14": "value",
+                "tag15": "value",
+                "tag16": "value",
+                "tag17": "value",
+                "tag18": "value",
+                "tag19": "value",
+                "tag20": "value",
+                "tag21": "value",
+                "tag22": "value",
+                "tag23": "value",
+                "tag24": "value",
+                "tag25": "value",
+                "tag26": "value",
+                "tag27": "value",
+                "tag28": "value",
+                "tag29": "value",
+                "tag30": "value",
+                "tag31": "value",
+                "tag32": "value",
+                "tag33": "value",
+                "tag34": "value",
+                "tag35": "value",
+                "tag36": "value",
+                "tag37": "value",
+                "tag38": "value",
+                "tag39": "value",
+                "tag40": "value",
+                "tag41": "value",
+                "tag42": "value",
+                "tag43": "value",
+                "tag44": "value",
+                "tag45": "value",
+                "tag46": "value",
+                "tag47": "value",
+                "tag48": "value",
+                "tag49": "value",
+                "tag50": "value"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": 4
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "apiVersion": "2024-03-02",
+            "name": "cctest-snapshot-limit-b",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "tags": {
+                "testtag": "testvalue"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": 4
+            }
+        }
+    ]
+}

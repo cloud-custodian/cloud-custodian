@@ -4,13 +4,12 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/361001ad-9c5e-42cb-9a09-5de1e80e822f",
-                "Tags": [
-                    {
-                        "Key": "c7n",
-                        "Value": "test"
-                    }
-                ]
+                "ResourceARN": "arn:aws:connect-campaigns:us-east-1:644160558196:campaign/be86a7da-93d5-41f4-969e-cae6903faeaa",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:connect-campaigns:us-east-1:644160558196:campaign/eb09f6bf-0c1b-416a-8c6f-3a4239491c10",
+                "Tags": []
             }
         ],
         "ResponseMetadata": {}

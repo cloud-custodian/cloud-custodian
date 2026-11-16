@@ -27,7 +27,16 @@ from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 log = logging.getLogger('custodian.rds-cluster')
 
 
-class DescribeCluster(DescribeSource):
+class TagListDescribeSource(DescribeSource):
+    """Describe source for rds apis that return tags inline as TagList."""
+
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagList', ())
+        return resources
+
+
+class DescribeCluster(TagListDescribeSource):
 
     def get_resources(self, ids):
         resources = chain.from_iterable(
@@ -40,11 +49,6 @@ class DescribeCluster(DescribeSource):
             for ids_chunk in chunks(ids, 100)  # DescribeCluster filter length limit
         )
         return list(resources)
-
-    def augment(self, resources):
-        for r in resources:
-            r['Tags'] = r.pop('TagList', ())
-        return resources
 
 
 class ConfigCluster(ConfigSource):
@@ -879,13 +883,6 @@ class PendingMaintenance(Filter):
         return results
 
 
-class DescribeDbShardGroup(DescribeSource):
-    def augment(self, resources):
-        for r in resources:
-            r['Tags'] = r.pop('TagList', ())
-        return resources
-
-
 @resources.register('rds-db-shard-group')
 class RDSDbShardGroup(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -899,5 +896,33 @@ class RDSDbShardGroup(QueryResourceManager):
         universal_taggable = object()
 
     source_mapping = {
-            'describe': DescribeDbShardGroup
+            'describe': TagListDescribeSource
         }
+
+
+@resources.register('rds-global-cluster')
+class RDSGlobalCluster(QueryResourceManager):
+    """Resource manager for Aurora global database clusters.
+
+    Global clusters are account level: the same set is returned from
+    every region and the arn carries no region component. Running a
+    policy against multiple regions will process each global cluster
+    once per region, so pin such policies to a single region.
+    """
+
+    class resource_type(TypeInfo):
+        service = 'rds'
+        arn = 'GlobalClusterArn'
+        arn_type = 'global-cluster'
+        arn_separator = ":"
+        enum_spec = ('describe_global_clusters', 'GlobalClusters', None)
+        name = id = 'GlobalClusterIdentifier'
+        config_id = 'GlobalClusterResourceId'
+        global_resource = True
+        universal_taggable = object()
+        cfn_type = config_type = 'AWS::RDS::GlobalCluster'
+
+    source_mapping = {
+        'describe': TagListDescribeSource,
+        'config': ConfigSource
+    }

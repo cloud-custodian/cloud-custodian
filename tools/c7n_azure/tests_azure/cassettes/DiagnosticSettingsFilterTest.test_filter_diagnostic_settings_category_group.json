@@ -1,0 +1,173 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 6353A0C330324DE7B2CD1B567872B4BA Ref B: CHI261140512029 Ref C: 2026-10-05T21:37:05Z"
+                    ],
+                    "date": [
+                        "Mon, 05 Oct 2026 21:37:07 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "3dd915bb-44c1-499c-86ea-361688a9e540",
+                        "e1cdb02c-daaa-46d8-8761-0cf8144f530f",
+                        "32faf682-3c60-4957-8ee5-7542364f6586"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "3831"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-category-group/providers/Microsoft.KeyVault/vaults/cckvdiagcg163597097918",
+                                "name": "cckvdiagcg163597097918",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-10-05T21:36:09.109Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-10-05T21:36:09.109Z"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [],
+                                    "enabledForDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 7,
+                                    "enableRbacAuthorization": true,
+                                    "vaultUri": "https://cckvdiagcg163597097918.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-category-group/providers/Microsoft.KeyVault/vaults/cckvdiagcg163597097918/providers/Microsoft.Insights/diagnosticSettings?api-version=2021-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1CC33218232F48229096BE16A923F89F Ref B: CH1AA2030814062 Ref C: 2026-10-05T21:37:11Z"
+                    ],
+                    "date": [
+                        "Mon, 05 Oct 2026 21:37:11 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1084"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_diagnostic-settings-category-group/providers/microsoft.keyvault/vaults/cckvdiagcg163597097918/providers/microsoft.insights/diagnosticSettings/ccdiagnosticsettingalllogs",
+                                "type": "Microsoft.Insights/diagnosticSettings",
+                                "name": "ccdiagnosticsettingalllogs",
+                                "location": "southcentralus",
+                                "kind": null,
+                                "tags": null,
+                                "properties": {
+                                    "storageAccountId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings-category-group/providers/Microsoft.Storage/storageAccounts/cckvdiagcg163597097918",
+                                    "serviceBusRuleId": null,
+                                    "workspaceId": null,
+                                    "eventHubAuthorizationRuleId": null,
+                                    "eventHubName": null,
+                                    "metrics": [
+                                        {
+                                            "category": "AllMetrics",
+                                            "enabled": false,
+                                            "retentionPolicy": {
+                                                "enabled": false,
+                                                "days": 0
+                                            }
+                                        }
+                                    ],
+                                    "logs": [
+                                        {
+                                            "category": null,
+                                            "categoryGroup": "allLogs",
+                                            "enabled": true,
+                                            "retentionPolicy": {
+                                                "enabled": false,
+                                                "days": 0
+                                            }
+                                        },
+                                        {
+                                            "category": null,
+                                            "categoryGroup": "audit",
+                                            "enabled": false,
+                                            "retentionPolicy": {
+                                                "enabled": false,
+                                                "days": 0
+                                            }
+                                        }
+                                    ],
+                                    "logAnalyticsDestinationType": "AzureDiagnostics"
+                                },
+                                "identity": null
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 25 Sep 2026 19:08:54 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "421",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings/c7n-test-keyring-gibbon/cryptoKeys/c7n-test-cryptokey:getIamPolicy?alt=json"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwZcU3Iscag=",
+    "bindings": [
+      {
+        "role": "roles/cloudkms.cryptoKeyDecrypter",
+        "members": [
+          "serviceAccount:c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/cloudkms.cryptoKeyEncrypter",
+        "members": [
+          "serviceAccount:c7n-kms-gibbon@cloud-custodian.iam.gserviceaccount.com"
+        ]
+      }
+    ]
+  }
+}

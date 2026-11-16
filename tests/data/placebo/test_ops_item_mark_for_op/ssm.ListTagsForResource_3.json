@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagList": [
+            {
+                "Key": "custodian_cleanup",
+                "Value": "Resource does not meet policy: update@2026/08/21"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,172 @@
+{
+    "status_code": 200,
+    "data": {
+        "Budgets": [
+            {
+                "BudgetName": "budget-ec2-alerted",
+                "BudgetLimit": {
+                    "Amount": "1200.0",
+                    "Unit": "USD"
+                },
+                "CostTypes": {
+                    "IncludeTax": true,
+                    "IncludeSubscription": true,
+                    "UseBlended": false,
+                    "IncludeRefund": true,
+                    "IncludeCredit": true,
+                    "IncludeUpfront": true,
+                    "IncludeRecurring": true,
+                    "IncludeOtherSubscription": true,
+                    "IncludeSupport": true,
+                    "IncludeDiscount": true,
+                    "UseAmortized": false
+                },
+                "TimeUnit": "MONTHLY",
+                "TimePeriod": {
+                    "Start": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 1,
+                        "hour": 0,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "End": {
+                        "__class__": "datetime",
+                        "year": 2087,
+                        "month": 6,
+                        "day": 15,
+                        "hour": 0,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    }
+                },
+                "CalculatedSpend": {
+                    "ActualSpend": {
+                        "Amount": "55.096",
+                        "Unit": "USD"
+                    },
+                    "ForecastedSpend": {
+                        "Amount": "242.421",
+                        "Unit": "USD"
+                    }
+                },
+                "BudgetType": "COST",
+                "AutoAdjustData": {
+                    "AutoAdjustType": "HISTORICAL",
+                    "HistoricalOptions": {
+                        "BudgetAdjustmentPeriod": 6,
+                        "LookBackAvailablePeriods": 6
+                    }
+                },
+                "FilterExpression": {
+                    "Dimensions": {
+                        "Key": "SERVICE",
+                        "Values": [
+                            "Amazon Elastic Compute Cloud - Compute"
+                        ],
+                        "MatchOptions": [
+                            "EQUALS"
+                        ]
+                    }
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 5,
+                    "minute": 56,
+                    "second": 25,
+                    "microsecond": 388000
+                }
+            },
+            {
+                "BudgetName": "budget-s3-unalerted",
+                "BudgetLimit": {
+                    "Amount": "300.0",
+                    "Unit": "USD"
+                },
+                "CostTypes": {
+                    "IncludeTax": true,
+                    "IncludeSubscription": true,
+                    "UseBlended": false,
+                    "IncludeRefund": true,
+                    "IncludeCredit": true,
+                    "IncludeUpfront": true,
+                    "IncludeRecurring": true,
+                    "IncludeOtherSubscription": true,
+                    "IncludeSupport": true,
+                    "IncludeDiscount": true,
+                    "UseAmortized": false
+                },
+                "TimeUnit": "MONTHLY",
+                "TimePeriod": {
+                    "Start": {
+                        "__class__": "datetime",
+                        "year": 2025,
+                        "month": 1,
+                        "day": 1,
+                        "hour": 0,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "End": {
+                        "__class__": "datetime",
+                        "year": 2087,
+                        "month": 6,
+                        "day": 15,
+                        "hour": 0,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    }
+                },
+                "CalculatedSpend": {
+                    "ActualSpend": {
+                        "Amount": "12.5",
+                        "Unit": "USD"
+                    },
+                    "ForecastedSpend": {
+                        "Amount": "40.0",
+                        "Unit": "USD"
+                    }
+                },
+                "BudgetType": "COST",
+                "AutoAdjustData": {
+                    "AutoAdjustType": "HISTORICAL",
+                    "HistoricalOptions": {
+                        "BudgetAdjustmentPeriod": 6,
+                        "LookBackAvailablePeriods": 6
+                    }
+                },
+                "FilterExpression": {
+                    "Dimensions": {
+                        "Key": "SERVICE",
+                        "Values": [
+                            "Amazon Simple Storage Service"
+                        ],
+                        "MatchOptions": [
+                            "EQUALS"
+                        ]
+                    }
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 6,
+                    "minute": 12,
+                    "second": 3,
+                    "microsecond": 114000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

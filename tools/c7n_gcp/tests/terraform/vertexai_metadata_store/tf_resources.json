@@ -1,0 +1,34 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_vertex_ai_metadata_store": {
+            "central_a": {
+                "create_time": "2026-09-23T19:43:36.038232Z",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "encryption_spec": [],
+                "id": "c7n-store-a",
+                "name": "c7n-store-a",
+                "project": "stkl-jim-fulton",
+                "region": "us-central1",
+                "state": [],
+                "timeouts": null,
+                "update_time": "2026-09-23T19:43:36.717721Z"
+            },
+            "central_b": {
+                "create_time": "2026-09-23T19:43:36.016150Z",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "encryption_spec": [],
+                "id": "c7n-store-b",
+                "name": "c7n-store-b",
+                "project": "stkl-jim-fulton",
+                "region": "us-central1",
+                "state": [],
+                "timeouts": null,
+                "update_time": "2026-09-23T19:43:36.774454Z"
+            }
+        }
+    }
+}

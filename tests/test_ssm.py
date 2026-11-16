@@ -126,6 +126,63 @@ class TestOpsCenter(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['OpsItemId'], 'oi-5aa4c36439ed')
 
+    def test_ops_item_tag(self):
+        factory = self.replay_flight_data('test_ops_item_tag')
+        p = self.load_policy({
+            'name': 'ops-item-tag',
+            'resource': 'aws.ops-item',
+            'filters': [
+                {'type': 'value', 'key': 'Title', 'value': 'c7n-test-tag'},
+                {'tag:Env': 'absent'}],
+            'actions': [
+                {'type': 'tag', 'key': 'Env', 'value': 'Dev'}]},
+            session_factory=factory, config={'region': 'us-east-1'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('ssm')
+        tags = client.list_tags_for_resource(
+            ResourceType='OpsItem',
+            ResourceId=resources[0]['OpsItemId'])['TagList']
+        self.assertEqual(tags, [{'Key': 'Env', 'Value': 'Dev'}])
+
+        p = self.load_policy({
+            'name': 'ops-item-untag',
+            'resource': 'aws.ops-item',
+            'filters': [
+                {'type': 'value', 'key': 'Title', 'value': 'c7n-test-tag'},
+                {'tag:Env': 'present'}],
+            'actions': [
+                {'type': 'remove-tag', 'tags': ['Env']}]},
+            session_factory=factory, config={'region': 'us-east-1'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(
+            ResourceType='OpsItem',
+            ResourceId=resources[0]['OpsItemId'])['TagList']
+        self.assertEqual(tags, [])
+
+    def test_ops_item_mark_for_op(self):
+        factory = self.replay_flight_data('test_ops_item_mark_for_op')
+        p = self.load_policy({
+            'name': 'ops-item-mark',
+            'resource': 'aws.ops-item',
+            'filters': [
+                {'type': 'value', 'key': 'Title', 'value': 'c7n-test-mark'},
+                {'tag:custodian_cleanup': 'absent'}],
+            'actions': [
+                {'type': 'mark-for-op', 'tag': 'custodian_cleanup',
+                 'op': 'update', 'days': 1}]},
+            session_factory=factory, config={'region': 'us-east-1'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('ssm')
+        tags = client.list_tags_for_resource(
+            ResourceType='OpsItem',
+            ResourceId=resources[0]['OpsItemId'])['TagList']
+        self.assertEqual(tags[0]['Key'], 'custodian_cleanup')
+        self.assertTrue(tags[0]['Value'].startswith(
+            'Resource does not meet policy: update@'))
+
 
 class TestSSM(BaseTest):
 
@@ -270,6 +327,244 @@ class TestSSM(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["InstanceId"], "mi-1111aa111aa11a111")
+
+    def test_ssm_managed_instance_tag_skips_ec2(self):
+        p = self.load_policy(
+            {
+                "name": "ssm-managed-instance-tag",
+                "resource": "ssm-managed-instance",
+                "actions": [{"type": "tag", "key": "Env", "value": "Dev"}],
+            },
+        )
+        action = p.resource_manager.actions[0]
+        self.assertEqual(
+            action.get_taggable(
+                [{"InstanceId": "mi-1111aa111aa11a111"},
+                 {"InstanceId": "i-0ba3874e85bb97244"}]),
+            [{"InstanceId": "mi-1111aa111aa11a111"}])
+        source = p.resource_manager.source
+        self.assertEqual(
+            source.get_taggable([{"InstanceId": "i-0ba3874e85bb97244"}]), [])
+
+    def test_ssm_managed_instance_tag(self):
+        session_factory = self.replay_flight_data("test_ssm_managed_instance_tag")
+        # the account has one hybrid (mi-*) instance without an Env tag
+        # and one ec2 (i-*) instance carrying Env=Prod in ec2 tags; the
+        # ec2 instance's tags are visible to the filter, so only the
+        # hybrid instance matches and gets tagged.
+        p = self.load_policy(
+            {
+                "name": "ssm-managed-instance-tag",
+                "resource": "ssm-managed-instance",
+                "filters": [{"tag:Env": "absent"}],
+                "actions": [{"type": "tag", "key": "Env", "value": "Dev"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]["InstanceId"].startswith("mi-"))
+        client = session_factory().client("ssm")
+        tags = client.list_tags_for_resource(
+            ResourceType="ManagedInstance",
+            ResourceId=resources[0]["InstanceId"])["TagList"]
+        self.assertEqual(tags, [{"Key": "Env", "Value": "Dev"}])
+
+        p = self.load_policy(
+            {
+                "name": "ssm-managed-instance-untag",
+                "resource": "ssm-managed-instance",
+                "filters": [
+                    {"type": "value", "key": "InstanceId",
+                     "op": "glob", "value": "mi-*"},
+                    {"tag:Env": "Dev"}],
+                "actions": [{"type": "remove-tag", "tags": ["Env"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(
+            ResourceType="ManagedInstance",
+            ResourceId=resources[0]["InstanceId"])["TagList"]
+        self.assertEqual(tags, [])
+
+    def test_ssm_patch_baseline_query(self):
+        session_factory = self.replay_flight_data("test_ssm_patch_baseline_query")
+        p = self.load_policy(
+            {
+                "name": "ssm-patch-baseline-tagged",
+                "resource": "ssm-patch-baseline",
+                "filters": [
+                    {"type": "value", "key": "BaselineName",
+                     "op": "glob", "value": "c7n-test-*"},
+                    {"tag:Team": "present"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["BaselineName"], "c7n-test-tagged")
+        self.assertTrue(resources[0]["BaselineId"].startswith("pb-"))
+
+    def test_ssm_patch_baseline_tag(self):
+        session_factory = self.replay_flight_data("test_ssm_patch_baseline_tag")
+        p = self.load_policy(
+            {
+                "name": "ssm-patch-baseline-tag",
+                "resource": "ssm-patch-baseline",
+                "filters": [
+                    {"type": "value", "key": "BaselineName",
+                     "value": "c7n-test-untagged"},
+                    {"tag:Env": "absent"}],
+                "actions": [{"type": "tag", "key": "Env", "value": "Dev"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("ssm")
+        tags = client.list_tags_for_resource(
+            ResourceType="PatchBaseline",
+            ResourceId=resources[0]["BaselineId"])["TagList"]
+        self.assertEqual(tags, [{"Key": "Env", "Value": "Dev"}])
+
+        p = self.load_policy(
+            {
+                "name": "ssm-patch-baseline-untag",
+                "resource": "ssm-patch-baseline",
+                "filters": [
+                    {"type": "value", "key": "BaselineName",
+                     "value": "c7n-test-untagged"},
+                    {"tag:Env": "Dev"}],
+                "actions": [{"type": "remove-tag", "tags": ["Env"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(
+            ResourceType="PatchBaseline",
+            ResourceId=resources[0]["BaselineId"])["TagList"]
+        self.assertEqual(tags, [])
+
+    def test_ssm_maintenance_window_query(self):
+        session_factory = self.replay_flight_data("test_ssm_maintenance_window_query")
+        p = self.load_policy(
+            {
+                "name": "ssm-maintenance-window-tagged",
+                "resource": "ssm-maintenance-window",
+                "filters": [
+                    {"type": "value", "key": "Name",
+                     "op": "glob", "value": "c7n-test-*"},
+                    {"tag:Team": "present"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "c7n-test-tagged")
+        self.assertTrue(resources[0]["WindowId"].startswith("mw-"))
+
+    def test_ssm_maintenance_window_tag(self):
+        session_factory = self.replay_flight_data("test_ssm_maintenance_window_tag")
+        p = self.load_policy(
+            {
+                "name": "ssm-maintenance-window-tag",
+                "resource": "ssm-maintenance-window",
+                "filters": [
+                    {"type": "value", "key": "Name",
+                     "value": "c7n-test-untagged"},
+                    {"tag:Env": "absent"}],
+                "actions": [{"type": "tag", "key": "Env", "value": "Dev"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("ssm")
+        tags = client.list_tags_for_resource(
+            ResourceType="MaintenanceWindow",
+            ResourceId=resources[0]["WindowId"])["TagList"]
+        self.assertEqual(tags, [{"Key": "Env", "Value": "Dev"}])
+
+        p = self.load_policy(
+            {
+                "name": "ssm-maintenance-window-untag",
+                "resource": "ssm-maintenance-window",
+                "filters": [
+                    {"type": "value", "key": "Name",
+                     "value": "c7n-test-untagged"},
+                    {"tag:Env": "Dev"}],
+                "actions": [{"type": "remove-tag", "tags": ["Env"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(
+            ResourceType="MaintenanceWindow",
+            ResourceId=resources[0]["WindowId"])["TagList"]
+        self.assertEqual(tags, [])
+
+    def test_ssm_association_query(self):
+        session_factory = self.replay_flight_data("test_ssm_association_query")
+        p = self.load_policy(
+            {
+                "name": "ssm-association-tagged",
+                "resource": "ssm-association",
+                "filters": [
+                    {"type": "value", "key": "AssociationName",
+                     "op": "glob", "value": "c7n-test-*"},
+                    {"tag:Team": "present"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["AssociationName"], "c7n-test-tagged")
+        self.assertTrue(resources[0]["AssociationId"])
+
+    def test_ssm_association_tag(self):
+        session_factory = self.replay_flight_data("test_ssm_association_tag")
+        p = self.load_policy(
+            {
+                "name": "ssm-association-tag",
+                "resource": "ssm-association",
+                "filters": [
+                    {"type": "value", "key": "AssociationName",
+                     "value": "c7n-test-untagged"},
+                    {"tag:Env": "absent"}],
+                "actions": [{"type": "tag", "key": "Env", "value": "Dev"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("ssm")
+        tags = client.list_tags_for_resource(
+            ResourceType="Association",
+            ResourceId=resources[0]["AssociationId"])["TagList"]
+        self.assertEqual(tags, [{"Key": "Env", "Value": "Dev"}])
+
+        p = self.load_policy(
+            {
+                "name": "ssm-association-untag",
+                "resource": "ssm-association",
+                "filters": [
+                    {"type": "value", "key": "AssociationName",
+                     "value": "c7n-test-untagged"},
+                    {"tag:Env": "Dev"}],
+                "actions": [{"type": "remove-tag", "tags": ["Env"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tags = client.list_tags_for_resource(
+            ResourceType="Association",
+            ResourceId=resources[0]["AssociationId"])["TagList"]
+        self.assertEqual(tags, [])
 
     def test_get_ssm_documents(self):
         session_factory = self.replay_flight_data("test_get_ssm_documents")

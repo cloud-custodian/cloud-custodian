@@ -13,7 +13,7 @@ from c7n.config import Bag, Config
 from c7n.exceptions import PolicyValidationError, InvalidOutputConfig
 from c7n.resources import aws, load_resources
 from c7n.schema import StructureParser
-from c7n import output, schema
+from c7n import credentials, output, schema, utils
 
 # resolver test needs to patch out thread usage
 from c7n.resources.sqs import SQS
@@ -24,8 +24,11 @@ from .common import BaseTest
 from aws_xray_sdk.core.models.segment import Segment
 from aws_xray_sdk.core.models.subsegment import Subsegment
 
+import boto3
 import pytest
 import vcr
+from botocore.exceptions import ClientError, EndpointConnectionError
+from botocore.stub import Stubber
 
 
 class TraceDoc(Bag):
@@ -355,6 +358,79 @@ class OutputMetricsTest(BaseTest):
             assert aws_api.call_args[0][0] == "PutMetricData"
             assert aws_api.call_args[0][1]["MetricData"] == [{'MetricName': 'ResourceCount'}]
             assert aws_api.call_count == 1
+
+
+class ApiStatsTest(BaseTest):
+
+    def stubbed_sqs(self, session):
+        client = session.client(
+            'sqs', region_name='us-east-1',
+            aws_access_key_id='AKID', aws_secret_access_key='SECRET')
+        stubber = Stubber(client)
+        stubber.activate()
+        self.addCleanup(stubber.deactivate)
+        return client, stubber
+
+    def test_records_calls_by_operation(self):
+        stats = aws.ApiStats(Bag(), Config.empty())
+        session = boto3.Session(region_name='us-east-1')
+        stats(session)
+        client, stubber = self.stubbed_sqs(session)
+        stubber.add_response('list_queues', {})
+        stubber.add_response('list_queues', {})
+        stubber.add_client_error('get_queue_url', 'QueueDoesNotExist')
+
+        client.list_queues()
+        client.list_queues()
+        with self.assertRaises(ClientError):
+            client.get_queue_url(QueueName='missing')
+
+        self.assertEqual(
+            stats.get_metadata(), {'sqs.ListQueues': 2, 'sqs.GetQueueUrl': 1})
+        self.assertGreater(stats.api_time, 0)
+
+    def test_records_transport_errors(self):
+        stats = aws.ApiStats(Bag(), Config.empty())
+        session = boto3.Session(region_name='us-east-1')
+        stats(session)
+        client = session.client(
+            'sqs', region_name='us-east-1',
+            aws_access_key_id='AKID', aws_secret_access_key='SECRET')
+        error = EndpointConnectionError(endpoint_url='https://sqs.us-east-1.amazonaws.com')
+
+        with patch.object(client._endpoint, 'make_request', side_effect=error):
+            with self.assertRaises(EndpointConnectionError):
+                client.list_queues()
+
+        self.assertEqual(stats.get_metadata(), {'sqs.ListQueues': 1})
+        self.assertGreater(stats.api_time, 0)
+
+    def test_execution_emits_metrics(self):
+        utils.reset_session_cache()
+        self.addCleanup(utils.reset_session_cache)
+        factory = credentials.SessionFactory('us-east-1')
+        metrics = Mock()
+        stats = aws.ApiStats(Bag(session_factory=factory, metrics=metrics), Config.empty())
+
+        with stats:
+            client, stubber = self.stubbed_sqs(utils.local_session(factory))
+            stubber.add_response('list_queues', {})
+            client.list_queues()
+
+        # A client keeps a copy of its session's event handlers, so check
+        # cleanup with one created from the cached session after the execution.
+        client, stubber = self.stubbed_sqs(utils.local_session(factory))
+        stubber.add_response('list_queues', {})
+        client.list_queues()
+
+        self.assertEqual(stats.get_metadata(), {'sqs.ListQueues': 1})
+        self.assertEqual(factory._subscribers, ())
+        self.assertEqual(output._api_call_recorders, [])
+        calls = {c.args[0]: c.args[1:] for c in metrics.put_metric.call_args_list}
+        self.assertEqual(calls['ApiCalls'], (1, 'Count'))
+        self.assertEqual(calls['ApiTime'][1], 'Seconds')
+        self.assertGreater(stats.api_time, 0)
+        self.assertEqual(calls['ApiTime'][0], round(stats.api_time, 3))
 
 
 class OutputLogsTest(BaseTest):
