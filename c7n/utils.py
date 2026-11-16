@@ -163,6 +163,46 @@ def parse_date(v, tz=None):
     return isinstance(v, datetime) and v or None
 
 
+# ISO 8601 durations built from fixed-length units. Years and months
+# vary in length, so a duration using them does not match.
+ISO_DURATION = re.compile(r"""
+    P
+    (?:(?P<weeks>\d+(?:[.,]\d+)?)W)?
+    (?:(?P<days>\d+(?:[.,]\d+)?)D)?
+    (?:T(?=\d)
+        (?:(?P<hours>\d+(?:[.,]\d+)?)H)?
+        (?:(?P<minutes>\d+(?:[.,]\d+)?)M)?
+        (?:(?P<seconds>\d+(?:[.,]\d+)?)S)?
+    )?
+""", re.VERBOSE | re.ASCII)
+
+
+def parse_duration(v):
+    """Parse an ISO 8601 duration such as ``PT30M`` or ``P1DT12H`` to a timedelta.
+
+    Weeks stand alone, only the smallest unit may have a fraction, and either
+    ``.`` or ``,`` marks the decimal. Returns None for anything else, including
+    durations in years or months and durations too large for a timedelta.
+    """
+    if not isinstance(v, str):
+        return None
+    match = ISO_DURATION.fullmatch(v.strip())
+    if match is None:
+        return None
+    parts = {unit: n for unit, n in match.groupdict().items() if n}
+    if not parts:
+        return None
+    # ISO 8601: weeks stand alone, and only the smallest unit given may have a fraction
+    if 'weeks' in parts and len(parts) > 1:
+        return None
+    if any(sep in n for n in list(parts.values())[:-1] for sep in '.,'):
+        return None
+    try:
+        return timedelta(**{unit: float(n.replace(',', '.')) for unit, n in parts.items()})
+    except OverflowError:
+        return None
+
+
 if typing.TYPE_CHECKING:
     from c7n.element import ElementJSONSchema
 
@@ -404,6 +444,24 @@ def get_partition(region):
     if not region:
         return ''
     return REGION_PARTITION_MAP.get(region, 'aws')
+
+
+def get_partition_region(partition):
+    """A region of `partition` to call when no region is otherwise given.
+
+    For a partition's global endpoints, and to ask which regions it has.
+    us-east-1 exists only in the commercial partition, where every account has
+    it enabled, unlike some opt-in regions. Other partitions take the first
+    region botocore lists for ec2. A partition botocore doesn't know, or none
+    at all, keeps us-east-1.
+    """
+    if partition and partition != 'aws':
+        # botocore is only a dependency of the aws provider, so import it here
+        from botocore.session import get_session
+        regions = get_session().get_available_regions('ec2', partition_name=partition)
+        if regions:
+            return sorted(regions)[0]
+    return 'us-east-1'
 
 
 def generate_arn(

@@ -109,6 +109,36 @@ class TestSecretsManager(BaseTest):
         final_tags = client.describe_secret(SecretId="c7n-test-key").get("Tags")
         self.assertFalse(final_tags)
 
+    def test_secrets_manager_tag_sends_only_new_tags(self):
+        # TagResource is additive, so existing tags must not be re-sent: doing so
+        # puts unrelated keys in aws:TagKeys and breaks tag-key-scoped IAM grants.
+        p = self.load_policy(
+            {
+                "name": "secrets-manager-tag-new-only",
+                "resource": "secrets-manager",
+                "actions": [{"type": "tag", "key": "acme_owner", "value": "sec"}],
+            },
+            validate=False,
+        )
+        action = p.resource_manager.actions[0]
+        client = MagicMock()
+        resources = [
+            {
+                "ARN": "arn:aws:secretsmanager:us-east-1:123456789012:secret:app-AbCdEf",
+                "Tags": [
+                    {"Key": "app", "Value": "billing"},
+                    {"Key": "aws:cloudformation:stack-name", "Value": "app-stack"},
+                ],
+            }
+        ]
+        action.process_resource_set(
+            client, resources, [{"Key": "acme_owner", "Value": "sec"}]
+        )
+        client.tag_resource.assert_called_once_with(
+            SecretId=resources[0]["ARN"],
+            Tags=[{"Key": "acme_owner", "Value": "sec"}],
+        )
+
     def test_mark_secret_for_op(self):
         self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
         session = self.replay_flight_data("test_secrets_manager_mark_for_op")
@@ -276,6 +306,17 @@ class TestSecretsManager(BaseTest):
         self.assertIsInstance(resources[0].get('VersionIdsToStages'), dict)
         self.assertEqual(resources[1].get('VersionIdsToStages'), None)
         self.assertEqual(resources[1]['c7n:DeniedMethods'], ['describe_secret'])
+
+    def test_secrets_manager_get_resources_by_arn(self):
+        self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_secrets_manager_describe")
+        p = self.load_policy({
+            "name": "get-secret-by-arn",
+            "resource": "aws.secrets-manager",
+        }, session_factory=session_factory)
+        arn = "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-test-key-XTUSpD"
+        resources = p.resource_manager.get_resources([arn])
+        self.assertEqual([r['Name'] for r in resources], ['c7n-test-key'])
 
     def test_secrets_manager_replica_access_denied(self):
         self.patch(SecretsManager, 'executor_factory', MainThreadExecutor)

@@ -1,0 +1,104 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 14 Oct 2026 02:50:19 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=123",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4703",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks?alt=json"
+  },
+  "body": {
+    "sinks": [
+      {
+        "name": "c7n-sink-exact-a",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR AND resource.type=\"gce_instance\"",
+        "createTime": "2026-10-14T02:50:14.935447113Z",
+        "updateTime": "2026-10-14T02:50:14.935447113Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-exact-a"
+      },
+      {
+        "name": "c7n-sink-exact-b",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "resource.type=\"gce_instance\" AND severity>=ERROR",
+        "createTime": "2026-10-14T02:50:15.048121686Z",
+        "updateTime": "2026-10-14T02:50:15.048121686Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-exact-b"
+      },
+      {
+        "name": "c7n-sink-exact-disabled",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR AND resource.type=\"gce_instance\"",
+        "createTime": "2026-10-14T02:50:15.047932126Z",
+        "updateTime": "2026-10-14T02:50:15.047932126Z",
+        "disabled": true,
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-exact-disabled"
+      },
+      {
+        "name": "c7n-sink-exact-no-filter-a",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "createTime": "2026-10-14T02:50:15.041346065Z",
+        "updateTime": "2026-10-14T02:50:15.041346065Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-exact-no-filter-a"
+      },
+      {
+        "name": "c7n-sink-exact-no-filter-b",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "createTime": "2026-10-14T02:50:15.048104698Z",
+        "updateTime": "2026-10-14T02:50:15.048104698Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-exact-no-filter-b"
+      },
+      {
+        "name": "c7n-sink-exact-non-match",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=WARNING AND resource.type=\"gce_instance\"",
+        "createTime": "2026-10-14T02:50:15.041484620Z",
+        "updateTime": "2026-10-14T02:50:15.041484620Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-exact-non-match"
+      },
+      {
+        "name": "c7n-sink-exact-other-dest",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/c7n-sink-exact-other",
+        "filter": "severity>=ERROR AND resource.type=\"gce_instance\"",
+        "writerIdentity": "serviceAccount:service-12345678901@gcp-sa-logging.iam.gserviceaccount.com",
+        "createTime": "2026-10-14T02:50:18.202498047Z",
+        "updateTime": "2026-10-14T02:50:18.202498047Z",
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-exact-other-dest"
+      },
+      {
+        "name": "c7n-sink-exact-with-exclusion",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "severity>=ERROR AND resource.type=\"gce_instance\"",
+        "createTime": "2026-10-14T02:50:15.047930281Z",
+        "updateTime": "2026-10-14T02:50:15.047930281Z",
+        "exclusions": [
+          {
+            "name": "zone",
+            "filter": "resource.labels.zone=\"us-east1-b\""
+          }
+        ],
+        "resourceName": "projects/cloud-custodian/sinks/c7n-sink-exact-with-exclusion"
+      },
+      {
+        "name": "_Required",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Required",
+        "filter": "LOG_ID(\"cloudaudit.googleapis.com/activity\") OR LOG_ID(\"externalaudit.googleapis.com/activity\") OR LOG_ID(\"cloudaudit.googleapis.com/system_event\") OR LOG_ID(\"externalaudit.googleapis.com/system_event\") OR LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") OR LOG_ID(\"externalaudit.googleapis.com/access_transparency\")",
+        "resourceName": "projects/cloud-custodian/sinks/_Required"
+      },
+      {
+        "name": "_Default",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "NOT LOG_ID(\"cloudaudit.googleapis.com/activity\") AND NOT LOG_ID(\"externalaudit.googleapis.com/activity\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"externalaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") AND NOT LOG_ID(\"externalaudit.googleapis.com/access_transparency\")",
+        "resourceName": "projects/cloud-custodian/sinks/_Default"
+      }
+    ]
+  }
+}

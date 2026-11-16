@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "actionGroups_name": {
+      "type": "string",
+      "defaultValue": "cctest-activity-alert"
+    }
+  },
+  "resources": [
+    {
+      "type": "microsoft.insights/actionGroups",
+      "apiVersion": "2019-06-01",
+      "name": "[parameters('actionGroups_name')]",
+      "location": "Global",
+      "properties": {
+        "groupShortName": "cctestalert",
+        "enabled": true
+      }
+    }
+  ]
+}

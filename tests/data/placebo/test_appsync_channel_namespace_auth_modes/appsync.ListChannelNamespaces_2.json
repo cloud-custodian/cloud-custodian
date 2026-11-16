@@ -1,0 +1,92 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "channelNamespaces": [
+            {
+                "apiId": "st7ke6ruefclllukmr6efhujrm",
+                "name": "explicit-apikey",
+                "tags": {
+                    "Env": "test"
+                },
+                "channelNamespaceArn": "arn:aws:appsync:us-east-1:644160558196:apis/st7ke6ruefclllukmr6efhujrm/channelNamespace/explicit-apikey",
+                "created": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 1,
+                    "minute": 18,
+                    "second": 32,
+                    "microsecond": 348000
+                },
+                "lastModified": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 1,
+                    "minute": 18,
+                    "second": 32,
+                    "microsecond": 348000
+                }
+            },
+            {
+                "apiId": "st7ke6ruefclllukmr6efhujrm",
+                "name": "explicit-iam",
+                "tags": {
+                    "Owner": "c7n"
+                },
+                "channelNamespaceArn": "arn:aws:appsync:us-east-1:644160558196:apis/st7ke6ruefclllukmr6efhujrm/channelNamespace/explicit-iam",
+                "created": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 1,
+                    "minute": 18,
+                    "second": 1,
+                    "microsecond": 569000
+                },
+                "lastModified": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 1,
+                    "minute": 18,
+                    "second": 1,
+                    "microsecond": 569000
+                }
+            },
+            {
+                "apiId": "st7ke6ruefclllukmr6efhujrm",
+                "name": "inherit",
+                "tags": {
+                    "Env": "test"
+                },
+                "channelNamespaceArn": "arn:aws:appsync:us-east-1:644160558196:apis/st7ke6ruefclllukmr6efhujrm/channelNamespace/inherit",
+                "created": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 1,
+                    "minute": 18,
+                    "second": 49,
+                    "microsecond": 580000
+                },
+                "lastModified": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 24,
+                    "hour": 1,
+                    "minute": 18,
+                    "second": 49,
+                    "microsecond": 580000
+                }
+            }
+        ]
+    }
+}

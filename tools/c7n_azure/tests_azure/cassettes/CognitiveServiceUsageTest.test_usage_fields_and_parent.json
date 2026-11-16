@@ -1,0 +1,1453 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "627"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "9"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DD91218BC8FB4FC4899ED2C9874899BF Ref B: CYS013050702051 Ref C: 2026-10-16T18:54:35Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "df8b0a79-3161-4778-b17f-a7d0101f17d2"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 18:54:35 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=7VE9b8IwFPwvVtuJkA%2fAgkioimiRgshSKEFVFtt5BDfEjmwnkCL%2bew1Spy4MHTvccPe%2b9O7OSMDJLLkoNQrP6DVard9XAQrR3phah65bEUEKqECYPvlqFPSZrFzdUM0Urw2XQrs%2bxjs8GmMHCKHOMGfUITAZOwEFNhkFHqU5dmslW56D0m7CmZJa7kx%2fJgvBDW9hBarlDLRLGJONMPqZ1Nxpbbc9MA28YOR42PH8pwdd8notSxBT6BbNx3bvrdN5R4JNF39Kng4Mi8Vba3mzncWYio2ms5PVFnta5YerBv6R0%2fRwq1t%2bSl6i412YH%2fnSgqbz4XWPRXfX3HW%2fndtt%2fTwW3uMgR5ceIqqKikJBQQzkt4es59Fbgnq3QBKiSlBWOmc%2fmWQozP5T%2beX4n6WSoQu6fAM%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=7VE9b8IwFPwvVtuJkA/AgkioimiRgshSKEFVFtt5BDfEjmwnkCL%2Bew1Spy4MHTvccPe%2B9O7OSMDJLLkoNQrP6DVard9XAQrR3phah65bEUEKqECYPvlqFPSZrFzdUM0Urw2XQrs%2Bxjs8GmMHCKHOMGfUITAZOwEFNhkFHqU5dmslW56D0m7CmZJa7kx/JgvBDW9hBarlDLRLGJONMPqZ1Nxpbbc9MA28YOR42PH8pwdd8notSxBT6BbNx3bvrdN5R4JNF39Kng4Mi8Vba3mzncWYio2ms5PVFnta5YerBv6R0/Rwq1t%2BSl6i412YH/nSgqbz4XWPRXfX3HW/ndtt/TwW3uMgR5ceIqqKikJBQQzkt4es59Fbgnq3QBKiSlBWOmc/mWQozP5T%2BeX4n6WSoQu6fAM%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "635"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "11"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1938D6638B8748668193A8DF0D8CCC02 Ref B: CYS013050703049 Ref C: 2026-10-16T18:54:36Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "04f325ea-e0e2-4635-89ba-7ac14714c7b9"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 18:54:36 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=7VHBTsJAFPyXjXqytBRogIQYUkVLaEwAaWO47G4fZW272%2bxuWyrh310wxoMH%2fQAPc5h5k%2fdeZo6Iw0EvGM8UGh%2fRw3S1flm5aIz2WpdqbNsF5jiFArju4PdKQoeKwlYVUVSyUjPBld31vJ03GHoWYEysfkKJhWE0tFwCdDRwHUISzy6lqFkCUtkho1IosdMdX6ScaVbDCmTNKCgbUyoqrtUdLplVG7c5MHEdd2A5nuV0b65Uxsq1yIBPoJ1Xr%2fHeWUezFrubNngTLOppGvBlbXgV%2b4FH%2bEYR%2f2C0%2bZ4USX7WoNswEuWXueFteD9t%2foRZwxYGJJr1z3tif%2f64zBu2i7tJwJ3rXoJOt99pPvMnkScmUyNiWUzTVEKKNSSX703A02WIPv0hlhlIIx23XwVs0Xj7X8GPWn6tYItO6PQB"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=7VHBTsJAFPyXjXqytBRogIQYUkVLaEwAaWO47G4fZW272%2BxuWyrh310wxoMH/QAPc5h5k/deZo6Iw0EvGM8UGh/Rw3S1flm5aIz2WpdqbNsF5jiFArju4PdKQoeKwlYVUVSyUjPBld31vJ03GHoWYEysfkKJhWE0tFwCdDRwHUISzy6lqFkCUtkho1IosdMdX6ScaVbDCmTNKCgbUyoqrtUdLplVG7c5MHEdd2A5nuV0b65Uxsq1yIBPoJ1Xr/HeWUezFrubNngTLOppGvBlbXgV%2B4FH%2BEYR/2C0%2BZ4USX7WoNswEuWXueFteD9t/oRZwxYGJJr1z3tif/64zBu2i7tJwJ3rXoJOt99pPvMnkScmUyNiWUzTVEKKNSSX703A02WIPv0hlhlIIx23XwVs0Xj7X8GPWn6tYItO6PQB",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "9517"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "14"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 55A4E0084B4F4536BDE16A84728BA2EF Ref B: CYS013050701009 Ref C: 2026-10-16T18:54:37Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "8a098599-fdcf-43dc-82ff-2a601ba3ce0c"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 18:54:37 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-usage/providers/Microsoft.CognitiveServices/accounts/cctestusage743534561266",
+                                "name": "cctestusage743534561266",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"101f88be-0000-0200-0000-6ad272df0000\"",
+                                "location": "eastus2",
+                                "sku": {
+                                    "name": "S"
+                                },
+                                "kind": "TextAnalytics",
+                                "properties": {
+                                    "endpoint": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                    "internalId": "f8029c25d77446198ceae5b9e19570ca",
+                                    "dateCreated": "2026-10-16T18:52:29.1437971Z",
+                                    "apiProperties": {
+                                        "qnaAzureSearchEndpointKey": null
+                                    },
+                                    "callRateLimit": {
+                                        "rules": [
+                                            {
+                                                "key": "workflow.endpoint.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/:analyze-conversations",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.conversations.jobs.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/jobs/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.conversations.jobs.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/jobs",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "language/analyze-conversations/jobs/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzetext.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/:analyze-text",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzetext.jobs.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/jobs/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzetext.jobs.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 300,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/jobs",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzedocuments.jobs.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-documents/jobs/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzedocuments.jobs.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-documents/jobs",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.generate.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/:generate",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.authoring.customtext.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.updatecalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.authoring.customtext.march.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/authoring/analyze-text/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.march.updatecalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/authoring/analyze-text/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.authoring.customtext.internal.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/internal/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.internal.updatecalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/internal/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.getCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.updateCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.march.getCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/authoring/analyze-conversations/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.march.updateCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/authoring/analyze-conversations/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.internal.getCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/internal/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.internal.updateCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/internal/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.customText",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/v3.1-preview.ct.1/analyze/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyze",
+                                                "renewalPeriod": 60,
+                                                "count": 300,
+                                                "dynamicThrottlingEnabled": true,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/v3.1/analyze/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "text/analytics/v3.2-preview.1/analyze/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "text/analytics/v3.2-preview.2/analyze/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.healthcare",
+                                                "renewalPeriod": 60,
+                                                "count": 300,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/v3.1/entities/health",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "text/analytics/v3.2-preview.1/health",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "text/analytics/v3.2-preview.2/health",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.languagedetection",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/v3.1/languages",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "dynamicThrottlingEnabled": true,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "container.billing",
+                                                "renewalPeriod": 10,
+                                                "count": 500,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "billing/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "questionanswering",
+                                                "renewalPeriod": 60,
+                                                "count": 600,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "qnamaker/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "unifiedlanguage.questionanswering",
+                                                "renewalPeriod": 1,
+                                                "count": 3,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/query-knowledgebases/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "unifiedlanguage.questionanswering.inference",
+                                                "renewalPeriod": 1,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/:query-*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyze.internal.autoTagging",
+                                                "renewalPeriod": 60,
+                                                "count": 150,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "TextAnalytics/ct-auto-tagging",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyze.internal.evaluation",
+                                                "renewalPeriod": 60,
+                                                "count": 150,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "TextAnalytics/ct-evaluation",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "default",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "quotaLimit": {
+                                        "rules": [
+                                            {
+                                                "key": "workflow.endpoint.postcalls",
+                                                "renewalPeriod": 2592000,
+                                                "count": 100000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "/language/:analyze-conversations",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "isMigrated": false,
+                                    "allowProjectManagement": false,
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "capabilities": [
+                                        {
+                                            "name": "DynamicThrottling"
+                                        },
+                                        {
+                                            "name": "VirtualNetworks"
+                                        },
+                                        {
+                                            "name": "EnabledApimVnet",
+                                            "value": "true"
+                                        },
+                                        {
+                                            "name": "TrustedServices",
+                                            "value": "Microsoft.CognitiveServices"
+                                        },
+                                        {
+                                            "name": "CustomerManagedKey"
+                                        },
+                                        {
+                                            "name": "CustomerManagedStorage"
+                                        },
+                                        {
+                                            "name": "Cloud",
+                                            "value": "TextAnalytics.Healthcare,TextAnalytics.Analyze,QuestionAnswer.AllApis,LanguageService.QuestionAnsweringApis"
+                                        },
+                                        {
+                                            "name": "Container",
+                                            "value": "TextAnalytics.Healthcare,TextAnalytics.EntityV3,TextAnalytics.EntityONNX,TextAnalytics.Keyphrase,TextAnalytics.KeyphraseV2,TextAnalytics.KeyPhraseONNX,TextAnalytics.LanguageFastText,TextAnalytics.Language,TextAnalytics.LanguageV2,TextAnalytics.Sentiment,TextAnalytics.SentimentV2,TextAnalytics.SentimentV3,TextAnalytics.SentimentV3Preview,TextAnalytics.SentimentONNX,TextAnalytics.CustomNER,TextAnalytics.textanalyticsdispatcher,TextAnalytics.SummarizationFrontend,TextAnalytics.SummarizationWorker,TextAnalytics.PII,TextAnalytics.CluRuntime,TextAnalytics.CluContainer,TextAnalytics.NER"
+                                        }
+                                    ],
+                                    "endpoints": {
+                                        "Text Analytics": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Custom Text Authoring": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Conversational Language Understanding Authoring": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Custom Question Answering Authoring": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Custom Question Answering": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "ConversationalLURuntime": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Language": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Language Remote MCP Server": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "QnAMaker": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Turing": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "QuestionAnswering": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "LUIS": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Container": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/"
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-10-16T18:52:28.8712473Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-10-16T18:52:28.8712473Z"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=7VHLTsJAFP2Xibqy9AE00IQYgqIlNiaAQEw387iUse1MMzMtr%2fDvDhjjwoV%2bgIuzOOee3HtzzhEJ2JlnLnKNoiN6GM7mr7MARWhjTKUj1y2xwBmUIEwLH2oFLSpLV9dEU8Urw6XQrh%2bG67DbCx3AmDgdRomDod9zAgK03w08QljoVko2nIHSbsKpklquTWskM8ENb2AGquEUtIsplbUw%2bg5X3Gms2x4YBF7QdbzQ8fybK53zai5zEAPYT%2bq31cabL8d7HCz28bvky7ahsZg2lterURwSsdBktLPaZENKVpw18LecLIvL3PJDcj%2fc%2fgnjLX%2b2IMtx57xnNZo8TostX698Fgvvus3Q6fY7zRfxJAtmM7UiVuUwyxRk2AC7fG8DHk4T9OlPsMpBWemYfhWQoij9r%2bBHLb9WkKITOn0A"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=7VHLTsJAFP2Xibqy9AE00IQYgqIlNiaAQEw387iUse1MMzMtr/DvDhjjwoV%2BgIuzOOee3HtzzhEJ2JlnLnKNoiN6GM7mr7MARWhjTKUj1y2xwBmUIEwLH2oFLSpLV9dEU8Urw6XQrh%2BG67DbCx3AmDgdRomDod9zAgK03w08QljoVko2nIHSbsKpklquTWskM8ENb2AGquEUtIsplbUw%2Bg5X3Gms2x4YBF7QdbzQ8fybK53zai5zEAPYT%2Bq31cabL8d7HCz28bvky7ahsZg2lterURwSsdBktLPaZENKVpw18LecLIvL3PJDcj/c/gnjLX%2B2IMtx57xnNZo8TostX698Fgvvus3Q6fY7zRfxJAtmM7UiVuUwyxRk2AC7fG8DHk4T9OlPsMpBWemYfhWQoij9r%2BBHLb9WkKITOn0A",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "12"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "10"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A964FA66562D4F309C7405A18910431B Ref B: CYS013050702021 Ref C: 2026-10-16T18:54:38Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "823a5aa2-a203-4a0c-a02d-12ef682a42a9"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 18:54:37 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-usage/providers/Microsoft.CognitiveServices/accounts/cctestusage743534561266/usages?api-version=2025-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "948"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "176"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: ED2B33BC234949B280A2C0C697E00021 Ref B: CYS013050703045 Ref C: 2026-10-16T18:54:38Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 18:54:38 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": {
+                                    "value": "TextAnalytics.CtAutoTagging",
+                                    "localizedValue": "TextAnalytics.CtAutoTagging"
+                                },
+                                "status": "Included",
+                                "currentValue": 0.0,
+                                "limit": 5000.0,
+                                "nextResetTime": "0001-01-01T00:00:00Z",
+                                "quotaPeriod": "30.00:00:00",
+                                "unit": "Count"
+                            },
+                            {
+                                "name": {
+                                    "value": "TextAnalytics.CtSaAutoTagging",
+                                    "localizedValue": "TextAnalytics.CtSaAutoTagging"
+                                },
+                                "status": "Included",
+                                "currentValue": 0.0,
+                                "limit": 1000.0,
+                                "nextResetTime": "0001-01-01T00:00:00Z",
+                                "quotaPeriod": "30.00:00:00",
+                                "unit": "Count"
+                            },
+                            {
+                                "name": {
+                                    "value": "TextAnalytics.CtEvaluation",
+                                    "localizedValue": "TextAnalytics.CtEvaluation"
+                                },
+                                "status": "Included",
+                                "currentValue": 0.0,
+                                "limit": 5000.0,
+                                "nextResetTime": "0001-01-01T00:00:00Z",
+                                "quotaPeriod": "30.00:00:00",
+                                "unit": "Count"
+                            },
+                            {
+                                "name": {
+                                    "value": "TextAnalytics.CustomHealthcare",
+                                    "localizedValue": "TextAnalytics.CustomHealthcare"
+                                },
+                                "status": "Included",
+                                "currentValue": 0.0,
+                                "limit": 10000.0,
+                                "nextResetTime": "0001-01-01T00:00:00Z",
+                                "quotaPeriod": "30.00:00:00",
+                                "unit": "Count"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "627"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "12"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: BB7C73DE36074BD395BBEA4D7C4E3390 Ref B: CYS013050704037 Ref C: 2026-10-16T18:54:39Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "8147f9c0-7817-4486-9969-056b6ea77770"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 18:54:39 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=7VE9b8IwFPwvVtuJkA%2fAgkioimiRgshSKEFVFtt5BDfEjmwnkCL%2bew1Spy4MHTvccPe%2b9O7OSMDJLLkoNQrP6DVard9XAQrR3phah65bEUEKqECYPvlqFPSZrFzdUM0Urw2XQrs%2bxjs8GmMHCKHOMGfUITAZOwEFNhkFHqU5dmslW56D0m7CmZJa7kx%2fJgvBDW9hBarlDLRLGJONMPqZ1Nxpbbc9MA28YOR42PH8pwdd8notSxBT6BbNx3bvrdN5R4JNF39Kng4Mi8Vba3mzncWYio2ms5PVFnta5YerBv6R0%2fRwq1t%2bSl6i412YH%2fnSgqbz4XWPRXfX3HW%2fndtt%2fTwW3uMgR5ceIqqKikJBQQzkt4es59Fbgnq3QBKiSlBWOmc%2fmWQozP5T%2beX4n6WSoQu6fAM%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=7VE9b8IwFPwvVtuJkA/AgkioimiRgshSKEFVFtt5BDfEjmwnkCL%2Bew1Spy4MHTvccPe%2B9O7OSMDJLLkoNQrP6DVard9XAQrR3phah65bEUEKqECYPvlqFPSZrFzdUM0Urw2XQrs%2Bxjs8GmMHCKHOMGfUITAZOwEFNhkFHqU5dmslW56D0m7CmZJa7kx/JgvBDW9hBarlDLRLGJONMPqZ1Nxpbbc9MA28YOR42PH8pwdd8notSxBT6BbNx3bvrdN5R4JNF39Kng4Mi8Vba3mzncWYio2ms5PVFnta5YerBv6R0/Rwq1t%2BSl6i412YH/nSgqbz4XWPRXfX3HW/ndtt/TwW3uMgR5ceIqqKikJBQQzkt4es59Fbgnq3QBKiSlBWOmc/mWQozP5T%2BeX4n6WSoQu6fAM%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "635"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "12"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 12802487F4FF4BEB954758DCCFD70B25 Ref B: CYS013050702017 Ref C: 2026-10-16T18:54:40Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "9e79efcb-a5be-4e2b-a403-1b9c8f6f8b20"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 18:54:41 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=7VHBTsJAFPyXjXqytBRogIQYUkVLaEwAaWO47G4fZW272%2bxuWyrh310wxoMH%2fQAPc5h5k%2fdeZo6Iw0EvGM8UGh%2fRw3S1flm5aIz2WpdqbNsF5jiFArju4PdKQoeKwlYVUVSyUjPBld31vJ03GHoWYEysfkKJhWE0tFwCdDRwHUISzy6lqFkCUtkho1IosdMdX6ScaVbDCmTNKCgbUyoqrtUdLplVG7c5MHEdd2A5nuV0b65Uxsq1yIBPoJ1Xr%2fHeWUezFrubNngTLOppGvBlbXgV%2b4FH%2bEYR%2f2C0%2bZ4USX7WoNswEuWXueFteD9t%2foRZwxYGJJr1z3tif%2f64zBu2i7tJwJ3rXoJOt99pPvMnkScmUyNiWUzTVEKKNSSX703A02WIPv0hlhlIIx23XwVs0Xj7X8GPWn6tYItO6PQB"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=7VHBTsJAFPyXjXqytBRogIQYUkVLaEwAaWO47G4fZW272%2BxuWyrh310wxoMH/QAPc5h5k/deZo6Iw0EvGM8UGh/Rw3S1flm5aIz2WpdqbNsF5jiFArju4PdKQoeKwlYVUVSyUjPBld31vJ03GHoWYEysfkKJhWE0tFwCdDRwHUISzy6lqFkCUtkho1IosdMdX6ScaVbDCmTNKCgbUyoqrtUdLplVG7c5MHEdd2A5nuV0b65Uxsq1yIBPoJ1Xr/HeWUezFrubNngTLOppGvBlbXgV%2B4FH%2BEYR/2C0%2BZ4USX7WoNswEuWXueFteD9t/oRZwxYGJJr1z3tif/64zBu2i7tJwJ3rXoJOt99pPvMnkScmUyNiWUzTVEKKNSSX703A02WIPv0hlhlIIx23XwVs0Xj7X8GPWn6tYItO6PQB",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "9517"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "12"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: BEBE893EDDE6432F9449105BB5C6B38C Ref B: CYS013050701017 Ref C: 2026-10-16T18:54:41Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "439c7fbf-6bb1-495c-9a7b-1cc5f78a8f53"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 18:54:41 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service-usage/providers/Microsoft.CognitiveServices/accounts/cctestusage743534561266",
+                                "name": "cctestusage743534561266",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"101f88be-0000-0200-0000-6ad272df0000\"",
+                                "location": "eastus2",
+                                "sku": {
+                                    "name": "S"
+                                },
+                                "kind": "TextAnalytics",
+                                "properties": {
+                                    "endpoint": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                    "internalId": "f8029c25d77446198ceae5b9e19570ca",
+                                    "dateCreated": "2026-10-16T18:52:29.1437971Z",
+                                    "apiProperties": {
+                                        "qnaAzureSearchEndpointKey": null
+                                    },
+                                    "callRateLimit": {
+                                        "rules": [
+                                            {
+                                                "key": "workflow.endpoint.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/:analyze-conversations",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.conversations.jobs.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/jobs/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.conversations.jobs.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/jobs",
+                                                        "method": "POST"
+                                                    },
+                                                    {
+                                                        "path": "language/analyze-conversations/jobs/*",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzetext.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/:analyze-text",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzetext.jobs.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/jobs/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzetext.jobs.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 300,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/jobs",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzedocuments.jobs.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-documents/jobs/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyzedocuments.jobs.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-documents/jobs",
+                                                        "method": "POST"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.generate.postcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/:generate",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.authoring.customtext.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.updatecalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.authoring.customtext.march.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/authoring/analyze-text/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.march.updatecalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/authoring/analyze-text/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.authoring.customtext.internal.getcalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/internal/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.internal.updatecalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-text/internal/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.getCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.updateCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.march.getCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/authoring/analyze-conversations/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.march.updateCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/authoring/analyze-conversations/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.internal.getCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/internal/projects/*",
+                                                        "method": "GET"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.unifiedAuthoring.clu.internal.updateCalls",
+                                                "renewalPeriod": 60,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/analyze-conversations/internal/projects/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.customText",
+                                                "renewalPeriod": 60,
+                                                "count": 100,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/v3.1-preview.ct.1/analyze/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyze",
+                                                "renewalPeriod": 60,
+                                                "count": 300,
+                                                "dynamicThrottlingEnabled": true,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/v3.1/analyze/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "text/analytics/v3.2-preview.1/analyze/*",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "text/analytics/v3.2-preview.2/analyze/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.healthcare",
+                                                "renewalPeriod": 60,
+                                                "count": 300,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/v3.1/entities/health",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "text/analytics/v3.2-preview.1/health",
+                                                        "method": "*"
+                                                    },
+                                                    {
+                                                        "path": "text/analytics/v3.2-preview.2/health",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.languagedetection",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/v3.1/languages",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics",
+                                                "renewalPeriod": 60,
+                                                "count": 1000,
+                                                "dynamicThrottlingEnabled": true,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "text/analytics/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "container.billing",
+                                                "renewalPeriod": 10,
+                                                "count": 500,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "billing/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "questionanswering",
+                                                "renewalPeriod": 60,
+                                                "count": 600,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "qnamaker/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "unifiedlanguage.questionanswering",
+                                                "renewalPeriod": 1,
+                                                "count": 3,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/query-knowledgebases/*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "unifiedlanguage.questionanswering.inference",
+                                                "renewalPeriod": 1,
+                                                "count": 10,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "language/:query-*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyze.internal.autoTagging",
+                                                "renewalPeriod": 60,
+                                                "count": 150,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "TextAnalytics/ct-auto-tagging",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "textAnalytics.analyze.internal.evaluation",
+                                                "renewalPeriod": 60,
+                                                "count": 150,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "TextAnalytics/ct-evaluation",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "key": "default",
+                                                "renewalPeriod": 1,
+                                                "count": 20,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "*",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "quotaLimit": {
+                                        "rules": [
+                                            {
+                                                "key": "workflow.endpoint.postcalls",
+                                                "renewalPeriod": 2592000,
+                                                "count": 100000,
+                                                "matchPatterns": [
+                                                    {
+                                                        "path": "/language/:analyze-conversations",
+                                                        "method": "*"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "isMigrated": false,
+                                    "allowProjectManagement": false,
+                                    "privateEndpointConnections": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "capabilities": [
+                                        {
+                                            "name": "DynamicThrottling"
+                                        },
+                                        {
+                                            "name": "VirtualNetworks"
+                                        },
+                                        {
+                                            "name": "EnabledApimVnet",
+                                            "value": "true"
+                                        },
+                                        {
+                                            "name": "TrustedServices",
+                                            "value": "Microsoft.CognitiveServices"
+                                        },
+                                        {
+                                            "name": "CustomerManagedKey"
+                                        },
+                                        {
+                                            "name": "CustomerManagedStorage"
+                                        },
+                                        {
+                                            "name": "Cloud",
+                                            "value": "TextAnalytics.Healthcare,TextAnalytics.Analyze,QuestionAnswer.AllApis,LanguageService.QuestionAnsweringApis"
+                                        },
+                                        {
+                                            "name": "Container",
+                                            "value": "TextAnalytics.Healthcare,TextAnalytics.EntityV3,TextAnalytics.EntityONNX,TextAnalytics.Keyphrase,TextAnalytics.KeyphraseV2,TextAnalytics.KeyPhraseONNX,TextAnalytics.LanguageFastText,TextAnalytics.Language,TextAnalytics.LanguageV2,TextAnalytics.Sentiment,TextAnalytics.SentimentV2,TextAnalytics.SentimentV3,TextAnalytics.SentimentV3Preview,TextAnalytics.SentimentONNX,TextAnalytics.CustomNER,TextAnalytics.textanalyticsdispatcher,TextAnalytics.SummarizationFrontend,TextAnalytics.SummarizationWorker,TextAnalytics.PII,TextAnalytics.CluRuntime,TextAnalytics.CluContainer,TextAnalytics.NER"
+                                        }
+                                    ],
+                                    "endpoints": {
+                                        "Text Analytics": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Custom Text Authoring": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Conversational Language Understanding Authoring": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Custom Question Answering Authoring": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Custom Question Answering": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "ConversationalLURuntime": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Language": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Language Remote MCP Server": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "QnAMaker": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Turing": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "QuestionAnswering": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "LUIS": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/",
+                                        "Container": "https://cctestusage743534561266-f8029.cognitiveservices.azure.com/"
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-10-16T18:52:28.8712473Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-10-16T18:52:28.8712473Z"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&%24skiptoken=7VHLTsJAFP2Xibqy9AE00IQYgqIlNiaAQEw387iUse1MMzMtr%2fDvDhjjwoV%2bgIuzOOee3HtzzhEJ2JlnLnKNoiN6GM7mr7MARWhjTKUj1y2xwBmUIEwLH2oFLSpLV9dEU8Urw6XQrh%2bG67DbCx3AmDgdRomDod9zAgK03w08QljoVko2nIHSbsKpklquTWskM8ENb2AGquEUtIsplbUw%2bg5X3Gms2x4YBF7QdbzQ8fybK53zai5zEAPYT%2bq31cabL8d7HCz28bvky7ahsZg2lterURwSsdBktLPaZENKVpw18LecLIvL3PJDcj%2fc%2fgnjLX%2b2IMtx57xnNZo8TostX698Fgvvus3Q6fY7zRfxJAtmM7UiVuUwyxRk2AC7fG8DHk4T9OlPsMpBWemYfhWQoij9r%2bBHLb9WkKITOn0A"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2025-06-01&$skiptoken=7VHLTsJAFP2Xibqy9AE00IQYgqIlNiaAQEw387iUse1MMzMtr/DvDhjjwoV%2BgIuzOOee3HtzzhEJ2JlnLnKNoiN6GM7mr7MARWhjTKUj1y2xwBmUIEwLH2oFLSpLV9dEU8Urw6XQrh%2BG67DbCx3AmDgdRomDod9zAgK03w08QljoVko2nIHSbsKpklquTWskM8ENb2AGquEUtIsplbUw%2Bg5X3Gms2x4YBF7QdbzQ8fybK53zai5zEAPYT%2Bq31cabL8d7HCz28bvky7ahsZg2lterURwSsdBktLPaZENKVpw18LecLIvL3PJDcj/c/gnjLX%2B2IMtx57xnNZo8TostX698Fgvvus3Q6fY7zRfxJAtmM7UiVuUwyxRk2AC7fG8DHk4T9OlPsMpBWemYfhWQoij9r%2BBHLb9WkKITOn0A",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "12"
+                    ],
+                    "x-envoy-upstream-service-time": [
+                        "11"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 9EA853607BD04BED95A41F8422DB0248 Ref B: CYS013050701019 Ref C: 2026-10-16T18:54:42Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "27598d9d-7c8b-4d91-9282-bc497824bd2c"
+                    ],
+                    "date": [
+                        "Fri, 16 Oct 2026 18:54:41 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        }
+    ]
+}

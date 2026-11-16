@@ -15,6 +15,19 @@ class ConnectTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertIn('Tags', resources[0])
+
+    def test_connect_instance_tag_filter(self):
+        session_factory = self.replay_flight_data("test_connect_query")
+        p = self.load_policy(
+            {
+                "name": "connect-instance-tag-filter-test",
+                "resource": "connect-instance",
+                "filters": [{"tag:BA": "present"}]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_connect_instance_attribute(self):
         session_factory = self.replay_flight_data("test_connect_instance_attribute")
@@ -133,6 +146,9 @@ class ConnectCampaignTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(2, len(resources))
+        self.assertIn('Tags', resources[0])
+        # confirm detail_spec enrichment still runs alongside tag augmentation
+        self.assertIn('connectInstanceConfig', resources[0])
 
     def test_connect_campaign_instance_config(self):
         session_factory = self.replay_flight_data("test_connect_campaign_instance_config_filter")

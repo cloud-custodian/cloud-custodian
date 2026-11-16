@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "AppBlocks": [
+            {
+                "Name": "c7n-test-app-block",
+                "Arn": "arn:aws:appstream:us-east-1:644160558196:app-block/c7n-test-app-block",
+                "SourceS3Location": {
+                    "S3Bucket": "c7n-appstream-placebo-644160558196-us-east-1",
+                    "S3Key": "app-block/c7n.vhdx"
+                },
+                "SetupScriptDetails": {
+                    "ScriptS3Location": {
+                        "S3Bucket": "c7n-appstream-placebo-644160558196-us-east-1",
+                        "S3Key": "app-block/setup.ps1"
+                    },
+                    "ExecutablePath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                    "ExecutableParameters": "-File setup.ps1",
+                    "TimeoutInSeconds": 60
+                },
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 14,
+                    "second": 11,
+                    "microsecond": 516000
+                },
+                "PackagingType": "CUSTOM",
+                "State": "ACTIVE",
+                "AppBlockErrors": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

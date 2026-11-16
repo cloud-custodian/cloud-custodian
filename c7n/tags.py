@@ -1423,15 +1423,12 @@ class CopyRelatedResourceTag(Tag):
         client = utils.local_session(
             self.manager.session_factory).client(
                 'resourcegroupstaggingapi', region_name=related_region)
-        from c7n.query import RetryPageIterator
-        paginator = client.get_paginator('get_resources')
-        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
 
-        resource_tag_results = client.get_resources(
-            ResourceARNList=list(ids))['ResourceTagMappingList']
-        resource_tag_map = {
-            r['ResourceARN']: {r['Key']: r['Value'] for r in r['Tags']}
-            for r in resource_tag_results}
+        # GetResources takes 1 to 100 arns per call
+        resource_tag_map = {}
+        for arn_set in utils.chunks(ids, 100):
+            for r in client.get_resources(ResourceARNList=arn_set)['ResourceTagMappingList']:
+                resource_tag_map[r['ResourceARN']] = {t['Key']: t['Value'] for t in r['Tags']}
         return resource_tag_map
 
     @classmethod

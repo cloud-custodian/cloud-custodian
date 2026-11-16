@@ -1,0 +1,27 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sat, 24 Oct 2026 15:58:51 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=109",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "716",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks/custodian-auto-audit-c7n-selection-380a8d93?alt=json"
+  },
+  "body": {
+    "name": "custodian-auto-audit-c7n-selection-380a8d93",
+    "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/custodian-auto-audit-c7n-selection-380a8d93",
+    "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"v1.compute.instances.insert\") AND ((NOT operation.first:* AND NOT operation.last:*) OR operation.first = true OR operation.last = true)",
+    "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+    "createTime": "2026-10-24T15:58:48.481128327Z",
+    "updateTime": "2026-10-24T15:58:50.539529339Z",
+    "resourceName": "projects/cloud-custodian/sinks/custodian-auto-audit-c7n-selection-380a8d93"
+  }
+}

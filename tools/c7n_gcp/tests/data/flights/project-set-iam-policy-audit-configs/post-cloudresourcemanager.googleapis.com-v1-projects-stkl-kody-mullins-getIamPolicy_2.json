@@ -1,0 +1,99 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 14 Oct 2026 22:39:00 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=245",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2034",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwZd1Jjn4PI=",
+    "bindings": [
+      {
+        "role": "roles/aiplatform.customCodeServiceAgent",
+        "members": [
+          "serviceAccount:service-82151825516@gcp-sa-aiplatform-cc.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/aiplatform.serviceAgent",
+        "members": [
+          "serviceAccount:service-82151825516@gcp-sa-aiplatform.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/aiplatform.tuningServiceAgent",
+        "members": [
+          "serviceAccount:service-82151825516@gcp-sa-vertex-tune.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/compute.instanceGroupManagerServiceAgent",
+        "members": [
+          "serviceAccount:82151825516@cloudservices.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/compute.serviceAgent",
+        "members": [
+          "serviceAccount:service-82151825516@compute-system.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/editor",
+        "members": [
+          "serviceAccount:82151825516-compute@developer.gserviceaccount.com",
+          "user:user1@example.com",
+          "user:user2@example.com"
+        ]
+      },
+      {
+        "role": "roles/logging.serviceAgent",
+        "members": [
+          "serviceAccount:service-82151825516@gcp-sa-logging.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/owner",
+        "members": [
+          "user:user2@example.com",
+          "user:user3@example.com"
+        ]
+      },
+      {
+        "role": "roles/pubsub.serviceAgent",
+        "members": [
+          "serviceAccount:service-82151825516@gcp-sa-pubsub.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/viewer",
+        "members": [
+          "serviceAccount:c7n-audit-config-test@stkl-kody-mullins.iam.gserviceaccount.com"
+        ]
+      }
+    ],
+    "auditConfigs": [
+      {
+        "service": "allServices",
+        "auditLogConfigs": [
+          {
+            "logType": "DATA_READ"
+          },
+          {
+            "logType": "DATA_WRITE"
+          }
+        ]
+      }
+    ]
+  }
+}

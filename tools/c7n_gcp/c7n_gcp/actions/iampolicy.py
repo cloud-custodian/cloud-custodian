@@ -1,24 +1,91 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters.iampolicy import IamPolicyFilter
 
+_AUDIT_LOG_CONFIG_SCHEMA = {
+    'type': 'object',
+    'required': ['log-type'],
+    'additionalProperties': False,
+    'properties': {
+        'log-type': {
+            'type': 'string',
+            'enum': ['ADMIN_READ', 'DATA_READ', 'DATA_WRITE'],
+        },
+        'exempted-members': {
+            'type': 'array',
+            'items': {'type': 'string'},
+            'minItems': 1,
+        },
+    },
+}
+
+_AUDIT_CONFIG_SCHEMA = {
+    'type': 'array',
+    'minItems': 1,
+    'items': {
+        'type': 'object',
+        'required': ['service', 'audit-log-configs'],
+        'additionalProperties': False,
+        'properties': {
+            'service': {'type': 'string'},
+            'audit-log-configs': {
+                'type': 'array',
+                'minItems': 1,
+                'items': _AUDIT_LOG_CONFIG_SCHEMA,
+            },
+        },
+    },
+}
+
+# Removals also accept exempted-members: '*' to clear every exempted member.
+_REMOVE_AUDIT_LOG_CONFIG_SCHEMA = {
+    **_AUDIT_LOG_CONFIG_SCHEMA,
+    'properties': {
+        **_AUDIT_LOG_CONFIG_SCHEMA['properties'],
+        'exempted-members': {'oneOf': [
+            _AUDIT_LOG_CONFIG_SCHEMA['properties']['exempted-members'],
+            {'enum': ['*']},
+        ]},
+    },
+}
+
+_REMOVE_AUDIT_CONFIG_SCHEMA = {
+    'type': 'array',
+    'minItems': 1,
+    'items': {
+        'type': 'object',
+        'required': ['service', 'audit-log-configs'],
+        'additionalProperties': False,
+        'properties': {
+            'service': {'type': 'string'},
+            'audit-log-configs': {
+                'type': 'array',
+                'minItems': 1,
+                'items': _REMOVE_AUDIT_LOG_CONFIG_SCHEMA,
+            },
+        },
+    },
+}
+
 
 class SetIamPolicy(MethodAction):
-    """ Sets IAM policy. It works with bindings only.
+    """ Sets IAM policy. Supports both role bindings and auditConfigs (Data Access audit logs).
 
         The action supports two lists for modifying the existing IAM policy: `add-bindings` and
-        `remove-bindings`. The `add-bindings` records are merged with the existing bindings, hereby
-        no changes are made if all the required bindings are already present in the applicable
-        resource. The `remove-bindings` records are used to filter out the existing bindings,
-        so the action will take no effect if there are no matches. For more information,
+        `remove-bindings`. The `add-bindings` records are merged with the existing bindings,
+        hereby no changes are made if all the required bindings are already present in the
+        applicable resource. The `remove-bindings` records are used to filter out the existing
+        bindings, so the action will take no effect if there are no matches. For more information,
         please refer to the `_add_bindings` and `_remove_bindings` methods respectively.
 
-        Considering a record added both to the `add-bindings` and `remove-bindings` lists, which
-        though is not a recommended thing to do in general, the latter is designed to be a more
-        restrictive one, so the record will be removed from the existing IAM bindings in the end.
+        Considering a record added both to the `add-bindings` and `remove-bindings` lists,
+        which though is not a recommended thing to do in general, the latter is designed to be a
+        more restrictive one, so the record will be removed from the existing IAM bindings in the
+        end.
 
         There following member types are available to work with:
         - allUsers,
@@ -28,8 +95,18 @@ class SetIamPolicy(MethodAction):
         - domain,
         - serviceAccount.
 
-        Note the `resource` field in the example that could be changed to another resource that has
-        both `setIamPolicy` and `getIamPolicy` methods (such as gcp.spanner-database-instance).
+        The `add-audit-configs` and `remove-audit-configs` keys allow enabling, disabling,
+        or adjusting Data Access audit logs (`ADMIN_READ`, `DATA_READ`, `DATA_WRITE`) and
+        their `exemptedMembers`. When removing, if no `exempted-members` are specified the
+        entire `log-type` entry is removed; if `exempted-members` are specified only those
+        members are pruned. A service entry is dropped entirely when all its log-types are removed.
+        In `remove-audit-configs` only, `exempted-members: '*'` clears every exempted member
+        while keeping the log type enabled, and `service: '*'` applies the entry to every
+        service in the policy. `service: '*'` requires `exempted-members` on each log type, so
+        it can never disable logging.
+
+        Note the `resource` field in the examples that could be changed to another resource that
+        has both `setIamPolicy` and `getIamPolicy` methods (such as gcp.spanner-database-instance).
 
         Example using exact values:
 
@@ -78,6 +155,61 @@ class SetIamPolicy(MethodAction):
                 actions:
                   - type: set-iam-policy
                     remove-bindings: matched
+
+        Example enabling Data Access audit logs and adding an exempted member:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: enable-data-access-audit-logs
+                resource: gcp.project
+                actions:
+                  - type: set-iam-policy
+                    add-audit-configs:
+                      - service: allServices
+                        audit-log-configs:
+                          - log-type: DATA_READ
+                          - log-type: DATA_WRITE
+                            exempted-members:
+                              - user:admin@example.com
+
+        Example removing a specific audit log type:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: remove-data-write-audit-log
+                resource: gcp.project
+                actions:
+                  - type: set-iam-policy
+                    remove-audit-configs:
+                      - service: allServices
+                        audit-log-configs:
+                          - log-type: DATA_WRITE
+
+        Example clearing every exempted member on every service while keeping logging on:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: remove-data-access-audit-exemptions
+                resource: gcp.project
+                filters:
+                  - type: iam-policy
+                    doc:
+                      key: "auditConfigs[].auditLogConfigs[].exemptedMembers[]"
+                      value: not-null
+                actions:
+                  - type: set-iam-policy
+                    remove-audit-configs:
+                      - service: '*'
+                        audit-log-configs:
+                          - log-type: ADMIN_READ
+                            exempted-members: '*'
+                          - log-type: DATA_READ
+                            exempted-members: '*'
+                          - log-type: DATA_WRITE
+                            exempted-members: '*'
         """
     schema = type_schema('set-iam-policy',
                          **{
@@ -107,52 +239,106 @@ class SetIamPolicy(MethodAction):
                                                  {'enum': ['*']}]}}}
                                  ]
                              },
+                             'add-audit-configs': _AUDIT_CONFIG_SCHEMA,
+                             'remove-audit-configs': _REMOVE_AUDIT_CONFIG_SCHEMA,
                          })
     method_spec = {'op': 'setIamPolicy'}
     schema_alias = True
 
+    def validate(self):
+        super().validate()
+        for spec in self.data.get('add-audit-configs', []):
+            if spec['service'] == '*':
+                raise PolicyValidationError(
+                    f"{self.type}: add-audit-configs does not support service '*'")
+        for spec in self.data.get('remove-audit-configs', []):
+            # Dropping whole log types from every service would wipe all audit logging.
+            if spec['service'] == '*' and any(
+                    'exempted-members' not in lc for lc in spec['audit-log-configs']):
+                raise PolicyValidationError(
+                    f"{self.type}: remove-audit-configs with service '*' requires "
+                    "exempted-members on every audit-log-config")
+        return self
+
     def get_resource_params(self, model, resource):
         """
-        Collects `existing_bindings` with the `_get_existing_bindings` method, `add_bindings` and
-        `remove_bindings` from a policy, applies `_add_bindings` to the `existing_bindings`, then
-        removes bindings either via `_remove_matched_bindings` (when ``remove-bindings: matched``)
-        or `_remove_bindings` (when an explicit list is provided), and finally sets the resulting
-        list at the 'bindings' key if there is at least a single record there, or assigns an empty
-        object to the 'policy' key in order to avoid errors produced by the API.
+        Fetches the full existing IAM policy once via `_get_existing_policy`, then:
+        - merges/removes bindings via `_add_bindings` / `_remove_bindings` /
+          `_remove_matched_bindings`,
+        - merges/removes auditConfigs via `_add_audit_configs` / `_remove_audit_configs`,
+        - round-trips the policy `etag` to prevent lost-update races and `version` to
+          preserve IAM Conditions support (version 3 policies),
+        - assembles the final `setIamPolicy` body.
 
         :param model: the parameters that are defined in a resource manager
         :param resource: the resource the action is applied to
         """
         params = self._verb_arguments(resource)
-        existing_bindings = self._get_existing_bindings(model, resource)
+        policy = self._get_existing_policy(model, resource)
+
+        existing_bindings = policy.get('bindings', [])
+        existing_audit_configs = policy.get('auditConfigs', [])
+
         add_bindings = self.data.get('add-bindings', [])
         remove_bindings = self.data.get('remove-bindings', [])
-        bindings_to_set = self._add_bindings(existing_bindings, add_bindings)
+        add_audit_configs = self.data.get('add-audit-configs', [])
+        remove_audit_configs = self.data.get('remove-audit-configs', [])
 
+        bindings_to_set = self._add_bindings(existing_bindings, add_bindings)
         if remove_bindings == 'matched':
             matched_pairs = resource.get(IamPolicyFilter.annotation_key, [])
             bindings_to_set = self._remove_matched_bindings(bindings_to_set, matched_pairs)
         else:
             bindings_to_set = self._remove_bindings(bindings_to_set, remove_bindings)
 
-        params['body'] = {
-            'policy': {'bindings': bindings_to_set} if len(bindings_to_set) > 0 else {}}
+        audit_configs_to_set = self._add_audit_configs(existing_audit_configs, add_audit_configs)
+        audit_configs_to_set = self._remove_audit_configs(
+            audit_configs_to_set, remove_audit_configs)
+
+        changes_bindings = bool(add_bindings or remove_bindings)
+        changes_audit_configs = bool(add_audit_configs or remove_audit_configs)
+
+        new_policy = {}
+        # Audit-only updates leave bindings out of both the body and the update mask, so
+        # conditional bindings (which a non-v3 getIamPolicy returns without their
+        # conditions) are never written back.
+        if bindings_to_set and (changes_bindings or not changes_audit_configs):
+            new_policy['bindings'] = bindings_to_set
+        if audit_configs_to_set:
+            new_policy['auditConfigs'] = audit_configs_to_set
+        if 'etag' in policy:
+            new_policy['etag'] = policy['etag']
+        if 'version' in policy:
+            new_policy['version'] = policy['version']
+
+        params['body'] = {'policy': new_policy}
+        if changes_audit_configs:
+            mask = ['bindings', 'etag', 'auditConfigs'] if changes_bindings else [
+                'etag', 'auditConfigs']
+            params['body']['updateMask'] = ','.join(mask)
         return params
 
-    def _get_existing_bindings(self, model, resource):
+    def _get_existing_policy(self, model, resource):
         """
-        Calls the `getIamPolicy` method on the resource the action is applied to and returns
-        either a list of existing bindings or an empty one if there is no 'bindings' key.
+        Calls the `getIamPolicy` method and returns the full policy dict.
 
-        :param model: the same as in `get_resource_params` (needed to take `component` from)
-        :param resource: the same as in `get_resource_params` (passed into `_verb_arguments`)
+        :param model: the same as in `get_resource_params`
+        :param resource: the same as in `get_resource_params`
         """
-        existing_bindings = local_session(self.manager.session_factory).client(
+        return local_session(self.manager.session_factory).client(
             self.manager.resource_type.service,
             self.manager.resource_type.version,
             model.component).execute_query(
             'getIamPolicy', verb_arguments=self._verb_arguments(resource))
-        return existing_bindings['bindings'] if 'bindings' in existing_bindings else []
+
+    def _get_existing_bindings(self, model, resource):
+        """
+        Returns the existing `bindings` list from the current IAM policy.
+
+        :param model: the same as in `get_resource_params`
+        :param resource: the same as in `get_resource_params`
+        """
+        return self._get_existing_policy(model, resource).get('bindings', [])
 
     def _verb_arguments(self, resource):
         """
@@ -264,6 +450,136 @@ class SetIamPolicy(MethodAction):
             if updated_members:
                 bindings.append({**binding, 'members': updated_members})
         return bindings
+
+    def _add_audit_configs(self, existing, to_add):
+        """Merge new auditConfig entries into the existing list.
+
+        For each service in `to_add`:
+        - If the service is not present in `existing`, it is added wholesale.
+        - If the service already exists, its `auditLogConfigs` are merged by `logType`:
+          - New log types are appended.
+          - Existing log types have their `exemptedMembers` unioned (no duplicates).
+
+        This method is idempotent: running it again with the same `to_add` produces no change.
+
+        :param existing: list of auditConfig dicts from the current IAM policy
+        :param to_add: list of auditConfig specs from the policy YAML
+        """
+        by_service = {e['service']: e for e in existing}
+
+        for spec in to_add:
+            service = spec['service']
+            new_log_configs = spec.get('audit-log-configs', [])
+
+            if service not in by_service:
+                by_service[service] = {
+                    'service': service,
+                    'auditLogConfigs': [self._spec_to_log_config(lc) for lc in new_log_configs],
+                }
+            else:
+                existing_entry = by_service[service]
+                existing_by_type = {
+                    lc['logType']: lc
+                    for lc in existing_entry.get('auditLogConfigs', [])
+                }
+                for lc_spec in new_log_configs:
+                    log_type = lc_spec['log-type']
+                    new_members = lc_spec.get('exempted-members', [])
+                    if log_type not in existing_by_type:
+                        existing_by_type[log_type] = self._spec_to_log_config(lc_spec)
+                    elif new_members:
+                        existing_members = existing_by_type[log_type].get('exemptedMembers', [])
+                        merged = list(dict.fromkeys(existing_members + new_members))
+                        existing_by_type[log_type] = {'logType': log_type,
+                                                       'exemptedMembers': merged}
+                existing_entry['auditLogConfigs'] = list(existing_by_type.values())
+
+        return list(by_service.values())
+
+    def _remove_audit_configs(self, existing, to_remove):
+        """Prune auditConfig entries from the existing list.
+
+        For each service in `to_remove` (`'*'` matches every service in `existing`):
+        - If the service is not present in `existing`, it is skipped (no-op).
+        - For each log type in the removal spec:
+          - If no `exempted-members` are specified, the entire log type entry is removed.
+          - If `exempted-members` is `'*'`, every exempted member is removed; the log type
+            itself is kept.
+          - If `exempted-members` are specified, only those members are removed from the
+            `exemptedMembers` list; the log type itself is kept (even if exemptedMembers
+            becomes empty, the logType remains enabled).
+        - If removing log types empties a service's `auditLogConfigs`, that service entry
+          is dropped entirely.
+
+        :param existing: list of auditConfig dicts from the current IAM policy
+        :param to_remove: list of auditConfig specs from the policy YAML
+        """
+        removals = {}
+        for spec in to_remove:
+            types = removals.setdefault(spec['service'], {})
+            for lc_spec in spec.get('audit-log-configs', []):
+                self._merge_audit_log_removal(
+                    types, lc_spec['log-type'], lc_spec.get('exempted-members', []))
+        wildcard_types = removals.pop('*', {})
+        result = []
+
+        for entry in existing:
+            service = entry['service']
+            if service not in removals and not wildcard_types:
+                result.append(entry)
+                continue
+
+            types_to_remove = dict(removals.get(service, {}))
+            for log_type, members in wildcard_types.items():
+                self._merge_audit_log_removal(types_to_remove, log_type, members)
+
+            filtered_log_configs = []
+            for lc in entry.get('auditLogConfigs', []):
+                log_type = lc['logType']
+                if log_type not in types_to_remove:
+                    filtered_log_configs.append(lc)
+                    continue
+                members_to_remove = types_to_remove[log_type]
+                if not members_to_remove:
+                    continue
+                if members_to_remove == '*':
+                    filtered_log_configs.append({'logType': log_type})
+                    continue
+                remaining = [m for m in lc.get('exemptedMembers', []) if m not in members_to_remove]
+                pruned = {'logType': log_type}
+                if remaining:
+                    pruned['exemptedMembers'] = remaining
+                filtered_log_configs.append(pruned)
+
+            if filtered_log_configs:
+                result.append({'service': service, 'auditLogConfigs': filtered_log_configs})
+
+        return result
+
+    def _merge_audit_log_removal(self, types, log_type, members):
+        """Accumulate a log-type removal so repeated specs don't overwrite each other.
+
+        An empty member list (remove the whole log type) wins over `'*'`, which wins over
+        an explicit member list.
+
+        :param types: dict of log type to pending removal, updated in place
+        :param log_type: the log type the removal applies to
+        :param members: `[]`, `'*'`, or a list of exempted members to remove
+        """
+        current = types.get(log_type)
+        if current == [] or not members:
+            types[log_type] = []
+        elif current == '*' or members == '*':
+            types[log_type] = '*'
+        else:
+            types[log_type] = (current or []) + members
+
+    def _spec_to_log_config(self, spec):
+        """Convert a policy YAML log-config spec to a GCP auditLogConfig dict."""
+        lc = {'logType': spec['log-type']}
+        if 'exempted-members' in spec:
+            lc['exemptedMembers'] = list(spec['exempted-members'])
+        return lc
 
     def _get_roles_to_bindings_dict(self, bindings_list):
         """

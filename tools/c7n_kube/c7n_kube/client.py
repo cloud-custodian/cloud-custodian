@@ -16,11 +16,36 @@
 
 import logging
 import os
+import time
 
 from kubernetes import config, client
 from kubernetes.client import Configuration, ApiClient
 
+from c7n.output import APICallStats, api_stats_outputs, record_api_call
+
 log = logging.getLogger("custodian.k8s.client")
+
+
+class InstrumentedAPI:
+    """Wraps a kubernetes api object (e.g. CoreV1Api) to record each public
+    method call, by method name, with its duration."""
+
+    def __init__(self, api):
+        self._api = api
+
+    def __getattr__(self, name):
+        attr = getattr(self._api, name)
+        if name.startswith("_") or not callable(attr):
+            return attr
+
+        def call(*args, **kwargs):
+            start = time.perf_counter()
+            try:
+                return attr(*args, **kwargs)
+            finally:
+                record_api_call(name, time.perf_counter() - start)
+
+        return call
 
 
 class Session:
@@ -35,4 +60,9 @@ class Session:
         api_client = ApiClient(configuration=client_config)
         log.debug("connecting to %s" % (api_client.configuration.host))
         # e.g. client.CoreV1Api()
-        return getattr(client, "%s%sApi" % (group, version))(api_client)
+        return InstrumentedAPI(getattr(client, "%s%sApi" % (group, version))(api_client))
+
+
+@api_stats_outputs.register("k8s")
+class APIStats(APICallStats):
+    """Count kubernetes api calls by client method name, and their time."""

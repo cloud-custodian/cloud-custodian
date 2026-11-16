@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueId": {
+            "type": "string"
+        },
+        "workspaceName": {
+            "type": "string",
+            "defaultValue": "cctestmlworkspace"
+        },
+        "environmentName": {
+            "type": "string",
+            "defaultValue": "cctest-env"
+        },
+        "archivedEnvironmentName": {
+            "type": "string",
+            "defaultValue": "cctest-archived-env"
+        }
+    },
+    "variables": {
+        "workspaceName": "[concat(parameters('workspaceName'), parameters('uniqueId'))]",
+        "storageAccountName": "[concat('cctestml', parameters('uniqueId'))]",
+        "keyVaultName": "[concat('cctestmlkv', parameters('uniqueId'))]",
+        "appInsightsName": "[concat('cctestmlai', parameters('uniqueId'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-09-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "eastus",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2"
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2021-10-01",
+            "name": "[variables('keyVaultName')]",
+            "location": "eastus",
+            "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "accessPolicies": []
+            }
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[variables('appInsightsName')]",
+            "location": "eastus",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            }
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces",
+            "apiVersion": "2023-04-01",
+            "name": "[variables('workspaceName')]",
+            "location": "eastus",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "keyVault": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "applicationInsights": "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+                "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}/{2}', variables('workspaceName'), parameters('environmentName'), '1')]",
+            "properties": {
+                "image": "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:latest",
+                "isArchived": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}/{2}', variables('workspaceName'), parameters('environmentName'), '2')]",
+            "properties": {
+                "image": "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:latest",
+                "isArchived": true
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]",
+                "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', variables('workspaceName'), parameters('environmentName'), '1')]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}/{2}', variables('workspaceName'), parameters('archivedEnvironmentName'), '1')]",
+            "properties": {
+                "image": "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:latest",
+                "isArchived": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', variables('workspaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces/environments",
+            "apiVersion": "2023-04-01",
+            "name": "[format('{0}/{1}', variables('workspaceName'), parameters('archivedEnvironmentName'))]",
+            "properties": {
+                "isArchived": true
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', variables('workspaceName'), parameters('archivedEnvironmentName'), '1')]"
+            ]
+        }
+    ]
+}
