@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Fleets": [
+            {
+                "Arn": "arn:aws:appstream:us-east-1:644160558196:fleet/c7n-test-fleet",
+                "Name": "c7n-test-fleet",
+                "ImageName": "AppStream-WinServer2022-08-31-2026",
+                "ImageArn": "arn:aws:appstream:us-east-1::image/AppStream-WinServer2022-08-31-2026",
+                "InstanceType": "stream.standard.small",
+                "FleetType": "ON_DEMAND",
+                "ComputeCapacityStatus": {
+                    "Desired": 1,
+                    "Running": 0,
+                    "InUse": 0,
+                    "Available": 0,
+                    "AvailableUserSessions": 0,
+                    "ActiveUserSessions": 0,
+                    "ActualUserSessions": 0,
+                    "Draining": 0,
+                    "DrainModeActiveUserSessions": 0,
+                    "DrainModeUnusedUserSessions": 0
+                },
+                "MaxUserDurationInSeconds": 57600,
+                "DisconnectTimeoutInSeconds": 900,
+                "State": "STOPPED",
+                "VpcConfig": {
+                    "SubnetIds": [
+                        "subnet-00577da7461ff5a4c"
+                    ],
+                    "SecurityGroupIds": [
+                        "sg-0ae85023b20e10ca7"
+                    ]
+                },
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 9,
+                    "second": 57,
+                    "microsecond": 914000
+                },
+                "FleetErrors": [],
+                "EnableDefaultInternetAccess": false,
+                "IdleDisconnectTimeoutInSeconds": 0,
+                "StreamView": "APP",
+                "DisableIMDSV1": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

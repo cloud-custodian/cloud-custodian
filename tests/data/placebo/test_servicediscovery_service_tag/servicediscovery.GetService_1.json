@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "Service": {
+            "Id": "srv-nykgvoamypms6afs",
+            "Arn": "arn:aws:servicediscovery:us-east-1:644160558196:service/srv-nykgvoamypms6afs",
+            "ResourceOwner": "644160558196",
+            "Name": "c7n-test-service",
+            "NamespaceId": "ns-oojghklepwvn7r5y",
+            "DnsConfig": {},
+            "Type": "HTTP",
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 10,
+                "hour": 13,
+                "minute": 56,
+                "second": 1,
+                "microsecond": 247000
+            },
+            "CreatorRequestId": "71ada77e-76ec-44a7-9a65-39f2c06274b5",
+            "CreatedByAccount": "644160558196"
+        },
+        "ResponseMetadata": {}
+    }
+}

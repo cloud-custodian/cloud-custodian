@@ -1,18 +1,24 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
+import datetime
 import logging
 
-from c7n.filters import Filter
-from c7n.utils import type_schema
+from azure.mgmt.keyvault import models
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
 from c7n_azure.filters import FirewallBypassFilter, FirewallRulesFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.session import Session
-from c7n_azure.utils import GraphHelper
+from c7n_azure.utils import GraphHelper, model_to_jsonschema
+from dateutil.parser import isoparse
 from netaddr import IPSet
+
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
+from c7n.filters import Filter
+from c7n.utils import type_schema
 
 log = logging.getLogger('custodian.azure.keyvault')
 
@@ -259,6 +265,70 @@ class WhiteListFilter(Filter):
         return access_policies
 
 
+class KeyVaultPropertiesUpdateAction(AzureBaseAction):
+    """Shared date handling for the ``update`` actions on Key Vault child resources.
+
+    ``not_before`` and ``expires_on`` are checked when the policy is validated,
+    then resolved once per run into ``self.not_before`` and ``self.expires_on``
+    for ``_process_resource`` to send. An ``expires_in_days`` value, where the
+    subclass schema allows it, sets the expiration relative to the run.
+    """
+
+    def validate(self):
+        if 'expires_on' in self.data and 'expires_in_days' in self.data:
+            raise PolicyValidationError(
+                f"'expires_on' and 'expires_in_days' are mutually exclusive "
+                f"on {self.manager.data}")
+        for field in ('not_before', 'expires_on'):
+            if field not in self.data:
+                continue
+            try:
+                isoparse(self.data[field])
+            except (TypeError, ValueError):
+                raise PolicyValidationError(
+                    f"'{field}' must be an ISO formatted date, "
+                    f"got {self.data[field]!r} on {self.manager.data}")
+        if self.data.get('not_before') and self.data.get('expires_on'):
+            self._check_window(
+                isoparse(self.data['not_before']),
+                isoparse(self.data['expires_on']),
+                PolicyValidationError)
+        return self
+
+    def _check_window(self, not_before, expires_on, error):
+        # Naive datetimes are sent to Key Vault as UTC, so compare them as UTC.
+        def as_utc(dt):
+            if dt.tzinfo is None:
+                return dt.replace(tzinfo=datetime.timezone.utc)
+            return dt
+
+        if not_before and expires_on and as_utc(not_before) >= as_utc(expires_on):
+            raise error(
+                f"'not_before' ({not_before.isoformat()}) must be earlier than the "
+                f"expiration ({expires_on.isoformat()}) on {self.manager.data}")
+
+    def process(self, resources, event=None):
+        # Imported here so the test harness's patch of utcnow takes effect.
+        from c7n_azure.utils import utcnow
+
+        # Resolved once per run, before resources are split across worker threads,
+        # so every resource gets the same expiration.
+        # isoparse accepts a trailing 'Z', which fromisoformat rejects before Python 3.11.
+        self.not_before = self.expires_on = None
+        if self.data.get('not_before'):
+            self.not_before = isoparse(self.data['not_before'])
+
+        if self.data.get('expires_on'):
+            self.expires_on = isoparse(self.data['expires_on'])
+        elif 'expires_in_days' in self.data:
+            self.expires_on = utcnow() + datetime.timedelta(days=self.data['expires_in_days'])
+
+        # An expires_in_days expiration is only known now; check before updating anything.
+        self._check_window(self.not_before, self.expires_on, PolicyExecutionError)
+
+        return super().process(resources, event)
+
+
 @KeyVault.action_registry.register('update-access-policy')
 class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
     """
@@ -331,3 +401,116 @@ class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
                 "permissions": i['permissions']} for i in access_policies]
 
         return {"accessPolicies": policies}
+
+
+@KeyVault.action_registry.register('update')
+class KeyVaultUpdateAction(AzureBaseAction):
+    """
+    Update a keyvault
+
+    Only the configured properties are sent, as a PATCH; the vault's other
+    settings are left unchanged.
+
+    To keep the tenant id the same, set it to "keep"
+    To keep the sku settings the same, set it to {"current": True}
+
+    Access policies are not supported here, because the PATCH replaces the
+    vault's existing access policy entries. Use the ``update-access-policy``
+    action instead, which supports both ``add`` and ``replace`` operations.
+
+    For more information on Vault patch properties:
+
+    https://learn.microsoft.com/en-us/python/api/azure-mgmt-keyvault/azure.mgmt.keyvault.models.vaultpatchproperties?view=azure-python
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: keyvault-vault-disable-public-access
+              resource: azure.keyvault
+              filters:
+                - name: test
+              actions:
+                - type: update
+                  configuration:
+                    public_network_access: Disabled
+    """
+
+    @staticmethod
+    def generate_schema():
+        configuration = model_to_jsonschema(models.VaultPatchProperties, models)
+        properties = configuration["properties"]
+
+        # handled by the update-access-policy action, which can add or replace
+        del properties["access_policies"]
+
+        properties["sku"] = {
+            "anyOf": [
+                properties["sku"],
+                {
+                    "type": "object",
+                    "properties": {"current": {"enum": [True]}},
+                    "required": ["current"],
+                    "additionalProperties": False,
+                },
+            ]
+        }
+        # optional on NetworkRuleSet, but make_network_acl_rule_set needs them
+        properties["network_acls"]["required"] = ["bypass", "default_action"]
+
+        return type_schema(
+            "update",
+            required=["configuration"],
+            configuration=configuration,
+        )
+
+    schema = generate_schema.__func__()  # python 3.9 compat
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def make_network_acl_rule_set(self, acl):
+        ip_rules = [
+            models.IPRule(**ip_rule)
+            for ip_rule in acl.get("ip_rules", [])
+        ]
+
+        virtual_network_rules = [
+            models.VirtualNetworkRule(**vn_rule)
+            for vn_rule in acl.get("virtual_network_rules", [])
+        ]
+
+        return models.NetworkRuleSet(
+            bypass=acl["bypass"],
+            default_action=acl["default_action"],
+            ip_rules=ip_rules,
+            virtual_network_rules=virtual_network_rules,
+        )
+
+    def _process_resource(self, resource):
+        props = copy.deepcopy(self.data["configuration"])
+
+        if props.get("tenant_id") == "keep":
+            props["tenant_id"] = resource["properties"]["tenantId"]
+
+        if props.get("sku") == {"current": True}:
+            props["sku"] = resource["properties"]["sku"]
+
+        if props.get("sku"):
+            props["sku"] = models.Sku(**props["sku"])
+
+        if props.get("network_acls"):
+            props["network_acls"] = self.make_network_acl_rule_set(props["network_acls"])
+
+        # VaultPatchProperties defaults every field to None, so only the
+        # configured properties are sent; VaultProperties would send its
+        # defaults (e.g. enable_rbac_authorization=False) and overwrite them.
+        params = models.VaultPatchParameters(
+            properties=models.VaultPatchProperties(**props)
+        )
+        self.client.vaults.update(
+            resource_group_name=resource["resourceGroup"],
+            vault_name=resource["name"],
+            parameters=params
+        )
