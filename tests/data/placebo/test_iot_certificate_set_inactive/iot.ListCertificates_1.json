@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "certificates": [
+            {
+                "certificateArn": "arn:aws:iot:us-east-1:644160558196:cert/6969630f630be222c36e9860129f7dd6a9ad132264e8a28b695043c2e68ed7a5",
+                "certificateId": "6969630f630be222c36e9860129f7dd6a9ad132264e8a28b695043c2e68ed7a5",
+                "status": "ACTIVE",
+                "creationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 14,
+                    "second": 8,
+                    "microsecond": 401000
+                }
+            }
+        ]
+    }
+}

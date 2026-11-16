@@ -17,6 +17,16 @@ import c7n.filters.vpc as net_filters
 import json
 
 
+class ConfigWorkspace(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        # config uses the cloudformation schema, which names the id 'Id'
+        if 'Id' in resource:
+            resource['WorkspaceId'] = resource.pop('Id')
+        return resource
+
+
 @resources.register('workspaces')
 class Workspace(QueryResourceManager):
 
@@ -30,7 +40,7 @@ class Workspace(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeWithResourceTags,
-        'config': ConfigSource
+        'config': ConfigWorkspace
     }
 
 
@@ -171,6 +181,23 @@ class WorkspaceImage(QueryResourceManager):
 
 @WorkspaceImage.filter_registry.register('cross-account')
 class WorkspaceImageCrossAccount(CrossAccountAccessFilter):
+    """Find WorkSpaces images that are shared with accounts that are not in the allowed
+    accounts.
+
+    Only the ``whitelist`` and ``whitelist_from`` options are supported.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: workspace-image-cross-account
+            resource: aws.workspaces-image
+            filters:
+              - type: cross-account
+                whitelist:
+                  - "123456789012"
+    """
 
     schema = type_schema(
         'cross-account',
@@ -277,6 +304,9 @@ class WorkspacesDirectorySG(net_filters.SecurityGroupFilter):
 class WorkSpacesDirectorySg(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "SubnetIds[]"
+
+
+WorkspaceDirectory.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
 @WorkspaceDirectory.filter_registry.register('connection-aliases')

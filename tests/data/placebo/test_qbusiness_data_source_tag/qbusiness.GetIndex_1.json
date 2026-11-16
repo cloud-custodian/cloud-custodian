@@ -1,0 +1,104 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "applicationId": "ed27546d-6f28-4480-820e-6592404f720f",
+        "indexId": "33c51a98-a798-4424-bf2a-ecd12c2796a4",
+        "displayName": "c7n-test",
+        "indexArn": "arn:aws:qbusiness:us-east-1:644160558196:application/ed27546d-6f28-4480-820e-6592404f720f/index/33c51a98-a798-4424-bf2a-ecd12c2796a4",
+        "status": "ACTIVE",
+        "type": "STARTER",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 8,
+            "day": 10,
+            "hour": 15,
+            "minute": 51,
+            "second": 55,
+            "microsecond": 314000
+        },
+        "updatedAt": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 8,
+            "day": 10,
+            "hour": 16,
+            "minute": 13,
+            "second": 44,
+            "microsecond": 42000
+        },
+        "capacityConfiguration": {
+            "units": 1
+        },
+        "documentAttributeConfigurations": [
+            {
+                "name": "_authors",
+                "type": "STRING_LIST",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_category",
+                "type": "STRING",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_created_at",
+                "type": "DATE",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_data_source_id",
+                "type": "STRING",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_data_source_type",
+                "type": "STRING",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_document_title",
+                "type": "STRING",
+                "search": "ENABLED"
+            },
+            {
+                "name": "_file_type",
+                "type": "STRING",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_language_code",
+                "type": "STRING",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_last_updated_at",
+                "type": "DATE",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_source_uri",
+                "type": "STRING",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_version",
+                "type": "STRING",
+                "search": "DISABLED"
+            },
+            {
+                "name": "_view_count",
+                "type": "NUMBER",
+                "search": "DISABLED"
+            }
+        ],
+        "error": {},
+        "indexStatistics": {
+            "textDocumentStatistics": {
+                "indexedTextBytes": 20859271,
+                "indexedTextDocumentCount": 1
+            }
+        }
+    }
+}

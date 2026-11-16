@@ -4,12 +4,13 @@
 import uuid
 
 from azure.core.exceptions import AzureError
-from msrestazure.tools import parse_resource_id
 
 from c7n.actions import BaseAction
 from c7n.filters import Filter, FilterValidationError
 from c7n.filters.core import PolicyValidationError, ValueFilter
 from c7n.utils import type_schema
+from c7n_azure.filters import FlowLogsFilter
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import PortsRangeHelper, StringUtils
@@ -290,7 +291,7 @@ class EgressFilter(NetworkSecurityGroupFilter):
 
 
 @NetworkSecurityGroup.filter_registry.register('flow-logs')
-class FlowLogs(ValueFilter):
+class FlowLogs(FlowLogsFilter):
     """Filter a Network Security Group by its associated flow logs. NOTE: only one flow log
     can be assigned to a Network Security Group, but to maintain parity with the Azure API, a list
     of flow logs is returned to the filter.
@@ -314,33 +315,6 @@ class FlowLogs(ValueFilter):
                   op: lt
                   value: 90
     """
-
-    schema = type_schema('flow-logs', rinherit=ValueFilter.schema)
-
-    def _get_flow_logs(self, resource):
-        parsed_ids = [
-            parse_resource_id(log['id'])
-            for log in resource['properties'].get('flowLogs', [])
-        ]
-
-        client = self.manager.get_client()
-
-        return [
-            client.flow_logs.get(
-                parsed_id['resource_group'],
-                parsed_id['name'],
-                parsed_id['resource_name']
-            ).serialize(True).get('properties')
-            for parsed_id in parsed_ids
-        ]
-
-    def __call__(self, resource):
-        key = 'c7n:flow-logs'
-
-        if key not in resource['properties']:
-            resource['properties'][key] = {'logs': self._get_flow_logs(resource)}
-
-        return super().__call__(resource['properties'][key])
 
 
 class NetworkSecurityGroupPortsAction(BaseAction):
@@ -459,3 +433,56 @@ class OpenRules(NetworkSecurityGroupPortsAction):
     """
     schema = type_schema('open', rinherit=NetworkSecurityGroupPortsAction.schema)
     access_action = ALLOW_OPERATION
+
+
+@NetworkSecurityGroup.action_registry.register('remove-rules')
+class RemoveRules(AzureBaseAction):
+    """Remove security rules from a Network Security Group
+
+    Deletes the rules matched by an ``ingress`` or ``egress`` filter, or every rule in
+    that direction with ``all``. Unlike ``close``, which adds a higher priority Deny
+    rule above the offending one, this removes the offending rule itself.
+
+    :example:
+
+    Remove inbound rules that allow traffic from any source
+
+    .. code-block:: yaml
+
+        policies:
+          - name: remove-public-ingress
+            resource: azure.networksecuritygroup
+            filters:
+              - type: ingress
+                source: '*'
+                access: Allow
+            actions:
+              - type: remove-rules
+                ingress: matched
+    """
+    schema = type_schema(
+        'remove-rules',
+        ingress={'type': 'string', 'enum': ['matched', 'all']},
+        egress={'type': 'string', 'enum': ['matched', 'all']},
+    )
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, nsg):
+        for key, direction, annotation in (
+                ('ingress', 'Inbound', IngressFilter.matched_annotation_key),
+                ('egress', 'Outbound', EgressFilter.matched_annotation_key)):
+
+            mode = self.data.get(key, 'matched')
+            if mode == 'matched':
+                rules = nsg.get(annotation, ())
+            elif mode == 'all':
+                rules = [r for r in nsg['properties']['securityRules']
+                         if StringUtils.equal(r['properties']['direction'], direction)]
+            else:
+                continue
+
+            for rule in rules:
+                self.client.security_rules.begin_delete(
+                    nsg['resourceGroup'], nsg['name'], rule['name']).result()

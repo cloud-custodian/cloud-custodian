@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "IdentityProvider": {
+            "UserPoolId": "us-east-1_2Jh0zF94o",
+            "ProviderName": "Google",
+            "ProviderType": "Google",
+            "ProviderDetails": {
+                "attributes_url": "https://people.googleapis.com/v1/people/me?personFields=",
+                "attributes_url_add_attributes": "true",
+                "authorize_scopes": "openid email",
+                "authorize_url": "https://accounts.google.com/o/oauth2/v2/auth",
+                "client_id": "c7n-placeholder.apps.googleusercontent.com",
+                "client_secret": "c7n-placeholder-secret",
+                "oidc_issuer": "https://accounts.google.com",
+                "token_request_method": "POST",
+                "token_url": "https://www.googleapis.com/oauth2/v4/token"
+            },
+            "AttributeMapping": {
+                "email": "email",
+                "username": "sub"
+            },
+            "IdpIdentifiers": [],
+            "LastModifiedDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 4,
+                "hour": 16,
+                "minute": 32,
+                "second": 11,
+                "microsecond": 212000
+            },
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 4,
+                "hour": 16,
+                "minute": 32,
+                "second": 11,
+                "microsecond": 212000
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

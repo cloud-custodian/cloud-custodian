@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArn": "arn:aws:sms-voice:us-east-1:644160558196:pool/pool-812d30eae66149a98277087dbff86b58",
+        "Policy": "{}",
+        "CreatedTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 11,
+            "day": 6,
+            "hour": 14,
+            "minute": 23,
+            "second": 24,
+            "microsecond": 995000
+        },
+        "ResponseMetadata": {}
+    }
+}

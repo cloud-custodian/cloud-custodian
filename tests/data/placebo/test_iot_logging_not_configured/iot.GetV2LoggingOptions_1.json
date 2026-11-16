@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "SetV2LoggingOptions was not previously called. No logging options have been set.",
+            "Code": "NotConfiguredException"
+        },
+        "ResponseMetadata": {},
+        "message": "SetV2LoggingOptions was not previously called. No logging options have been set."
+    }
+}

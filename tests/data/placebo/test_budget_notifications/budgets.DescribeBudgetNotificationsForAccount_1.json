@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "BudgetNotificationsForAccount": [
+            {
+                "BudgetName": "budget-ec2-alerted",
+                "Notifications": [
+                    {
+                        "NotificationType": "ACTUAL",
+                        "ComparisonOperator": "GREATER_THAN",
+                        "Threshold": 100.0,
+                        "ThresholdType": "PERCENTAGE",
+                        "NotificationState": "ALARM"
+                    },
+                    {
+                        "NotificationType": "FORECASTED",
+                        "ComparisonOperator": "GREATER_THAN",
+                        "Threshold": 80.0,
+                        "ThresholdType": "PERCENTAGE",
+                        "NotificationState": "OK"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

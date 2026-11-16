@@ -1,18 +1,43 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from unittest.mock import Mock
+
+from azure.core.exceptions import ResourceNotFoundError
+
 from c7n.utils import local_session
 from c7n_azure.query import _serialize
 from c7n_azure.resources.machine_learning_job import (
     MachineLearningJob,
     MachineLearningJobArchiveAction,
+    MachineLearningJobCancelAction,
 )
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
-from ..azure_common import BaseTest, arm_template, cassette_name
+from ..azure_common import (
+    BaseTest,
+    arm_template,
+    cassette_name,
+    strict_cassette,
+    )
 
 
 class MachineLearningJobTest(BaseTest):
+
+    def test_machine_learning_job_query_args(self):
+        parent = {
+            'name': 'workspace',
+            'resourceGroup': 'resource-group',
+        }
+
+        self.assertEqual(
+            {
+                'resource_group_name': 'resource-group',
+                'workspace_name': 'workspace',
+                'list_view_type': 'All',
+            },
+            MachineLearningJob.resource_type.extra_args(parent),
+        )
 
     def test_machine_learning_job_schema_validate(self):
         p = self.load_policy({
@@ -28,6 +53,13 @@ class MachineLearningJobTest(BaseTest):
         }, validate=True)
         self.assertTrue(p)
 
+        p = self.load_policy({
+            'name': 'cancel-machine-learning-jobs',
+            'resource': 'azure.machine-learning-job',
+            'actions': [{'type': 'cancel'}],
+        }, validate=True)
+        self.assertTrue(p)
+
         for action in ('tag', 'untag', 'auto-tag-user', 'auto-tag-date',
                        'tag-trim', 'mark-for-op'):
             self.assertNotIn(action, MachineLearningJob.action_registry)
@@ -37,13 +69,46 @@ class MachineLearningJobTest(BaseTest):
     @arm_template('machine-learning-job.json')
     @cassette_name('machine-learning-jobs')
     def test_machine_learning_job_query(self):
-        p = self.load_policy({
-            'name': 'find-all-machine-learning-jobs',
+        policy = {
+            'name': 'find-machine-learning-job',
             'resource': 'azure.machine-learning-job',
-        })
-        resources = p.run()
+            'filters': [{
+                'type': 'value',
+                'key': 'resourceGroup',
+                'value': 'test_machine-learning-job',
+            }, {
+                'type': 'value',
+                'key': 'name',
+                'value': 'cctest-sweep-job',
+            }],
+        }
+        resources = self.load_policy(policy).run()
+        self.assertEqual(1, len(resources))
+        self.assertFalse(resources[0]['properties']['isArchived'])
+
+        resource = resources[0]
+        resource_group = ResourceIdParser.get_resource_group(resource['id'])
+        workspace = ResourceIdParser.get_resource_name(resource['c7n:parent-id'])
+        client = local_session(Session).client(
+            'azure.mgmt.machinelearningservices.MachineLearningServicesMgmtClient')
+        job = client.jobs.get(resource_group, workspace, resource['name'])
+        while job.properties.status not in ('Completed', 'Failed', 'Canceled'):
+            self.sleep_in_live_mode(30)
+            job = client.jobs.get(resource_group, workspace, resource['name'])
+
+        resource = _serialize(job)
+        resource['properties']['isArchived'] = True
+        client.jobs.create_or_update(
+            resource_group_name=resource_group,
+            workspace_name=workspace,
+            id=resource['name'],
+            body=resource,
+        )
+
+        resources = self.load_policy(policy).run()
         self.assertEqual(1, len(resources))
         self.assertEqual('cctest-sweep-job', resources[0]['name'])
+        self.assertTrue(resources[0]['properties']['isArchived'])
         self.assertIn('/jobs/', resources[0]['id'])
 
     @arm_template('machine-learning-job.json')
@@ -106,6 +171,54 @@ class MachineLearningJobTest(BaseTest):
         )
         self.assertTrue(job.properties.is_archived)
 
+    def test_machine_learning_job_continues_after_failed_workspace(self):
+        # When one workspace raises ResourceNotFoundError during child enumeration
+        # (e.g. a ghost entry in Azure Resource Graph for a deleted workspace),
+        # the run should continue and return jobs from healthy workspaces.
+        ghost_parent = {
+            'id': '/subscriptions/sub/resourceGroups/rg-ghost/providers/'
+                  'Microsoft.MachineLearningServices/workspaces/ghost-ws',
+            'name': 'ghost-ws',
+            'resourceGroup': 'rg-ghost',
+        }
+        good_parent = {
+            'id': '/subscriptions/sub/resourceGroups/rg/providers/'
+                  'Microsoft.MachineLearningServices/workspaces/good-ws',
+            'name': 'good-ws',
+            'resourceGroup': 'rg',
+        }
+        good_job = {
+            'id': '/subscriptions/sub/resourceGroups/rg/providers/'
+                  'Microsoft.MachineLearningServices/workspaces/good-ws/jobs/job1',
+            'name': 'job1',
+            'resourceGroup': 'rg',
+            'type': 'Microsoft.MachineLearningServices/workspaces/jobs',
+            'properties': {'jobType': 'Command'},
+        }
+
+        parent_manager = Mock()
+        parent_manager.resource_type.id = 'id'
+        parent_manager.resources.return_value = [ghost_parent, good_parent]
+
+        p = self.load_policy({
+            'name': 'find-all-machine-learning-jobs',
+            'resource': 'azure.machine-learning-job',
+        })
+        manager = p.resource_manager
+        manager.get_parent_manager = Mock(return_value=parent_manager)
+
+        def enumerate_side_effect(parent, type_info, **kwargs):
+            if parent['name'] == 'ghost-ws':
+                raise ResourceNotFoundError('ParentResourceNotFound')
+            return [good_job]
+
+        manager.enumerate_resources = Mock(side_effect=enumerate_side_effect)
+
+        resources = manager.resources()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('job1', resources[0]['name'])
+
     @arm_template('machine-learning-job-archive.json')
     @cassette_name('machine-learning-job-archive-skip')
     def test_machine_learning_job_archive_skips_archived_job(self):
@@ -128,3 +241,62 @@ class MachineLearningJobTest(BaseTest):
         action._prepare_processing()
 
         self.assertEqual('already archived', action._process_resource(resource))
+
+    @arm_template('machine-learning-job-cancel.json')
+    @strict_cassette('machine-learning-job-cancel')
+    def test_machine_learning_job_cancel(self):
+        p = self.load_policy({
+            'name': 'cancel-machine-learning-job',
+            'resource': 'azure.machine-learning-job',
+            'filters': [{
+                'type': 'value',
+                'key': 'resourceGroup',
+                'value': 'test_machine-learning-job-cancel',
+            }, {
+                'type': 'value',
+                'key': 'name',
+                'value': 'cctest-cancel-job',
+            }],
+            'actions': [{'type': 'cancel'}],
+        }, validate=True, session_factory=Session)
+
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+        client = local_session(Session).client(
+            'azure.mgmt.machinelearningservices.MachineLearningServicesMgmtClient')
+        resource_group = ResourceIdParser.get_resource_group(resources[0]['id'])
+        workspace = ResourceIdParser.get_resource_name(resources[0]['c7n:parent-id'])
+        job = client.jobs.get(resource_group, workspace, resources[0]['name'])
+        # Cancellation is requested without waiting, so a live run can still
+        # see the job running for a moment after the request is accepted.
+        while job.properties.status not in (
+                'CancelRequested', 'Canceled', 'Completed', 'Failed'):
+            self.sleep_in_live_mode(30)
+            job = client.jobs.get(resource_group, workspace, resources[0]['name'])
+
+        self.assertIn(job.properties.status, ('CancelRequested', 'Canceled'))
+
+    @arm_template('machine-learning-job-cancel.json')
+    @strict_cassette('machine-learning-job-cancel-skip')
+    def test_machine_learning_job_cancel_skips_completed_job(self):
+        p = self.load_policy({
+            'name': 'cancel-machine-learning-job',
+            'resource': 'azure.machine-learning-job',
+            'actions': [{'type': 'cancel'}],
+        }, validate=True, session_factory=Session)
+        client = local_session(Session).client(
+            'azure.mgmt.machinelearningservices.MachineLearningServicesMgmtClient')
+        job = client.jobs.get(
+            'test_machine-learning-job-cancel',
+            'cctest-mlws-job-cancel',
+            'cctest-completed-job',
+        )
+        resource = _serialize(job)
+
+        self.assertEqual('Completed', resource['properties']['status'])
+        action = MachineLearningJobCancelAction({'type': 'cancel'}, p.resource_manager)
+        action._prepare_processing()
+
+        self.assertEqual(
+            'not cancelled, status is Completed', action._process_resource(resource))

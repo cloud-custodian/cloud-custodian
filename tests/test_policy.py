@@ -392,7 +392,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::ApiGateway::UsagePlan",
             "AWS::ApiGatewayV2::Integration",
             "AWS::AppConfig::Extension",
-            "AWS::AppStream::AppBlockBuilder",
             "AWS::B2BI::Capability",
             "AWS::BCMDataExports::Export",
             "AWS::Backup::RestoreTestingPlan",
@@ -587,7 +586,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::Amplify::App",
             "AWS::AppMesh::VirtualService",
             "AWS::AppRunner::VpcConnector",
-            "AWS::AppStream::Application",
             "AWS::Cassandra::Keyspace",
             "AWS::ECS::TaskSet",
             "AWS::Evidently::Project",
@@ -699,7 +697,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::LookoutMetrics::Alert',
             'AWS::MediaPackage::PackagingConfiguration',
             'AWS::MediaPackage::PackagingGroup',
-            'AWS::RDS::GlobalCluster',
             'AWS::RUM::AppMonitor',
             'AWS::ResilienceHub::ResiliencyPolicy',
             'AWS::RoboMaker::RobotApplicationVersion',
@@ -726,7 +723,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EC2::LaunchTemplate',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::TransitGatewayAttachment',
-            'AWS::EC2::TransitGatewayRouteTable',
             'AWS::ECR::PublicRepository',
             'AWS::EFS::AccessPoint',
             'AWS::EMR::SecurityConfiguration',
@@ -778,7 +774,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::GlobalAccelerator::Listener',
             'AWS::DMS::Certificate',
             'AWS::Detective::Graph',
-            'AWS::EC2::TransitGatewayRouteTable',
             'AWS::Glue::Job',
             'AWS::SageMaker::NotebookInstanceLifecycleConfig',
             'AWS::SES::ContactList',
@@ -994,7 +989,8 @@ class PolicyMetaLint(BaseTest):
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
             'apigw-domain-name', 'backup-job', 'quicksight-account', 'codedeploy-config',
-            'cleanrooms-collaboration-member', 's3files-mount-target'}
+            'cleanrooms-collaboration-member', 's3files-mount-target',
+            'kafka-broker'}
 
         missing_method = []
         for k, v in manager.resources.items():

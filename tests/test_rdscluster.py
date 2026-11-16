@@ -926,3 +926,108 @@ class TestRDSDBShardGroup(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['DBShardGroupIdentifier'], 'db-shard-1')
+
+
+class RDSGlobalClusterTest(BaseTest):
+
+    def test_rds_global_cluster_tag_filter(self):
+        session_factory = self.replay_flight_data("test_rds_global_cluster_tag_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-global-cluster-untagged",
+                "resource": "rds-global-cluster",
+                "filters": [{"tag:Owner": "absent"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["GlobalClusterIdentifier"], "c7n-global-untagged")
+
+    def test_rds_global_cluster_tag_and_remove(self):
+        session_factory = self.replay_flight_data("test_rds_global_cluster_tag_and_remove")
+        client = session_factory().client("rds")
+
+        p = self.load_policy(
+            {
+                "name": "rds-global-cluster-tag",
+                "resource": "rds-global-cluster",
+                "filters": [{"GlobalClusterIdentifier": "c7n-global-untagged"}],
+                "actions": [{"type": "tag", "key": "xyz", "value": "hello world"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        arn = resources[0]["GlobalClusterArn"]
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+        self.assertEqual(tag_map.get("xyz"), "hello world")
+
+        p = self.load_policy(
+            {
+                "name": "rds-global-cluster-remove-tag",
+                "resource": "rds-global-cluster",
+                "filters": [{"tag:xyz": "not-null"}],
+                "actions": [{"type": "remove-tag", "tags": ["xyz"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+        self.assertNotIn("xyz", tag_map)
+
+    def test_rds_global_cluster_mark_match_unmark(self):
+        session_factory = self.replay_flight_data("test_rds_global_cluster_mark_match_unmark")
+        client = session_factory().client("rds")
+
+        p = self.load_policy(
+            {
+                "name": "rds-global-cluster-mark",
+                "resource": "rds-global-cluster",
+                "filters": [{"GlobalClusterIdentifier": "c7n-global-untagged"}],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_next",
+                        "days": 1,
+                        "op": "notify",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        arn = resources[0]["GlobalClusterArn"]
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+        self.assertIn("custodian_next", tag_map)
+
+        p = self.load_policy(
+            {
+                "name": "rds-global-cluster-unmark",
+                "resource": "rds-global-cluster",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "custodian_next",
+                        "op": "notify",
+                        "skew": 1,
+                    }
+                ],
+                "actions": [{"type": "remove-tag", "tags": ["custodian_next"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+        self.assertNotIn("custodian_next", tag_map)

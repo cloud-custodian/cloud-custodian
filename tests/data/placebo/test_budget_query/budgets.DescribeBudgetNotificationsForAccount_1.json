@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "BudgetNotificationsForAccount": [
+            {
+                "BudgetName": "budget-ec2-monthly",
+                "Notifications": [
+                    {
+                        "NotificationType": "FORECASTED",
+                        "ComparisonOperator": "GREATER_THAN",
+                        "Threshold": 100.0,
+                        "ThresholdType": "PERCENTAGE",
+                        "NotificationState": "OK"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
