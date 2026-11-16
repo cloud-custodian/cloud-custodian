@@ -127,6 +127,33 @@ class DescribeUnit(DescribeSource):
         self.fetch_ous(client, query["ParentId"], ous, [query["ParentId"]])
         return universal_augment(self.manager, list(ous.values()))
 
+    def get_resources(self, ids, cache=True):
+        client = local_session(self.manager.session_factory).client("organizations")
+        units = []
+        for ou_id in ids:
+            # event ids (ie. a DetachPolicy targetId) can also be an account or the root
+            if not ou_id.startswith("ou-"):
+                continue
+            try:
+                ou = self.describe_ou(client, ou_id)
+            except client.exceptions.OrganizationalUnitNotFoundException:
+                continue
+            # list parents only returns the immediate parent, so walk up to the
+            # root to fill in the same Parents and Path as fetch_ous.
+            parents, names = [], [ou["Name"]]
+            parent = client.list_parents(ChildId=ou_id)["Parents"][0]
+            while parent["Type"] != "ROOT":
+                parents.insert(0, parent["Id"])
+                names.insert(0, self.describe_ou(client, parent["Id"])["Name"])
+                parent = client.list_parents(ChildId=parent["Id"])["Parents"][0]
+            ou["Parents"] = [parent["Id"]] + parents
+            ou["Path"] = "/".join(names)
+            units.append(ou)
+        return universal_augment(self.manager, units)
+
+    def describe_ou(self, client, ou_id):
+        return client.describe_organizational_unit(OrganizationalUnitId=ou_id)["OrganizationalUnit"]
+
     def fetch_ous(self, client, parent_id, units, stack):
         pager = client.get_paginator("list_children")
         ou_ids = [
@@ -157,6 +184,7 @@ class OrgUnit(QueryResourceManager):
         global_resource = True
         permissions_augment = (
             "organizations:ListChildren",
+            "organizations:ListParents",
             "organizations:DescribeOrganizationalUnit",
             "organizations:ListTagsForResource",
         )

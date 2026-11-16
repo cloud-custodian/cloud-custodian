@@ -352,6 +352,61 @@ def test_org_unit_moto(test, org_tree):
     assert rmap["GroupC"]["Parents"] == [org_tree["root"]["Id"], org_tree["dept_a"]["Id"]]
 
 
+def test_org_unit_get_resources(test, org_tree):
+    p = test.load_policy({"name": "units", "resource": "aws.org-unit"})
+    pulled = {r["Id"]: r for r in p.run()}
+    dept_a, group_c = org_tree["dept_a"]["Id"], org_tree["group_c"]["Id"]
+    # event ids (ie. a DetachPolicy targetId) can also be an account, the root
+    # or an ou that no longer exists.
+    resources = p.resource_manager.get_resources(
+        [
+            dept_a,
+            group_c,
+            org_tree["account_a"]["AccountId"],
+            org_tree["root"]["Id"],
+            "ou-abcd-zzzzzzzz",
+        ]
+    )
+    assert resources == [pulled[dept_a], pulled[group_c]]
+
+
+def test_org_unit_cloudtrail_mode(test, policy_tree):
+    p = test.load_policy(
+        {
+            "name": "ou-policy-detached",
+            "resource": "aws.org-unit",
+            "mode": {
+                "type": "cloudtrail",
+                "events": [
+                    {
+                        "event": "DetachPolicy",
+                        "source": "organizations.amazonaws.com",
+                        "ids": "requestParameters.targetId",
+                    }
+                ],
+            },
+            "filters": [
+                {
+                    "type": "policy",
+                    "policy-type": "SERVICE_CONTROL_POLICY",
+                    "inherited": True,
+                    "attrs": [{"Name": "super-flow"}],
+                }
+            ],
+        }
+    )
+    event = {
+        "detail": {
+            "eventName": "DetachPolicy",
+            "eventSource": "organizations.amazonaws.com",
+            "requestParameters": {"targetId": policy_tree["group_c"]["Id"]},
+        }
+    }
+    resources = p.push(event, None)
+    assert [r["Name"] for r in resources] == ["GroupC"]
+    assert resources[0]["Path"] == "DeptA/GroupC"
+
+
 def test_org_account_moto(test, org_tree):
     p = test.load_policy(
         {
