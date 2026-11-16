@@ -469,6 +469,30 @@ class UtilTest(BaseTest):
                          '"2018-02-02T12:00:00"')
         self.assertEqual(str(d), '2018-02-02 12:00:00')
 
+    def test_format_date_default_format(self):
+        d = parse_date("2018-02-02 12:00")
+        iso = "%Y-%m-%dT%H:%M:%SZ"
+
+        # an increment with no format of its own takes the default
+        self.assertEqual(
+            "{:-7d}".format(utils.FormatDate(d, iso)), "2018-01-26T12:00:00Z")
+        self.assertEqual(
+            "{:+7d}".format(utils.FormatDate(d, iso)), "2018-02-09T12:00:00Z")
+
+        # an explicit format still wins
+        self.assertEqual(
+            "{:-7d%Y-%m-%d}".format(utils.FormatDate(d, iso)), "2018-01-26")
+
+        # no increment means no default, so {now} is unchanged
+        self.assertEqual(
+            "{}".format(utils.FormatDate(d, iso)), "2018-02-02 12:00:00")
+        self.assertEqual(
+            "{:%Y-%m-%d}".format(utils.FormatDate(d, iso)), "2018-02-02")
+
+        # and without a default the increment behaves as it did before
+        self.assertEqual(
+            "{:-7d}".format(utils.FormatDate(d)), "2018-01-26 12:00:00")
+
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
         self.assertEqual(list(utils.group_by(items, "Type").keys()), [None, "a", "b"])

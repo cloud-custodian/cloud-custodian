@@ -769,8 +769,9 @@ class FormatDate:
 
     date_increment = re.compile(r'[-+][0-9]+[Mdh]')
 
-    def __init__(self, d=None):
+    def __init__(self, d=None, default_format=None):
         self._d = d
+        self._default_format = default_format
 
     def __str__(self):
         return str(self._d)
@@ -780,8 +781,8 @@ class FormatDate:
         return self._d
 
     @classmethod
-    def utcnow(cls):
-        return cls(datetime.utcnow())
+    def utcnow(cls, default_format=None):
+        return cls(datetime.utcnow(), default_format)
 
     def __getattr__(self, k):
         return getattr(self._d, k)
@@ -801,6 +802,11 @@ class FormatDate:
             d = d + timedelta(**p)
         if increments:
             fmt = self.date_increment.sub("", fmt)
+            # an increment with no format of its own takes the resource's
+            # default, so a policy can say {now:-7d} and get a value its
+            # provider api will accept.
+            if not fmt and self._default_format:
+                fmt = self._default_format
         return d.__format__(fmt)
 
 
