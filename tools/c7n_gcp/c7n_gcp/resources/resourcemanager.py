@@ -144,7 +144,9 @@ class GCPProjectMetricsFilter(GCPMetricsFilter):
     """Filter projects by an aggregate Cloud Monitoring metric.
 
     The project supplies the Monitoring API scope, so this filter does not use
-    the resource join key required by the generic ``metrics`` filter.
+    the resource join key required by the generic ``metrics`` filter. The
+    ``distribution`` key reduces a ``DISTRIBUTION``-typed metric exactly as it
+    does on the generic filter.
 
     :example:
 
@@ -174,6 +176,7 @@ class GCPProjectMetricsFilter(GCPMetricsFilter):
             'reducer': {'type': 'string', 'enum': REDUCERS},
             'aligner': {'type': 'string', 'enum': ALIGNERS},
             'value': {'type': 'number'},
+            'distribution': {'type': 'string', 'enum': ['count', 'mean', 'sum']},
             'filter': {'type': 'string'},
             'missing-value': {'type': 'number'},
             'required': ('value', 'name', 'op'),

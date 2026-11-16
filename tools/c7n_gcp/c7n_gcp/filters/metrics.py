@@ -3,9 +3,6 @@
 """
 Monitoring Metrics suppport for resources
 """
-import math
-import operator
-import sys
 from datetime import datetime, timedelta
 
 from c7n.exceptions import PolicyExecutionError
@@ -98,6 +95,28 @@ class GCPMetricsFilter(Filter):
             value: 0.05
             op: less-than
             period-start: start-of-day
+
+    Cloud Monitoring returns a ``DISTRIBUTION``-typed metric as a histogram rather
+    than a number. The ``distribution`` key chooses how to reduce one to a scalar:
+    ``count``, ``mean``, or ``sum`` (the default), reconstructed as ``count * mean``
+    since a histogram carries no total. Scalar metrics ignore the key. Either way
+    the filter compares the most recent point in the window, so a metric left on
+    the default ``ALIGN_NONE`` is read on its latest sample, not its total.
+
+    .. code-block:: yaml
+
+      - name: tuned-model-chatty-responses
+        resource: gcp.vertex-ai-endpoint
+        filters:
+          - type: metrics
+            name: aiplatform.googleapis.com/tuned_model/online_serving/tokens
+            aligner: ALIGN_SUM
+            reducer: REDUCE_SUM
+            group-by-fields: ["resource.labels.endpoint_id"]
+            distribution: mean
+            days: 1
+            value: 100
+            op: greater-than
     """
 
     schema = type_schema(
@@ -111,7 +130,7 @@ class GCPMetricsFilter(Filter):
           'reducer': {'type': 'string', 'enum': REDUCERS},
           'aligner': {'type': 'string', 'enum': ALIGNERS},
           'value': {'type': 'number'},
-          'value-type': {'type': 'string', 'enum': ['count', 'mean', 'sum']},
+          'distribution': {'type': 'string', 'enum': ['count', 'mean', 'sum']},
           'filter': {'type': 'string'},
           'missing-value': {'type': 'number'},
           'required': ('value', 'name', 'op')})
@@ -155,7 +174,7 @@ class GCPMetricsFilter(Filter):
         self.resource_metric_dict = {}
         self.op = OPERATORS[self.data.get('op', 'less-than')]
         self.value = self.data['value']
-        self.value_type = self.data.get('value-type', 'sum')
+        self.distribution = self.data.get('distribution', 'sum')
         self.filter = self.data.get('filter', '')
         self.c7n_metric_key = "%s.%s.%s" % (self.metric, self.aligner, self.reducer)
 
@@ -243,43 +262,41 @@ class GCPMetricsFilter(Filter):
         return batched_filters
 
     def split_by_resource(self, metric_list):
-        # metric_key is a path into a series, such as resource.labels.endpoint_id,
-        # so this reads each series' own id for the resource it describes.
+        unresolved = 0
         for series in metric_list:
             resource_name = jmespath_search(self.metric_key, series)
+            if resource_name is None:
+                # metric-key does not identify this series, so no resource can
+                # ever look it up.
+                unresolved += 1
+                continue
             if resource_name in self.resource_metric_dict:
+                labels = {**series.get('resource', {}).get('labels', {}),
+                          **series.get('metric', {}).get('labels', {})}
                 raise PolicyExecutionError(
-                    "metric %s returned multiple timeSeries for %s. Collapse them with "
-                    "'group-by-fields' and a 'reducer', or select one with 'filter'" % (
-                        self.metric, resource_name))
+                    f"metric {self.metric} returned multiple timeSeries for "
+                    f"{resource_name} (labels {labels}). Collapse them with "
+                    f"'group-by-fields' and a 'reducer', or select one with 'filter'")
             self.resource_metric_dict[resource_name] = series
-
-    def get_distribution_parts(self, distribution):
-        # count is an int64 field, serialized by the API as a string. Proto3
-        # JSON omits both fields when they hold their default, which the API
-        # does for an alignment period with no samples.
-        return int(distribution.get('count', 0)), float(distribution.get('mean', 0.0))
+        if unresolved:
+            self.log.warning(
+                f"{unresolved} timeSeries did not resolve metric-key "
+                f"{self.metric_key} for {self.metric}")
 
     def get_point_value(self, value):
-        distribution = value.get('distributionValue')
-        if distribution is None:
+        dist = value.get('distributionValue')
+        if dist is None:
             return float(list(value.values())[0])
-        count, mean = self.get_distribution_parts(distribution)
-        if self.value_type == 'count':
+        # count is an int64, which proto3 JSON sends as a string, and proto3
+        # omits a field holding its default, so an alignment period with no
+        # samples arrives with neither count nor mean.
+        count = int(dist.get('count', 0))
+        mean = float(dist.get('mean', 0.0))
+        if self.distribution == 'count':
             return count
-        if self.value_type == 'mean':
+        if self.distribution == 'mean':
             return mean
         return count * mean
-
-    def get_metric_value(self, points):
-        values = [p["value"] for p in points]
-        if self.value_type == 'mean' and any('distributionValue' in v for v in values):
-            # Summing per-point means is meaningless. Weight each mean by its count.
-            parts = [self.get_distribution_parts(v.get('distributionValue', {}))
-                     for v in values]
-            count = sum(c for c, _ in parts)
-            return sum(c * m for c, m in parts) / count if count else 0.0
-        return sum(self.get_point_value(v) for v in values)
 
     def process_resource(self, resource):
         resource_metric = resource.setdefault('c7n.metrics', {})
@@ -291,28 +308,10 @@ class GCPMetricsFilter(Filter):
         if metric is None:
             metric_value = self.missing_value
         else:
-            metric_value = self.get_metric_value(metric["points"])
+            metric_value = self.get_point_value(metric["points"][0]["value"])
 
         resource_metric[self.c7n_metric_key] = metric
 
-        return self.compare(metric_value, metric)
-
-    def compare(self, metric_value, metric):
-        # count * mean rebuilds a sum from a rounded mean, so it can differ from the
-        # true sum by a few ulps per point. An exact == or != would then fail on
-        # values such as 3 * 0.1 against 0.3. The tolerance scales with the number
-        # of points reduced and the magnitude of the terms summed, so cancellation
-        # to zero still matches while materially different readings do not. Counts
-        # are integers and stay exact.
-        approximate = (
-            metric is not None and self.value_type != 'count' and
-            any('distributionValue' in p["value"] for p in metric["points"]))
-        if approximate and self.op in (operator.eq, operator.ne):
-            rel_tol = 2 * (len(metric["points"]) + 1) * sys.float_info.epsilon
-            scale = sum(abs(self.get_point_value(p["value"])) for p in metric["points"])
-            close = math.isclose(
-                metric_value, self.value, rel_tol=rel_tol, abs_tol=rel_tol * scale)
-            return close if self.op is operator.eq else not close
         return self.op(metric_value, self.value)
 
     @classmethod
