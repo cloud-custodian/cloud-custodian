@@ -1,0 +1,64 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_spanner_instance": {
+            "c7n": {
+                "autoscaling_config": [
+                    {
+                        "asymmetric_autoscaling_options": [],
+                        "autoscaling_limits": [
+                            {
+                                "max_nodes": 2,
+                                "max_processing_units": 0,
+                                "min_nodes": 1,
+                                "min_processing_units": 0
+                            }
+                        ],
+                        "autoscaling_targets": [
+                            {
+                                "high_priority_cpu_utilization_percent": 0,
+                                "storage_utilization_percent": 90,
+                                "total_cpu_utilization_percent": 80
+                            }
+                        ]
+                    }
+                ],
+                "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+                "default_backup_schedule_type": "AUTOMATIC",
+                "deletion_policy": "DELETE",
+                "display_name": "arachnid-spanner-au",
+                "edition": "ENTERPRISE",
+                "effective_labels": {
+                    "env": "c7n-test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "force_destroy": false,
+                "id": "stkl-kody-mullins/arachnid-spanner-au",
+                "instance_type": "PROVISIONED",
+                "labels": {
+                    "env": "c7n-test"
+                },
+                "name": "arachnid-spanner-au",
+                "num_nodes": 1,
+                "processing_units": 1000,
+                "project": "stkl-kody-mullins",
+                "state": "READY",
+                "terraform_labels": {
+                    "env": "c7n-test",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null
+            }
+        },
+        "random_pet": {
+            "c7n": {
+                "id": "arachnid",
+                "keepers": null,
+                "length": 1,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}

@@ -531,6 +531,49 @@ def test_spanner_autoscaling_set(test, spanner_autoscaling):
     assert instance['displayName'] == instance_name
 
 
+@terraform('spanner_autoscaled')
+def test_spanner_autoscaling_update(test, spanner_autoscaled):
+    instance_name = spanner_autoscaled['google_spanner_instance.c7n.name']
+    session_factory = test.replay_flight_data('spanner-autoscaling-update')
+    policy = test.load_policy({
+        'name': 'spanner-autoscaling-update',
+        'resource': 'gcp.spanner-instance',
+        'filters': [
+            {'type': 'value', 'key': 'displayName', 'value': instance_name},
+            {'type': 'value', 'key': 'autoscalingConfig', 'value': 'present'},
+        ],
+        'actions': [{
+            'type': 'set-autoscaling',
+            'minNodes': 1,
+            'maxNodes': 3,
+            'storageUtilizationPercent': 95,
+        }],
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+
+    # The patch is a long-running operation; poll until the new limit shows up.
+    client = policy.resource_manager.get_client()
+    for _ in range(30):
+        instance = client.execute_query('get', {'name': resources[0]['name']})
+        if instance['autoscalingConfig']['autoscalingLimits'].get('maxNodes') == 3:
+            break
+        if test.recording:
+            time.sleep(5)
+    else:
+        raise AssertionError('Timed out waiting for autoscalingConfig to be updated.')
+
+    assert instance['autoscalingConfig'] == {
+        'autoscalingLimits': {'minNodes': 1, 'maxNodes': 3},
+        'autoscalingTargets': {
+            # Not in the policy, so the instance's existing target is kept.
+            'totalCpuUtilizationPercent': 80,
+            'storageUtilizationPercent': 95,
+        },
+    }
+
+
 def _load_set_autoscaling(test, **action):
     return test.load_policy({
         'name': 'spanner-autoscaling',

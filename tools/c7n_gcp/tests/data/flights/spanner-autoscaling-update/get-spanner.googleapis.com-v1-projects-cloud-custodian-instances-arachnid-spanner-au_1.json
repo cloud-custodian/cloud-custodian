@@ -1,0 +1,53 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 16 Nov 2026 18:36:26 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=322",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "931",
+    "-content-encoding": "gzip",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances/arachnid-spanner-au?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/instances/arachnid-spanner-au",
+    "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+    "displayName": "arachnid-spanner-au",
+    "nodeCount": 1,
+    "state": "READY",
+    "labels": {
+      "env": "c7n-test",
+      "goog-terraform-provisioned": "true"
+    },
+    "processingUnits": 1000,
+    "instanceType": "PROVISIONED",
+    "createTime": "2026-11-16T18:36:16.901575Z",
+    "updateTime": "2026-11-16T18:36:26.126942Z",
+    "autoscalingConfig": {
+      "autoscalingLimits": {
+        "minNodes": 1,
+        "maxNodes": 3
+      },
+      "autoscalingTargets": {
+        "storageUtilizationPercent": 95,
+        "totalCpuUtilizationPercent": 80
+      }
+    },
+    "replicaComputeCapacity": [
+      {
+        "replicaSelection": {
+          "location": "us-central1"
+        },
+        "nodeCount": 1
+      }
+    ],
+    "edition": "ENTERPRISE",
+    "resourceLocation": "us-central1",
+    "defaultBackupScheduleType": "AUTOMATIC"
+  }
+}
