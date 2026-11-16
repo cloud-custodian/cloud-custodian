@@ -365,9 +365,33 @@ def test_org_unit_get_resources(test, org_tree):
             org_tree["account_a"]["AccountId"],
             org_tree["root"]["Id"],
             "ou-abcd-zzzzzzzz",
-        ]
+        ],
+        # p.run() filled the resource cache; skip it so the event lookup itself runs.
+        cache=False,
     )
     assert resources == [pulled[dept_a], pulled[group_c]]
+
+
+def test_org_unit_get_resources_skips_ou_removed_during_lookup(test, org_tree):
+    p = test.load_policy({"name": "units", "resource": "aws.org-unit"})
+    client = boto3.client("organizations", region_name="us-east-1")
+    temp = client.create_organizational_unit(
+        ParentId=org_tree["dept_a"]["Id"], Name="Temp"
+    )["OrganizationalUnit"]["Id"]
+    describe_ou = org_module.DescribeUnit.describe_ou
+
+    def describe_then_remove(self, client, ou_id):
+        ou = describe_ou(self, client, ou_id)
+        if ou_id == temp:
+            # the ou is removed between the describe and the ancestry walk
+            client.delete_organizational_unit(OrganizationalUnitId=temp)
+        return ou
+
+    with mock.patch.object(org_module.DescribeUnit, "describe_ou", describe_then_remove):
+        resources = p.resource_manager.get_resources(
+            [temp, org_tree["group_c"]["Id"]], cache=False
+        )
+    assert [r["Id"] for r in resources] == [org_tree["group_c"]["Id"]]
 
 
 def test_org_unit_cloudtrail_mode(test, policy_tree):

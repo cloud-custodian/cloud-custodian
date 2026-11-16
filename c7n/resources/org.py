@@ -136,16 +136,20 @@ class DescribeUnit(DescribeSource):
                 continue
             try:
                 ou = self.describe_ou(client, ou_id)
-            except client.exceptions.OrganizationalUnitNotFoundException:
+                # list parents only returns the immediate parent, so walk up to the
+                # root to fill in the same Parents and Path as fetch_ous.
+                parents, names = [], [ou["Name"]]
+                parent = client.list_parents(ChildId=ou_id)["Parents"][0]
+                while parent["Type"] != "ROOT":
+                    parents.insert(0, parent["Id"])
+                    names.insert(0, self.describe_ou(client, parent["Id"])["Name"])
+                    parent = client.list_parents(ChildId=parent["Id"])["Parents"][0]
+            except (
+                client.exceptions.OrganizationalUnitNotFoundException,
+                client.exceptions.ChildNotFoundException,
+            ):
+                # the ou, or one of its ancestors, was removed before or during the lookup
                 continue
-            # list parents only returns the immediate parent, so walk up to the
-            # root to fill in the same Parents and Path as fetch_ous.
-            parents, names = [], [ou["Name"]]
-            parent = client.list_parents(ChildId=ou_id)["Parents"][0]
-            while parent["Type"] != "ROOT":
-                parents.insert(0, parent["Id"])
-                names.insert(0, self.describe_ou(client, parent["Id"])["Name"])
-                parent = client.list_parents(ChildId=parent["Id"])["Parents"][0]
             ou["Parents"] = [parent["Id"]] + parents
             ou["Path"] = "/".join(names)
             units.append(ou)
