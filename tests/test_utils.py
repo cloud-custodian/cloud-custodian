@@ -456,6 +456,14 @@ class UtilTest(BaseTest):
 
         self.assertEqual("{:+5M%M}".format(utils.FormatDate(d)), "05")
 
+        self.assertEqual("{:-5h%H}".format(utils.FormatDate(d)), "07")
+
+        self.assertEqual("{:-5d%d}".format(utils.FormatDate(d)), "28")
+
+        self.assertEqual("{:-5M%M}".format(utils.FormatDate(d)), "55")
+
+        self.assertEqual("{:-7d%Y-%m-%d}".format(utils.FormatDate(d)), "2018-01-26")
+
         self.assertEqual(json.dumps(utils.FormatDate(d),
                                     cls=utils.JsonEncoder, indent=2),
                          '"2018-02-02T12:00:00"')

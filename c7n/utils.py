@@ -767,7 +767,7 @@ class DeferredFormatString(UserString):
 class FormatDate:
     """a datetime wrapper with extended pyformat syntax"""
 
-    date_increment = re.compile(r'\+[0-9]+[Mdh]')
+    date_increment = re.compile(r'[-+][0-9]+[Mdh]')
 
     def __init__(self, d=None):
         self._d = d
@@ -791,12 +791,13 @@ class FormatDate:
         increments = self.date_increment.findall(fmt)
         for i in increments:
             p = {}
+            sign = -1 if i[0] == '-' else 1
             if i[-1] == 'M':
-                p['minutes'] = float(i[1:-1])
+                p['minutes'] = sign * float(i[1:-1])
             if i[-1] == 'h':
-                p['hours'] = float(i[1:-1])
+                p['hours'] = sign * float(i[1:-1])
             if i[-1] == 'd':
-                p['days'] = float(i[1:-1])
+                p['days'] = sign * float(i[1:-1])
             d = d + timedelta(**p)
         if increments:
             fmt = self.date_increment.sub("", fmt)
