@@ -25,6 +25,16 @@ else
     fi
 fi
 
+# Returns 0 if the resource group exists, 1 if it doesn't, 2 if the lookup failed.
+group_exists() {
+    local exists
+    if ! exists=$(az group exists --name "$1"); then
+        echo "Failed to check whether resource group $1 exists"
+        return 2
+    fi
+    [[ "$exists" == "true" ]]
+}
+
 delete_resource() {
     echo "Delete for $filenameNoExtension started"
     fileName=${1##*/}
@@ -103,7 +113,11 @@ delete_resource() {
         done
     fi
 
-    if [[ "$(az group exists --name "$rgName")" == "true" ]]; then
+    group_exists "$rgName"
+    group_status=$?
+    if [[ $group_status -eq 2 ]]; then
+        return 1
+    elif [[ $group_status -eq 0 ]]; then
         if ! az group delete --name "$rgName" --yes --output None; then
             echo "Failed to delete resource group $rgName"
             return 1
@@ -125,7 +139,11 @@ delete_resource() {
 delete_acs() {
     echo "Delete for ACS started"
     rgName=test_containerservice
-    if [[ "$(az group exists --name "$rgName")" == "true" ]]; then
+    group_exists "$rgName"
+    group_status=$?
+    if [[ $group_status -eq 2 ]]; then
+        return 1
+    elif [[ $group_status -eq 0 ]]; then
         if ! az group delete --name "$rgName" --yes --no-wait; then
             echo "Failed to delete resource group $rgName"
             return 1
@@ -146,11 +164,16 @@ delete_policy_assignment() {
 delete_cognitive_services() {
     echo "Delete for cog services started"
     deleted_account_id="/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.CognitiveServices/locations/global/resourceGroups/test_cognitive-service/deletedAccounts/cctest-cog-serv"
-    if az resource show --ids "$deleted_account_id" --output None 2>/dev/null; then
-        if ! az resource delete --ids "$deleted_account_id"; then
-            echo "Failed to purge soft-deleted cognitive services account cctest-cog-serv"
+    # Only a not-found response means there is nothing to purge; any other
+    # lookup error (auth, throttling, network) must fail the cleanup.
+    if ! show_error=$(az resource show --ids "$deleted_account_id" --output None 2>&1); then
+        if [[ "$show_error" != *NotFound* ]]; then
+            echo "Failed to look up soft-deleted cognitive services account cctest-cog-serv: ${show_error}"
             return 1
         fi
+    elif ! az resource delete --ids "$deleted_account_id"; then
+        echo "Failed to purge soft-deleted cognitive services account cctest-cog-serv"
+        return 1
     fi
     echo "Delete for cog services complete"
 }
