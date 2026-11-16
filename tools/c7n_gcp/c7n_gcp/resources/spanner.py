@@ -255,6 +255,7 @@ class SpannerInstanceSetAutoscaling(MethodAction):
     max_limit_ratio = 10
 
     def validate(self):
+        super().validate()
         has_nodes = any(k in self.data for k in self.node_limits)
         has_units = any(k in self.data for k in self.processing_unit_limits)
         if has_nodes == has_units:
