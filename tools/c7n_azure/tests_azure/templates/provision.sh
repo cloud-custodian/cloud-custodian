@@ -327,7 +327,10 @@ deploy_resource() {
 
         az deployment sub create --location $resourceLocation \
             --name cctest-subscription-diagnostic-storage \
-            --template-file $file --output None
+            --template-file $file --output None || {
+            echo "Failed to deploy subscription diagnostic storage fixture."
+            exit 1
+        }
     elif [[ "$fileName" == "ai-foundry-application.json" ]]; then
 
         unique_suffix="$(date +%s%N | tail -c 13)"
