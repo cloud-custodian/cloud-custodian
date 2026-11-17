@@ -1,0 +1,55 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 15 Oct 2026 13:38:21 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1243",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/indexes?alt=json"
+  },
+  "body": {
+    "indexes": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/indexes/7999331921140121600",
+        "displayName": "c7n-test-index-central-413a81aa",
+        "metadataSchemaUri": "gs://google-cloud-aiplatform/schema/matchingengine/metadata/nearest_neighbor_search_1.0.0.yaml",
+        "metadata": {
+          "config": {
+            "dimensions": 2,
+            "distanceMeasureType": "DOT_PRODUCT_DISTANCE",
+            "featureNormType": "NONE",
+            "algorithmConfig": {
+              "bruteForceConfig": {}
+            },
+            "shardSize": "SHARD_SIZE_SMALL"
+          }
+        },
+        "deployedIndexes": [
+          {
+            "indexEndpoint": "projects/cloud-custodian/locations/us-central1/indexEndpoints/5704871056297164800",
+            "deployedIndexId": "c7n_test_index_413a81aa"
+          }
+        ],
+        "etag": "AMEw9yO8zvC602jCuVMntznorsNUyptww-rqmtP8sJTa7TSigweSfaWt_qJ-FE-rgoY=",
+        "labels": {
+          "goog-terraform-provisioned": "true",
+          "owner": "custodian"
+        },
+        "createTime": "2026-10-15T13:06:48.101510Z",
+        "updateTime": "2026-10-15T13:07:16.134834Z",
+        "indexStats": {
+          "shardsCount": 1
+        },
+        "indexUpdateMethod": "STREAM_UPDATE",
+        "encryptionSpec": {}
+      }
+    ]
+  }
+}
