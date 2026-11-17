@@ -83,4 +83,4 @@ Enable the Instance Metadata Tags.
 
 Instance MetaData Tags Reference: https://amzn.to/2XOuxpQ
 
-Custodian Filters reference: https://cloud-custodian.github.io/cloud-custodian/docs/filters.html
+Custodian Filters reference: https://cloudcustodian.io/docs/filters.html
