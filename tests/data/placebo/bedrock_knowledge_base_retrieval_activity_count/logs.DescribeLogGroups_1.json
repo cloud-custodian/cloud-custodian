@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "c7n-kb-activity-default-2b71",
+                "creationTime": 1791497510805,
+                "retentionInDays": 1,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-kb-activity-default-2b71:*",
+                "storedBytes": 0,
+                "logGroupClass": "STANDARD",
+                "logGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:c7n-kb-activity-default-2b71",
+                "deletionProtectionEnabled": false,
+                "bearerTokenAuthenticationEnabled": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
