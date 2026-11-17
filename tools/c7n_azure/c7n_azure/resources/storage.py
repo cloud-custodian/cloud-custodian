@@ -11,7 +11,8 @@ from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
 from azure.storage.blob import BlobServiceClient
 from azure.storage.common.models import Logging, RetentionPolicy
 from azure.storage.file import FileService
-from azure.storage.queue import QueueServiceClient
+from azure.storage.queue import (QueueAnalyticsLogging, QueueServiceClient,
+                                 RetentionPolicy as QueueRetentionPolicy)
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import type_schema, Filter, ListItemFilter
 from c7n.utils import get_annotation_prefix, local_session
@@ -697,6 +698,13 @@ class StorageSettingsUtilities:
     @staticmethod
     def update_logging(storage_type, storage_account, logging_settings, session=None):
         client = StorageSettingsUtilities._get_client(storage_type, storage_account, session)
+
+        if storage_type == QUEUE_TYPE and isinstance(logging_settings, dict):
+            # azure-storage-queue >= 12.18 needs a model, not a dict
+            logging_settings = QueueAnalyticsLogging(**dict(
+                logging_settings,
+                retention_policy=QueueRetentionPolicy(
+                    **logging_settings['retention_policy'])))
 
         if storage_type in [QUEUE_TYPE, BLOB_TYPE]:
             return getattr(client, 'set_service_properties')(analytics_logging=logging_settings)

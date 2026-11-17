@@ -71,12 +71,16 @@ def test_load_array_expression(test):
         "GetContactInformation",
         "GetGovCloudAccountInformation",
         "GetPrimaryEmail",
+        "GetPrimaryEmailUpdateStatus",
         "GetRegionOptStatus",
         "ListRegions",
         "PutAccountName",
         "PutAlternateContact",
         "PutContactInformation",
-        "StartPrimaryEmailUpdate"
+        "ReopenAccount",
+        "SendPhoneNumberVerification",
+        "StartPrimaryEmailUpdate",
+        "VerifyPhoneNumber",
     ]
 
 
