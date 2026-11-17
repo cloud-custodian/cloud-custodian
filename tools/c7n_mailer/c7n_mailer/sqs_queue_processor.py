@@ -14,6 +14,8 @@ import zlib
 from c7n_mailer.target import MessageTargetMixin
 
 DATA_MESSAGE = "maidmsg/1.0"
+# Stop starting new messages of a lambda invocation when less time than this is left.
+MIN_REMAINING_MS = 30 * 1000
 
 
 class MailerSqsQueueIterator:
@@ -120,6 +122,52 @@ class MailerSqsQueueProcessor(MessageTargetMixin):
             process_pool.join()
         self.logger.info("No sqs_messages left on the queue, exiting c7n_mailer.")
         return
+
+    def process_event(self, event, remaining_ms=None):
+        """Processes the messages of an SQS-triggered lambda invocation.
+
+        Returns the ids of the messages that failed, so that only those are retried:
+        https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html
+
+        remaining_ms returns the time left in the invocation. When it gets short, the
+        remaining messages are returned as failures instead of being processed: if the
+        invocation timed out, lambda would retry the whole batch, including the messages
+        that were already sent.
+        """
+        failures = []
+        for record in event.get("Records", []):
+            if remaining_ms is not None and remaining_ms() < MIN_REMAINING_MS:
+                self.logger.warning(
+                    "Lambda timeout close, leaving message %s for the next invocation",
+                    record["messageId"],
+                )
+                failures.append({"itemIdentifier": record["messageId"]})
+                continue
+            if failures and record.get("eventSourceARN", "").endswith(".fifo"):
+                # Keep the order of a FIFO queue: retry everything after the first failure.
+                failures.append({"itemIdentifier": record["messageId"]})
+                continue
+            # Lambda uses camel case keys and lower case attribute types.
+            sqs_message = {
+                "MessageId": record["messageId"],
+                "Body": record["body"],
+                "Attributes": record.get("attributes", {}),
+                "MessageAttributes": {
+                    k: {"StringValue": v.get("stringValue")}
+                    for k, v in record.get("messageAttributes", {}).items()
+                },
+            }
+            msg_kind = sqs_message["MessageAttributes"].get("mtype", {}).get("StringValue")
+            if msg_kind != DATA_MESSAGE:
+                self.logger.warning(
+                    "Unknown sqs_message or sns format %s" % (sqs_message["Body"][:50])
+                )
+            try:
+                self.process_sqs_message(sqs_message)
+            except Exception:
+                self.logger.exception("Error processing message %s", record["messageId"])
+                failures.append({"itemIdentifier": record["messageId"]})
+        return {"batchItemFailures": failures}
 
     # This function when processing sqs messages will only deliver messages over email or sns
     # If you explicitly declare which tags are aws_usernames (synonymous with ldap uids)
