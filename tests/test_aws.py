@@ -108,6 +108,18 @@ class TestArnResolver:
             result = aws.ArnResolver.resolve_type(arn)
             assert result == expected
 
+    def test_arn_resolve_type_launch_template(self):
+        # aws.launch-template shares the launch-template arn type with
+        # aws.launch-template-version; arns keep resolving to the version
+        # resource, whose get_resources accepts template ids.
+        aws.AWS.get_resource_types(
+            ("aws.launch-template", "aws.launch-template-version"))
+        for value in (
+            'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0123456789abcdef0',
+            'arn:aws:ec2:us-east-1:123456789012:launch-template/lt-0123456789abcdef0/3',
+        ):
+            assert aws.ArnResolver.resolve_type(value) == 'launch-template-version'
+
     def test_arn_cwe_resolver(self):
 
         evars = dict(
