@@ -160,6 +160,9 @@ class EmailDelivery:
                 "get_account_emails account_email_mapping: %s.", account_email_mapping
             )
             email_list = account_email_mapping.get(account_id, [])
+            # An account can map to a single address or to a list of addresses.
+            if isinstance(email_list, str):
+                email_list = [email_list]
             self.logger.debug("get_account_emails email_list: %s.", email_list)
 
         return self.get_valid_emails_from_list(email_list)
