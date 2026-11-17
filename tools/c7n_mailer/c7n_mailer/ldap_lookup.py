@@ -34,7 +34,9 @@ class LdapLookup:
         if self.cache_engine == "redis":
             redis_host = config.get("redis_host")
             redis_port = int(config.get("redis_port", 6379))
-            self.caching = self.get_redis_connection(redis_host, redis_port)
+            self.caching = self.get_redis_connection(
+                redis_host, redis_port, redis_url=config.get("redis_url")
+            )
         elif self.cache_engine == "sqlite":  # nosec
             if not have_sqlite:
                 raise RuntimeError("No sqlite available: stackoverflow.com/q/44058239")
@@ -45,8 +47,8 @@ class LdapLookup:
                 config.get("ldap_cache_file", "/var/tmp/ldap.cache"), logger  # nosec
             )
 
-    def get_redis_connection(self, redis_host, redis_port):
-        return Redis(redis_host=redis_host, redis_port=redis_port, db=0)
+    def get_redis_connection(self, redis_host, redis_port, redis_url=None):
+        return Redis(redis_host=redis_host, redis_port=redis_port, db=0, redis_url=redis_url)
 
     def get_connection(self, ldap_uri, ldap_bind_user, ldap_bind_password):
         # note, if ldap_bind_user and ldap_bind_password are None
@@ -192,8 +194,12 @@ class LocalSqlite:
 # redis can't write complex python objects like dictionaries as values (the way memcache can)
 # so we turn our dict into a json string when setting, and json.loads when getting
 class Redis:
-    def __init__(self, redis_host=None, redis_port=6379, db=0):
-        self.connection = redis.StrictRedis(host=redis_host, port=redis_port, db=db)
+    def __init__(self, redis_host=None, redis_port=6379, db=0, redis_url=None):
+        if redis_url:
+            # e.g. rediss://host:6380/0 to connect with TLS (encryption in transit)
+            self.connection = redis.StrictRedis.from_url(redis_url)
+        else:
+            self.connection = redis.StrictRedis(host=redis_host, port=redis_port, db=db)
 
     def get(self, key):
         cache_value = self.connection.get(key)
