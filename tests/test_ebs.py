@@ -1026,10 +1026,12 @@ class EncryptExtantVolumesTest(BaseTest):
         )
         action = policy.resource_manager.actions[0]
         # an unattached volume, plus an encrypted one that is also unattached
-        self.assertIsNone(action.process([
-            {"VolumeId": "vol-1", "Encrypted": False, "Attachments": []},
-            {"VolumeId": "vol-2", "Encrypted": True, "Attachments": []},
-        ]))
+        with self.assertLogs("custodian.ebs", level="WARNING") as logs:
+            self.assertIsNone(action.process([
+                {"VolumeId": "vol-1", "Encrypted": False, "Attachments": []},
+                {"VolumeId": "vol-2", "Encrypted": True, "Attachments": []},
+            ]))
+        self.assertIn("skipping 2 unattached", logs.output[0])
 
 
 class TestKmsAlias(BaseTest):
