@@ -115,6 +115,15 @@ class EmailTest(unittest.TestCase):
         valid_emails = self.email_delivery.get_valid_emails_from_list(list_1)
         self.assertEqual(valid_emails, ["michael_bolton@initech.com", "bill@initech.com"])
 
+    def test_get_valid_emails_from_list_splits_owner_contacts(self):
+        # A resource-owner tag can hold several addresses separated by colons.
+        valid_emails = self.email_delivery.get_valid_emails_from_list(
+            ["milton@initech.com:bill@initech.com", "lsdk:peter@initech.com"]
+        )
+        self.assertEqual(
+            valid_emails, ["milton@initech.com", "bill@initech.com", "peter@initech.com"]
+        )
+
     def test_event_owner_ldap_flow(self):
         targets = ["event-owner"]
         michael_bolton_email = self.email_delivery.get_event_owner_email(targets, CLOUDTRAIL_EVENT)
@@ -310,6 +319,20 @@ class EmailTest(unittest.TestCase):
         logger_mock.debug.assert_called_with(
             "Using org_domain to reconstruct email addresses from contact_tags values"
         )
+
+    def test_get_resource_owner_emails_from_resource_org_domain_colon_separated(self):
+        config = copy.deepcopy(MAILER_CONFIG)
+        config["org_domain"] = "test.com"
+        del config["ldap_uri"]
+        config["contact_tags"] = ["OwnerContact"]
+
+        self.email_delivery = MockEmailDelivery(config, self.aws_session, MagicMock())
+        resource = {"Tags": [{"Key": "OwnerContact", "Value": "milton@initech.com:peter"}]}
+        emails = self.email_delivery.get_resource_owner_emails_from_resource(
+            SQS_MESSAGE_1, resource
+        )
+
+        assert emails == ["milton@initech.com", "peter@test.com"]
 
     def test_cc_email_functionality(self):
         email = get_mimetext_message(
