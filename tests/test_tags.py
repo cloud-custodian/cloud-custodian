@@ -3,6 +3,7 @@
 """Most tags tests within their corresponding resource tags, we use this
 module to test some universal tagging infrastructure not directly exposed.
 """
+import os
 import time
 import jsonschema
 from datetime import datetime
@@ -224,6 +225,48 @@ class UniversalTagTest(BaseTest):
               actions:
                 remove-tag: alias 'unmark' has been deprecated
             """)
+
+
+class MarkForOpTimezoneTest(BaseTest):
+
+    def mark_policy(self, **action):
+        return self.load_policy({
+            'name': 'mark-tz',
+            'resource': 'ec2',
+            'actions': [dict(type='mark-for-op', op='stop', **action)]})
+
+    @freeze_time("2026-11-17 20:00:00")
+    def test_mark_for_op_tz_names(self):
+        # use a non utc local zone, so falling back to it shows in the stamp
+        with patch.dict(os.environ, {'TZ': 'America/New_York'}):
+            for tz, days, hours, expected in [
+                ('Asia/Tokyo', 0, 1, '2026/11/18 0600 JST'),
+                ('Asia/Tokyo', 1, 0, '2026/11/19'),
+                ('UTC', 0, 1, '2026/11/17 2100 UTC'),
+                ('jst', 0, 1, '2026/11/18 0600 JST'),
+            ]:
+                policy = self.mark_policy(tz=tz, days=days, hours=hours)
+                action = policy.resource_manager.actions[0]
+                self.assertEqual(
+                    action.get_config_values()['action_date'], expected)
+
+    def test_mark_for_op_invalid_tz(self):
+        with self.assertRaisesRegex(
+                PolicyValidationError, 'Invalid timezone specified not-a-zone'):
+            self.mark_policy(tz='not-a-zone', hours=1)
+
+    def test_marked_for_op_tz_validation(self):
+        def marked_policy(tz):
+            return self.load_policy({
+                'name': 'marked-tz',
+                'resource': 'ec2',
+                'filters': [{'type': 'marked-for-op', 'op': 'stop', 'tz': tz}]})
+
+        for tz in ('utc', 'UTC', 'Asia/Tokyo'):
+            marked_policy(tz)
+        with self.assertRaisesRegex(
+                PolicyValidationError, "Invalid timezone specified 'not-a-zone'"):
+            marked_policy('not-a-zone')
 
 
 class CoalesceCopyUserTags(BaseTest):
