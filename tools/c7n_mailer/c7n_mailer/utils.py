@@ -407,9 +407,9 @@ def kms_decrypt(config, logger, session, encrypted_field):
     if config.get(encrypted_field):
         try:
             kms = session.client("kms")
-            return kms.decrypt(CiphertextBlob=base64.b64decode(config[encrypted_field]))[
+            plaintext = kms.decrypt(CiphertextBlob=base64.b64decode(config[encrypted_field]))[
                 "Plaintext"
-            ].decode("utf8")
+            ]
         except (TypeError, base64.binascii.Error) as e:
             logger.warning(
                 "Error: %s Unable to base64 decode %s, will assume plaintext."
@@ -422,6 +422,17 @@ def kms_decrypt(config, logger, session, encrypted_field):
                 "Error: %s Unable to decrypt %s with kms, will assume plaintext."
                 % (e, encrypted_field)
             )
+        else:
+            try:
+                return plaintext.decode("utf8")
+            except UnicodeDecodeError:
+                # KMS decrypted the value, so it isn't plaintext, but what was encrypted
+                # wasn't text. AWS CLI v2 base64-decodes --plaintext before encrypting it.
+                raise ValueError(
+                    "%s was decrypted with kms but isn't UTF-8 text. If you encrypted it "
+                    "with AWS CLI v2, pass the secret with --plaintext fileb://<file> or "
+                    "add --cli-binary-format raw-in-base64-out." % encrypted_field
+                ) from None
         return config[encrypted_field]
     else:
         logger.debug("No encrypted value to decrypt.")
