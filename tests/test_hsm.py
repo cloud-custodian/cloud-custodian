@@ -144,4 +144,3 @@ class CloudHSMClusterTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
