@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "MetricDataResults": [
+            {
+                "Id": "m0",
+                "Label": "ResourceCount",
+                "Timestamps": [
+                    {
+                        "__class__": "datetime",
+                        "year": 2026,
+                        "month": 4,
+                        "day": 7,
+                        "hour": 12,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    }
+                ],
+                "Values": [
+                    3500.0
+                ],
+                "StatusCode": "Complete"
+            }
+        ],
+        "Messages": [],
+        "ResponseMetadata": {
+            "RequestId": "d4e5f6a7-b8c9-0123-defa-234567890123",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {},
+            "RetryAttempts": 0
+        }
+    }
+}
