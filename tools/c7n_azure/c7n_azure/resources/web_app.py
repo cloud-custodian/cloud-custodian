@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
@@ -129,3 +130,65 @@ class AuthenticationFilter(ValueFilter):
             i['c7n:authentication'] = instance.serialize(keep_readonly=True)['properties']
 
         return super().__call__(i['c7n:authentication'])
+
+
+@WebApp.action_registry.register('stop')
+class WebAppStopAction(AzureBaseAction):
+    """Stop a web application
+
+    :example:
+
+    This policy will stop web apps outside of business hours.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-webapps-offhours
+            resource: azure.webapp
+            filters:
+              - type: offhour
+                default_tz: pt
+                offhour: 18
+                tag: onoffhour_schedule
+            actions:
+              - type: stop
+    """
+
+    schema = type_schema('stop')
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.web_apps.stop(resource['resourceGroup'], resource['name'])
+
+
+@WebApp.action_registry.register('start')
+class WebAppStartAction(AzureBaseAction):
+    """Start a web application
+
+    :example:
+
+    This policy will start web apps at the beginning of business hours.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: start-webapps-onhours
+            resource: azure.webapp
+            filters:
+              - type: onhour
+                default_tz: pt
+                onhour: 8
+                tag: onoffhour_schedule
+            actions:
+              - type: start
+    """
+
+    schema = type_schema('start')
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.web_apps.start(resource['resourceGroup'], resource['name'])
