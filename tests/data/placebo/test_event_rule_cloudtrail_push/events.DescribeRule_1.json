@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "custodian-orders-created",
+        "Arn": "arn:aws:events:us-east-1:644160558196:rule/orders-bus/custodian-orders-created",
+        "EventPattern": "{\"source\":[\"orders\"]}",
+        "State": "ENABLED",
+        "EventBusName": "orders-bus",
+        "CreatedBy": "644160558196",
+        "ResponseMetadata": {}
+    }
+}
