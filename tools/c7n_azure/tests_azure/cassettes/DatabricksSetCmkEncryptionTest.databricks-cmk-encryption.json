@@ -1,0 +1,591 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "azure-deprecating": [
+                        "Due to an RBAC security default, Key Vault's Resource Manager API versions older than 2026-02-01 will retire on 2027-04-01 (https://learn.microsoft.com/en-us/azure/key-vault/general/access-control-default?tabs=azure-cli)"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 05 Nov 2026 18:51:18 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "1645"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.KeyVault/vaults/cctestcmkxt2qe6xufzpak",
+                                "name": "cctestcmkxt2qe6xufzpak",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "systemData": {
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2026-11-05T18:48:05.339Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2026-11-05T18:48:05.339Z"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "00000000-0000-0000-0000-000000000012",
+                                            "permissions": {
+                                                "keys": [
+                                                    "get",
+                                                    "wrapKey",
+                                                    "unwrapKey"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 7,
+                                    "enableRbacAuthorization": false,
+                                    "enablePurgeProtection": true,
+                                    "vaultUri": "https://cctestcmkxt2qe6xufzpak.vault.azure.net/",
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&%24skiptoken=3ZDdSsNAEIXfZRGvut1kTVoaCFJFLNhW7J9WAjLZTtMlJhtmN7W19N3deukjCMO5GM5h5nwnVuPBjXVdWpac2Px5uRjdP0wXs%2bF4OWcJ2znX2ESICmoosMLadeG7JewqUwnb5laRbpw2tRUIkdzGcY%2fHYdDjUT%2b64YNBHnAVykG%2bhX4IUV8QWtOSwkcybWOFQ%2bs%2bNuAgJ61Ky1VViobMXm%2bQrJhoRcaares%2b4XEF7acT%2b4vaW2g033uLP5zKQMY88BNeX9nSf2NKrNO1nAbvb9NgLUPC0ctRvS4ljla%2bwd0OvtKUnTsMqBoWBWEBDjeLS8w3Hs4mrPNLZQJUIvnVKfsDJmNJ9n%2fRZOzMzj8%3d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.KeyVault/vaults?api-version=2025-05-01&$skiptoken=3ZDdSsNAEIXfZRGvut1kTVoaCFJFLNhW7J9WAjLZTtMlJhtmN7W19N3deukjCMO5GM5h5nwnVuPBjXVdWpac2Px5uRjdP0wXs%2BF4OWcJ2znX2ESICmoosMLadeG7JewqUwnb5laRbpw2tRUIkdzGcY/HYdDjUT%2B64YNBHnAVykG%2BhX4IUV8QWtOSwkcybWOFQ%2Bs%2BNuAgJ61Ky1VViobMXm%2BQrJhoRcaares%2B4XEF7acT%2B4vaW2g033uLP5zKQMY88BNeX9nSf2NKrNO1nAbvb9NgLUPC0ctRvS4ljla%2Bwd0OvtKUnTsMqBoWBWEBDjeLS8w3Hs4mrPNLZQJUIvnVKfsDJmNJ9n/RZOzMzj8%3D",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "azure-deprecating": [
+                        "Due to an RBAC security default, Key Vault's Resource Manager API versions older than 2026-02-01 will retire on 2027-04-01 (https://learn.microsoft.com/en-us/azure/key-vault/general/access-control-default?tabs=azure-cli)"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 05 Nov 2026 18:51:19 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Databricks/workspaces?api-version=2018-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "date": [
+                        "Thu, 05 Nov 2026 18:51:20 GMT"
+                    ],
+                    "content-length": [
+                        "1666"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "privateLinkAssets": [],
+                                    "managedResourceGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk_managed",
+                                    "parameters": {
+                                        "enableFedRampCertification": {
+                                            "type": "Bool",
+                                            "value": false
+                                        },
+                                        "enableNoPublicIp": {
+                                            "type": "Bool",
+                                            "value": true
+                                        },
+                                        "prepareEncryption": {
+                                            "type": "Bool",
+                                            "value": true
+                                        },
+                                        "requireInfrastructureEncryption": {
+                                            "type": "Bool",
+                                            "value": false
+                                        },
+                                        "resourceTags": {
+                                            "type": "Object",
+                                            "value": {
+                                                "application": "databricks",
+                                                "databricks-environment": "true"
+                                            }
+                                        },
+                                        "storageAccountName": {
+                                            "type": "String",
+                                            "value": "dbstoragecctest"
+                                        },
+                                        "storageAccountSkuName": {
+                                            "type": "String",
+                                            "value": "Standard_ZRS"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "authorizations": [
+                                        {
+                                            "principalId": "00000000-0000-0000-0000-000000000013",
+                                            "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                                        }
+                                    ],
+                                    "createdBy": {
+                                        "oid": "00000000-0000-0000-0000-000000000011",
+                                        "puid": "0000000000000000",
+                                        "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                                    },
+                                    "updatedBy": {
+                                        "oid": "00000000-0000-0000-0000-000000000011",
+                                        "puid": "0000000000000000",
+                                        "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                                    },
+                                    "workspaceId": "0000000000000000",
+                                    "workspaceUrl": "adb-0000000000000000.4.azuredatabricks.net",
+                                    "createdDateTime": "2026-11-05T18:38:28.8589634Z",
+                                    "storageAccountIdentity": {
+                                        "principalId": "00000000-0000-0000-0000-000000000012",
+                                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                                        "type": "SystemAssigned"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.Databricks/workspaces/cctestdatabrickscmk",
+                                "name": "cctestdatabrickscmk",
+                                "type": "Microsoft.Databricks/workspaces",
+                                "sku": {
+                                    "name": "premium"
+                                },
+                                "location": "southcentralus"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.Databricks/workspaces/cctestdatabrickscmk?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "date": [
+                        "Thu, 05 Nov 2026 18:51:20 GMT"
+                    ],
+                    "content-length": [
+                        "2570"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "isUcEnabled": false,
+                            "privateLinkAssets": [],
+                            "managedResourceGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk_managed",
+                            "parameters": {
+                                "enableFedRampCertification": {
+                                    "type": "Bool",
+                                    "value": false
+                                },
+                                "enableNoPublicIp": {
+                                    "type": "Bool",
+                                    "value": true
+                                },
+                                "prepareEncryption": {
+                                    "type": "Bool",
+                                    "value": true
+                                },
+                                "requireInfrastructureEncryption": {
+                                    "type": "Bool",
+                                    "value": false
+                                },
+                                "resourceTags": {
+                                    "type": "Object",
+                                    "value": {
+                                        "application": "databricks",
+                                        "databricks-environment": "true"
+                                    }
+                                },
+                                "storageAccountName": {
+                                    "type": "String",
+                                    "value": "dbstoragecctest"
+                                },
+                                "storageAccountSkuName": {
+                                    "type": "String",
+                                    "value": "Standard_ZRS"
+                                }
+                            },
+                            "provisioningState": "Succeeded",
+                            "authorizations": [
+                                {
+                                    "principalId": "00000000-0000-0000-0000-000000000013",
+                                    "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                                }
+                            ],
+                            "createdBy": {
+                                "oid": "00000000-0000-0000-0000-000000000011",
+                                "puid": "0000000000000000",
+                                "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                            },
+                            "updatedBy": {
+                                "oid": "00000000-0000-0000-0000-000000000011",
+                                "puid": "0000000000000000",
+                                "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                            },
+                            "workspaceId": "0000000000000000",
+                            "workspaceUrl": "adb-0000000000000000.4.azuredatabricks.net",
+                            "createdDateTime": "2026-11-05T18:38:28.8589634Z",
+                            "storageAccountIdentity": {
+                                "principalId": "00000000-0000-0000-0000-000000000012",
+                                "tenantId": "00000000-0000-0000-0000-000000000003",
+                                "type": "SystemAssigned"
+                            }
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.Databricks/workspaces/cctestdatabrickscmk",
+                        "name": "cctestdatabrickscmk",
+                        "type": "Microsoft.Databricks/workspaces",
+                        "sku": {
+                            "name": "premium"
+                        },
+                        "location": "southcentralus",
+                        "systemData": {
+                            "createdBy": "user@example.com",
+                            "createdByType": "User",
+                            "createdAt": "2026-11-05T18:38:28.7198865+00:00",
+                            "lastModifiedBy": "user@example.com",
+                            "lastModifiedByType": "User",
+                            "lastModifiedAt": "2026-11-05T18:38:28.7198865+00:00"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.Databricks/workspaces/cctestdatabrickscmk?api-version=2024-05-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "99"
+                    ],
+                    "date": [
+                        "Thu, 05 Nov 2026 18:51:27 GMT"
+                    ],
+                    "content-length": [
+                        "2307"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.Databricks/locations/southcentralus/operationStatuses/eyJmdWxseVF1YWxpZmllZEFwcGxpYW5jZUlkIjoiL3N1YnNjcmlwdGlvbnMvZWE0MmY1NTYtNTEwNi00NzQzLTk5YjAtYzEyOWJmYTcxYTQ3L3Jlc291cmNlR3JvdXBzL3Rlc3RfZGF0YWJyaWNrcy1jbWsvcHJvdmlkZXJzL01pY3Jvc29mdC5EYXRhYnJpY2tzL3dvcmtzcGFjZXMvY2N0ZXN0ZGF0YWJyaWNrc2NtayIsImpvYklkIjoiQXBwbGlhbmNlUHJvdmlzaW9uaW5nSm9iOjJEUkdBOjJEVEVTVDozQTVGREFUQUJSSUNLUzozQTJEQ01LOjJEQ0NURVNUREFUQUJSSUNLU0NNSyJ9?api-version=2024-05-01&t=639295014887463015&c=redacted&s=redacted&h=redacted"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "isUcEnabled": false,
+                            "managedResourceGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk_managed",
+                            "parameters": {
+                                "enableFedRampCertification": {
+                                    "type": "Bool",
+                                    "value": false
+                                },
+                                "enableNoPublicIp": {
+                                    "type": "Bool",
+                                    "value": true
+                                },
+                                "prepareEncryption": {
+                                    "type": "Bool",
+                                    "value": true
+                                },
+                                "requireInfrastructureEncryption": {
+                                    "type": "Bool",
+                                    "value": false
+                                },
+                                "resourceTags": {
+                                    "type": "Object",
+                                    "value": {
+                                        "application": "databricks",
+                                        "databricks-environment": "true"
+                                    }
+                                },
+                                "storageAccountName": {
+                                    "type": "String",
+                                    "value": "dbstoragecctest"
+                                },
+                                "storageAccountSkuName": {
+                                    "type": "String",
+                                    "value": "Standard_ZRS"
+                                },
+                                "encryption": {
+                                    "value": {
+                                        "keySource": "Microsoft.Keyvault",
+                                        "keyvaulturi": "https://cctestcmkxt2qe6xufzpak.vault.azure.net/",
+                                        "KeyName": "cctest-dbfs-key"
+                                    }
+                                }
+                            },
+                            "provisioningState": "Updating",
+                            "authorizations": [
+                                {
+                                    "principalId": "00000000-0000-0000-0000-000000000013",
+                                    "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                                }
+                            ],
+                            "createdBy": {},
+                            "updatedBy": {
+                                "oid": "00000000-0000-0000-0000-000000000011",
+                                "puid": "0000000000000000",
+                                "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                            },
+                            "createdDateTime": "2026-11-05T18:51:22.1522961Z"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.Databricks/workspaces/cctestdatabrickscmk",
+                        "name": "cctestdatabrickscmk",
+                        "type": "Microsoft.Databricks/workspaces",
+                        "sku": {
+                            "name": "premium"
+                        },
+                        "location": "southcentralus",
+                        "systemData": {
+                            "createdBy": "user@example.com",
+                            "createdByType": "User",
+                            "createdAt": "2026-11-05T18:38:28.7198865+00:00",
+                            "lastModifiedBy": "user@example.com",
+                            "lastModifiedByType": "User",
+                            "lastModifiedAt": "2026-11-05T18:51:22.1213639+00:00"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.Databricks/workspaces/cctestdatabrickscmk?api-version=2018-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "date": [
+                        "Thu, 05 Nov 2026 18:56:08 GMT"
+                    ],
+                    "content-length": [
+                        "2519"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "privateLinkAssets": [],
+                            "managedResourceGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk_managed",
+                            "parameters": {
+                                "enableFedRampCertification": {
+                                    "type": "Bool",
+                                    "value": false
+                                },
+                                "enableNoPublicIp": {
+                                    "type": "Bool",
+                                    "value": true
+                                },
+                                "prepareEncryption": {
+                                    "type": "Bool",
+                                    "value": true
+                                },
+                                "requireInfrastructureEncryption": {
+                                    "type": "Bool",
+                                    "value": false
+                                },
+                                "resourceTags": {
+                                    "type": "Object",
+                                    "value": {
+                                        "application": "databricks",
+                                        "databricks-environment": "true"
+                                    }
+                                },
+                                "storageAccountName": {
+                                    "type": "String",
+                                    "value": "dbstoragecctest"
+                                },
+                                "storageAccountSkuName": {
+                                    "type": "String",
+                                    "value": "Standard_ZRS"
+                                },
+                                "encryption": {
+                                    "type": "Object",
+                                    "value": {
+                                        "keySource": "Microsoft.Keyvault",
+                                        "keyvaulturi": "https://cctestcmkxt2qe6xufzpak.vault.azure.net/",
+                                        "KeyName": "cctest-dbfs-key",
+                                        "keyversion": ""
+                                    }
+                                }
+                            },
+                            "provisioningState": "Succeeded",
+                            "authorizations": [
+                                {
+                                    "principalId": "00000000-0000-0000-0000-000000000013",
+                                    "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                                }
+                            ],
+                            "createdBy": {
+                                "oid": "00000000-0000-0000-0000-000000000011",
+                                "puid": "0000000000000000",
+                                "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                            },
+                            "updatedBy": {
+                                "oid": "00000000-0000-0000-0000-000000000011",
+                                "puid": "0000000000000000",
+                                "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                            },
+                            "workspaceId": "0000000000000000",
+                            "workspaceUrl": "adb-0000000000000000.4.azuredatabricks.net",
+                            "createdDateTime": "2026-11-05T18:38:28.8589634Z",
+                            "storageAccountIdentity": {
+                                "principalId": "00000000-0000-0000-0000-000000000012",
+                                "tenantId": "00000000-0000-0000-0000-000000000003",
+                                "type": "SystemAssigned"
+                            }
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks-cmk/providers/Microsoft.Databricks/workspaces/cctestdatabrickscmk",
+                        "name": "cctestdatabrickscmk",
+                        "type": "Microsoft.Databricks/workspaces",
+                        "sku": {
+                            "name": "premium"
+                        },
+                        "location": "southcentralus"
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "uniqueId": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "workspaceName": "cctestdatabrickscmk",
+    "vaultName": "[concat('cctestcmk', parameters('uniqueId'))]",
+    "keyName": "cctest-dbfs-key"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Databricks/workspaces",
+      "apiVersion": "2024-05-01",
+      "name": "[variables('workspaceName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "premium"
+      },
+      "properties": {
+        "managedResourceGroupId": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', 'test_databricks-cmk_managed')]",
+        "parameters": {
+          "prepareEncryption": {
+            "value": true
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2023-07-01",
+      "name": "[variables('vaultName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Databricks/workspaces', variables('workspaceName'))]"
+      ],
+      "properties": {
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "family": "A",
+          "name": "standard"
+        },
+        "enableRbacAuthorization": false,
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": 7,
+        "enablePurgeProtection": true,
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[reference(resourceId('Microsoft.Databricks/workspaces', variables('workspaceName')), '2024-05-01').storageAccountIdentity.principalId]",
+            "permissions": {
+              "keys": [
+                "get",
+                "wrapKey",
+                "unwrapKey"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/keys",
+      "apiVersion": "2023-07-01",
+      "name": "[concat(variables('vaultName'), '/', variables('keyName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]"
+      ],
+      "properties": {
+        "kty": "RSA",
+        "keySize": 2048
+      }
+    }
+  ]
+}
