@@ -134,7 +134,6 @@ class CloudHSMBackup(QueryResourceManager):
         permission_prefix = arn_service = 'cloudhsm'
         enum_spec = ('describe_backups', 'Backups', None)
         id = name = 'BackupId'
-        universal_taggable = object()
         permissions_augment = ("cloudhsm:ListTagsForResource",)
 
     source_mapping = {
