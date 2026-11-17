@@ -400,6 +400,19 @@ class EmailTest(unittest.TestCase):
             assert "To: bill_lumberg@initech.com" in args[1]["RawMessage"]["Data"]
             args = mock_send.call_args_list[1][0]
             assert "To: someone@example.com" in args[1]["RawMessage"]["Data"]
+            assert "ConfigurationSetName" not in args[1]
+
+    def test_ses_send_raw_email_with_configuration_set(self):
+        config = copy.deepcopy(MAILER_CONFIG)
+        del config["smtp_server"]
+        config["ses_configuration_set"] = "mailer-events"
+        delivery = MockEmailDelivery(config, self.aws_session, MagicMock())
+
+        with patch("botocore.client.BaseClient._make_api_call") as mock_send:
+            delivery.send_c7n_email(copy.deepcopy(SQS_MESSAGE_1))
+            args = mock_send.call_args_list[0][0]
+            assert args[0] == "SendRawEmail"
+            assert args[1]["ConfigurationSetName"] == "mailer-events"
 
     def test_get_ldap_connection(self):
         with patch("c7n_mailer.email_delivery.decrypt") as patched:
