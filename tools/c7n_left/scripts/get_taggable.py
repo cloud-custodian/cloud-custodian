@@ -65,7 +65,7 @@ def get_taggable_resources(schema):
 def main(output, module_path):
     taggable = {}
     for path in module_path:
-        subprocess.run(["terraform", "init"], cwd=path, check=True)
+        subprocess.run(["terraform", "init", "-upgrade"], cwd=path, check=True)
         proc = subprocess.run(
             ["terraform", "providers", "schema", "-json"],
             cwd=path,
