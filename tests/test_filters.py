@@ -2047,5 +2047,112 @@ class AnnotationSweeperTest(unittest.TestCase):
         self.assertEqual(resources, swept)
 
 
+class TestRequiredValueFilter(BaseTest):
+
+    def test_missing_and_null(self):
+        cases = [
+            ('eq', 'ready', False),
+            ('ne', 'ready', True),
+            ('in', ['ready'], False),
+            ('not-in', ['ready'], True),
+            ('gt', 0, False),
+        ]
+        for resource in ({}, {'state': None}):
+            for op, value, default in cases:
+                for required, expected in ((None, default), (True, False), (False, True)):
+                    with self.subTest(resource=resource, op=op, required=required):
+                        data = {'type': 'value', 'key': 'state', 'op': op, 'value': value}
+                        if required is not None:
+                            data['required'] = required
+                        self.assertEqual(base_filters.ValueFilter(data).match(resource), expected)
+
+    def test_present_values_still_require_condition(self):
+        for value in (False, 0, '', [], {}, 'ready'):
+            for required in (True, False):
+                with self.subTest(value=value, required=required):
+                    data = {'type': 'value', 'key': 'state', 'required': required, 'value': value}
+                    self.assertTrue(base_filters.ValueFilter(data).match({'state': value}))
+                    data['value'] = 'different'
+                    self.assertFalse(base_filters.ValueFilter(data).match({'state': value}))
+
+    def test_presence_before_value_conversion(self):
+        for vtype in ('integer', 'size'):
+            for required, expected in ((True, False), (False, True)):
+                with self.subTest(vtype=vtype, required=required):
+                    data = {'type': 'value', 'key': 'state', 'value_type': vtype,
+                            'value': 1, 'required': required}
+                    self.assertEqual(base_filters.ValueFilter(data).match({}), expected)
+                    self.assertFalse(base_filters.ValueFilter(data).match({'state': 0}))
+
+    def test_tag_presence_across_providers(self):
+        for resource in ({'Tags': []}, {'tags': {}}, {'labels': {}}):
+            for required, expected in ((True, False), (False, True)):
+                with self.subTest(resource=resource, required=required):
+                    data = {'type': 'value', 'key': 'tag:Environment', 'op': 'eq',
+                            'value': 'prod', 'required': required}
+                    self.assertEqual(base_filters.ValueFilter(data).match(resource), expected)
+        for resource in ({'Tags': [{'Key': 'Environment', 'Value': ''}]},
+                         {'tags': {'Environment': ''}}, {'labels': {'Environment': ''}}):
+            self.assertTrue(base_filters.ValueFilter({
+                'type': 'value', 'key': 'tag:Environment', 'required': True,
+                'value': ''}).match(resource))
+
+    def test_special_values(self):
+        for value in ('absent', 'present', 'empty', 'not-null'):
+            for required, expected in ((True, False), (False, True)):
+                with self.subTest(value=value, required=required):
+                    data = {'type': 'value', 'key': 'state', 'value': value,
+                            'required': required}
+                    self.assertEqual(base_filters.ValueFilter(data).match({}), expected)
+                    self.assertEqual(base_filters.ValueFilter(data).match({'state': 'ready'}),
+                                     value in ('present', 'not-null'))
+
+    def test_nested_path_and_value_path(self):
+        data = {'type': 'value', 'key': 'config.state', 'value_path': 'expected',
+                'op': 'eq', 'required': False}
+        vf = base_filters.ValueFilter(data)
+        self.assertTrue(vf.match({'config': {}, 'expected': 'ready'}))
+        self.assertTrue(vf.match({'config': {'state': 'ready'}, 'expected': 'ready'}))
+        self.assertFalse(vf.match({'config': {'state': 'pending'}, 'expected': 'ready'}))
+
+    def test_value_regex_presence(self):
+        data = {'type': 'value', 'key': 'state', 'value_regex': r'state=(\w+)',
+                'value': 'ready', 'required': False}
+        vf = base_filters.ValueFilter(data)
+        self.assertTrue(vf.match({'state': 'unmatched'}))
+        self.assertTrue(vf.match({'state': 'state=ready'}))
+        self.assertFalse(vf.match({'state': 'state=pending'}))
+
+    def test_required_schema_and_annotations(self):
+        for required in (True, False):
+            policy = self.load_policy({
+                'name': 'required-state', 'resource': 'ec2',
+                'filters': [{'type': 'value', 'key': 'State.Name', 'value': 'running',
+                             'required': required}],
+            }, validate=True)
+            missing, running, stopped = {}, {'State': {'Name': 'running'}}, {
+                'State': {'Name': 'stopped'}}
+            expected = [running] if required else [missing, running]
+            self.assertEqual(policy.resource_manager.filter_resources(
+                [missing, running, stopped]), expected)
+            for resource in expected:
+                self.assertIn('State.Name', resource['c7n:MatchedFilters'])
+        for required in ('true', 1, None):
+            with self.subTest(required=required), self.assertRaises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'invalid-required', 'resource': 'ec2',
+                    'filters': [{'type': 'value', 'key': 'State.Name', 'value': 'running',
+                                 'required': required}],
+                }, validate=True)
+
+    def test_resource_count_rejects_required(self):
+        for required in (True, False):
+            with self.subTest(required=required), self.assertRaisesRegex(
+                    PolicyValidationError, 'required.*resource_count'):
+                base_filters.ValueFilter({
+                    'type': 'value', 'value_type': 'resource_count', 'op': 'gt', 'value': 0,
+                    'required': required}).validate()
+
+
 if __name__ == "__main__":
     unittest.main()
