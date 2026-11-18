@@ -762,6 +762,8 @@ class AzureOffHour(OffHour):
                                             tag=self.tag_key,
                                             utf_8=True)
 
+        if tag_value is False and self.fallback_schedule:
+            tag_value = self.fallback_schedule
         if tag_value is not False:
             tag_value = tag_value.lower().strip("'\"")
         return tag_value
@@ -775,6 +777,8 @@ class AzureOnHour(OnHour):
                                             tag=self.tag_key,
                                             utf_8=True)
 
+        if tag_value is False and self.fallback_schedule:
+            tag_value = self.fallback_schedule
         if tag_value is not False:
             tag_value = tag_value.lower().strip("'\"")
         return tag_value
