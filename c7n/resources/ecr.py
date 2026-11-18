@@ -471,12 +471,9 @@ class LifecycleRule(Filter):
 
         results = []
         for r in resources:
-            found = False
-            for rule in r[self.policy_annotation].get('rules', []):
-                found = True
-                for m in matchers:
-                    if not m(rule):
-                        found = False
+            found = any(
+                all(m(rule) for m in matchers)
+                for rule in r[self.policy_annotation].get('rules', []))
             if found and state:
                 results.append(r)
             if not found and not state:
