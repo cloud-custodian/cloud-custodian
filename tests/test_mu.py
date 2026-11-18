@@ -362,7 +362,8 @@ class PolicyLambdaProvision(Publish):
         self.assertEqual(
             json.loads(events[0].render_event_pattern()),
             {'detail': {
-                'eventTypeCategory': ['issue', 'scheduledChange']},
+                'eventTypeCategory': ['issue', 'scheduledChange'],
+                'statusCode': ['open', 'upcoming']},
              'source': ['aws.health']}
         )
 
