@@ -94,6 +94,17 @@ class Folder(QueryResourceManager):
                     return {'parent': child['parent']}
 
 
+@Folder.action_registry.register('set-iam-policy')
+class FolderSetIamPolicy(SetIamPolicy):
+    """
+    Overrides the base implementation to process Folder resources correctly.
+    """
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments
+
+
 @resources.register('project')
 class Project(QueryResourceManager):
     """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects
