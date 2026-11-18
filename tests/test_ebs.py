@@ -1014,6 +1014,25 @@ class EncryptExtantVolumesTest(BaseTest):
                 if (v["Attachments"][0]["InstanceId"] == r["Attachments"][0]["InstanceId"]):
                     self.assertEqual(v["Tags"], r["Tags"])
 
+    def test_encrypt_volumes_skips_unattached(self):
+        policy = self.load_policy(
+            {
+                "name": "ebs-encrypt-unattached",
+                "resource": "ebs",
+                "actions": [
+                    {"type": "encrypt-instance-volumes", "key": "alias/encryptebs"}
+                ],
+            }
+        )
+        action = policy.resource_manager.actions[0]
+        # an unattached volume, plus an encrypted one that is also unattached
+        with self.assertLogs("custodian.ebs", level="WARNING") as logs:
+            self.assertIsNone(action.process([
+                {"VolumeId": "vol-1", "Encrypted": False, "Attachments": []},
+                {"VolumeId": "vol-2", "Encrypted": True, "Attachments": []},
+            ]))
+        self.assertIn("skipping 2 unattached", logs.output[0])
+
 
 class TestKmsAlias(BaseTest):
 
