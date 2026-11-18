@@ -202,6 +202,9 @@ class DefenderSecurityContact(QueryResourceManager, metaclass=QueryMeta):
             return {'api_version': '2023-12-01-preview'}
 
 
+SECURITY_CONTACT_ROLES = ['AccountAdmin', 'ServiceAdmin', 'Owner', 'Contributor']
+
+
 @DefenderSecurityContact.action_registry.register('set-security-contact')
 class SetSecurityContactAction(AzureBaseAction):
     """Update a Microsoft Defender for Cloud security contact.
@@ -210,6 +213,10 @@ class SetSecurityContactAction(AzureBaseAction):
     contact is read first and only the properties given in the action are
     changed. ``notifications-sources``, when given, replaces the existing
     list of sources.
+
+    Under ``notifications-by-role``, ``roles`` replaces the roles already
+    set, while ``add-roles`` merges into them and keeps the rest. The two
+    are mutually exclusive.
 
     :example:
 
@@ -236,6 +243,28 @@ class SetSecurityContactAction(AzureBaseAction):
                 notifications-sources:
                   - source-type: Alert
                     minimal-severity: High
+
+    :example:
+
+    Notify subscription owners without disturbing the roles already set.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-defender-contact-notify-owners
+            resource: azure.defender-contact
+            filters:
+              - not:
+                - type: value
+                  key: properties.notificationsByRole.roles
+                  op: contains
+                  value: Owner
+            actions:
+              - type: set-security-contact
+                notifications-by-role:
+                  state: "On"
+                  add-roles:
+                    - Owner
     """
 
     schema = type_schema(
@@ -261,10 +290,12 @@ class SetSecurityContactAction(AzureBaseAction):
                     'state': {'type': 'string', 'enum': ['On', 'Off']},
                     'roles': {
                         'type': 'array',
-                        'items': {
-                            'type': 'string',
-                            'enum': ['AccountAdmin', 'ServiceAdmin', 'Owner', 'Contributor'],
-                        },
+                        'items': {'type': 'string', 'enum': SECURITY_CONTACT_ROLES},
+                    },
+                    'add-roles': {
+                        'type': 'array',
+                        'minItems': 1,
+                        'items': {'type': 'string', 'enum': SECURITY_CONTACT_ROLES},
                     },
                 },
             },
@@ -312,6 +343,11 @@ class SetSecurityContactAction(AzureBaseAction):
             raise PolicyValidationError(
                 f"set-security-contact requires at least one of: {', '.join(self.settable)}"
             )
+        by_role = self.data.get('notifications-by-role') or {}
+        if 'roles' in by_role and 'add-roles' in by_role:
+            raise PolicyValidationError(
+                "set-security-contact: roles and add-roles are mutually exclusive"
+            )
         return self
 
     def _process_resources(self, resources, event):
@@ -353,6 +389,12 @@ class SetSecurityContactAction(AzureBaseAction):
                 current.state = by_role['state']
             if 'roles' in by_role:
                 current.roles = by_role['roles']
+            elif 'add-roles' in by_role:
+                roles = list(current.roles or [])
+                for role in by_role['add-roles']:
+                    if role not in roles:
+                        roles.append(role)
+                current.roles = roles
             contact.notifications_by_role = current
         if 'notifications-sources' in self.data:
             contact.notifications_sources = [
