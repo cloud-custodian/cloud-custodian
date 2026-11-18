@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"CrossAccount\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::112233445566:root\"},\"Action\":\"s3express:*\",\"Resource\":\"arn:aws:s3express:us-east-1:644160558196:accesspoint/c7n-test-cross-account-ap--use1-az4--xa-s3\"}]}"
+    }
+}
