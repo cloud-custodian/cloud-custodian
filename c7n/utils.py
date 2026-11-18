@@ -1144,6 +1144,19 @@ def is_not_found(err):
     return False
 
 
+def is_access_denied(err):
+    """Determine if an aws exception is an access denied error.
+
+    Returns boolean.
+
+    Services disagree on the code, and SNS uses AuthorizationError for a
+    resource policy deny. Codes are matched exactly so that unrelated
+    errors are never mistaken for a denial.
+    """
+    return err.response['Error']['Code'] in (
+        'AccessDenied', 'AccessDeniedException', 'AuthorizationError')
+
+
 def get_support_region(manager):
     # support is a unique service in that it doesnt support regional endpoints
     # thus, we need to construct the client based off the regions found here:
