@@ -13,10 +13,27 @@ CCTESTVM_ID = (
     '/providers/Microsoft.Compute/virtualMachines/cctestvm')
 
 
-def policy_states_page(*states):
-    # Stand in for the SDK's return value, which is an ItemPaged: iterable, and
-    # with no `.value`. A Mock would supply a `.value` the real client lacks.
-    return ItemPaged(lambda token=None: None, lambda _: (None, iter(states)))
+def policy_states_pages(*pages):
+    # Stand in for the SDK's return value, which is an ItemPaged: iterable, with no
+    # `.value` (a Mock would supply one the real client lacks), and spread over
+    # continuation pages so a filter that reads only the first page is caught.
+    remaining = [list(page) for page in pages]
+
+    def get_next(token=None):
+        return remaining.pop(0) if remaining else []
+
+    def extract_data(page):
+        return ('next' if remaining else None), iter(page)
+
+    return ItemPaged(get_next, extract_data)
+
+
+def policy_state(resource_id, compliance_state='NonCompliant', definition='test-definition'):
+    return PolicyState(
+        resource_id=resource_id,
+        compliance_state=compliance_state,
+        policy_definition_id=(
+            f'/providers/Microsoft.Authorization/policyDefinitions/{definition}'))
 
 
 class PolicyCompliance(BaseTest):
@@ -37,7 +54,7 @@ class PolicyCompliance(BaseTest):
     @patch("azure.mgmt.policyinsights.operations.PolicyStatesOperations."
            "list_query_results_for_subscription")
     def test_find_by_name(self, policy_mock):
-        policy_mock.return_value = policy_states_page()
+        policy_mock.return_value = policy_states_pages()
 
         p = self.load_policy({
             'name': 'test-azure-vm',
@@ -74,7 +91,7 @@ class PolicyCompliance(BaseTest):
            "list_query_results_for_subscription")
     @patch("azure.mgmt.resource.policy.PolicyClient")
     def test_find_by_name_definition(self, client_mock, policy_mock):
-        policy_mock.return_value = policy_states_page()
+        policy_mock.return_value = policy_states_pages()
         client_mock.policy_definitions.list.return_value = [PolicyDefinition(display_name='TEST')]
 
         p = self.load_policy({
@@ -114,12 +131,11 @@ class PolicyCompliance(BaseTest):
     @patch("azure.mgmt.policyinsights.operations.PolicyStatesOperations."
            "list_query_results_for_subscription")
     def test_non_compliant_resource_is_matched(self, policy_mock):
-        state = PolicyState(
-            resource_id=CCTESTVM_ID,
-            policy_definition_id='/providers/Microsoft.Authorization'
-                                 '/policyDefinitions/test-definition')
+        # The match sits on the second page, so reading only the first fails here.
+        other = policy_state('/subscriptions/x/other-vm')
+        matching = policy_state(CCTESTVM_ID)
         # A pager is consumed once, so hand each call its own, as the SDK does.
-        policy_mock.side_effect = lambda **kwargs: policy_states_page(state)
+        policy_mock.side_effect = lambda **kwargs: policy_states_pages([other], [matching])
 
         def vm_policy(compliant):
             return self.load_policy({
@@ -140,3 +156,29 @@ class PolicyCompliance(BaseTest):
         assert non_compliant[0]['id'].lower() == CCTESTVM_ID.lower()
 
         assert vm_policy(True).run() == []
+
+    @arm_template('vm.json')
+    @cassette_name('test_find_by_name')
+    @patch("azure.mgmt.policyinsights.operations.PolicyStatesOperations."
+           "list_query_results_for_subscription")
+    def test_compliant_state_is_not_matched(self, policy_mock):
+        # The query returns compliant records too; they must not read as findings.
+        policy_mock.side_effect = lambda **kwargs: policy_states_pages(
+            [policy_state(CCTESTVM_ID, compliance_state='Compliant')])
+
+        def vm_policy(compliant):
+            return self.load_policy({
+                'name': 'test-azure-vm',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'},
+                    {'type': 'policy-compliant',
+                     'compliant': compliant}]
+            })
+
+        assert vm_policy(False).run() == []
+        assert len(vm_policy(True).run()) == 1
