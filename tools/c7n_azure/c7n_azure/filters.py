@@ -765,14 +765,18 @@ class PolicyComponentsFilter(ListItemFilter):
     Azure Policy definitions in a Resource Provider mode -- the ``Microsoft.*.Data``
     modes -- are evaluated against a resource's components rather than against the
     resource itself, and write no record to the policy states that ``policy-compliant``
-    reads. They are only visible here.
+    reads. Component compliance is only available through this filter.
 
     What a component is depends on the mode: pods and containers under
     ``Microsoft.Kubernetes.Data``, certificates and keys under ``Microsoft.KeyVault.Data``.
     Each item is a component compliance record carrying ``componentId``, ``componentType``,
     ``complianceState`` and the definition that produced it; for Kubernetes ``componentId``
-    is ``namespace/name``. Matched components are annotated onto the resource under
-    ``c7n:PolicyComponents``.
+    is ``namespace/name``. Unless ``count`` is used, the components that matched are
+    annotated onto the resource under ``c7n:PolicyComponents``.
+
+    Only states evaluated in the last 24 hours are considered, which is the query's own
+    default window. The Kubernetes add-on reports every 15 minutes and comfortably fits
+    inside it; a mode evaluated on the slower standard cycle may not.
 
     :example:
 
@@ -796,13 +800,18 @@ class PolicyComponentsFilter(ListItemFilter):
         count={'type': 'number'},
         count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
     )
-    schema_alias = True
     annotate_items = True
     item_annotation_key = 'c7n:PolicyComponents'
 
-    # componentPolicyStates has no operation group in azure-mgmt-policyinsights 1.0.1, and
-    # the 1.1.0bN previews that add one page with GET against an endpoint ARM serves POST
-    # only. Issue the request directly rather than take that dependency.
+    # policyStates can expand component detail, but only at resource scope, and the
+    # expansion carries just id/type/name/timestamp/complianceState -- no per-component
+    # policy definition, so a definition cannot be named. Kubernetes mode also writes no
+    # parent policy state for the expansion to hang off. Hence componentPolicyStates.
+    #
+    # It has no operation group in azure-mgmt-policyinsights 1.0.1, and the 1.1.0bN
+    # previews that add one paginate with GET, while ARM serves this endpoint by POST
+    # only. So issue the request directly rather than take that dependency. Going through
+    # the client keeps the session's auth, retry and api-stats policies.
     api_version = '2024-10-01'
 
     def get_item_values(self, resource):
@@ -810,9 +819,16 @@ class PolicyComponentsFilter(ListItemFilter):
             'azure.mgmt.policyinsights.PolicyInsightsClient')
         url = (f"{resource['id']}/providers/Microsoft.PolicyInsights"
                "/componentPolicyStates/latest/queryResults")
-        response = client._send_request(HttpRequest(
-            'POST', url, params={'api-version': self.api_version}))
-        response.raise_for_status()
+        try:
+            response = client._send_request(HttpRequest(
+                'POST', url, params={'api-version': self.api_version}))
+            response.raise_for_status()
+        except HttpResponseError:
+            # Raising here would abort the policy and discard every other resource's
+            # result, so skip this one and leave the reason in the log.
+            self.log.exception(
+                f"Could not get component policy states on {resource['id']}")
+            return []
         # Unlike policyStates, this query carries no nextLink in its contract, so the
         # whole set comes back in one body.
         return response.json().get('value', [])

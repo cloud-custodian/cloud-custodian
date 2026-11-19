@@ -57,6 +57,17 @@ class KeyVaultTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_policy_components_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-keyvault',
+                'resource': 'azure.keyvault',
+                'filters': [
+                    {'type': 'policy-components',
+                     'attrs': [{'complianceState': 'NonCompliant'}]}]
+            }, validate=True)
+            assert p
+
     @arm_template('keyvault.json')
     @cassette_name('common')
     @patch('azure.mgmt.policyinsights.PolicyInsightsClient._send_request')

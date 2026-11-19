@@ -517,4 +517,6 @@ class KeyVaultUpdateAction(AzureBaseAction):
         )
 
 
+# Vaults are assessed by Microsoft.KeyVault.Data definitions, which report against
+# their certificates and keys rather than the vault.
 KeyVault.filter_registry.register('policy-components', PolicyComponentsFilter)

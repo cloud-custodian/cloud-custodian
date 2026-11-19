@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 from unittest.mock import patch
 
+from azure.core.exceptions import HttpResponseError
+
 from ..azure_common import BaseTest, arm_template, cassette_name
 
 # "Kubernetes cluster containers should not share host namespaces", a
@@ -56,7 +58,7 @@ class AksTest(BaseTest):
                     {'type': 'policy-components',
                      'attrs': [{'complianceState': 'NonCompliant'}]}]
             }, validate=True)
-            self.assertTrue(p)
+            assert p
 
     @arm_template('aks.json')
     @cassette_name('test_find_aks_by_name')
@@ -107,3 +109,41 @@ class AksTest(BaseTest):
         assert resources == []
         # Not matching has to mean the components were read and none qualified.
         send_request.assert_called_once()
+
+    @arm_template('aks.json')
+    @cassette_name('test_find_aks_by_name')
+    @patch('azure.mgmt.policyinsights.PolicyInsightsClient._send_request')
+    def test_policy_components_query_failure_skips_the_resource(self, send_request):
+        send_request.side_effect = HttpResponseError(message='Forbidden')
+
+        # A failed query must not abort the policy and discard every other resource.
+        resources = self.load_policy({
+            'name': 'test-azure-aks',
+            'resource': 'azure.aks',
+            'filters': [
+                {'type': 'policy-components',
+                 'attrs': [{'complianceState': 'NonCompliant'}]}]
+        }).run()
+
+        assert resources == []
+        send_request.assert_called_once()
+
+    @arm_template('aks.json')
+    @cassette_name('test_find_aks_by_name')
+    @patch('azure.mgmt.policyinsights.PolicyInsightsClient._send_request')
+    def test_policy_components_count(self, send_request):
+        send_request.return_value.json.return_value = component_response(
+            ('default/bad-one', 'NonCompliant', HOST_NAMESPACES_DEFINITION),
+            ('default/bad-two', 'NonCompliant', HOST_NAMESPACES_DEFINITION))
+
+        resources = self.load_policy({
+            'name': 'test-azure-aks',
+            'resource': 'azure.aks',
+            'filters': [
+                {'type': 'policy-components',
+                 'attrs': [{'complianceState': 'NonCompliant'}],
+                 'count': 1,
+                 'count_op': 'gt'}]
+        }).run()
+
+        assert len(resources) == 1

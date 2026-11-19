@@ -44,4 +44,6 @@ class KubernetesService(ArmResourceManager):
         resource_type = 'Microsoft.ContainerService/managedClusters'
 
 
+# Clusters are assessed by Microsoft.Kubernetes.Data definitions, which report
+# against components rather than the cluster.
 KubernetesService.filter_registry.register('policy-components', PolicyComponentsFilter)
