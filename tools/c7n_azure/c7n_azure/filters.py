@@ -18,10 +18,11 @@ from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil.parser import parse
 from azure.core.exceptions import HttpResponseError
+from azure.core.rest import HttpRequest
 from msrestazure.tools import parse_resource_id
 
 from c7n_azure.provider import resources
-from c7n.filters import Filter, FilterValidationError, ValueFilter
+from c7n.filters import Filter, FilterValidationError, ListItemFilter, ValueFilter
 from c7n.filters.core import PolicyValidationError
 from c7n.exceptions import PolicyExecutionError
 from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
@@ -752,6 +753,65 @@ class PolicyCompliantFilter(Filter):
             return [r for r in resources if r['id'].lower() not in non_compliant]
         else:
             return [r for r in resources if r['id'].lower() in non_compliant]
+
+
+class PolicyComponentsFilter(ListItemFilter):
+    """Filter resources on the Azure Policy compliance of their components
+
+    Azure Policy definitions in a Resource Provider mode -- the ``Microsoft.*.Data``
+    modes -- are evaluated against a resource's components rather than against the
+    resource itself, and write no record to the policy states that ``policy-compliant``
+    reads. They are only visible here.
+
+    What a component is depends on the mode: pods and containers under
+    ``Microsoft.Kubernetes.Data``, certificates and keys under ``Microsoft.KeyVault.Data``.
+    Each item is a component compliance record carrying ``componentId``, ``componentType``,
+    ``complianceState`` and the definition that produced it; for Kubernetes ``componentId``
+    is ``namespace/name``. Matched components are annotated onto the resource under
+    ``c7n:PolicyComponents``.
+
+    :example:
+
+    Clusters with a component that fails the host namespace sharing built-in.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: aks-pods-sharing-host-namespaces
+            resource: azure.aks
+            filters:
+              - type: policy-components
+                attrs:
+                  - complianceState: NonCompliant
+                  - policyDefinitionName: 47a1ee2f-2a2a-4576-bf2a-e0e36709c2b8
+    """
+
+    schema = type_schema(
+        'policy-components',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+    )
+    schema_alias = True
+    annotate_items = True
+    item_annotation_key = 'c7n:PolicyComponents'
+
+    # componentPolicyStates has no operation group in azure-mgmt-policyinsights 1.0.1, and
+    # the 1.1.0bN previews that add one page with GET against an endpoint ARM serves POST
+    # only. Issue the request directly rather than take that dependency.
+    api_version = '2024-10-01'
+
+    def get_item_values(self, resource):
+        client = self.manager.get_session().client(
+            'azure.mgmt.policyinsights.PolicyInsightsClient')
+        url = (f"{resource['id']}/providers/Microsoft.PolicyInsights"
+               "/componentPolicyStates/latest/queryResults")
+        response = client._send_request(HttpRequest(
+            'POST', url, params={'api-version': self.api_version}))
+        response.raise_for_status()
+        # Unlike policyStates, this query carries no nextLink in its contract, so the
+        # whole set comes back in one body.
+        return response.json().get('value', [])
 
 
 class AzureOffHour(OffHour):

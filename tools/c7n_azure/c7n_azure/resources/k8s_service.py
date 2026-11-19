@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n_azure.filters import PolicyComponentsFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
@@ -41,3 +42,6 @@ class KubernetesService(ArmResourceManager):
             'properties.agentPoolProfiles[][name, count]'
         )
         resource_type = 'Microsoft.ContainerService/managedClusters'
+
+
+KubernetesService.filter_registry.register('policy-components', PolicyComponentsFilter)
