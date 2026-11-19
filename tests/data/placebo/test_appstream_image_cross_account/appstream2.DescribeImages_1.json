@@ -1,0 +1,106 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Name": "c7n-test-image",
+                "Arn": "arn:aws:appstream:us-east-1:644160558196:image/c7n-test-image",
+                "DisplayName": "c7n-test-image",
+                "State": "AVAILABLE",
+                "Visibility": "PRIVATE",
+                "ImageBuilderSupported": true,
+                "Platform": "WINDOWS_SERVER_2022",
+                "Description": "c7n test image",
+                "Applications": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 9,
+                    "second": 58,
+                    "microsecond": 565000
+                },
+                "PublicBaseImageReleasedDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 14,
+                    "hour": 22,
+                    "minute": 31,
+                    "second": 55,
+                    "microsecond": 777000
+                },
+                "AppstreamAgentVersion": "10-25-2026",
+                "ImageErrors": [],
+                "LatestAppstreamAgentVersion": "TRUE",
+                "SupportedInstanceFamilies": [
+                    "General Purpose",
+                    "Compute Optimized",
+                    "Memory Optimized"
+                ],
+                "DynamicAppProvidersEnabled": "DISABLED",
+                "ImageSharedWithOthers": "TRUE",
+                "ManagedSoftwareIncluded": false,
+                "ImageType": "NATIVE",
+                "BaseImageArn": "arn:aws:appstream:us-east-1::image/AppStream-WinServer2022-08-31-2026",
+                "ImageBuilderName": "c7n-test-image-builder",
+                "ImagePermissions": {
+                    "allowFleet": true,
+                    "allowImageBuilder": true
+                }
+            },
+            {
+                "Name": "c7n-test-image-2",
+                "Arn": "arn:aws:appstream:us-east-1:644160558196:image/c7n-test-image-2",
+                "DisplayName": "c7n-test-image-2",
+                "State": "AVAILABLE",
+                "Visibility": "PRIVATE",
+                "ImageBuilderSupported": true,
+                "Platform": "WINDOWS_SERVER_2022",
+                "Description": "c7n test image",
+                "Applications": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 9,
+                    "second": 58,
+                    "microsecond": 565000
+                },
+                "PublicBaseImageReleasedDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 14,
+                    "hour": 22,
+                    "minute": 31,
+                    "second": 55,
+                    "microsecond": 777000
+                },
+                "AppstreamAgentVersion": "10-25-2026",
+                "ImageErrors": [],
+                "LatestAppstreamAgentVersion": "TRUE",
+                "SupportedInstanceFamilies": [
+                    "General Purpose",
+                    "Compute Optimized",
+                    "Memory Optimized"
+                ],
+                "DynamicAppProvidersEnabled": "DISABLED",
+                "ImageSharedWithOthers": "FALSE",
+                "ManagedSoftwareIncluded": false,
+                "ImageType": "NATIVE",
+                "BaseImageArn": "arn:aws:appstream:us-east-1::image/AppStream-WinServer2022-08-31-2026",
+                "ImageBuilderName": "c7n-test-image-builder",
+                "ImagePermissions": {
+                    "allowFleet": true,
+                    "allowImageBuilder": true
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

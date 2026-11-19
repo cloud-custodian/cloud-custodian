@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "Users": [
+            {
+                "Arn": "arn:aws:appstream:us-east-1:644160558196:user/userpool/24c87438-0061-7092-cea0-0e05ffaa22d4",
+                "UserName": "c7n-test@example.com",
+                "Enabled": true,
+                "Status": "FORCE_CHANGE_PASSWORD",
+                "FirstName": "c7n",
+                "LastName": "test",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 14,
+                    "second": 14,
+                    "microsecond": 379000
+                },
+                "AuthenticationType": "USERPOOL"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

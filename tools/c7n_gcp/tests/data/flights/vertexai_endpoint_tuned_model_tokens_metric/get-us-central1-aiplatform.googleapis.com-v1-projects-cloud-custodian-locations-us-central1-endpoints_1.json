@@ -1,0 +1,79 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 15 Sep 2026 23:56:51 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2148",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/endpoints?alt=json"
+  },
+  "body": {
+    "endpoints": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/endpoints/3381592541446012928",
+        "displayName": "c7n-11097-distribution-metric-test",
+        "deployedModels": [
+          {
+            "id": "7719271466138599424",
+            "model": "projects/cloud-custodian/locations/us-central1/models/5014415687204995072",
+            "displayName": "c7n-11097-distribution-metric-test",
+            "createTime": "2026-09-15T19:42:59.865579Z",
+            "automaticResources": {
+              "minReplicaCount": 1,
+              "maxReplicaCount": 1
+            },
+            "disableContainerLogging": true,
+            "modelVersionId": "1",
+            "checkpointId": "2"
+          }
+        ],
+        "trafficSplit": {
+          "7719271466138599424": 100
+        },
+        "etag": "AMEw9yM349FdgfN9uTwQcq6Dzv6uUCZk6JzJTDP_AJMTL6rFe3fAeMYB-G_WoeRjFxUQ",
+        "labels": {
+          "tune-type": "sft",
+          "google-vertex-llm-tuning-job-id": "2048592893592993792"
+        },
+        "createTime": "2026-09-15T19:42:48.842025Z",
+        "updateTime": "2026-09-15T19:43:01.614051Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/endpoints/6997983042224521216",
+        "displayName": "c7n-11097-distribution-metric-test",
+        "deployedModels": [
+          {
+            "id": "984138223406022656",
+            "model": "projects/cloud-custodian/locations/us-central1/models/5014415687204995072",
+            "displayName": "c7n-11097-distribution-metric-test",
+            "createTime": "2026-09-15T19:42:29.831677Z",
+            "automaticResources": {
+              "minReplicaCount": 1,
+              "maxReplicaCount": 1
+            },
+            "disableContainerLogging": true,
+            "modelVersionId": "1",
+            "checkpointId": "1"
+          }
+        ],
+        "trafficSplit": {
+          "984138223406022656": 100
+        },
+        "etag": "AMEw9yNnU1m2Qf3GPxOt6I_wTdz546cX0yom_PkIpsDFdRnVrbsCTICryYUaRyPuFFAt",
+        "labels": {
+          "tune-type": "sft",
+          "google-vertex-llm-tuning-job-id": "2048592893592993792"
+        },
+        "createTime": "2026-09-15T19:42:17.170118Z",
+        "updateTime": "2026-09-15T19:42:31.899757Z"
+      }
+    ]
+  }
+}
