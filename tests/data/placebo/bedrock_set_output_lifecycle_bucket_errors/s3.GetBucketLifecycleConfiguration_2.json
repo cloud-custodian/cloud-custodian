@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "ResponseMetadata": {},
+        "Error": {
+            "Code": "NoSuchBucket",
+            "Message": "The specified bucket does not exist",
+            "BucketName": "missing"
+        }
+    }
+}
