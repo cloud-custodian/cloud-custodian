@@ -744,7 +744,7 @@ class PolicyCompliantFilter(Filter):
         # Find non-compliant resources
         client = s.client('azure.mgmt.policyinsights.PolicyInsightsClient')
         query = client.policy_states.list_query_results_for_subscription(
-            policy_states_resource='latest', subscription_id=s.subscription_id).value
+            policy_states_resource='latest', subscription_id=s.subscription_id)
         non_compliant = [f.resource_id.lower() for f in query
                          if not definition_ids or f.policy_definition_id.lower() in definition_ids]
 
