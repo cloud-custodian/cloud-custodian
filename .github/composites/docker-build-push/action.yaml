@@ -19,17 +19,17 @@ runs:
   using: "composite"
   steps:
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 # ratchet:docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 # ratchet:docker/setup-qemu-action@v4.1.0
 
     - name: Set up Docker Buildx
       id: buildx
-      uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # ratchet:docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # ratchet:docker/setup-buildx-action@v4.1.0
 
     # until we get read only credentials, we'll only login if we're pushing
     # note that we can hit rate limits on pulling though
     - name: Login to Docker Hub
       if: "${{ inputs.push == 'true' }}"
-      uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # ratchet:docker/login-action@v3
+      uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # ratchet:docker/login-action@v4.2.0
       with:
         username: ${{ env.HUB_USER }}
         password: ${{ env.HUB_TOKEN }}
@@ -58,7 +58,7 @@ runs:
 
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # ratchet:docker/metadata-action@v5
+      uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # ratchet:docker/metadata-action@v6.1.0
       with:
         images: |
           ${{ inputs.repository }}/${{ inputs.name }}
@@ -78,7 +78,7 @@ runs:
     # https://github.com/docker/buildx/issues/166
     # https://github.com/docker/buildx/issues/59
     - name: Build
-      uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # ratchet:docker/build-push-action@v5
+      uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # ratchet:docker/build-push-action@v7.2.0
       with:
         context: .
         build-args: |
@@ -108,7 +108,7 @@ runs:
     - name: Push
       id: "push"
       if: "${{ inputs.push == 'true' }}"
-      uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # ratchet:docker/build-push-action@v5
+      uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # ratchet:docker/build-push-action@v7.2.0
       with:
         context: .
         build-args: |
@@ -124,7 +124,7 @@ runs:
 
     - name: Install cosign
       if: "${{ inputs.push == 'true' }}"
-      uses: sigstore/cosign-installer@d7d6bc7722e3daa8354c50bcb52f4837da5e9b6a # ratchet:sigstore/cosign-installer@v3
+      uses: sigstore/cosign-installer@d7d6bc7722e3daa8354c50bcb52f4837da5e9b6a # ratchet:sigstore/cosign-installer@v3.8.1
       with:
         cosign-release: 'v1.13.6'
 
