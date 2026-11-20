@@ -1,0 +1,27 @@
+{
+  "body": {
+    "name": "operation-1736723401234-62c4e5f6d7a8b-9c1d2e3f-4a5b6c7d",
+    "zone": "us-central1-a",
+    "operationType": "DELETE_NODE_POOL",
+    "status": "RUNNING",
+    "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1736723401234-62c4e5f6d7a8b-9c1d2e3f-4a5b6c7d",
+    "targetLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-a/clusters/custodian-test-cluster/nodePools/custodian-nodepool-delete-test",
+    "startTime": "2026-01-12T23:20:01.234Z",
+    "endTime": ""
+  },
+  "headers": {
+    "status": "200",
+    "content-length": "512",
+    "x-xss-protection": "0",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, X-Origin, Referer",
+    "server": "ESF",
+    "-content-encoding": "gzip",
+    "cache-control": "private",
+    "date": "Mon, 12 Jan 2026 23:20:01 GMT",
+    "x-frame-options": "SAMEORIGIN",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

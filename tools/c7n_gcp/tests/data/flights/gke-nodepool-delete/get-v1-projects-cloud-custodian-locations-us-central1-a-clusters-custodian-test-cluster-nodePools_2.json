@@ -1,0 +1,54 @@
+{
+  "body": {
+    "nodePools": [
+      {
+        "status": "RUNNING",
+        "management": {
+          "autoUpgrade": true,
+          "autoRepair": true
+        },
+        "name": "default-pool",
+        "instanceGroupUrls": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instanceGroups/gke-custodian-test-cluster-default-pool-87654321-grp"
+        ],
+        "autoscaling": {},
+        "version": "1.28.3-gke.1286000",
+        "initialNodeCount": 3,
+        "config": {
+          "machineType": "e2-medium",
+          "diskSizeGb": 100,
+          "oauthScopes": [
+            "https://www.googleapis.com/auth/devstorage.read_only",
+            "https://www.googleapis.com/auth/logging.write",
+            "https://www.googleapis.com/auth/monitoring",
+            "https://www.googleapis.com/auth/servicecontrol",
+            "https://www.googleapis.com/auth/service.management.readonly",
+            "https://www.googleapis.com/auth/trace.append"
+          ],
+          "imageType": "COS_CONTAINERD",
+          "diskType": "pd-balanced",
+          "shieldedInstanceConfig": {
+            "enableIntegrityMonitoring": true
+          }
+        },
+        "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-a/clusters/custodian-test-cluster/nodePools/default-pool"
+      }
+    ]
+  },
+  "headers": {
+    "status": "200",
+    "content-length": "1989",
+    "x-xss-protection": "0",
+    "content-location": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/us-central1-a/clusters/custodian-test-cluster/nodePools?alt=json",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, X-Origin, Referer",
+    "server": "ESF",
+    "-content-encoding": "gzip",
+    "cache-control": "private",
+    "date": "Mon, 12 Jan 2026 23:20:10 GMT",
+    "x-frame-options": "SAMEORIGIN",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
