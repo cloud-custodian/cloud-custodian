@@ -8,7 +8,7 @@ from azure.mgmt.security.models import (
 )
 from c7n.exceptions import PolicyValidationError
 
-from ..azure_common import BaseTest
+from ..azure_common import BaseTest, strict_cassette
 
 
 class DefenderTest(BaseTest):
@@ -174,6 +174,7 @@ class DefenderSetSecurityContactTest(BaseTest):
                     }],
                 }, validate=True)
 
+    @strict_cassette('test_set_security_contact')
     def test_set_security_contact(self):
         discover = self.load_policy({
             'name': 'test-set-security-contact-discover',
@@ -223,6 +224,7 @@ class DefenderSetSecurityContactTest(BaseTest):
             else:
                 client.security_contacts.create(name, existing)
 
+    @strict_cassette('test_set_security_contact_add_roles')
     def test_set_security_contact_add_roles(self):
         discover = self.load_policy({
             'name': 'test-set-security-contact-add-roles-discover',
