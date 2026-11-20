@@ -4,6 +4,7 @@ import fnmatch
 import json
 from urllib.parse import urlparse, parse_qs
 
+import botocore
 from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
 from concurrent.futures import as_completed
@@ -15,7 +16,7 @@ from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 import c7n.filters.iamrole as iam_filters
-from c7n.exceptions import PolicyExecutionError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.aws import shape_validate
@@ -33,6 +34,7 @@ from c7n.utils import (
     jmespath_compile
 )
 from botocore.config import Config
+from c7n.vendored.distutils.version import LooseVersion
 from .securityhub import PostFinding
 
 ErrAccessDenied = "AccessDeniedException"
@@ -1044,6 +1046,18 @@ class KmsEventSourceMappingFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KMSKeyArn'
 
 
+LAMBDA_WEB_MIN_BOTOCORE = '1.43.107'
+
+
+def validate_lambda_web_botocore(resource_type):
+    if LooseVersion(botocore.__version__) < LooseVersion(LAMBDA_WEB_MIN_BOTOCORE):
+        raise PolicyValidationError(
+            f"{resource_type} requires botocore version {LAMBDA_WEB_MIN_BOTOCORE} "
+            f"or above. Installed version is {botocore.__version__}. "
+            "For Lambda execution modes, add boto3 and botocore to mode.packages."
+        )
+
+
 class DescribeLambdaWebFunction(query.DescribeSource):
 
     def augment(self, resources):
@@ -1085,9 +1099,22 @@ class LambdaWebFunction(query.QueryResourceManager):
     evaluate endpoints individually.
 
     Requires botocore >= 1.43.107, the first release with the ``lambda-web``
-    service. The resource has a CloudFormation type
-    (``AWS::Lambda::WebFunction``) but no AWS Config type, so policies run in
-    ``periodic`` or ``config-poll-rule`` (with ``ignore-support-check``) mode.
+    service. Default Lambda Python runtimes may ship an older botocore. For
+    policies with a Lambda execution mode, bundle current SDKs with the
+    policy:
+
+    .. code-block:: yaml
+
+        mode:
+          type: periodic
+          schedule: "rate(1 day)"
+          packages:
+            - boto3
+            - botocore
+
+    The resource has a CloudFormation type (``AWS::Lambda::WebFunction``) but
+    no AWS Config type, so policies run in ``periodic`` or
+    ``config-poll-rule`` (with ``ignore-support-check``) mode.
 
     :example:
 
@@ -1118,6 +1145,10 @@ class LambdaWebFunction(query.QueryResourceManager):
     source_mapping = {
         'describe': DescribeLambdaWebFunction,
     }
+
+    def validate(self):
+        validate_lambda_web_botocore(self.type)
+        return super().validate()
 
 
 def get_web_function_policy(client, retry, function_arn):
@@ -1399,6 +1430,20 @@ class LambdaWebEndpoint(query.ChildResourceManager):
     - ``ApplicationManaged``: Lambda performs no authorization and does not
       evaluate the resource based policy; anyone with the URL can invoke.
 
+    Requires botocore >= 1.43.107, the first release with the ``lambda-web``
+    service. Default Lambda Python runtimes may ship an older botocore. For
+    policies with a Lambda execution mode, bundle current SDKs with the
+    policy:
+
+    .. code-block:: yaml
+
+        mode:
+          type: periodic
+          schedule: "rate(1 day)"
+          packages:
+            - boto3
+            - botocore
+
     :example:
 
     .. code-block:: yaml
@@ -1433,6 +1478,10 @@ class LambdaWebEndpoint(query.ChildResourceManager):
         cfn_type = 'AWS::Lambda::WebFunctionEndpoint'
         date = 'createdAt'
         permissions_enum = ('lambda:ListWebFunctionEndpoints',)
+
+    def validate(self):
+        validate_lambda_web_botocore(self.type)
+        return super().validate()
 
     def get_resources(self, ids, cache=True, augment=True):
         resources = []

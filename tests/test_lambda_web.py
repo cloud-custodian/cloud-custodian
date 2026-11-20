@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 
 from .apicallcaptor import ApiCallCaptor
 from .common import BaseTest
-from c7n.exceptions import PolicyExecutionError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.awslambda import (
     DeleteWebFunction,
@@ -409,3 +409,26 @@ class EndpointStatementScopeTest(BaseTest):
 
     def test_no_resource_element(self):
         self.assertTrue(self.applies({'Sid': 'x'}))
+
+
+class LambdaWebBotocoreVersionTest(BaseTest):
+
+    def test_validate_old_botocore(self):
+        for resource in ('aws.lambda-web-function', 'aws.lambda-web-endpoint'):
+            with mock.patch('c7n.resources.awslambda.botocore') as botocore_mock:
+                botocore_mock.__version__ = '1.43.106'
+                with self.assertRaises(PolicyValidationError) as ctx:
+                    self.load_policy(
+                        {'name': 'lambda-web-old-botocore', 'resource': resource})
+            msg = str(ctx.exception)
+            self.assertIn('requires botocore version 1.43.107', msg)
+            self.assertIn('Installed version is 1.43.106', msg)
+            self.assertIn('mode.packages', msg)
+
+    def test_validate_supported_botocore(self):
+        for version in ('1.43.107', '1.50.0'):
+            with mock.patch('c7n.resources.awslambda.botocore') as botocore_mock:
+                botocore_mock.__version__ = version
+                for resource in ('aws.lambda-web-function', 'aws.lambda-web-endpoint'):
+                    self.load_policy(
+                        {'name': 'lambda-web-ok-botocore', 'resource': resource})
