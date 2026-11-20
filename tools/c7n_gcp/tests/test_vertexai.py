@@ -3266,6 +3266,42 @@ def test_vertexai_query_now_allowed_in_pull_mode(test):
     assert '{now' not in policy.resource_manager.get_resource_query()['filter']
 
 
+PERIODIC_MODE = {
+    'type': 'gcp-periodic',
+    'schedule': '0 * * * *',
+    'service-account': 'c7n@cloud-custodian.iam.gserviceaccount.com'}
+
+
+@pytest.mark.parametrize('filter_value', [
+    'display_name="{nowindow}"',      # somebody's own variable
+    'display_name="snow{nowhere}"',   # ditto, mid-string
+    'display_name="{{now}}"',         # the escape for a literal {now}
+    'state="JOB_STATE_FAILED"',
+])
+def test_vertexai_query_now_check_matches_the_variable(test, filter_value):
+    """Only {now} itself defers. A prefix match took three of these with it."""
+    test.load_policy(
+        {'name': 'vertexai-custom-job-now-lookalike',
+         'resource': 'gcp.vertex-ai-custom-job',
+         'mode': PERIODIC_MODE,
+         'query': [{'filter': filter_value}]})
+
+
+def test_vertexai_query_now_defers_to_the_enumeration_check(test):
+    """gcp-audit never reaches a list call, so {now} is not its problem.
+
+    The enumeration check says the useful thing, and it has to win or the
+    policy author fixes {now} and then hits the real error on the next run.
+    """
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-custom-job-now-audit',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'mode': {'type': 'gcp-audit', 'methods': ['foo']},
+             'query': [{'filter': 'create_time>"{now:-7d}"'}]})
+    assert 'applies to enumeration only' in str(caught.value)
+
+
 def test_vertexai_query_rejects_now_in_serverless_mode(test):
     """gcp-periodic is a PullMode, so the query does reach the list call, and
     a ServerlessExecutionMode, so {now} is deferred. Nothing expands it inside
@@ -3275,10 +3311,7 @@ def test_vertexai_query_rejects_now_in_serverless_mode(test):
         test.load_policy(
             {'name': 'vertexai-custom-job-now-periodic',
              'resource': 'gcp.vertex-ai-custom-job',
-             'mode': {
-                 'type': 'gcp-periodic',
-                 'schedule': '0 * * * *',
-                 'service-account': 'c7n@cloud-custodian.iam.gserviceaccount.com'},
+             'mode': PERIODIC_MODE,
              'query': [{'filter': 'create_time>"{now:-7d}"'}]})
     assert 'never expands' in str(caught.value)
 

@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 from collections import defaultdict
@@ -145,17 +146,31 @@ class VertexAIQueryManager(QueryResourceManager):
                 f"{self.type} query location {value!r} is not a Vertex AI "
                 f"region")
 
-        # A serverless mode defers {now} (c7n/policy.py), and nothing
-        # expands it again inside the deployed function, so the filter would
-        # reach the API with the braces still in it. gcp-periodic is both a
-        # PullMode and a ServerlessExecutionMode, so it passes the mode check
-        # above and still lands here.
-        if '{now' in value and isinstance(
-                self.ctx.policy.get_execution_mode(), ServerlessExecutionMode):
+        self._validate_deferred_now(key, value)
+
+    # {now} itself, not {nowindow}, and not the {{now}} that c7n expands to a
+    # literal. A lone brace before it means the pair is escaped.
+    NOW_VARIABLE = re.compile(r'(?<!\{)\{now[:}]')
+
+    def _validate_deferred_now(self, key, value):
+        """A mode can both enumerate and defer {now}, which sends it raw.
+
+        gcp-periodic is a PullMode, so the query reaches the list call, and a
+        ServerlessExecutionMode, so get_variables leaves {now} deferred and
+        nothing expands it inside the function. Modes that only defer are
+        caught by the enumeration check in validate instead, which says the
+        more useful thing.
+        """
+        mode = self.ctx.policy.get_execution_mode()
+        if not (isinstance(mode, PullMode)
+                and isinstance(mode, ServerlessExecutionMode)):
+            return
+
+        if self.NOW_VARIABLE.search(value):
             raise PolicyValidationError(
                 f"{self.type} query {key} uses {{now}}, which "
-                f"{self.data['mode']['type']} defers and never expands, so it "
-                f"would reach the API unexpanded")
+                f"{self.data.get('mode', {}).get('type')} defers and never "
+                f"expands, so it would reach the API unexpanded")
 
     def get_resource_query(self):
         """location entries pick regions, every other key is a list parameter."""
