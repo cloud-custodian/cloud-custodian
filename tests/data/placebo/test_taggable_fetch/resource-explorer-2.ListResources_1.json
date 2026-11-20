@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Resources": [],
+        "ViewArn": "arn:aws:resource-explorer-2:us-east-1:644160558196:view/us-east-1/50e8313f-e58b-4af9-8083-859e0058f284"
+    }
+}
