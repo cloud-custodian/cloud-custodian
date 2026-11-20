@@ -52,6 +52,48 @@ class AppFlowTests(BaseTest):
         call = appflow.describe_flow(flowName=flow_name)
         self.assertEqual({}, call.get('tags'))
 
+    def test_appflow_deactivate(self):
+        session_factory = self.replay_flight_data('test_appflow_deactivate')
+        p = self.load_policy(
+            {
+                'name': 'app-flow-deactivate',
+                'resource': 'app-flow',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'flowStatus',
+                    'value': 'Active'
+                }],
+                'actions': [{
+                    'type': 'deactivate'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]['flowStatus'], 'Active')
+
+    def test_appflow_activate(self):
+        session_factory = self.replay_flight_data('test_appflow_activate')
+        p = self.load_policy(
+            {
+                'name': 'app-flow-activate',
+                'resource': 'app-flow',
+                'filters': [{
+                    'type': 'value',
+                    'key': 'flowStatus',
+                    'value': 'Suspended'
+                }],
+                'actions': [{
+                    'type': 'activate'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]['flowStatus'], 'Suspended')
+
     def test_appflow_delete(self):
         session_factory = self.replay_flight_data('test_appflow_delete')
         p = self.load_policy(
