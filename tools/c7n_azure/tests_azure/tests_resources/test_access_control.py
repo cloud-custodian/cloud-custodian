@@ -132,6 +132,7 @@ class AccessControlTest(BaseTest):
                 Exception.__init__(self, 'Forbidden')
                 self.status_code = 403
                 self.message = 'Forbidden'
+                self.error = None
 
         get_principal_dictionary.side_effect = ForbiddenCloudError()
 
