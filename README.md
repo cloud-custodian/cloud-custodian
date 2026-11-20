@@ -286,7 +286,8 @@ potential vulnerability in Cloud Custodian please let the Cloud
 [Custodian Security Team](mailto:security@cloudcustodian.io) know with
 the details of the vulnerability. We'll send a confirmation email to
 acknowledge your report, and we'll send an additional email when we've
-identified the issue positively or negatively.
+identified the issue positively or negatively. See [SECURITY.md](SECURITY.md)
+for details.
 
 Code of Conduct
 ---------------
@@ -294,4 +295,12 @@ Code of Conduct
 This project adheres to the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md)
 
 By participating, you are expected to honor this code.
+
+Governance
+----------
+
+Cloud Custodian is governed with the goals of transparency, vendor
+neutrality, and scalable community leadership. See [GOVERNANCE.md](GOVERNANCE.md)
+for details on project areas, maintainer roles, and decision-making, and
+[OWNERS.md](OWNERS.md) for the current list of maintainers.
 
