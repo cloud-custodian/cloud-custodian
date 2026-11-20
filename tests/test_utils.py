@@ -859,6 +859,15 @@ class UtilTest(BaseTest):
             {'k': '{limit}',
              'b': '21'})
 
+        # err_fallback is the caller's list of mistakes to forgive, so it has
+        # to reach a nested value too. policy data is never flat.
+        self.assertRaises(
+            IndexError, utils.format_string_values, '{1}', ())
+        self.assertRaises(
+            IndexError, utils.format_string_values, {'a': {'b': '{1}'}}, ())
+        self.assertRaises(
+            IndexError, utils.format_string_values, {'a': ['{1}']}, ())
+
     def test_get_support_region(self):
         # AWS Partition
         mock_manager = mock.MagicMock()

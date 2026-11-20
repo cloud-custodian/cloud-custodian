@@ -664,12 +664,14 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), formatter=Non
     if isinstance(obj, dict):
         new = {}
         for key in obj.keys():
-            new[key] = format_string_values(obj[key], formatter=formatter, *args, **kwargs)
+            new[key] = format_string_values(
+                obj[key], err_fallback, formatter, *args, **kwargs)
         return new
     elif isinstance(obj, list):
         new = []
         for item in obj:
-            new.append(format_string_values(item, formatter=formatter, *args, **kwargs))
+            new.append(format_string_values(
+                item, err_fallback, formatter, *args, **kwargs))
         return new
     elif isinstance(obj, str):
         try:
