@@ -1,0 +1,498 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts?api-version=2023-12-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "content-length": [
+                        "12"
+                    ],
+                    "date": [
+                        "Wed, 18 Nov 2026 19:25:14 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B95817E4209348E08AF0C1E26A809CE9 Ref B: CHI261140504031 Ref C: 2026-11-18T19:25:14Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "api-supported-versions": [
+                        "2023-12-01-preview"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default?api-version=2023-12-01-preview",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "199"
+                    ],
+                    "content-length": [
+                        "464"
+                    ],
+                    "date": [
+                        "Wed, 18 Nov 2026 19:25:15 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 66FD219AEE724FFDADBE98C92B8A9F7F Ref B: CH1AA2030813052 Ref C: 2026-11-18T19:25:15Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "api-supported-versions": [
+                        "2023-12-01-preview"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "notificationsSources": [
+                                {
+                                    "minimalSeverity": "High",
+                                    "sourceType": "Alert"
+                                }
+                            ],
+                            "isEnabled": true,
+                            "notificationsByRole": {
+                                "state": "On",
+                                "roles": [
+                                    "Contributor"
+                                ]
+                            },
+                            "emails": "c7n-baseline@example.com",
+                            "phone": ""
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default",
+                        "name": "default",
+                        "type": "Microsoft.Security/securityContacts",
+                        "etag": "\"f6038dcd-0000-0d00-0000-6afdfb9c0000\"",
+                        "location": "West Europe"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default?api-version=2023-12-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "content-length": [
+                        "464"
+                    ],
+                    "date": [
+                        "Wed, 18 Nov 2026 19:25:16 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: FD8AE741800F4197A0B50F01970BC578 Ref B: CHI261140507034 Ref C: 2026-11-18T19:25:16Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "api-supported-versions": [
+                        "2023-12-01-preview"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "notificationsSources": [
+                                {
+                                    "minimalSeverity": "High",
+                                    "sourceType": "Alert"
+                                }
+                            ],
+                            "isEnabled": true,
+                            "notificationsByRole": {
+                                "state": "On",
+                                "roles": [
+                                    "Contributor"
+                                ]
+                            },
+                            "emails": "c7n-baseline@example.com",
+                            "phone": ""
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default",
+                        "name": "default",
+                        "type": "Microsoft.Security/securityContacts",
+                        "etag": "\"f6038dcd-0000-0d00-0000-6afdfb9c0000\"",
+                        "location": "West Europe"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts?api-version=2023-12-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "content-length": [
+                        "476"
+                    ],
+                    "date": [
+                        "Wed, 18 Nov 2026 19:25:17 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: C08A50F568F34308AC3CA48F3BB21CE3 Ref B: CH1AA2030814062 Ref C: 2026-11-18T19:25:17Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "api-supported-versions": [
+                        "2023-12-01-preview"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "notificationsSources": [
+                                        {
+                                            "minimalSeverity": "High",
+                                            "sourceType": "Alert"
+                                        }
+                                    ],
+                                    "isEnabled": true,
+                                    "notificationsByRole": {
+                                        "state": "On",
+                                        "roles": [
+                                            "Contributor"
+                                        ]
+                                    },
+                                    "emails": "c7n-baseline@example.com",
+                                    "phone": ""
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default",
+                                "name": "default",
+                                "type": "Microsoft.Security/securityContacts",
+                                "etag": "\"f6038dcd-0000-0d00-0000-6afdfb9c0000\"",
+                                "location": "West Europe"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default?api-version=2023-12-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "content-length": [
+                        "464"
+                    ],
+                    "date": [
+                        "Wed, 18 Nov 2026 19:25:18 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 079F0EBC709B473F8B099FC2BE9C52CC Ref B: CH1AA2030814025 Ref C: 2026-11-18T19:25:17Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "api-supported-versions": [
+                        "2023-12-01-preview"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "notificationsSources": [
+                                {
+                                    "minimalSeverity": "High",
+                                    "sourceType": "Alert"
+                                }
+                            ],
+                            "isEnabled": true,
+                            "notificationsByRole": {
+                                "state": "On",
+                                "roles": [
+                                    "Contributor"
+                                ]
+                            },
+                            "emails": "c7n-baseline@example.com",
+                            "phone": ""
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default",
+                        "name": "default",
+                        "type": "Microsoft.Security/securityContacts",
+                        "etag": "\"f6038dcd-0000-0d00-0000-6afdfb9c0000\"",
+                        "location": "West Europe"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default?api-version=2023-12-01-preview",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "199"
+                    ],
+                    "content-length": [
+                        "472"
+                    ],
+                    "date": [
+                        "Wed, 18 Nov 2026 19:25:42 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 22071DB17AE64D508A9B7DCC6387B80C Ref B: CH1AA2030813062 Ref C: 2026-11-18T19:25:42Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "api-supported-versions": [
+                        "2023-12-01-preview"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "notificationsSources": [
+                                {
+                                    "minimalSeverity": "High",
+                                    "sourceType": "Alert"
+                                }
+                            ],
+                            "isEnabled": true,
+                            "notificationsByRole": {
+                                "state": "On",
+                                "roles": [
+                                    "Contributor",
+                                    "Owner"
+                                ]
+                            },
+                            "emails": "c7n-baseline@example.com",
+                            "phone": ""
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default",
+                        "name": "default",
+                        "type": "Microsoft.Security/securityContacts",
+                        "etag": "\"f60317d4-0000-0d00-0000-6afdfbb60000\"",
+                        "location": "West Europe"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default?api-version=2023-12-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "249"
+                    ],
+                    "content-length": [
+                        "472"
+                    ],
+                    "date": [
+                        "Wed, 18 Nov 2026 19:25:43 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 7CFEE892EB44481FAF0A5EC06CE30A8E Ref B: CHI261140510025 Ref C: 2026-11-18T19:25:43Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "api-supported-versions": [
+                        "2023-12-01-preview"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "notificationsSources": [
+                                {
+                                    "minimalSeverity": "High",
+                                    "sourceType": "Alert"
+                                }
+                            ],
+                            "isEnabled": true,
+                            "notificationsByRole": {
+                                "state": "On",
+                                "roles": [
+                                    "Contributor",
+                                    "Owner"
+                                ]
+                            },
+                            "emails": "c7n-baseline@example.com",
+                            "phone": ""
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default",
+                        "name": "default",
+                        "type": "Microsoft.Security/securityContacts",
+                        "etag": "\"f60317d4-0000-0d00-0000-6afdfbb60000\"",
+                        "location": "West Europe"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/securityContacts/default?api-version=2023-12-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "199"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
+                        "2999"
+                    ],
+                    "content-length": [
+                        "2"
+                    ],
+                    "date": [
+                        "Wed, 18 Nov 2026 19:25:44 GMT"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: D7B6D97FE7784751A9E33C856F7D800E Ref B: CHI261140509040 Ref C: 2026-11-18T19:25:44Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "api-supported-versions": [
+                        "2023-12-01-preview"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {}
+                }
+            }
+        }
+    ]
+}

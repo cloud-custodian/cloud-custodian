@@ -1,6 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from ..azure_common import BaseTest
+import pytest
+from azure.mgmt.security.models import (
+    NotificationsSourceAlert,
+    SecurityContact,
+    SecurityContactPropertiesNotificationsByRole,
+)
+from c7n.exceptions import PolicyValidationError
+
+from ..azure_common import BaseTest, strict_cassette
 
 
 class DefenderTest(BaseTest):
@@ -109,3 +117,158 @@ class DefenderTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'VVvm1')
+
+
+class DefenderSetSecurityContactTest(BaseTest):
+    def test_set_security_contact_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-set-security-contact',
+                'resource': 'azure.defender-contact',
+                'actions': [{
+                    'type': 'set-security-contact',
+                    'emails': ['security@example.com'],
+                    'is-enabled': True,
+                    'notifications-by-role': {'state': 'On', 'roles': ['Owner']},
+                    'notifications-sources': [
+                        {'source-type': 'Alert', 'minimal-severity': 'High'},
+                        {'source-type': 'AttackPath', 'minimal-risk-level': 'Critical'},
+                    ],
+                }],
+            }, validate=True)
+            assert p
+
+    def test_set_security_contact_requires_property(self):
+        with self.sign_out_patch():
+            with pytest.raises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-set-security-contact-empty',
+                    'resource': 'azure.defender-contact',
+                    'actions': [{'type': 'set-security-contact'}],
+                }, validate=True)
+
+    def test_set_security_contact_add_roles_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-set-security-contact-add-roles',
+                'resource': 'azure.defender-contact',
+                'actions': [{
+                    'type': 'set-security-contact',
+                    'notifications-by-role': {'state': 'On', 'add-roles': ['Owner']},
+                }],
+            }, validate=True)
+            assert p
+
+    def test_set_security_contact_roles_and_add_roles_exclusive(self):
+        with self.sign_out_patch():
+            with pytest.raises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-set-security-contact-both-roles',
+                    'resource': 'azure.defender-contact',
+                    'actions': [{
+                        'type': 'set-security-contact',
+                        'notifications-by-role': {
+                            'roles': ['Contributor'],
+                            'add-roles': ['Owner'],
+                        },
+                    }],
+                }, validate=True)
+
+    @strict_cassette('test_set_security_contact')
+    def test_set_security_contact(self):
+        discover = self.load_policy({
+            'name': 'test-set-security-contact-discover',
+            'resource': 'azure.defender-contact',
+        })
+        client = discover.resource_manager.get_client()
+        name = 'default'
+        existing = next(
+            (c for c in client.security_contacts.list() if c.name == name), None
+        )
+        if existing is None:
+            client.security_contacts.create(name, SecurityContact(
+                emails='c7n-baseline@example.com',
+                is_enabled=True,
+                notifications_by_role=SecurityContactPropertiesNotificationsByRole(
+                    state='On', roles=['Owner']
+                ),
+                notifications_sources=[NotificationsSourceAlert(minimal_severity='High')],
+            ))
+
+        try:
+            resources = discover.run()
+            assert len(resources) == 1
+            assert resources[0]['name'] == name
+
+            before = client.security_contacts.get(name)
+            assert before.emails != 'c7n-test@example.com'
+
+            p = self.load_policy({
+                'name': 'test-set-security-contact',
+                'resource': 'azure.defender-contact',
+                'actions': [{
+                    'type': 'set-security-contact',
+                    'emails': ['c7n-test@example.com'],
+                }],
+            })
+            p.run()
+
+            after = client.security_contacts.get(name)
+            assert after.emails == 'c7n-test@example.com'
+            assert after.is_enabled == before.is_enabled
+            assert after.notifications_by_role == before.notifications_by_role
+            assert after.notifications_sources == before.notifications_sources
+        finally:
+            if existing is None:
+                client.security_contacts.delete(name)
+            else:
+                client.security_contacts.create(name, existing)
+
+    @strict_cassette('test_set_security_contact_add_roles')
+    def test_set_security_contact_add_roles(self):
+        discover = self.load_policy({
+            'name': 'test-set-security-contact-add-roles-discover',
+            'resource': 'azure.defender-contact',
+        })
+        client = discover.resource_manager.get_client()
+        name = 'default'
+        existing = next(
+            (c for c in client.security_contacts.list() if c.name == name), None
+        )
+
+        try:
+            # A baseline with a role already set, so the merge has something to keep.
+            client.security_contacts.create(name, SecurityContact(
+                emails='c7n-baseline@example.com',
+                is_enabled=True,
+                notifications_by_role=SecurityContactPropertiesNotificationsByRole(
+                    state='On', roles=['Contributor']
+                ),
+                notifications_sources=[NotificationsSourceAlert(minimal_severity='High')],
+            ))
+            before = client.security_contacts.get(name)
+            assert set(before.notifications_by_role.roles) == {'Contributor'}
+
+            p = self.load_policy({
+                'name': 'test-set-security-contact-add-roles-run',
+                'resource': 'azure.defender-contact',
+                'actions': [{
+                    'type': 'set-security-contact',
+                    'notifications-by-role': {'add-roles': ['Owner']},
+                }],
+            })
+            p.run()
+
+            after = client.security_contacts.get(name)
+            # Owner is merged in and Contributor survives. Order is not asserted
+            # because the service returns the roles in its own order.
+            assert set(after.notifications_by_role.roles) == {'Contributor', 'Owner'}
+            assert after.notifications_by_role.state == before.notifications_by_role.state
+            assert after.emails == before.emails
+            assert after.is_enabled == before.is_enabled
+            assert after.notifications_sources == before.notifications_sources
+        finally:
+            if existing is None:
+                client.security_contacts.delete(name)
+            else:
+                client.security_contacts.create(name, existing)
