@@ -31,6 +31,7 @@ import socket
 import ssl
 import time
 from contextlib import nullcontext as no_rate_limiter
+from pathlib import Path
 from urllib.error import URLError
 
 from googleapiclient import discovery, errors  # NOQA
@@ -55,6 +56,10 @@ CLOUD_SCOPES = frozenset(['https://www.googleapis.com/auth/cloud-platform'])
 
 # Per request max wait timeout.
 HTTP_REQUEST_TIMEOUT = 30.0
+
+# Discovery documents for APIs google-api-python-client doesn't bundle yet.
+# Refresh with tools/dev/data_gcp_discovery.py.
+VENDORED_DISCOVERY_DIR = Path(__file__).parent / 'discovery'
 
 # Per thread storage.
 LOCAL_THREAD = threading.local()
@@ -129,6 +134,9 @@ def _create_service_api(credentials, service_name, version, developer_key=None,
             client options to configure the API endpoint. Used for services that
             require location-specific hostnames (e.g., Vertex AI).
 
+    If the library has no discovery document for the API, a vendored copy in
+    VENDORED_DISCOVERY_DIR is used.
+
     Returns:
         object: A Resource object with methods for interacting with the service.
     """
@@ -153,7 +161,18 @@ def _create_service_api(credentials, service_name, version, developer_key=None,
     if client_options:
         discovery_kwargs['client_options'] = client_options
 
-    return discovery.build(**discovery_kwargs)
+    try:
+        return discovery.build(**discovery_kwargs)
+    except errors.UnknownApiNameOrVersion:
+        vendored = VENDORED_DISCOVERY_DIR / f'{service_name}.{version}.json'
+        if not vendored.exists():
+            raise
+        return discovery.build_from_document(
+            vendored.read_text(encoding='utf-8'),
+            developerKey=developer_key,
+            http=discovery_kwargs.get('http'),
+            credentials=discovery_kwargs.get('credentials'),
+            client_options=client_options)
 
 
 def _build_http(http=None):

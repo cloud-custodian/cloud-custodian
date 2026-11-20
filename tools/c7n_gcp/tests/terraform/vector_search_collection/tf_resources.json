@@ -1,0 +1,164 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "busy_name": {
+            "value": "projects/cloud-custodian/locations/us-central1/collections/c7n-active",
+            "type": "string"
+        },
+        "idle_name": {
+            "value": "projects/cloud-custodian/locations/us-east1/collections/c7n-unused",
+            "type": "string"
+        }
+    },
+    "resources": {
+        "google_vector_search_collection": {
+            "busy": {
+                "collection_id": "c7n-active",
+                "create_time": "2026-11-03T21:32:29.017316465Z",
+                "data_schema": "",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "display_name": "c7n active collection",
+                "effective_labels": {
+                    "env": "c7n",
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "id": "projects/cloud-custodian/locations/us-central1/collections/c7n-active",
+                "labels": {
+                    "env": "c7n"
+                },
+                "location": "us-central1",
+                "name": "projects/cloud-custodian/locations/us-central1/collections/c7n-active",
+                "project": "cloud-custodian",
+                "terraform_labels": {
+                    "env": "c7n",
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-11-03T21:32:33.037136424Z",
+                "vector_schema": [
+                    {
+                        "dense_vector": [
+                            {
+                                "dimensions": 3,
+                                "vertex_embedding_config": []
+                            }
+                        ],
+                        "field_name": "emb",
+                        "sparse_vector": []
+                    }
+                ]
+            },
+            "idle": {
+                "collection_id": "c7n-unused",
+                "create_time": "2026-11-03T21:32:29.026308299Z",
+                "data_schema": "",
+                "deletion_policy": "DELETE",
+                "description": "",
+                "display_name": "c7n unused collection",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "encryption_spec": [],
+                "id": "projects/cloud-custodian/locations/us-east1/collections/c7n-unused",
+                "labels": null,
+                "location": "us-east1",
+                "name": "projects/cloud-custodian/locations/us-east1/collections/c7n-unused",
+                "project": "cloud-custodian",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": null,
+                "update_time": "2026-11-03T21:32:32.873435812Z",
+                "vector_schema": [
+                    {
+                        "dense_vector": [
+                            {
+                                "dimensions": 3,
+                                "vertex_embedding_config": []
+                            }
+                        ],
+                        "field_name": "emb",
+                        "sparse_vector": []
+                    }
+                ]
+            }
+        },
+        "google_vector_search_data_object": {
+            "book": {
+                "collection_id": "c7n-active",
+                "create_time": "2026-11-03T21:32:39.875375Z",
+                "data": "",
+                "data_object_id": "book1",
+                "deletion_policy": "DELETE",
+                "etag": "1WCjitpz/fWjedSvoVM2q7bR9sJsd5bsp2O0RMiiyTk=",
+                "id": "projects/cloud-custodian/locations/us-central1/collections/c7n-active/dataObjects/book1",
+                "location": "us-central1",
+                "name": "projects/cloud-custodian/locations/us-central1/collections/c7n-active/dataObjects/book1",
+                "project": "cloud-custodian",
+                "timeouts": null,
+                "update_time": "2026-11-03T21:32:39.875375Z",
+                "vectors": [
+                    {
+                        "dense": [
+                            {
+                                "values": [
+                                    1,
+                                    0,
+                                    0
+                                ]
+                            }
+                        ],
+                        "field_name": "emb",
+                        "sparse": []
+                    }
+                ]
+            }
+        },
+        "google_vector_search_index": {
+            "busy": {
+                "collection_id": "c7n-active",
+                "create_time": "2026-11-03T21:32:39.761711311Z",
+                "dedicated_infrastructure": [
+                    {
+                        "autoscaling_spec": [
+                            {
+                                "max_replica_count": 1,
+                                "min_replica_count": 1
+                            }
+                        ],
+                        "mode": "PERFORMANCE_OPTIMIZED"
+                    }
+                ],
+                "deletion_policy": "DELETE",
+                "dense_scann": [],
+                "description": "",
+                "display_name": "",
+                "distance_metric": "DOT_PRODUCT",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "filter_fields": null,
+                "id": "projects/cloud-custodian/locations/us-central1/collections/c7n-active/indexes/c7n-idx",
+                "index_field": "emb",
+                "index_id": "c7n-idx",
+                "labels": null,
+                "location": "us-central1",
+                "name": "projects/cloud-custodian/locations/us-central1/collections/c7n-active/indexes/c7n-idx",
+                "project": "cloud-custodian",
+                "skip_wait": true,
+                "store_fields": null,
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "timeouts": {
+                    "create": null,
+                    "delete": "120m",
+                    "update": null
+                },
+                "update_time": "2026-11-03T21:32:39.761711311Z"
+            }
+        }
+    }
+}

@@ -1,0 +1,2625 @@
+{
+  "auth": {
+    "oauth2": {
+      "scopes": {
+        "https://www.googleapis.com/auth/cloud-platform": {
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
+        },
+        "https://www.googleapis.com/auth/vectorsearch": {
+          "description": "See, edit, configure, and delete your Google Cloud Vector Search data and see the email address for your Google Account"
+        },
+        "https://www.googleapis.com/auth/vectorsearch.readonly": {
+          "description": "See your Google Cloud Vector Search data and the email address of your Google Account"
+        }
+      }
+    }
+  },
+  "basePath": "",
+  "baseUrl": "https://vectorsearch.googleapis.com/",
+  "batchPath": "batch",
+  "canonicalName": "Vector Search",
+  "description": "The Vector Search API provides a fully-managed, highly performant, and scalable vector database designed to power next-generation search, recommendation, and generative AI applications. It allows you to store, index, and query your data and its corresponding vector embeddings through a simple, intuitive interface. With Vector Search, you can define custom schemas for your data, insert objects with associated metadata, automatically generate embeddings from your data, and perform fast approximate nearest neighbor (ANN) searches to find semantically similar items at scale.",
+  "discoveryVersion": "v1",
+  "documentationLink": "https://docs.cloud.google.com/vertex-ai/docs/vector-search-2/overview",
+  "endpoints": [
+    {
+      "description": "Regional Endpoint",
+      "endpointUrl": "https://vectorsearch.us.rep.googleapis.com/",
+      "location": "us"
+    }
+  ],
+  "fullyEncodeReservedExpansion": true,
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "id": "vectorsearch:v1",
+  "kind": "discovery#restDescription",
+  "mtlsRootUrl": "https://vectorsearch.mtls.googleapis.com/",
+  "name": "vectorsearch",
+  "ownerDomain": "google.com",
+  "ownerName": "Google",
+  "parameters": {
+    "$.xgafv": {
+      "description": "V1 error format.",
+      "enum": [
+        "1",
+        "2"
+      ],
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ],
+      "location": "query",
+      "type": "string"
+    },
+    "access_token": {
+      "description": "OAuth access token.",
+      "location": "query",
+      "type": "string"
+    },
+    "alt": {
+      "default": "json",
+      "description": "Data format for response.",
+      "enum": [
+        "json",
+        "media",
+        "proto"
+      ],
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json",
+        "Media download with context-dependent Content-Type",
+        "Responses with Content-Type of application/x-protobuf"
+      ],
+      "location": "query",
+      "type": "string"
+    },
+    "callback": {
+      "description": "JSONP",
+      "location": "query",
+      "type": "string"
+    },
+    "fields": {
+      "description": "Selector specifying which fields to include in a partial response.",
+      "location": "query",
+      "type": "string"
+    },
+    "key": {
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+      "location": "query",
+      "type": "string"
+    },
+    "oauth_token": {
+      "description": "OAuth 2.0 token for the current user.",
+      "location": "query",
+      "type": "string"
+    },
+    "prettyPrint": {
+      "default": "true",
+      "description": "Returns response with indentations and line breaks.",
+      "location": "query",
+      "type": "boolean"
+    },
+    "quotaUser": {
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
+      "location": "query",
+      "type": "string"
+    },
+    "uploadType": {
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
+      "location": "query",
+      "type": "string"
+    },
+    "upload_protocol": {
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
+      "location": "query",
+      "type": "string"
+    }
+  },
+  "protocol": "rest",
+  "resources": {
+    "projects": {
+      "resources": {
+        "locations": {
+          "methods": {
+            "get": {
+              "description": "Gets information about a location.",
+              "flatPath": "v1/projects/{projectsId}/locations/{locationsId}",
+              "httpMethod": "GET",
+              "id": "vectorsearch.projects.locations.get",
+              "parameterOrder": [
+                "name"
+              ],
+              "parameters": {
+                "name": {
+                  "description": "Resource name for the location.",
+                  "location": "path",
+                  "pattern": "^projects/[^/]+/locations/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "path": "v1/{+name}",
+              "response": {
+                "$ref": "GoogleCloudLocationLocation"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/vectorsearch",
+                "https://www.googleapis.com/auth/vectorsearch.readonly"
+              ]
+            },
+            "list": {
+              "description": "Lists information about the supported locations for this service. This method lists locations based on the resource scope provided in the ListLocationsRequest.name field: * **Global locations**: If `name` is empty, the method lists the public locations available to all projects. * **Project-specific locations**: If `name` follows the format `projects/{project}`, the method lists locations visible to that specific project. This includes public, private, or other project-specific locations enabled for the project. For gRPC and client library implementations, the resource name is passed as the `name` field. For direct service calls, the resource name is incorporated into the request path based on the specific service implementation and version.",
+              "flatPath": "v1/projects/{projectsId}/locations",
+              "httpMethod": "GET",
+              "id": "vectorsearch.projects.locations.list",
+              "parameterOrder": [
+                "name"
+              ],
+              "parameters": {
+                "extraLocationTypes": {
+                  "description": "Optional. Do not use this field unless explicitly documented otherwise. This is primarily for internal usage.",
+                  "location": "query",
+                  "repeated": true,
+                  "type": "string"
+                },
+                "filter": {
+                  "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
+                  "location": "query",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The resource that owns the locations collection, if applicable.",
+                  "location": "path",
+                  "pattern": "^projects/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                },
+                "pageSize": {
+                  "description": "The maximum number of results to return. If not set, the service selects a default.",
+                  "format": "int32",
+                  "location": "query",
+                  "type": "integer"
+                },
+                "pageToken": {
+                  "description": "A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "path": "v1/{+name}/locations",
+              "response": {
+                "$ref": "GoogleCloudLocationListLocationsResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/vectorsearch",
+                "https://www.googleapis.com/auth/vectorsearch.readonly"
+              ]
+            }
+          },
+          "resources": {
+            "collections": {
+              "methods": {
+                "create": {
+                  "description": "Creates a new Collection in a given project and location.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections",
+                  "httpMethod": "POST",
+                  "id": "vectorsearch.projects.locations.collections.create",
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "parameters": {
+                    "collectionId": {
+                      "description": "Required. ID of the Collection to create. The id must be 1-63 characters long, and comply with [RFC1035](https://www.ietf.org/rfc/rfc1035.txt). Specifically, it must be 1-63 characters long and match the regular expression `[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?`.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "parent": {
+                      "description": "Required. Value for parent.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+parent}/collections",
+                  "request": {
+                    "$ref": "GoogleCloudVectorsearchV1Collection"
+                  },
+                  "response": {
+                    "$ref": "GoogleLongrunningOperation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch"
+                  ]
+                },
+                "delete": {
+                  "description": "Deletes a single Collection.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}",
+                  "httpMethod": "DELETE",
+                  "id": "vectorsearch.projects.locations.collections.delete",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "force": {
+                      "description": "Optional. If set to true, any Indexes and DataObjects from this Collection will also be deleted. (Otherwise, the request will only work if the Collection has no Indexes and DataObjects.)",
+                      "location": "query",
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "description": "Required. Name of the resource",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}",
+                  "response": {
+                    "$ref": "GoogleLongrunningOperation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch"
+                  ]
+                },
+                "exportDataObjects": {
+                  "description": "Initiates a Long-Running Operation to export DataObjects from a Collection.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}:exportDataObjects",
+                  "httpMethod": "POST",
+                  "id": "vectorsearch.projects.locations.collections.exportDataObjects",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The resource name of the Collection from which we want to export Data Objects. Format: `projects/{project}/locations/{location}/collections/{collection}`.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}:exportDataObjects",
+                  "request": {
+                    "$ref": "GoogleCloudVectorsearchV1ExportDataObjectsRequest"
+                  },
+                  "response": {
+                    "$ref": "GoogleLongrunningOperation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch"
+                  ]
+                },
+                "get": {
+                  "description": "Gets details of a single Collection.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}",
+                  "httpMethod": "GET",
+                  "id": "vectorsearch.projects.locations.collections.get",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the resource",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}",
+                  "response": {
+                    "$ref": "GoogleCloudVectorsearchV1Collection"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch",
+                    "https://www.googleapis.com/auth/vectorsearch.readonly"
+                  ]
+                },
+                "importDataObjects": {
+                  "description": "Initiates a Long-Running Operation to import DataObjects into a Collection.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}:importDataObjects",
+                  "httpMethod": "POST",
+                  "id": "vectorsearch.projects.locations.collections.importDataObjects",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "Required. The resource name of the Collection to import DataObjects into. Format: `projects/{project}/locations/{location}/collections/{collection}`.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}:importDataObjects",
+                  "request": {
+                    "$ref": "GoogleCloudVectorsearchV1ImportDataObjectsRequest"
+                  },
+                  "response": {
+                    "$ref": "GoogleLongrunningOperation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch"
+                  ]
+                },
+                "list": {
+                  "description": "Lists Collections in a given project and location.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections",
+                  "httpMethod": "GET",
+                  "id": "vectorsearch.projects.locations.collections.list",
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "parameters": {
+                    "filter": {
+                      "description": "Optional. Filtering results",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "orderBy": {
+                      "description": "Optional. Hint for how to order the results",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "Optional. Requested page size. Server may return fewer items than requested. If unspecified, server will pick an appropriate default.",
+                      "format": "int32",
+                      "location": "query",
+                      "type": "integer"
+                    },
+                    "pageToken": {
+                      "description": "Optional. A token identifying a page of results the server should return.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "parent": {
+                      "description": "Required. Parent value for ListCollectionsRequest",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+parent}/collections",
+                  "response": {
+                    "$ref": "GoogleCloudVectorsearchV1ListCollectionsResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch",
+                    "https://www.googleapis.com/auth/vectorsearch.readonly"
+                  ]
+                },
+                "patch": {
+                  "description": "Updates the parameters of a single Collection.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}",
+                  "httpMethod": "PATCH",
+                  "id": "vectorsearch.projects.locations.collections.patch",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "Identifier. name of resource",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "updateMask": {
+                      "description": "Optional. Field mask is used to specify the fields to be overwritten in the Collection resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field will be overwritten if it is in the mask. If the user does not provide a mask then all fields present in the request will be overwritten. The following fields support update: `display_name`, `description`, `labels`, `data_schema`, `vector_schema`. For `data_schema` and `vector_schema`, fields can only be added, not deleted, but `vertex_embedding_config` in `vector_schema` can be added or removed. Partial updates for `data_schema` and `vector_schema` are also supported by using sub-field paths in `update_mask`, e.g. `data_schema.properties.foo` or `vector_schema.my_vector_field`. If `*` is provided in the update_mask, full replacement will be performed.",
+                      "format": "google-fieldmask",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}",
+                  "request": {
+                    "$ref": "GoogleCloudVectorsearchV1Collection"
+                  },
+                  "response": {
+                    "$ref": "GoogleLongrunningOperation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch"
+                  ]
+                }
+              },
+              "resources": {
+                "dataObjects": {
+                  "methods": {
+                    "aggregate": {
+                      "description": "Aggregates data objects.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects:aggregate",
+                      "httpMethod": "POST",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.aggregate",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The resource name of the Collection for which to query. Format: `projects/{project}/locations/{location}/collections/{collection}`",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/dataObjects:aggregate",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1AggregateDataObjectsRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1AggregateDataObjectsResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch",
+                        "https://www.googleapis.com/auth/vectorsearch.readonly"
+                      ]
+                    },
+                    "batchCreate": {
+                      "description": "Creates a batch of dataObjects.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects:batchCreate",
+                      "httpMethod": "POST",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.batchCreate",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The resource name of the Collection to create the DataObjects in. Format: `projects/{project}/locations/{location}/collections/{collection}`. The parent field in the CreateDataObjectRequest messages must match this field.",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/dataObjects:batchCreate",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1BatchCreateDataObjectsRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1BatchCreateDataObjectsResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch"
+                      ]
+                    },
+                    "batchDelete": {
+                      "description": "Deletes dataObjects in a batch.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects:batchDelete",
+                      "httpMethod": "POST",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.batchDelete",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The resource name of the Collection to delete the DataObjects in. Format: `projects/{project}/locations/{location}/collections/{collection}`.",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/dataObjects:batchDelete",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1BatchDeleteDataObjectsRequest"
+                      },
+                      "response": {
+                        "$ref": "Empty"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch"
+                      ]
+                    },
+                    "batchSearch": {
+                      "description": "Batch searches data objects.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects:batchSearch",
+                      "httpMethod": "POST",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.batchSearch",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The resource name of the Collection for which to search. Format: `projects/{project}/locations/{location}/collections/{collection}`",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/dataObjects:batchSearch",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1BatchSearchDataObjectsRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1BatchSearchDataObjectsResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch",
+                        "https://www.googleapis.com/auth/vectorsearch.readonly"
+                      ]
+                    },
+                    "batchUpdate": {
+                      "description": "Updates dataObjects in a batch.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects:batchUpdate",
+                      "httpMethod": "POST",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.batchUpdate",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The resource name of the Collection to update the DataObjects in. Format: `projects/{project}/locations/{location}/collections/{collection}`. The parent field in the UpdateDataObjectRequest messages must match this field.",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/dataObjects:batchUpdate",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1BatchUpdateDataObjectsRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1BatchUpdateDataObjectsResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch"
+                      ]
+                    },
+                    "create": {
+                      "description": "Creates a dataObject.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects",
+                      "httpMethod": "POST",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.create",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "dataObjectId": {
+                          "description": "Required. The id of the dataObject to create. The id must be 1-63 characters long, and comply with [RFC1035](https://www.ietf.org/rfc/rfc1035.txt). Specifically, it must be 1-63 characters long and match the regular expression `[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?`.",
+                          "location": "query",
+                          "type": "string"
+                        },
+                        "parent": {
+                          "description": "Required. The resource name of the Collection to create the DataObject in. Format: `projects/{project}/locations/{location}/collections/{collection}`",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/dataObjects",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1DataObject"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1DataObject"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch"
+                      ]
+                    },
+                    "delete": {
+                      "description": "Deletes a dataObject.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects/{dataObjectsId}",
+                      "httpMethod": "DELETE",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.delete",
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "parameters": {
+                        "etag": {
+                          "description": "Optional. The current etag of the DataObject. If an etag is provided and does not match the current etag of the DataObject, deletion will be blocked and an ABORTED error will be returned.",
+                          "location": "query",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Required. The name of the DataObject resource to be deleted. Format: `projects/{project}/locations/{location}/collections/{collection}/dataObjects/{dataObject}`",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+/dataObjects/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+name}",
+                      "response": {
+                        "$ref": "Empty"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch"
+                      ]
+                    },
+                    "get": {
+                      "description": "Gets a data object.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects/{dataObjectsId}",
+                      "httpMethod": "GET",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.get",
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The name of the DataObject resource. Format: `projects/{project}/locations/{location}/collections/{collection}/dataObjects/{dataObject}`",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+/dataObjects/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+name}",
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1DataObject"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch",
+                        "https://www.googleapis.com/auth/vectorsearch.readonly"
+                      ]
+                    },
+                    "patch": {
+                      "description": "Updates a dataObject.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects/{dataObjectsId}",
+                      "httpMethod": "PATCH",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.patch",
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "parameters": {
+                        "name": {
+                          "description": "Identifier. The fully qualified resource name of the dataObject. Format: `projects/{project}/locations/{location}/collections/{collection}/dataObjects/{data_object_id}` The data_object_id must be 1-63 characters long, and comply with [RFC1035](https://www.ietf.org/rfc/rfc1035.txt).",
+                          "location": "path",
+                          "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+                          "required": true,
+                          "type": "string"
+                        },
+                        "updateMask": {
+                          "description": "Optional. The update mask applies to the resource. See google.protobuf.FieldMask.",
+                          "format": "google-fieldmask",
+                          "location": "query",
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+name}",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1DataObject"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1DataObject"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch"
+                      ]
+                    },
+                    "query": {
+                      "description": "Queries data objects.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects:query",
+                      "httpMethod": "POST",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.query",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The resource name of the Collection for which to query. Format: `projects/{project}/locations/{location}/collections/{collection}`",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/dataObjects:query",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1QueryDataObjectsRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1QueryDataObjectsResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch",
+                        "https://www.googleapis.com/auth/vectorsearch.readonly"
+                      ]
+                    },
+                    "search": {
+                      "description": "Searches data objects.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/dataObjects:search",
+                      "httpMethod": "POST",
+                      "id": "vectorsearch.projects.locations.collections.dataObjects.search",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "parent": {
+                          "description": "Required. The resource name of the Collection for which to search. Format: `projects/{project}/locations/{location}/collections/{collection}`",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/dataObjects:search",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1SearchDataObjectsRequest"
+                      },
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1SearchDataObjectsResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch",
+                        "https://www.googleapis.com/auth/vectorsearch.readonly"
+                      ]
+                    }
+                  }
+                },
+                "indexes": {
+                  "methods": {
+                    "create": {
+                      "description": "Creates a new Index in a given project and location.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/indexes",
+                      "httpMethod": "POST",
+                      "id": "vectorsearch.projects.locations.collections.indexes.create",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "indexId": {
+                          "description": "Required. ID of the Index to create. The id must be 1-63 characters long, and comply with [RFC1035](https://www.ietf.org/rfc/rfc1035.txt). Specifically, it must be 1-63 characters long and match the regular expression `[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?`.",
+                          "location": "query",
+                          "type": "string"
+                        },
+                        "parent": {
+                          "description": "Required. The resource name of the Collection for which to create the Index. Format: `projects/{project}/locations/{location}/collections/{collection}`",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                          "location": "query",
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/indexes",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1Index"
+                      },
+                      "response": {
+                        "$ref": "GoogleLongrunningOperation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch"
+                      ]
+                    },
+                    "delete": {
+                      "description": "Deletes a single Index.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/indexes/{indexesId}",
+                      "httpMethod": "DELETE",
+                      "id": "vectorsearch.projects.locations.collections.indexes.delete",
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "parameters": {
+                        "name": {
+                          "description": "Required. The resource name of the Index to delete. Format: `projects/{project}/locations/{location}/collections/{collection}/indexes/{index}`",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+/indexes/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                          "location": "query",
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+name}",
+                      "response": {
+                        "$ref": "GoogleLongrunningOperation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch"
+                      ]
+                    },
+                    "get": {
+                      "description": "Gets details of a single Index.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/indexes/{indexesId}",
+                      "httpMethod": "GET",
+                      "id": "vectorsearch.projects.locations.collections.indexes.get",
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "parameters": {
+                        "name": {
+                          "description": "Required. Name of the resource",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+/indexes/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+name}",
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1Index"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch",
+                        "https://www.googleapis.com/auth/vectorsearch.readonly"
+                      ]
+                    },
+                    "list": {
+                      "description": "Lists Indexes in a given project and location.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/indexes",
+                      "httpMethod": "GET",
+                      "id": "vectorsearch.projects.locations.collections.indexes.list",
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "filter": {
+                          "description": "Optional. Filtering results",
+                          "location": "query",
+                          "type": "string"
+                        },
+                        "orderBy": {
+                          "description": "Optional. Hint for how to order the results",
+                          "location": "query",
+                          "type": "string"
+                        },
+                        "pageSize": {
+                          "description": "Optional. Requested page size. Server may return fewer items than requested. If unspecified, server will pick an appropriate default.",
+                          "format": "int32",
+                          "location": "query",
+                          "type": "integer"
+                        },
+                        "pageToken": {
+                          "description": "Optional. A token identifying a page of results the server should return.",
+                          "location": "query",
+                          "type": "string"
+                        },
+                        "parent": {
+                          "description": "Required. Parent value for ListIndexesRequest",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+parent}/indexes",
+                      "response": {
+                        "$ref": "GoogleCloudVectorsearchV1ListIndexesResponse"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch",
+                        "https://www.googleapis.com/auth/vectorsearch.readonly"
+                      ]
+                    },
+                    "patch": {
+                      "description": "Updates the parameters of a single Index.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/collections/{collectionsId}/indexes/{indexesId}",
+                      "httpMethod": "PATCH",
+                      "id": "vectorsearch.projects.locations.collections.indexes.patch",
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "parameters": {
+                        "name": {
+                          "description": "Identifier. name of resource",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/collections/[^/]+/indexes/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                          "location": "query",
+                          "type": "string"
+                        },
+                        "updateMask": {
+                          "description": "Optional. Specifies the fields to be overwritten in the Index resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field will be overwritten if it is in the mask. If the user does not provide a mask then all fields present in the request with non-empty values will be overwritten. The following fields support update: * `display_name` * `description` * `labels` * `dedicated_infrastructure.autoscaling_spec.min_replica_count` * `dedicated_infrastructure.autoscaling_spec.max_replica_count` If `*` is provided in the `update_mask`, full replacement of mutable fields will be performed.",
+                          "format": "google-fieldmask",
+                          "location": "query",
+                          "type": "string"
+                        }
+                      },
+                      "path": "v1/{+name}",
+                      "request": {
+                        "$ref": "GoogleCloudVectorsearchV1Index"
+                      },
+                      "response": {
+                        "$ref": "GoogleLongrunningOperation"
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/vectorsearch"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "operations": {
+              "methods": {
+                "cancel": {
+                  "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
+                  "httpMethod": "POST",
+                  "id": "vectorsearch.projects.locations.operations.cancel",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource to be cancelled.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}:cancel",
+                  "request": {
+                    "$ref": "GoogleLongrunningCancelOperationRequest"
+                  },
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch"
+                  ]
+                },
+                "delete": {
+                  "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "httpMethod": "DELETE",
+                  "id": "vectorsearch.projects.locations.operations.delete",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource to be deleted.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}",
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch"
+                  ]
+                },
+                "get": {
+                  "description": "Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "httpMethod": "GET",
+                  "id": "vectorsearch.projects.locations.operations.get",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}",
+                  "response": {
+                    "$ref": "GoogleLongrunningOperation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch",
+                    "https://www.googleapis.com/auth/vectorsearch.readonly"
+                  ]
+                },
+                "list": {
+                  "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations",
+                  "httpMethod": "GET",
+                  "id": "vectorsearch.projects.locations.operations.list",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "filter": {
+                      "description": "The standard list filter.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "The name of the operation's parent resource.",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The standard list page size.",
+                      "format": "int32",
+                      "location": "query",
+                      "type": "integer"
+                    },
+                    "pageToken": {
+                      "description": "The standard list page token.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "returnPartialSuccess": {
+                      "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                      "location": "query",
+                      "type": "boolean"
+                    }
+                  },
+                  "path": "v1/{+name}/operations",
+                  "response": {
+                    "$ref": "GoogleLongrunningListOperationsResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/vectorsearch",
+                    "https://www.googleapis.com/auth/vectorsearch.readonly"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "revision": "20261022",
+  "rootUrl": "https://vectorsearch.googleapis.com/",
+  "schemas": {
+    "Empty": {
+      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
+      "id": "Empty",
+      "properties": {},
+      "type": "object"
+    },
+    "GoogleCloudLocationListLocationsResponse": {
+      "description": "The response message for Locations.ListLocations.",
+      "id": "GoogleCloudLocationListLocationsResponse",
+      "properties": {
+        "locations": {
+          "description": "A list of locations that matches the specified filter in the request.",
+          "items": {
+            "$ref": "GoogleCloudLocationLocation"
+          },
+          "type": "array"
+        },
+        "nextPageToken": {
+          "description": "The standard List next-page token.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudLocationLocation": {
+      "description": "A resource that represents a Google Cloud location.",
+      "id": "GoogleCloudLocationLocation",
+      "properties": {
+        "displayName": {
+          "description": "The friendly name for this location, typically a nearby city name. For example, \"Tokyo\".",
+          "type": "string"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Cross-service attributes for the location. For example {\"cloud.googleapis.com/region\": \"us-east1\"}",
+          "type": "object"
+        },
+        "locationId": {
+          "description": "The canonical id for this location. For example: `\"us-east1\"`.",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": {
+            "description": "Properties of the object. Contains field @type with type URL.",
+            "type": "any"
+          },
+          "description": "Service-specific metadata. For example the available capacity at the given location.",
+          "type": "object"
+        },
+        "name": {
+          "description": "Resource name for the location, which may vary between implementations. For example: `\"projects/example-project/locations/us-east1\"`",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1AggregateDataObjectsRequest": {
+      "description": "Request message for DataObjectSearchService.AggregateDataObjects.",
+      "id": "GoogleCloudVectorsearchV1AggregateDataObjectsRequest",
+      "properties": {
+        "aggregate": {
+          "description": "Required. The aggregation method to apply to the query.",
+          "enum": [
+            "AGGREGATION_METHOD_UNSPECIFIED",
+            "COUNT"
+          ],
+          "enumDescriptions": [
+            "Should not be used.",
+            "Count the number of data objects that match the filter."
+          ],
+          "type": "string"
+        },
+        "filter": {
+          "additionalProperties": {
+            "description": "Properties of the object.",
+            "type": "any"
+          },
+          "description": "Optional. A JSON filter expression, e.g. `{\"genre\": {\"$eq\": \"sci-fi\"}}`, represented as a `google.protobuf.Struct`. An empty filter (`{}`) matches all data objects. Otherwise, each JSON object in the filter must have exactly one key: either a field name mapped to one operator (`{\"price\": {\"$lt\": 100}}`), or a logical operator: `$and` or `$or` with a list of filters, or `$not` with one filter. Field operators and their values: `$eq` and `$ne` take a string, number or bool; `$lt`, `$lte`, `$gt` and `$gte` take a number; `$in`, `$nin` and `$all` take a list of strings; `$exists` takes a bool. Several keys in one object (implicit AND) and implicit equality (`{\"genre\": \"sci-fi\"}`) are rejected; use `$and` and `$eq` instead. Logical operators can be nested at most 2 levels deep, e.g. `{\"$and\": [{\"$or\": [{\"a\": {\"$eq\": 1}}, {\"b\": {\"$eq\": 2}}]}]}`. Deeper filters are rejected with `INVALID_ARGUMENT`.",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1AggregateDataObjectsResponse": {
+      "description": "Response message for DataObjectSearchService.AggregateDataObjects.",
+      "id": "GoogleCloudVectorsearchV1AggregateDataObjectsResponse",
+      "properties": {
+        "aggregateResults": {
+          "description": "Output only. The aggregated results of the query.",
+          "items": {
+            "additionalProperties": {
+              "description": "Properties of the object.",
+              "type": "any"
+            },
+            "type": "object"
+          },
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1BatchCreateDataObjectsRequest": {
+      "description": "Request message for DataObjectService.BatchCreateDataObjects.",
+      "id": "GoogleCloudVectorsearchV1BatchCreateDataObjectsRequest",
+      "properties": {
+        "requests": {
+          "description": "Required. The request message specifying the resources to create. A maximum of 1000 DataObjects can be created in a batch.",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1CreateDataObjectRequest"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1BatchCreateDataObjectsResponse": {
+      "description": "Response message for DataObjectService.BatchCreateDataObjects.",
+      "id": "GoogleCloudVectorsearchV1BatchCreateDataObjectsResponse",
+      "properties": {
+        "dataObjects": {
+          "description": "Output only. DataObjects created.",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1DataObject"
+          },
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1BatchDeleteDataObjectsRequest": {
+      "description": "Request message for DataObjectService.BatchDeleteDataObjects.",
+      "id": "GoogleCloudVectorsearchV1BatchDeleteDataObjectsRequest",
+      "properties": {
+        "requests": {
+          "description": "Required. The request message specifying the resources to delete. A maximum of 1000 DataObjects can be deleted in a batch.",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1DeleteDataObjectRequest"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1BatchSearchDataObjectsRequest": {
+      "description": "A request to perform a batch of search operations.",
+      "id": "GoogleCloudVectorsearchV1BatchSearchDataObjectsRequest",
+      "properties": {
+        "combine": {
+          "$ref": "GoogleCloudVectorsearchV1BatchSearchDataObjectsRequestCombineResultsOptions",
+          "description": "Optional. Options for combining the results of the batch search operations."
+        },
+        "searches": {
+          "description": "Required. A list of search requests to execute in parallel.",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1Search"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1BatchSearchDataObjectsRequestCombineResultsOptions": {
+      "description": "Options for combining the results of the batch search operations.",
+      "id": "GoogleCloudVectorsearchV1BatchSearchDataObjectsRequestCombineResultsOptions",
+      "properties": {
+        "outputFields": {
+          "$ref": "GoogleCloudVectorsearchV1OutputFields",
+          "description": "Optional. Mask specifying which fields to return."
+        },
+        "ranker": {
+          "$ref": "GoogleCloudVectorsearchV1Ranker",
+          "description": "Required. The ranker to use for combining the results."
+        },
+        "topK": {
+          "description": "Optional. The number of results to return. If not set, a default value will be used.",
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1BatchSearchDataObjectsResponse": {
+      "description": "A response from a batch search operation.",
+      "id": "GoogleCloudVectorsearchV1BatchSearchDataObjectsResponse",
+      "properties": {
+        "results": {
+          "description": "Output only. A list of search responses, one for each request in the batch. If a ranker is used, a single ranked list of results is returned.",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1SearchDataObjectsResponse"
+          },
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1BatchUpdateDataObjectsRequest": {
+      "description": "Request message for DataObjectService.BatchUpdateDataObjects.",
+      "id": "GoogleCloudVectorsearchV1BatchUpdateDataObjectsRequest",
+      "properties": {
+        "requests": {
+          "description": "Required. The request message specifying the resources to update. A maximum of 1000 DataObjects can be updated in a batch.",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1UpdateDataObjectRequest"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1BatchUpdateDataObjectsResponse": {
+      "description": "Response message for DataObjectService.BatchUpdateDataObjects.",
+      "id": "GoogleCloudVectorsearchV1BatchUpdateDataObjectsResponse",
+      "properties": {},
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1Collection": {
+      "description": "Message describing Collection object",
+      "id": "GoogleCloudVectorsearchV1Collection",
+      "properties": {
+        "createTime": {
+          "description": "Output only. [Output only] Create time stamp",
+          "format": "google-datetime",
+          "readOnly": true,
+          "type": "string"
+        },
+        "dataSchema": {
+          "additionalProperties": {
+            "description": "Properties of the object.",
+            "type": "any"
+          },
+          "description": "Optional. JSON Schema for data. Field names must contain only alphanumeric characters, underscores, and hyphens. The schema must be compliant with [JSON Schema Draft 7](https://json-schema.org/draft-07/schema).",
+          "type": "object"
+        },
+        "description": {
+          "description": "Optional. User-specified description of the collection",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Optional. User-specified display name of the collection",
+          "type": "string"
+        },
+        "encryptionSpec": {
+          "$ref": "GoogleCloudVectorsearchV1EncryptionSpec",
+          "description": "Optional. Immutable. Specifies the customer-managed encryption key spec for a Collection. If set, this Collection and all sub-resources of this Collection will be secured by this key."
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. Labels as key value pairs.",
+          "type": "object"
+        },
+        "name": {
+          "description": "Identifier. name of resource",
+          "type": "string"
+        },
+        "updateTime": {
+          "description": "Output only. [Output only] Update time stamp",
+          "format": "google-datetime",
+          "readOnly": true,
+          "type": "string"
+        },
+        "vectorSchema": {
+          "additionalProperties": {
+            "$ref": "GoogleCloudVectorsearchV1VectorField"
+          },
+          "description": "Optional. Schema for vector fields. Only vector fields in this schema will be searchable. Field names must contain only alphanumeric characters, underscores, and hyphens.",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1CombinedQuery": {
+      "description": "A query that combines multiple sub-queries with a boolean operator.",
+      "id": "GoogleCloudVectorsearchV1CombinedQuery",
+      "properties": {
+        "op": {
+          "description": "Required. The boolean operator used to combine the sub-queries.",
+          "enum": [
+            "OPERATOR_UNSPECIFIED",
+            "AND",
+            "OR"
+          ],
+          "enumDescriptions": [
+            "Default value. This value is unused.",
+            "All sub-queries must match.",
+            "At least one sub-query must match."
+          ],
+          "type": "string"
+        },
+        "subQueries": {
+          "description": "Required. The sub-queries to be combined.",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1StructuredQuery"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1CreateDataObjectRequest": {
+      "description": "Request message for DataObjectService.CreateDataObject.",
+      "id": "GoogleCloudVectorsearchV1CreateDataObjectRequest",
+      "properties": {
+        "dataObject": {
+          "$ref": "GoogleCloudVectorsearchV1DataObject",
+          "description": "Required. The DataObject to create."
+        },
+        "dataObjectId": {
+          "description": "Required. The id of the dataObject to create. The id must be 1-63 characters long, and comply with [RFC1035](https://www.ietf.org/rfc/rfc1035.txt). Specifically, it must be 1-63 characters long and match the regular expression `[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?`.",
+          "type": "string"
+        },
+        "parent": {
+          "description": "Required. The resource name of the Collection to create the DataObject in. Format: `projects/{project}/locations/{location}/collections/{collection}`",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1DataObject": {
+      "description": "A dataObject resource in Vector Search.",
+      "id": "GoogleCloudVectorsearchV1DataObject",
+      "properties": {
+        "createTime": {
+          "description": "Output only. Timestamp the dataObject was created at.",
+          "format": "google-datetime",
+          "readOnly": true,
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": {
+            "description": "Properties of the object.",
+            "type": "any"
+          },
+          "description": "Optional. The data of the dataObject.",
+          "type": "object"
+        },
+        "dataObjectId": {
+          "description": "Output only. The id of the dataObject.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "etag": {
+          "description": "Optional. The etag of the dataObject.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Identifier. The fully qualified resource name of the dataObject. Format: `projects/{project}/locations/{location}/collections/{collection}/dataObjects/{data_object_id}` The data_object_id must be 1-63 characters long, and comply with [RFC1035](https://www.ietf.org/rfc/rfc1035.txt).",
+          "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+          "type": "string"
+        },
+        "updateTime": {
+          "description": "Output only. Timestamp the dataObject was last updated.",
+          "format": "google-datetime",
+          "readOnly": true,
+          "type": "string"
+        },
+        "vectors": {
+          "additionalProperties": {
+            "$ref": "GoogleCloudVectorsearchV1Vector"
+          },
+          "description": "Optional. The vectors of the dataObject.",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1DedicatedInfrastructure": {
+      "description": "Represents dedicated infrastructure for the index.",
+      "id": "GoogleCloudVectorsearchV1DedicatedInfrastructure",
+      "properties": {
+        "autoscalingSpec": {
+          "$ref": "GoogleCloudVectorsearchV1DedicatedInfrastructureAutoscalingSpec",
+          "description": "Optional. Autoscaling specification."
+        },
+        "mode": {
+          "description": "Optional. Mode of the dedicated infrastructure.",
+          "enum": [
+            "MODE_UNSPECIFIED",
+            "STORAGE_OPTIMIZED",
+            "PERFORMANCE_OPTIMIZED"
+          ],
+          "enumDescriptions": [
+            "Default will use `PERFORMANCE_OPTIMIZED`.",
+            "This is storage optimized variation.",
+            "This is Performance optimized on E2 or equivalent family."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1DedicatedInfrastructureAutoscalingSpec": {
+      "description": "Specification for autoscaling.",
+      "id": "GoogleCloudVectorsearchV1DedicatedInfrastructureAutoscalingSpec",
+      "properties": {
+        "maxReplicaCount": {
+          "description": "Optional. The maximum number of replicas. Must be >= `min_replica_count` and <= `1000`. For the v1beta version, if not set or set to `0`, defaults to the greater of `min_replica_count` and `5`. For all other versions, if not set or set to `0`, defaults to the greater of `min_replica_count` and `2`.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "minReplicaCount": {
+          "description": "Optional. The minimum number of replicas. If not set or set to `0`, defaults to `2`. Must be >= `1` and <= `1000`.",
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1DeleteDataObjectRequest": {
+      "description": "Request message for DataObjectService.DeleteDataObject.",
+      "id": "GoogleCloudVectorsearchV1DeleteDataObjectRequest",
+      "properties": {
+        "etag": {
+          "description": "Optional. The current etag of the DataObject. If an etag is provided and does not match the current etag of the DataObject, deletion will be blocked and an ABORTED error will be returned.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Required. The name of the DataObject resource to be deleted. Format: `projects/{project}/locations/{location}/collections/{collection}/dataObjects/{dataObject}`",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1DenseScannIndex": {
+      "description": "Dense ScaNN index configuration.",
+      "id": "GoogleCloudVectorsearchV1DenseScannIndex",
+      "properties": {
+        "featureNormType": {
+          "description": "Optional. Feature norm type.",
+          "enum": [
+            "FEATURE_NORM_TYPE_UNSPECIFIED",
+            "NONE",
+            "UNIT_L2_NORM"
+          ],
+          "enumDescriptions": [
+            "Unspecified feature norm type.",
+            "No norm applied.",
+            "Unit L2 norm."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1DenseVector": {
+      "description": "A dense vector.",
+      "id": "GoogleCloudVectorsearchV1DenseVector",
+      "properties": {
+        "values": {
+          "description": "Required. The values of the vector.",
+          "items": {
+            "format": "float",
+            "type": "number"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1DenseVectorField": {
+      "description": "Message describing a dense vector field.",
+      "id": "GoogleCloudVectorsearchV1DenseVectorField",
+      "properties": {
+        "dimensions": {
+          "description": "Dimensionality of the vector field.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "vertexEmbeddingConfig": {
+          "$ref": "GoogleCloudVectorsearchV1VertexEmbeddingConfig",
+          "description": "Optional. Configuration for generating embeddings for the vector field. If not specified, the embedding field must be populated in the DataObject."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1EncryptionSpec": {
+      "description": "Represents a customer-managed encryption key specification that can be applied to a Vector Search collection.",
+      "id": "GoogleCloudVectorsearchV1EncryptionSpec",
+      "properties": {
+        "cryptoKeyName": {
+          "description": "Required. Resource name of the Cloud KMS key used to protect the resource. The Cloud KMS key must be in the same region as the resource. It must have the format `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1ExportDataObjectsRequest": {
+      "description": "Request message for VectorSearchService.ExportDataObjects.",
+      "id": "GoogleCloudVectorsearchV1ExportDataObjectsRequest",
+      "properties": {
+        "fieldFilter": {
+          "$ref": "GoogleCloudVectorsearchV1ExportDataObjectsRequestFieldFilter",
+          "description": "Optional. Restricts which top-level Data Object fields appear in each exported JSONL record. If unset, every field is exported (the existing behavior). The primary use case is excluding the per-object `etag` so that the exported records can be imported into a Collection in a different region without optimistic-concurrency conflicts. Allowed field names are `id`, `data`, `vectors`, `etag`."
+        },
+        "gcsDestination": {
+          "$ref": "GoogleCloudVectorsearchV1ExportDataObjectsRequestGcsExportDestination",
+          "description": "The Cloud Storage location where user wants to export Data Objects."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1ExportDataObjectsRequestFieldFilter": {
+      "description": "Selects which top-level Data Object fields are emitted at export time.",
+      "id": "GoogleCloudVectorsearchV1ExportDataObjectsRequestFieldFilter",
+      "properties": {
+        "excludedFields": {
+          "$ref": "GoogleCloudVectorsearchV1ExportDataObjectsRequestFieldFilterFieldList",
+          "description": "Optional. Every top-level field except these will appear in each exported record."
+        },
+        "includedFields": {
+          "$ref": "GoogleCloudVectorsearchV1ExportDataObjectsRequestFieldFilterFieldList",
+          "description": "Optional. Only these top-level fields will appear in each exported record."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1ExportDataObjectsRequestFieldFilterFieldList": {
+      "description": "Wrapper for a repeated string. Wrapping in a message lets the surrounding `oneof` distinguish \"field set to an empty list\" (which is rejected as INVALID_ARGUMENT) from \"field not set\".",
+      "id": "GoogleCloudVectorsearchV1ExportDataObjectsRequestFieldFilterFieldList",
+      "properties": {
+        "fields": {
+          "description": "Required. The list of top-level Data Object JSON field names. Allowed values are `id`, `data`, `vectors`, `etag`.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1ExportDataObjectsRequestGcsExportDestination": {
+      "description": "Google Cloud Storage configuration for the export.",
+      "id": "GoogleCloudVectorsearchV1ExportDataObjectsRequestGcsExportDestination",
+      "properties": {
+        "exportUri": {
+          "description": "Required. URI prefix of the Cloud Storage where to export Data Objects. The bucket is required to be in the same region as the collection.",
+          "type": "string"
+        },
+        "format": {
+          "description": "Required. The format of the exported Data Objects.",
+          "enum": [
+            "FORMAT_UNSPECIFIED",
+            "JSONL"
+          ],
+          "enumDescriptions": [
+            "Unspecified format.",
+            "Exports Data Objects in `JSONL` format."
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1ImportDataObjectsRequest": {
+      "description": "Request message for VectorSearchService.ImportDataObjects.",
+      "id": "GoogleCloudVectorsearchV1ImportDataObjectsRequest",
+      "properties": {
+        "gcsImport": {
+          "$ref": "GoogleCloudVectorsearchV1ImportDataObjectsRequestGcsImportConfig",
+          "description": "The Cloud Storage location of the input content."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1ImportDataObjectsRequestGcsImportConfig": {
+      "description": "Google Cloud Storage configuration for the import.",
+      "id": "GoogleCloudVectorsearchV1ImportDataObjectsRequestGcsImportConfig",
+      "properties": {
+        "contentsUri": {
+          "description": "Required. URI prefix of the Cloud Storage DataObjects to import.",
+          "type": "string"
+        },
+        "errorUri": {
+          "description": "Required. URI prefix of the Cloud Storage location to write any errors encountered during the import.",
+          "type": "string"
+        },
+        "outputUri": {
+          "description": "Optional. URI prefix of the Cloud Storage location to write DataObject `IDs` and `etags` of DataObjects that were successfully imported. The service will write the successfully imported DataObjects to sharded files under this prefix. If this field is empty, no output will be written.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1Index": {
+      "description": "Message describing Index object",
+      "id": "GoogleCloudVectorsearchV1Index",
+      "properties": {
+        "createTime": {
+          "description": "Output only. [Output only] Create time stamp",
+          "format": "google-datetime",
+          "readOnly": true,
+          "type": "string"
+        },
+        "dedicatedInfrastructure": {
+          "$ref": "GoogleCloudVectorsearchV1DedicatedInfrastructure",
+          "description": "Optional. Dedicated infrastructure for the index."
+        },
+        "denseScann": {
+          "$ref": "GoogleCloudVectorsearchV1DenseScannIndex",
+          "description": "Optional. Dense ScaNN index."
+        },
+        "description": {
+          "description": "Optional. User-specified description of the index",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Optional. User-specified display name of the index",
+          "type": "string"
+        },
+        "distanceMetric": {
+          "description": "Optional. Distance metric used for indexing. If not specified, will default to DOT_PRODUCT.",
+          "enum": [
+            "DISTANCE_METRIC_UNSPECIFIED",
+            "DOT_PRODUCT",
+            "COSINE_DISTANCE"
+          ],
+          "enumDescriptions": [
+            "Default value, distance metric is not specified.",
+            "Dot product distance metric.",
+            "Cosine distance metric."
+          ],
+          "type": "string"
+        },
+        "filterFields": {
+          "description": "Optional. The fields to push into the index to enable fast ANN inline filtering.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "indexField": {
+          "description": "Required. The collection schema field to index.",
+          "type": "string"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. Labels as key value pairs.",
+          "type": "object"
+        },
+        "name": {
+          "description": "Identifier. name of resource",
+          "type": "string"
+        },
+        "storeFields": {
+          "description": "Optional. The fields to push into the index to enable inline data retrieval.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "updateTime": {
+          "description": "Output only. [Output only] Update time stamp",
+          "format": "google-datetime",
+          "readOnly": true,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1ListCollectionsResponse": {
+      "description": "Message for response to listing Collections",
+      "id": "GoogleCloudVectorsearchV1ListCollectionsResponse",
+      "properties": {
+        "collections": {
+          "description": "The list of Collection",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1Collection"
+          },
+          "type": "array"
+        },
+        "nextPageToken": {
+          "description": "A token identifying a page of results the server should return.",
+          "type": "string"
+        },
+        "unreachable": {
+          "description": "Unordered list. Locations that could not be reached.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1ListIndexesResponse": {
+      "description": "Message for response to listing Indexes",
+      "id": "GoogleCloudVectorsearchV1ListIndexesResponse",
+      "properties": {
+        "indexes": {
+          "description": "The list of Index",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1Index"
+          },
+          "type": "array"
+        },
+        "nextPageToken": {
+          "description": "A token identifying a page of results the server should return.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1OperationMetadata": {
+      "description": "Represents the metadata of the long-running operation.",
+      "id": "GoogleCloudVectorsearchV1OperationMetadata",
+      "properties": {
+        "apiVersion": {
+          "description": "Output only. API version used to start the operation.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "createTime": {
+          "description": "Output only. The time the operation was created.",
+          "format": "google-datetime",
+          "readOnly": true,
+          "type": "string"
+        },
+        "endTime": {
+          "description": "Output only. The time the operation finished running.",
+          "format": "google-datetime",
+          "readOnly": true,
+          "type": "string"
+        },
+        "requestedCancellation": {
+          "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have google.longrunning.Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
+          "type": "boolean"
+        },
+        "statusMessage": {
+          "description": "Output only. Human-readable status of the operation, if any.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "target": {
+          "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "verb": {
+          "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1OutputFields": {
+      "description": "Defines an output fields struct for data in DataObject. Output fields are opt-in. A search or query result contains only the data object name and ID, plus the fields listed here. If this message is unset or a list is empty, the corresponding part of the data object (`data`, `vectors` or metadata) is omitted from the result; it is not an indication that the stored data object is empty. Use `\"*\"` in a list to return all fields of that kind.",
+      "id": "GoogleCloudVectorsearchV1OutputFields",
+      "properties": {
+        "dataFields": {
+          "description": "Optional. The fields from the data fields to include in the output. Use `\"*\"` to include all data fields. If empty, `data` is omitted from results.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "metadataFields": {
+          "description": "Optional. The DataObject metadata fields to include in the output: `create_time`, `update_time` and `etag`. Use `\"*\"` to include all metadata fields. If empty, these fields are omitted from results.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "vectorFields": {
+          "description": "Optional. The fields from the vector fields to include in the output. Use `\"*\"` to include all vector fields. If empty, `vectors` is omitted from results.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1QueryDataObjectsRequest": {
+      "description": "Request message for DataObjectSearchService.QueryDataObjects.",
+      "id": "GoogleCloudVectorsearchV1QueryDataObjectsRequest",
+      "properties": {
+        "filter": {
+          "additionalProperties": {
+            "description": "Properties of the object.",
+            "type": "any"
+          },
+          "description": "Optional. A JSON filter expression, e.g. `{\"genre\": {\"$eq\": \"sci-fi\"}}`, represented as a `google.protobuf.Struct`. An empty filter (`{}`) matches all data objects. Otherwise, each JSON object in the filter must have exactly one key: either a field name mapped to one operator (`{\"price\": {\"$lt\": 100}}`), or a logical operator: `$and` or `$or` with a list of filters, or `$not` with one filter. Field operators and their values: `$eq` and `$ne` take a string, number or bool; `$lt`, `$lte`, `$gt` and `$gte` take a number; `$in`, `$nin` and `$all` take a list of strings; `$exists` takes a bool. Several keys in one object (implicit AND) and implicit equality (`{\"genre\": \"sci-fi\"}`) are rejected; use `$and` and `$eq` instead. Logical operators can be nested at most 2 levels deep, e.g. `{\"$and\": [{\"$or\": [{\"a\": {\"$eq\": 1}}, {\"b\": {\"$eq\": 2}}]}]}`. Deeper filters are rejected with `INVALID_ARGUMENT`.",
+          "type": "object"
+        },
+        "outputFields": {
+          "$ref": "GoogleCloudVectorsearchV1OutputFields",
+          "description": "Optional. Mask specifying which fields to return."
+        },
+        "pageSize": {
+          "description": "Optional. The standard list page size. Default is 100. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "pageToken": {
+          "description": "Optional. The standard list page token. Typically obtained via QueryDataObjectsResponse.next_page_token of the previous DataObjectSearchService.QueryDataObjects call.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1QueryDataObjectsResponse": {
+      "description": "Response message for DataObjectSearchService.QueryDataObjects.",
+      "id": "GoogleCloudVectorsearchV1QueryDataObjectsResponse",
+      "properties": {
+        "dataObjects": {
+          "description": "Output only. The list of dataObjects that match the query.",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1DataObject"
+          },
+          "readOnly": true,
+          "type": "array"
+        },
+        "nextPageToken": {
+          "description": "Output only. A token to retrieve next page of results. Pass to DataObjectSearchService.QueryDataObjectsRequest.page_token to obtain that page.",
+          "readOnly": true,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1QueryEnhancement": {
+      "description": "Query enhancement settings. When enabled, expands the search terms with stemming, synonyms, and spelling corrections, and removes stop words.",
+      "id": "GoogleCloudVectorsearchV1QueryEnhancement",
+      "properties": {
+        "enabled": {
+          "description": "Optional. Whether query enhancement is enabled.",
+          "type": "boolean"
+        },
+        "languageCode": {
+          "description": "Optional. The IETF BCP 47 language tag, such as \"en-US\", for query enhancement. If unset, the language is detected automatically. See .",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1Ranker": {
+      "description": "Defines a ranker to combine results from multiple searches.",
+      "id": "GoogleCloudVectorsearchV1Ranker",
+      "properties": {
+        "rrf": {
+          "$ref": "GoogleCloudVectorsearchV1ReciprocalRankFusion",
+          "description": "Reciprocal Rank Fusion ranking."
+        },
+        "vertexRanker": {
+          "$ref": "GoogleCloudVectorsearchV1VertexRanker",
+          "description": "Optional. Vertex AI ranking."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1ReciprocalRankFusion": {
+      "description": "Defines the Reciprocal Rank Fusion (RRF) algorithm for result ranking.",
+      "id": "GoogleCloudVectorsearchV1ReciprocalRankFusion",
+      "properties": {
+        "weights": {
+          "description": "Required. The weights to apply to each search result set during fusion.",
+          "items": {
+            "format": "double",
+            "type": "number"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1Search": {
+      "description": "A single search request within a batch operation.",
+      "id": "GoogleCloudVectorsearchV1Search",
+      "properties": {
+        "semanticSearch": {
+          "$ref": "GoogleCloudVectorsearchV1SemanticSearch",
+          "description": "A semantic search."
+        },
+        "textSearch": {
+          "$ref": "GoogleCloudVectorsearchV1TextSearch",
+          "description": "A text search operation."
+        },
+        "vectorSearch": {
+          "$ref": "GoogleCloudVectorsearchV1VectorSearch",
+          "description": "A vector-based search."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SearchDataObjectsRequest": {
+      "description": "Request for performing a single search.",
+      "id": "GoogleCloudVectorsearchV1SearchDataObjectsRequest",
+      "properties": {
+        "pageSize": {
+          "description": "Optional. The standard list page size. Only supported for KNN. If not set, up to search_type.top_k results will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "pageToken": {
+          "description": "Optional. The standard list page token. Typically obtained via SearchDataObjectsResponse.next_page_token of the previous DataObjectSearchService.SearchDataObjects call.",
+          "type": "string"
+        },
+        "semanticSearch": {
+          "$ref": "GoogleCloudVectorsearchV1SemanticSearch",
+          "description": "A semantic search operation."
+        },
+        "textSearch": {
+          "$ref": "GoogleCloudVectorsearchV1TextSearch",
+          "description": "Optional. A text search operation."
+        },
+        "vectorSearch": {
+          "$ref": "GoogleCloudVectorsearchV1VectorSearch",
+          "description": "A vector search operation."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SearchDataObjectsResponse": {
+      "description": "Response for a search request.",
+      "id": "GoogleCloudVectorsearchV1SearchDataObjectsResponse",
+      "properties": {
+        "nextPageToken": {
+          "description": "Output only. A token to retrieve next page of results. Pass to DataObjectSearchService.SearchDataObjectsRequest.page_token to obtain that page.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "results": {
+          "description": "Output only. The list of dataObjects that match the search criteria.",
+          "items": {
+            "$ref": "GoogleCloudVectorsearchV1SearchResult"
+          },
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SearchHint": {
+      "description": "Represents a hint to the search index engine.",
+      "id": "GoogleCloudVectorsearchV1SearchHint",
+      "properties": {
+        "indexHint": {
+          "$ref": "GoogleCloudVectorsearchV1SearchHintIndexHint",
+          "description": "Optional. Specifies that the search should use a particular index."
+        },
+        "knnHint": {
+          "$ref": "GoogleCloudVectorsearchV1SearchHintKnnHint",
+          "description": "Optional. If set, the search will use the system's default K-Nearest Neighbor (KNN) index engine."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SearchHintIndexHint": {
+      "description": "Message to specify the index to use for the search.",
+      "id": "GoogleCloudVectorsearchV1SearchHintIndexHint",
+      "properties": {
+        "denseScannParams": {
+          "$ref": "GoogleCloudVectorsearchV1SearchHintIndexHintDenseScannParams",
+          "description": "Optional. Dense ScaNN parameters."
+        },
+        "name": {
+          "description": "Required. The resource name of the index to use for the search. The index must be in the same project, location, and collection. Format: `projects/{project}/locations/{location}/collections/{collection}/indexes/{index}`",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SearchHintIndexHintDenseScannParams": {
+      "description": "Parameters for dense ScaNN.",
+      "id": "GoogleCloudVectorsearchV1SearchHintIndexHintDenseScannParams",
+      "properties": {
+        "targetRecall": {
+          "description": "Optional. The target recall for the search. Must be a double in the range [0, 1]. While the search aims to achieve this level of recall, it is not guaranteed.",
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SearchHintKnnHint": {
+      "description": "KnnHint will be used if search should be explicitly done on system's default K-Nearest Neighbor (KNN) index engine.",
+      "id": "GoogleCloudVectorsearchV1SearchHintKnnHint",
+      "properties": {},
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SearchResult": {
+      "description": "A single search result.",
+      "id": "GoogleCloudVectorsearchV1SearchResult",
+      "properties": {
+        "dataObject": {
+          "$ref": "GoogleCloudVectorsearchV1DataObject",
+          "description": "Output only. The matching data object.",
+          "readOnly": true
+        },
+        "distance": {
+          "description": "Output only. Similarity distance or ranker score returned by BatchSearchDataObjects.",
+          "format": "double",
+          "readOnly": true,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SemanticSearch": {
+      "description": "Defines a semantic search operation.",
+      "id": "GoogleCloudVectorsearchV1SemanticSearch",
+      "properties": {
+        "filter": {
+          "additionalProperties": {
+            "description": "Properties of the object.",
+            "type": "any"
+          },
+          "description": "Optional. A JSON filter expression, e.g. `{\"genre\": {\"$eq\": \"sci-fi\"}}`, represented as a `google.protobuf.Struct`. An empty filter (`{}`) matches all data objects. Otherwise, each JSON object in the filter must have exactly one key: either a field name mapped to one operator (`{\"price\": {\"$lt\": 100}}`), or a logical operator: `$and` or `$or` with a list of filters, or `$not` with one filter. Field operators and their values: `$eq` and `$ne` take a string, number or bool; `$lt`, `$lte`, `$gt` and `$gte` take a number; `$in`, `$nin` and `$all` take a list of strings; `$exists` takes a bool. Several keys in one object (implicit AND) and implicit equality (`{\"genre\": \"sci-fi\"}`) are rejected; use `$and` and `$eq` instead. Logical operators can be nested at most 2 levels deep, e.g. `{\"$and\": [{\"$or\": [{\"a\": {\"$eq\": 1}}, {\"b\": {\"$eq\": 2}}]}]}`. Deeper filters are rejected with `INVALID_ARGUMENT`. Which filters are accepted depends on how the search is served. If it is served by an approximate nearest neighbor (ANN) index (by default when a ready index exists on `search_field`, or when one is selected via `search_hint.index_hint`), every filtered field must be listed in `Index.filter_fields` at index creation, `$or` and `$all` are accepted only at the top level of the filter, and `$not` and `$exists` are not supported. Not every unsupported filter is rejected: most produce `INVALID_ARGUMENT`, but some are silently ignored, so do not rely on the error. If no ready index exists on `search_field`, or if `search_hint.knn_hint` is set, the search is served by K-Nearest Neighbor (KNN) search, which has none of these filter restrictions.",
+          "type": "object"
+        },
+        "outputFields": {
+          "$ref": "GoogleCloudVectorsearchV1OutputFields",
+          "description": "Optional. The fields to return in the search results."
+        },
+        "searchField": {
+          "description": "Required. The vector field to search.",
+          "type": "string"
+        },
+        "searchHint": {
+          "$ref": "GoogleCloudVectorsearchV1SearchHint",
+          "description": "Optional. Sets the search hint. If no strategy is specified, the service will use an index if one is available, and fall back to KNN search otherwise."
+        },
+        "searchText": {
+          "description": "Optional. The query text, which is used to generate an embedding according to the embedding model specified in the collection config. Required when using the text search mode.",
+          "type": "string"
+        },
+        "taskType": {
+          "description": "Optional. The task type of the query embedding. Must be specified for text-only embedding models, see Not needed for multi modal embedding models, see ",
+          "enum": [
+            "EMBEDDING_TASK_TYPE_UNSPECIFIED",
+            "RETRIEVAL_QUERY",
+            "RETRIEVAL_DOCUMENT",
+            "SEMANTIC_SIMILARITY",
+            "CLASSIFICATION",
+            "CLUSTERING",
+            "QUESTION_ANSWERING",
+            "FACT_VERIFICATION",
+            "CODE_RETRIEVAL_QUERY"
+          ],
+          "enumDescriptions": [
+            "Unspecified task type.",
+            "Specifies the given text is a query in a search/retrieval setting.",
+            "Specifies the given text is a document from the corpus being searched.",
+            "Specifies the given text will be used for STS.",
+            "Specifies that the given text will be classified.",
+            "Specifies that the embeddings will be used for clustering.",
+            "Specifies that the embeddings will be used for question answering.",
+            "Specifies that the embeddings will be used for fact verification.",
+            "Specifies that the embeddings will be used for code retrieval."
+          ],
+          "type": "string"
+        },
+        "topK": {
+          "description": "Optional. The number of data objects to return.",
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SparseVector": {
+      "description": "A sparse vector.",
+      "id": "GoogleCloudVectorsearchV1SparseVector",
+      "properties": {
+        "indices": {
+          "description": "Required. The corresponding indices for the values.",
+          "items": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "values": {
+          "description": "Required. The values of the vector.",
+          "items": {
+            "format": "float",
+            "type": "number"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1SparseVectorField": {
+      "description": "Message describing a sparse vector field.",
+      "id": "GoogleCloudVectorsearchV1SparseVectorField",
+      "properties": {},
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1StructuredQuery": {
+      "description": "A structured query for text search. Allows expressing field-targeted text queries combined via boolean operators, with optional per-node boosting.",
+      "id": "GoogleCloudVectorsearchV1StructuredQuery",
+      "properties": {
+        "boost": {
+          "description": "Optional. Optional multiplier applied to this query node's contribution to the final relevance score. Must be non-negative; if unset or 0, defaults to 1.0. Values greater than 1.0 increase its influence on ranking, values between 0.0 and 1.0 decrease it.",
+          "format": "float",
+          "type": "number"
+        },
+        "combine": {
+          "$ref": "GoogleCloudVectorsearchV1CombinedQuery",
+          "description": "Optional. A query that combines multiple sub-queries with a boolean operator."
+        },
+        "text": {
+          "$ref": "GoogleCloudVectorsearchV1TextQuery",
+          "description": "Optional. A leaf-level text query."
+        },
+        "unary": {
+          "$ref": "GoogleCloudVectorsearchV1UnaryQuery",
+          "description": "Optional. A query that applies a unary operator to a sub-query."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1TextQuery": {
+      "description": "A leaf-level text query targeting one or more data fields. When multiple fields are specified, this is equivalent to combining per-field matches with an OR operator (i.e. the query matches if the text is found in any of the listed fields).",
+      "id": "GoogleCloudVectorsearchV1TextQuery",
+      "properties": {
+        "fields": {
+          "description": "Required. The data fields to search against.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "matchType": {
+          "description": "Optional. The matching strategy to apply for this query. If unset, defaults to `TEXT`.",
+          "enum": [
+            "MATCH_TYPE_UNSPECIFIED",
+            "TEXT",
+            "EXACT"
+          ],
+          "enumDescriptions": [
+            "Defaults to `TEXT`.",
+            "Treats `text` as individual search terms combined with an implicit AND: every term must appear in the field, in any order and any position. Case-insensitive.",
+            "Matches only when the entire field value is exactly equal to `text`."
+          ],
+          "type": "string"
+        },
+        "queryEnhancement": {
+          "$ref": "GoogleCloudVectorsearchV1QueryEnhancement",
+          "description": "Optional. The query enhancement settings to apply for this query."
+        },
+        "text": {
+          "description": "Required. The text to search for.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1TextSearch": {
+      "description": "Defines a text search operation.",
+      "id": "GoogleCloudVectorsearchV1TextSearch",
+      "properties": {
+        "dataFieldNames": {
+          "description": "Optional. The data field names to search. Required when using the default text search mode.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "filter": {
+          "additionalProperties": {
+            "description": "Properties of the object.",
+            "type": "any"
+          },
+          "description": "Optional. A JSON filter expression, e.g. `{\"genre\": {\"$eq\": \"sci-fi\"}}`, represented as a `google.protobuf.Struct`. An empty filter (`{}`) matches all data objects. Otherwise, each JSON object in the filter must have exactly one key: either a field name mapped to one operator (`{\"price\": {\"$lt\": 100}}`), or a logical operator: `$and` or `$or` with a list of filters, or `$not` with one filter. Field operators and their values: `$eq` and `$ne` take a string, number or bool; `$lt`, `$lte`, `$gt` and `$gte` take a number; `$in`, `$nin` and `$all` take a list of strings; `$exists` takes a bool. Several keys in one object (implicit AND) and implicit equality (`{\"genre\": \"sci-fi\"}`) are rejected; use `$and` and `$eq` instead. Logical operators can be nested at most 2 levels deep, e.g. `{\"$and\": [{\"$or\": [{\"a\": {\"$eq\": 1}}, {\"b\": {\"$eq\": 2}}]}]}`. Deeper filters are rejected with `INVALID_ARGUMENT`.",
+          "type": "object"
+        },
+        "outputFields": {
+          "$ref": "GoogleCloudVectorsearchV1OutputFields",
+          "description": "Optional. The fields to return in the search results."
+        },
+        "searchText": {
+          "description": "Optional. The query text. Required when using the default text search mode.",
+          "type": "string"
+        },
+        "structuredQuery": {
+          "$ref": "GoogleCloudVectorsearchV1StructuredQuery",
+          "description": "Optional. Structured query definition. When set, `search_text` and `data_field_names` must be left empty; otherwise the request will be rejected with an `INVALID_ARGUMENT` error. Conversely, when `structured_query` is unset, both `search_text` and `data_field_names` are required."
+        },
+        "topK": {
+          "description": "Optional. The number of results to return.",
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1UnaryQuery": {
+      "description": "A query that applies a unary operator to a sub-query.",
+      "id": "GoogleCloudVectorsearchV1UnaryQuery",
+      "properties": {
+        "op": {
+          "description": "Required. The unary operator to apply.",
+          "enum": [
+            "OPERATOR_UNSPECIFIED",
+            "NOT"
+          ],
+          "enumDescriptions": [
+            "Default value. This value is unused.",
+            "Negates the sub-query."
+          ],
+          "type": "string"
+        },
+        "subQuery": {
+          "$ref": "GoogleCloudVectorsearchV1StructuredQuery",
+          "description": "Required. The sub-query the operator is applied to."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1UpdateDataObjectRequest": {
+      "description": "Request message for DataObjectService.UpdateDataObject.",
+      "id": "GoogleCloudVectorsearchV1UpdateDataObjectRequest",
+      "properties": {
+        "dataObject": {
+          "$ref": "GoogleCloudVectorsearchV1DataObject",
+          "description": "Required. The DataObject which replaces the resource on the server."
+        },
+        "updateMask": {
+          "description": "Optional. The update mask applies to the resource. See google.protobuf.FieldMask.",
+          "format": "google-fieldmask",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1Vector": {
+      "description": "A vector which can be either dense or sparse.",
+      "id": "GoogleCloudVectorsearchV1Vector",
+      "properties": {
+        "dense": {
+          "$ref": "GoogleCloudVectorsearchV1DenseVector",
+          "description": "A dense vector."
+        },
+        "sparse": {
+          "$ref": "GoogleCloudVectorsearchV1SparseVector",
+          "description": "A sparse vector."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1VectorField": {
+      "description": "Message describing a vector field.",
+      "id": "GoogleCloudVectorsearchV1VectorField",
+      "properties": {
+        "denseVector": {
+          "$ref": "GoogleCloudVectorsearchV1DenseVectorField",
+          "description": "Dense vector field."
+        },
+        "sparseVector": {
+          "$ref": "GoogleCloudVectorsearchV1SparseVectorField",
+          "description": "Sparse vector field."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1VectorSearch": {
+      "description": "Defines a search operation using a query vector.",
+      "id": "GoogleCloudVectorsearchV1VectorSearch",
+      "properties": {
+        "distanceMetric": {
+          "description": "Optional. The distance metric to use for the KNN search. If not specified, DOT_PRODUCT will be used as the default.",
+          "enum": [
+            "DISTANCE_METRIC_UNSPECIFIED",
+            "DOT_PRODUCT",
+            "COSINE_DISTANCE"
+          ],
+          "enumDescriptions": [
+            "Default value, distance metric is not specified.",
+            "Dot product distance metric.",
+            "Cosine distance metric."
+          ],
+          "type": "string"
+        },
+        "filter": {
+          "additionalProperties": {
+            "description": "Properties of the object.",
+            "type": "any"
+          },
+          "description": "Optional. A JSON filter expression, e.g. `{\"genre\": {\"$eq\": \"sci-fi\"}}`, represented as a `google.protobuf.Struct`. An empty filter (`{}`) matches all data objects. Otherwise, each JSON object in the filter must have exactly one key: either a field name mapped to one operator (`{\"price\": {\"$lt\": 100}}`), or a logical operator: `$and` or `$or` with a list of filters, or `$not` with one filter. Field operators and their values: `$eq` and `$ne` take a string, number or bool; `$lt`, `$lte`, `$gt` and `$gte` take a number; `$in`, `$nin` and `$all` take a list of strings; `$exists` takes a bool. Several keys in one object (implicit AND) and implicit equality (`{\"genre\": \"sci-fi\"}`) are rejected; use `$and` and `$eq` instead. Logical operators can be nested at most 2 levels deep, e.g. `{\"$and\": [{\"$or\": [{\"a\": {\"$eq\": 1}}, {\"b\": {\"$eq\": 2}}]}]}`. Deeper filters are rejected with `INVALID_ARGUMENT`. Which filters are accepted depends on how the search is served. If it is served by an approximate nearest neighbor (ANN) index (by default when a ready index exists on `search_field`, or when one is selected via `search_hint.index_hint`), every filtered field must be listed in `Index.filter_fields` at index creation, `$or` and `$all` are accepted only at the top level of the filter, and `$not` and `$exists` are not supported. Not every unsupported filter is rejected: most produce `INVALID_ARGUMENT`, but some are silently ignored, so do not rely on the error. If no ready index exists on `search_field`, or if `search_hint.knn_hint` is set, the search is served by K-Nearest Neighbor (KNN) search, which has none of these filter restrictions.",
+          "type": "object"
+        },
+        "outputFields": {
+          "$ref": "GoogleCloudVectorsearchV1OutputFields",
+          "description": "Optional. Mask specifying which fields to return."
+        },
+        "searchField": {
+          "description": "Required. The vector field to search.",
+          "type": "string"
+        },
+        "searchHint": {
+          "$ref": "GoogleCloudVectorsearchV1SearchHint",
+          "description": "Optional. Sets the search hint. If no strategy is specified, the service will use an index if one is available, and fall back to the default KNN search otherwise."
+        },
+        "sparseVector": {
+          "$ref": "GoogleCloudVectorsearchV1SparseVector",
+          "description": "A sparse vector for the query."
+        },
+        "topK": {
+          "description": "Optional. The number of nearest neighbors to return.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "vector": {
+          "$ref": "GoogleCloudVectorsearchV1DenseVector",
+          "description": "A dense vector for the query."
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1VertexEmbeddingConfig": {
+      "description": "Message describing the configuration for generating embeddings for a vector field using Vertex AI embeddings API.",
+      "id": "GoogleCloudVectorsearchV1VertexEmbeddingConfig",
+      "properties": {
+        "modelId": {
+          "description": "Required. Required: ID of the embedding model to use. See https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models#embeddings-models for the list of supported models.",
+          "type": "string"
+        },
+        "taskType": {
+          "description": "Optional. Optional: Task type for the embeddings. Required for text-only embedding models, see https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/embeddings/task-types Not needed for multi modal embedding models, see https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/embeddings/get-multimodal-embeddings#specify-task-instructions",
+          "enum": [
+            "EMBEDDING_TASK_TYPE_UNSPECIFIED",
+            "RETRIEVAL_QUERY",
+            "RETRIEVAL_DOCUMENT",
+            "SEMANTIC_SIMILARITY",
+            "CLASSIFICATION",
+            "CLUSTERING",
+            "QUESTION_ANSWERING",
+            "FACT_VERIFICATION",
+            "CODE_RETRIEVAL_QUERY"
+          ],
+          "enumDescriptions": [
+            "Unspecified task type.",
+            "Specifies the given text is a query in a search/retrieval setting.",
+            "Specifies the given text is a document from the corpus being searched.",
+            "Specifies the given text will be used for STS.",
+            "Specifies that the given text will be classified.",
+            "Specifies that the embeddings will be used for clustering.",
+            "Specifies that the embeddings will be used for question answering.",
+            "Specifies that the embeddings will be used for fact verification.",
+            "Specifies that the embeddings will be used for code retrieval."
+          ],
+          "type": "string"
+        },
+        "textTemplate": {
+          "description": "Optional. Text template for the input to the model. The template must contain one or more references to fields in the DataObject, e.g.: \"Movie Title: {title} ---- Movie Plot: {plot}\". Required when using the text-only path.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1VertexRanker": {
+      "description": "Defines a ranker using the Vertex AI ranking service. See for details.",
+      "id": "GoogleCloudVectorsearchV1VertexRanker",
+      "properties": {
+        "model": {
+          "description": "Required. The model used for ranking documents. The list of available models is described in . Currently, only `semantic-ranker-fast@latest` is supported.",
+          "type": "string"
+        },
+        "textRecordSpec": {
+          "$ref": "GoogleCloudVectorsearchV1VertexRankerTextRecordSpec",
+          "description": "The record spec for text search."
+        },
+        "topN": {
+          "description": "Required. The number of documents to be processed for ranking.",
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleCloudVectorsearchV1VertexRankerTextRecordSpec": {
+      "description": "The record spec for text search.",
+      "id": "GoogleCloudVectorsearchV1VertexRankerTextRecordSpec",
+      "properties": {
+        "contentTemplate": {
+          "description": "Optional. The template used to generate the record's content.",
+          "type": "string"
+        },
+        "query": {
+          "description": "Required. The query against which the records are ranked and scored.",
+          "type": "string"
+        },
+        "titleTemplate": {
+          "description": "Optional. The template used to generate the record's title.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleLongrunningCancelOperationRequest": {
+      "description": "The request message for Operations.CancelOperation.",
+      "id": "GoogleLongrunningCancelOperationRequest",
+      "properties": {},
+      "type": "object"
+    },
+    "GoogleLongrunningListOperationsResponse": {
+      "description": "The response message for Operations.ListOperations.",
+      "id": "GoogleLongrunningListOperationsResponse",
+      "properties": {
+        "nextPageToken": {
+          "description": "The standard List next-page token.",
+          "type": "string"
+        },
+        "operations": {
+          "description": "A list of operations that matches the specified filter in the request.",
+          "items": {
+            "$ref": "GoogleLongrunningOperation"
+          },
+          "type": "array"
+        },
+        "unreachable": {
+          "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleLongrunningOperation": {
+      "description": "This resource represents a long-running operation that is the result of a network API call.",
+      "id": "GoogleLongrunningOperation",
+      "properties": {
+        "done": {
+          "description": "If the value is `false`, it means the operation is still in progress. If `true`, the operation is completed, and either `error` or `response` is available.",
+          "type": "boolean"
+        },
+        "error": {
+          "$ref": "GoogleRpcStatus",
+          "description": "The error result of the operation in case of failure or cancellation."
+        },
+        "metadata": {
+          "additionalProperties": {
+            "description": "Properties of the object. Contains field @type with type URL.",
+            "type": "any"
+          },
+          "description": "Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.",
+          "type": "object"
+        },
+        "name": {
+          "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.",
+          "type": "string"
+        },
+        "response": {
+          "additionalProperties": {
+            "description": "Properties of the object. Contains field @type with type URL.",
+            "type": "any"
+          },
+          "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "GoogleRpcStatus": {
+      "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
+      "id": "GoogleRpcStatus",
+      "properties": {
+        "code": {
+          "description": "The status code, which should be an enum value of google.rpc.Code.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "details": {
+          "description": "A list of messages that carry the error details. There is a common set of message types for APIs to use.",
+          "items": {
+            "additionalProperties": {
+              "description": "Properties of the object. Contains field @type with type URL.",
+              "type": "any"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "message": {
+          "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "servicePath": "",
+  "title": "Vector Search API",
+  "version": "v1",
+  "version_module": true
+}

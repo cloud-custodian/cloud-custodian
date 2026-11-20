@@ -5,9 +5,14 @@ from unittest import mock
 
 import google.auth
 import pytest
+from google.api_core.client_options import ClientOptions
+from googleapiclient.errors import UnknownApiNameOrVersion
+from googleapiclient.http import HttpMockSequence
 
+from c7n_gcp import client as gcp_client
 from c7n_gcp.client import (
     Session,
+    _create_service_api,
     get_workspace_customer,
     get_workspace_subject,
 )
@@ -126,3 +131,40 @@ def test_clients_without_scopes_are_unaffected(monkeypatch):
     client = session.client('compute', 'v1', 'instances')
     assert client._credentials is session._credentials
     assert client._use_cached_http is True
+
+
+def test_vendored_discovery_builds_without_network():
+    # An empty HttpMockSequence fails any request, so building the client
+    # can't have fetched the discovery document.
+    service = _create_service_api(
+        None, 'vectorsearch', 'v1', http=HttpMockSequence([]))
+    request = service.projects().locations().collections().list(
+        parent='projects/cloud-custodian/locations/us-central1')
+    assert request.uri.startswith(
+        'https://vectorsearch.googleapis.com/v1/'
+        'projects/cloud-custodian/locations/us-central1/collections')
+
+
+def test_vendored_discovery_passes_client_options_and_key():
+    service = _create_service_api(
+        None, 'vectorsearch', 'v1', developer_key='test-key', http=HttpMockSequence([]),
+        client_options=ClientOptions(api_endpoint='https://example.invalid/'))
+    uri = service.projects().locations().collections().list(
+        parent='projects/cloud-custodian/locations/us-central1').uri
+    assert uri.startswith('https://example.invalid/v1/')
+    assert 'key=test-key' in uri
+
+
+def test_bundled_discovery_wins_over_vendored(tmp_path, monkeypatch):
+    (tmp_path / 'pubsub.v1.json').write_text('not a discovery document')
+    monkeypatch.setattr(gcp_client, 'VENDORED_DISCOVERY_DIR', tmp_path)
+    service = _create_service_api(
+        None, 'pubsub', 'v1', http=HttpMockSequence([]))
+    assert service.projects().topics().list(project='projects/x').uri.startswith(
+        'https://pubsub.googleapis.com/v1/projects/x/topics')
+
+
+def test_unknown_api_without_vendored_document_raises(tmp_path, monkeypatch):
+    monkeypatch.setattr(gcp_client, 'VENDORED_DISCOVERY_DIR', tmp_path)
+    with pytest.raises(UnknownApiNameOrVersion):
+        _create_service_api(None, 'vectorsearch', 'v1', http=HttpMockSequence([]))
