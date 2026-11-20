@@ -371,13 +371,15 @@ class OffHoursFilterTest(BaseTest):
         for schedule in ("off=(M-F,25)", "off", "tz=nowhere"):
             with self.assertRaisesRegex(PolicyValidationError, "Invalid schedule Bad: "):
                 OffHour({"schedules": {"Bad": schedule}}).validate()
-        # yaml gives 247 and True for unquoted 247 and on, and a menu2day tag
-        # is read as men-ay
-        for name in (247, True, "", "On", "OFF", "menu2day"):
+        # yaml gives 247 and True for unquoted 247 and on, a menu2day tag is
+        # read as men-ay, and quotes around a tag value are stripped
+        for name in (247, True, "", "On", "OFF", "menu2day", '"business"', "late'"):
             self.assertRaises(
                 PolicyValidationError,
                 OffHour({"schedules": {name: "tz=pt"}}).validate,
             )
+        with self.assertRaisesRegex(PolicyValidationError, "'business' is defined twice"):
+            OffHour({"schedules": {"Business": "tz=pt", "business": "tz=et"}}).validate()
         f = OnHour({"schedules": {
             "west": "tz=pt", "business": "off=(M-F,19);on=(M-F,7);"}})
         self.assertEqual(f.validate(), f)

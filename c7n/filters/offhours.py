@@ -228,8 +228,9 @@ option, and tag each resource with the name of its schedule:
 An instance tagged ``downtime: business`` is stopped at 19:00 Eastern time on
 weekdays, and one tagged ``downtime: late`` at 22:00 Pacific time on weekdays
 and 13:00 on Saturdays. The matching onhour policy needs the same
-**schedules**. Names can not be ``on`` or ``off``, or contain the escape
-sequences listed below.
+**schedules**. Names are not case sensitive, so two names can not differ only
+in case. Names also can not be ``on`` or ``off``, start or end with a quote, or
+contain the escape sequences listed below.
 
 Without **schedules**, you can define a separate policy with a unique ``tag``
 name for each schedule, and tag resources with that tag name and a value of
@@ -410,17 +411,25 @@ class Time(Filter):
         if hour not in self.parser.VALID_HOURS:
             raise PolicyValidationError(
                 "Invalid hour specified %s" % (hour,))
+        seen = set()
         for name, schedule in self.data.get('schedules', {}).items():
             # yaml reads unquoted on/off/yes/no and numbers as other types
             if not isinstance(name, str):
                 raise PolicyValidationError(
                     "Schedule name %r is not a string, quote it" % (name,))
             key = name.lower()
-            if key in ('', 'on', 'off') or any(
+            if key in seen:
+                raise PolicyValidationError(
+                    "Schedule name '%s' is defined twice, names are not case "
+                    "sensitive" % name)
+            seen.add(key)
+            # on, off and '' already mean something, and tag values have outer
+            # quotes stripped (and escapes replaced, except on azure)
+            if key in ('', 'on', 'off') or key != key.strip('\'"') or any(
                     e in key for e in self.TAG_RESTRICTIONS_ESCAPE):
                 raise PolicyValidationError(
-                    "Schedule name '%s' is reserved or contains a tag escape "
-                    "sequence" % name)
+                    "Schedule name '%s' is reserved, starts or ends with a "
+                    "quote, or contains a tag escape sequence" % name)
             parsed = self.parser.parse(self.schedules[key])
             if parsed is None or self.get_tz(parsed['tz']) is None:
                 raise PolicyValidationError(
