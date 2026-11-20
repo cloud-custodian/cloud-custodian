@@ -1,0 +1,642 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Insights/diagnosticSettings?api-version=2021-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "12"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: BAF5867461D742DB839B43620151E70E Ref B: CH1AA2020603033 Ref C: 2026-11-13T15:09:20Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Fri, 13 Nov 2026 15:09:20 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "529"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 7C464A4991F3457AB47AF1379B65AFF4 Ref B: CH1AA2030814052 Ref C: 2026-11-13T15:09:21Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Fri, 13 Nov 2026 15:09:21 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [
+                            {
+                                "tenantId": "00000000-0000-0000-0000-000000000003"
+                            }
+                        ],
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "Test Subscription",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "PayAsYouGo_2014-09-01",
+                            "spendingLimit": "Off"
+                        },
+                        "promotions": [
+                            {
+                                "category": "freetier",
+                                "endDateTime": "2025-09-13T21:06:45.7634916Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Insights/diagnosticSettings/cctest-sub-diag-update?api-version=2021-05-01-preview",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "641"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "99"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: FA2DF43543A54D249EA76ADB9F7A1D9E Ref B: CHI261140511052 Ref C: 2026-11-13T15:09:21Z"
+                    ],
+                    "date": [
+                        "Fri, 13 Nov 2026 15:09:22 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/diagnosticSettings/cctest-sub-diag-update",
+                        "type": "Microsoft.Insights/diagnosticSettings",
+                        "name": "cctest-sub-diag-update",
+                        "location": "global",
+                        "properties": {
+                            "workspaceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-diagnostic-settings/providers/Microsoft.OperationalInsights/workspaces/cctest-sub-diag-workspace",
+                            "logs": [
+                                {
+                                    "category": "Administrative",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "ServiceHealth",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Alert",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Insights/diagnosticSettings/cctest-sub-diag-update?api-version=2021-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "957"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: E4C1069F0DA6415487FCA1EA1C62A0F4 Ref B: CHI261140502034 Ref C: 2026-11-13T15:09:23Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Fri, 13 Nov 2026 15:09:22 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/diagnosticSettings/cctest-sub-diag-update",
+                        "type": "Microsoft.Insights/diagnosticSettings",
+                        "name": "cctest-sub-diag-update",
+                        "location": "global",
+                        "properties": {
+                            "workspaceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-diagnostic-settings/providers/Microsoft.OperationalInsights/workspaces/cctest-sub-diag-workspace",
+                            "logs": [
+                                {
+                                    "category": "Administrative",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "ServiceHealth",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Alert",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Security",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Recommendation",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Policy",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Autoscale",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "ResourceHealth",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "529"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 4BB74DDF87D94375BB249122A386FFC2 Ref B: CHI261140513029 Ref C: 2026-11-13T15:09:23Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Fri, 13 Nov 2026 15:09:23 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [
+                            {
+                                "tenantId": "00000000-0000-0000-0000-000000000003"
+                            }
+                        ],
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "Test Subscription",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "PayAsYouGo_2014-09-01",
+                            "spendingLimit": "Off"
+                        },
+                        "promotions": [
+                            {
+                                "category": "freetier",
+                                "endDateTime": "2025-09-13T21:06:45.7634916Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Insights/diagnosticSettings?api-version=2021-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "969"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: D0E36BD18C0B4D13A87EDB258A63F4A5 Ref B: CH1AA2030814036 Ref C: 2026-11-13T15:09:24Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Fri, 13 Nov 2026 15:09:23 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/diagnosticSettings/cctest-sub-diag-update",
+                                "type": "Microsoft.Insights/diagnosticSettings",
+                                "name": "cctest-sub-diag-update",
+                                "location": "global",
+                                "properties": {
+                                    "workspaceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-diagnostic-settings/providers/Microsoft.OperationalInsights/workspaces/cctest-sub-diag-workspace",
+                                    "logs": [
+                                        {
+                                            "category": "Administrative",
+                                            "enabled": true,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "ServiceHealth",
+                                            "enabled": true,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Alert",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Security",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Recommendation",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Policy",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Autoscale",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "ResourceHealth",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Insights/diagnosticSettings/cctest-sub-diag-update?api-version=2021-05-01-preview",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "954"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "99"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 28A209426BFD40D3AB29C344F4F12EDE Ref B: CH1AA2030813040 Ref C: 2026-11-13T15:09:24Z"
+                    ],
+                    "date": [
+                        "Fri, 13 Nov 2026 15:09:25 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/diagnosticSettings/cctest-sub-diag-update",
+                        "type": "Microsoft.Insights/diagnosticSettings",
+                        "name": "cctest-sub-diag-update",
+                        "location": "global",
+                        "properties": {
+                            "workspaceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-diagnostic-settings/providers/Microsoft.OperationalInsights/workspaces/cctest-sub-diag-workspace",
+                            "logs": [
+                                {
+                                    "category": "Administrative",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "ServiceHealth",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Alert",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Security",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Recommendation",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Policy",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Autoscale",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "ResourceHealth",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Insights/diagnosticSettings/cctest-sub-diag-update?api-version=2021-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "954"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B2201293F50C4473A90FE8A85AF5281D Ref B: CH1AA2030814029 Ref C: 2026-11-13T15:09:26Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Fri, 13 Nov 2026 15:09:26 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/diagnosticSettings/cctest-sub-diag-update",
+                        "type": "Microsoft.Insights/diagnosticSettings",
+                        "name": "cctest-sub-diag-update",
+                        "location": "global",
+                        "properties": {
+                            "workspaceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_subscription-diagnostic-settings/providers/Microsoft.OperationalInsights/workspaces/cctest-sub-diag-workspace",
+                            "logs": [
+                                {
+                                    "category": "Administrative",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "ServiceHealth",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Alert",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Security",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Recommendation",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Policy",
+                                    "enabled": true,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "Autoscale",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                },
+                                {
+                                    "category": "ResourceHealth",
+                                    "enabled": false,
+                                    "categoryGroup": null
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Insights/diagnosticSettings/cctest-sub-diag-update?api-version=2021-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "0"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "199"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
+                        "2999"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DEBA2CA91CFC4E8B803A9DEEB7D7B534 Ref B: CHI261140504062 Ref C: 2026-11-13T15:09:26Z"
+                    ],
+                    "date": [
+                        "Fri, 13 Nov 2026 15:09:28 GMT"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        }
+    ]
+}

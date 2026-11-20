@@ -3,9 +3,11 @@
 from unittest.mock import ANY, Mock, call, patch
 
 import pytest
+from azure.core.exceptions import HttpResponseError
 from azure.mgmt.resource import SubscriptionClient
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
+from c7n_azure.filters import DiagnosticSettingsFilter
 from c7n_azure.resources.subscription import SubscriptionDiagnosticSettingFilter
 from c7n_azure.session import Session
 
@@ -141,6 +143,234 @@ class SubscriptionDiagnosticSettingsFilterTest(BaseTest):
                  api_version='2021-05-01-preview', cls=ANY)
             for sub in ('sub-1', 'sub-2', 'sub-3')
         ])
+
+
+SUBSCRIPTION = {'id': f'/subscriptions/{DEFAULT_SUBSCRIPTION_ID}',
+                'subscriptionId': DEFAULT_SUBSCRIPTION_ID,
+                'displayName': 'cctest-subscription'}
+DIAG_RESOURCE_GROUP = 'test_subscription-diagnostic-settings'
+DIAG_WORKSPACE_NAME = 'cctest-sub-diag-workspace'
+DIAG_STORAGE_ID = (f'/subscriptions/{DEFAULT_SUBSCRIPTION_ID}/resourceGroups/'
+                   f'{DIAG_RESOURCE_GROUP}/providers/Microsoft.Storage/storageAccounts/cctestsubdiag')
+CIS_CATEGORIES = ['Administrative', 'Alert', 'Policy', 'Security']
+
+
+def _workspace_id(subscription_id=DEFAULT_SUBSCRIPTION_ID):
+    return (f'/subscriptions/{subscription_id}/resourceGroups/{DIAG_RESOURCE_GROUP}'
+            f'/providers/Microsoft.OperationalInsights/workspaces/{DIAG_WORKSPACE_NAME}')
+
+
+def _setting_id(name, subscription_id=DEFAULT_SUBSCRIPTION_ID):
+    return (f'/subscriptions/{subscription_id}/providers/Microsoft.Insights'
+            f'/diagnosticSettings/{name}')
+
+
+def _raw_log(category, enabled):
+    # The shape Azure returns at 2021-05-01-preview, nulls included
+    return {'category': category, 'categoryGroup': None, 'enabled': enabled}
+
+
+def _logs(categories, enabled=True):
+    return [{'category': c, 'enabled': enabled} for c in categories]
+
+
+class SubscriptionDiagnosticSettingsLiveMixin:
+    """Reads and removes the subscription diagnostic settings a recorded test writes.
+
+    A subscription setting outlives cleanup.sh, which only deletes the resource
+    group, so each recorded test deletes the settings it creates.
+    """
+
+    def _resources_client(self):
+        return self.session.client('azure.mgmt.resource.ResourceManagementClient').resources
+
+    def _setting_id(self, name):
+        return _setting_id(name, self.session.get_subscription_id())
+
+    def _workspace_id(self):
+        return _workspace_id(self.session.get_subscription_id())
+
+    def _get_setting(self, name):
+        return self._resources_client().get_by_id(
+            resource_id=self._setting_id(name),
+            api_version=DiagnosticSettingsFilter.api_version).properties
+
+    def _setting_names(self):
+        return [s['name'] for s in DiagnosticSettingsFilter.get_raw_settings(
+            self.session.client('azure.mgmt.resource.ResourceManagementClient'),
+            f'/subscriptions/{self.session.get_subscription_id()}')]
+
+    def _delete_setting(self, name):
+        self._resources_client().begin_delete_by_id(
+            resource_id=self._setting_id(name),
+            api_version=DiagnosticSettingsFilter.api_version).result()
+
+    @staticmethod
+    def _enabled_categories(setting):
+        return sorted(log['category'] for log in setting['logs']
+                      if log['enabled'] and log.get('category'))
+
+    def _set_policy(self, name, logs):
+        return self.load_policy({
+            'name': 'test-sub-set-diagnostic-settings',
+            'resource': 'azure.subscription',
+            'actions': [{
+                'type': 'set-diagnostic-settings',
+                'name': name,
+                'workspaceId': self._workspace_id(),
+                'logs': logs,
+            }],
+        }, validate=True)
+
+
+class SubscriptionSetDiagnosticSettingsTest(SubscriptionDiagnosticSettingsLiveMixin, BaseTest):
+
+    def _load(self, **fields):
+        action = {'type': 'set-diagnostic-settings', 'name': 'cctest-activity-log', **fields}
+        with self.sign_out_patch():
+            return self.load_policy({
+                'name': 'test-sub-set-diagnostic-settings',
+                'resource': 'azure.subscription',
+                'actions': [action],
+            }, validate=True)
+
+    def test_schema_rejects_fields_subscriptions_lack(self):
+        # Subscription settings have no metrics and no logAnalyticsDestinationType
+        for extra in ({'metrics': [{'category': 'AllMetrics', 'enabled': True}]},
+                      {'logAnalyticsDestinationType': 'Dedicated'}):
+            with self.subTest(extra=extra), pytest.raises(PolicyValidationError):
+                self._load(workspaceId=_workspace_id(), logs=_logs(['Administrative']),
+                           **extra)
+
+    def test_schema_requires_logs(self):
+        with pytest.raises(PolicyValidationError, match="'logs' is a required property"):
+            self._load(workspaceId=_workspace_id())
+
+    @arm_template('subscription-diagnostic-settings.json')
+    @strict_cassette('set-diagnostic-settings')
+    def test_creates_setting_on_subscription(self):
+        name = 'cctest-sub-diag-set'
+        assert name not in self._setting_names()
+        try:
+            resources = self._set_policy(name, _logs(CIS_CATEGORIES)).run()
+
+            setting = self._get_setting(name)
+        finally:
+            self._delete_setting(name)
+
+        assert len(resources) == 1
+        assert setting['workspaceId'].lower() == self._workspace_id().lower()
+        assert self._enabled_categories(setting) == CIS_CATEGORIES
+
+
+class SubscriptionUpdateDiagnosticSettingsTest(SubscriptionDiagnosticSettingsLiveMixin, BaseTest):
+
+    def _load(self, logs):
+        with self.sign_out_patch():
+            return self.load_policy({
+                'name': 'test-sub-update-diagnostic-settings',
+                'resource': 'azure.subscription',
+                'actions': [{'type': 'update-diagnostic-settings', 'logs': logs}],
+            }, validate=True)
+
+    def _run(self, settings, logs=None, put_side_effect=None):
+        """Run the action against ``settings`` as Azure lists them, and return the PUT mock.
+
+        Raises whatever the action raises; the mock is then on ``self.put``.
+        """
+        action = self._load(logs or _logs(CIS_CATEGORIES)).resource_manager.actions[0]
+        with patch.object(action.manager, 'get_session') as get_session:
+            resources = get_session.return_value.client.return_value.resources
+            resources.get_by_id.return_value = {'value': settings}
+            self.put = resources.begin_create_or_update_by_id
+            self.put.side_effect = put_side_effect
+            action.process([SUBSCRIPTION])
+        return self.put
+
+    def test_schema_rejects(self):
+        for logs in ([],
+                     [{'enabled': True}],
+                     [{'category': 'Alert', 'categoryGroup': 'allLogs', 'enabled': True}],
+                     [{'category': 'Alert'}]):
+            with self.subTest(logs=logs), pytest.raises(PolicyValidationError):
+                self._load(logs)
+
+    def test_skips_setting_already_as_requested(self):
+        # Matching ignores case, as Azure does for category names
+        complete = {'name': 'complete', 'properties': {
+            'storageAccountId': DIAG_STORAGE_ID,
+            'logs': [_raw_log(c.lower(), True) for c in CIS_CATEGORIES],
+        }}
+        partial = {'name': 'partial', 'properties': {
+            'storageAccountId': DIAG_STORAGE_ID,
+            'logs': [_raw_log('Administrative', True)],
+        }}
+
+        put = self._run([complete, partial])
+
+        assert [c.kwargs['resource_id'] for c in put.call_args_list] == [
+            _setting_id('partial')]
+
+    def test_disables_and_matches_category_groups(self):
+        setting = {'name': 'groups', 'properties': {
+            'workspaceId': _workspace_id(),
+            'logs': [{'category': None, 'categoryGroup': 'allLogs', 'enabled': True},
+                     _raw_log('Security', True)],
+        }}
+
+        put = self._run([setting], logs=[{'categoryGroup': 'AllLogs', 'enabled': False},
+                                         {'category': 'Security', 'enabled': True}])
+
+        assert put.call_args.kwargs['parameters'].properties['logs'] == [
+            {'categoryGroup': 'allLogs', 'enabled': False},
+            {'category': 'Security', 'enabled': True},
+        ]
+
+    def test_no_settings_writes_nothing(self):
+        put = self._run([])
+
+        assert put.call_count == 0
+
+    def test_raises_after_processing_every_setting(self):
+        """Verifies a failed write doesn't stop the other settings, and still fails the run."""
+        settings = [{'name': name, 'properties': {
+            'workspaceId': _workspace_id(), 'logs': [_raw_log('Administrative', True)]}}
+            for name in ('first', 'second')]
+
+        with pytest.raises(HttpResponseError, match='Data sink is already used'):
+            self._run(settings, logs=_logs(['Alert']), put_side_effect=[
+                HttpResponseError('Data sink is already used'), Mock()])
+
+        assert [c.kwargs['resource_id'] for c in self.put.call_args_list] == [
+            _setting_id('first'), _setting_id('second')]
+
+    @arm_template('subscription-diagnostic-settings.json')
+    @strict_cassette('update-diagnostic-settings')
+    def test_merges_categories_into_existing_setting(self):
+        name = 'cctest-sub-diag-update'
+        # The action writes every setting on the subscription, so refuse to run
+        # where it would touch settings this test didn't create.
+        assert self._setting_names() == []
+        baseline_logs = _logs(['Administrative', 'ServiceHealth']) + _logs(['Alert'], False)
+        try:
+            self._set_policy(name, baseline_logs).run()
+            before = self._get_setting(name)
+
+            resources = self.load_policy({
+                'name': 'test-sub-update-diagnostic-settings',
+                'resource': 'azure.subscription',
+                'actions': [{'type': 'update-diagnostic-settings',
+                             'logs': _logs(CIS_CATEGORIES)}],
+            }, validate=True).run()
+
+            after = self._get_setting(name)
+        finally:
+            self._delete_setting(name)
+
+        assert len(resources) == 1
+        assert self._enabled_categories(before) == ['Administrative', 'ServiceHealth']
+        assert self._enabled_categories(after) == sorted(CIS_CATEGORIES + ['ServiceHealth'])
+        assert after['workspaceId'].lower() == self._workspace_id().lower()
 
 
 class SubscriptionTaggingTest(BaseTest):
