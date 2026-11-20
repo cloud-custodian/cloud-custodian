@@ -148,9 +148,16 @@ class VertexAIQueryManager(QueryResourceManager):
 
         self._validate_deferred_now(key, value)
 
-    # {now} itself, not {nowindow}, and not the {{now}} that c7n expands to a
-    # literal. A lone brace before it means the pair is escaped.
-    NOW_VARIABLE = re.compile(r'(?<!\{)\{now[:}]')
+    # {now} itself, not {nowindow}. The trailing class covers the whole field:
+    # a bare {now}, a format spec after :, and a conversion after !, since
+    # {now!s} renders the deferred string as the word now.
+    #
+    # An escaped {{now}} is a known gap rather than an oversight. Expansion
+    # collapses it to {now} before validate runs under `custodian run`, so by
+    # then it cannot be told from the variable. It survives `custodian
+    # validate`, which does not expand. A Vertex filter wanting that literal
+    # is not a case worth carrying escape state through expansion for.
+    NOW_VARIABLE = re.compile(r'(?<!\{)\{now[!:}]')
 
     def _validate_deferred_now(self, key, value):
         """A mode can both enumerate and defer {now}, which sends it raw.

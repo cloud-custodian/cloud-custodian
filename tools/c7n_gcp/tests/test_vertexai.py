@@ -3275,11 +3275,10 @@ PERIODIC_MODE = {
 @pytest.mark.parametrize('filter_value', [
     'display_name="{nowindow}"',      # somebody's own variable
     'display_name="snow{nowhere}"',   # ditto, mid-string
-    'display_name="{{now}}"',         # the escape for a literal {now}
     'state="JOB_STATE_FAILED"',
 ])
 def test_vertexai_query_now_check_matches_the_variable(test, filter_value):
-    """Only {now} itself defers. A prefix match took three of these with it."""
+    """Only {now} itself defers. A prefix match took these with it."""
     test.load_policy(
         {'name': 'vertexai-custom-job-now-lookalike',
          'resource': 'gcp.vertex-ai-custom-job',
@@ -3300,6 +3299,23 @@ def test_vertexai_query_now_defers_to_the_enumeration_check(test):
              'mode': {'type': 'gcp-audit', 'methods': ['foo']},
              'query': [{'filter': 'create_time>"{now:-7d}"'}]})
     assert 'applies to enumeration only' in str(caught.value)
+
+
+@pytest.mark.parametrize('filter_value', [
+    'create_time>"{now}"',
+    'create_time>"{now:-7d}"',
+    'create_time>"{now!s}"',   # renders the deferred string as the word now
+    'create_time>"{now!r}"',
+])
+def test_vertexai_query_rejects_every_now_field(test, filter_value):
+    """A conversion is as unexpanded as a format spec, and sends worse."""
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-custom-job-now-field',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'mode': PERIODIC_MODE,
+             'query': [{'filter': filter_value}]})
+    assert 'never expands' in str(caught.value)
 
 
 def test_vertexai_query_rejects_now_in_serverless_mode(test):
