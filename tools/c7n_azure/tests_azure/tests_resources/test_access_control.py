@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template
 from c7n_azure.resources.access_control import ScopeFilter
+from msrestazure.azure_exceptions import CloudError
 from unittest.mock import patch, MagicMock
 
 
@@ -121,6 +122,34 @@ class AccessControlTest(BaseTest):
         self.assertFalse(scope_filter.is_scope("/subscription/resourceGroups/foo", rg_type))
         self.assertFalse(scope_filter.is_scope("/foo/bar/xyz", rg_type))
         self.assertFalse(scope_filter.is_scope(resource_group_scope + "/vm/bar", rg_type))
+
+    @patch('c7n_azure.resources.access_control.RoleAssignment.get_session')
+    @patch('c7n_azure.resources.access_control.GraphHelper.get_principal_dictionary')
+    def test_augment_graph_forbidden_raises(self, get_principal_dictionary, get_session):
+        class ForbiddenCloudError(CloudError):
+            # Skip CloudError.__init__, which needs a real pipeline response to deserialize.
+            def __init__(self):
+                Exception.__init__(self, 'Forbidden')
+                self.status_code = 403
+                self.message = 'Forbidden'
+                self.error = None
+
+        get_principal_dictionary.side_effect = ForbiddenCloudError()
+
+        p = self.load_policy({
+            'name': 'test-assignments-by-role',
+            'resource': 'azure.roleassignment',
+        })
+        resources = [{'properties': {'principalId': 'abc'}}]
+        with self.assertLogs(level='ERROR') as logs:
+            with self.assertRaises(ForbiddenCloudError):
+                p.resource_manager.augment(resources)
+
+        self.assertIn('Azure AD Graph', logs.output[0])
+
+        get_principal_dictionary.assert_called_once_with(
+            get_session.return_value.get_session_for_resource.return_value.client.return_value,
+            ['abc'], raise_on_graph_call_error=True)
 
     def test_scope_filter_management_group(self):
         sub_scope = "/subscriptions/111-111-1111"
