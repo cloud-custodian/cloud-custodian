@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserProfiles": [
+            {
+                "DomainId": "d-1lndajqoikmx",
+                "UserProfileName": "c7n-filesystems-superb-tiger",
+                "Status": "InService",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 6,
+                    "minute": 56,
+                    "second": 55,
+                    "microsecond": 118000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 6,
+                    "minute": 57,
+                    "second": 0,
+                    "microsecond": 932000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

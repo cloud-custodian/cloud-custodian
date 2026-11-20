@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserProfileArn": "arn:aws:sagemaker:us-west-2:644160558196:user-profile/d-1lndajqoikmx/c7n-filesystems-superb-tiger",
+        "ResponseMetadata": {}
+    }
+}
