@@ -12,14 +12,18 @@ from ..azure_common import BaseTest, arm_template, cassette_name
 HOST_NAMESPACES_DEFINITION = '47a1ee2f-2a2a-4576-bf2a-e0e36709c2b8'
 PRIVILEGED_CONTAINERS_DEFINITION = '95edb821-ddaf-4404-9732-666045e056b4'
 
+# The cluster and the assignment the aks-policy-components template deploys.
+RECORDED_CLUSTER = 'cctestakspolicy'
+RECORDED_ASSIGNMENT = 'cctestakshostnamespaces'
+
 
 def component_response(*components):
-    # componentType is deliberately absent: the field exists, but its value for
-    # Kubernetes has not been measured and nothing here reads it.
     return {'value': [
         {'componentId': component_id,
+         'componentType': 'pod',
          'complianceState': compliance_state,
-         'policyDefinitionName': definition}
+         'policyDefinitionName': definition,
+         'policyAssignmentName': RECORDED_ASSIGNMENT}
         for component_id, compliance_state, definition in components]}
 
 
@@ -50,6 +54,11 @@ class AksTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+
+class AksPolicyComponentsFilterTest(BaseTest):
+
+    recording_resource_group = 'test_aks-policy-components'
+
     def test_policy_components_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
@@ -61,14 +70,46 @@ class AksTest(BaseTest):
             }, validate=True)
             assert p
 
-    @arm_template('aks.json')
-    @cassette_name('test_find_aks_by_name')
+    @arm_template('aks-policy-components.json')
+    def test_policy_components_matches_non_compliant(self):
+        # Recorded against a cluster running a hostPID pod, with the host namespaces
+        # definition assigned to its resource group. See the template's .md for the
+        # setup, which cannot be done by ARM alone.
+        p = self.load_policy({
+            'name': 'test-azure-aks',
+            'resource': 'azure.aks',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value': RECORDED_CLUSTER},
+                {'type': 'policy-components',
+                 'attrs': [
+                     {'complianceState': 'NonCompliant'},
+                     {'policyDefinitionName': HOST_NAMESPACES_DEFINITION},
+                     # A component is reported once per assignment naming the
+                     # definition, so the fixture's own assignment is named to keep
+                     # whatever else the subscription assigns out of the result.
+                     {'policyAssignmentName': RECORDED_ASSIGNMENT}]}]
+        })
+
+        resources = p.run()
+
+        assert len(resources) == 1
+        assert resources[0]['name'] == RECORDED_CLUSTER
+        # Only the component that matched is annotated, not every record returned.
+        assert [(c['componentId'], c['componentType'])
+                for c in resources[0]['c7n:PolicyComponents']] == [
+            ('default/bad-hostpid', 'pod')]
+
+    @arm_template('aks-policy-components.json')
+    @cassette_name('test_policy_components_matches_non_compliant')
     @patch('azure.mgmt.policyinsights.PolicyInsightsClient._send_request')
-    def test_policy_components_matches_non_compliant(self, send_request):
+    def test_policy_components_names_the_definition(self, send_request):
         send_request.return_value.json.return_value = component_response(
             ('default/good-pod', 'Compliant', HOST_NAMESPACES_DEFINITION),
             ('default/bad-hostpid', 'NonCompliant', HOST_NAMESPACES_DEFINITION),
-            # Non-compliant, but with a definition the policy did not name.
+            # Non-compliant, but under a definition the policy did not name.
             ('default/privileged', 'NonCompliant', PRIVILEGED_CONTAINERS_DEFINITION))
 
         resources = self.load_policy({
@@ -82,7 +123,6 @@ class AksTest(BaseTest):
         }).run()
 
         assert len(resources) == 1
-        # Only the component that matched is annotated, not every record returned.
         assert [c['componentId'] for c in resources[0]['c7n:PolicyComponents']] == [
             'default/bad-hostpid']
 
@@ -92,8 +132,8 @@ class AksTest(BaseTest):
         assert 'componentPolicyStates/latest/queryResults' in request.url
         assert 'api-version=2024-10-01' in request.url
 
-    @arm_template('aks.json')
-    @cassette_name('test_find_aks_by_name')
+    @arm_template('aks-policy-components.json')
+    @cassette_name('test_policy_components_matches_non_compliant')
     @patch('azure.mgmt.policyinsights.PolicyInsightsClient._send_request')
     def test_policy_components_ignores_compliant(self, send_request):
         send_request.return_value.json.return_value = component_response(
@@ -111,8 +151,8 @@ class AksTest(BaseTest):
         # Not matching has to mean the components were read and none qualified.
         send_request.assert_called_once()
 
-    @arm_template('aks.json')
-    @cassette_name('test_find_aks_by_name')
+    @arm_template('aks-policy-components.json')
+    @cassette_name('test_policy_components_matches_non_compliant')
     @patch('azure.mgmt.policyinsights.PolicyInsightsClient._send_request')
     def test_policy_components_query_failure_raises(self, send_request):
         send_request.return_value.raise_for_status.side_effect = HttpResponseError(
@@ -131,8 +171,8 @@ class AksTest(BaseTest):
         with pytest.raises(HttpResponseError):
             p.run()
 
-    @arm_template('aks.json')
-    @cassette_name('test_find_aks_by_name')
+    @arm_template('aks-policy-components.json')
+    @cassette_name('test_policy_components_matches_non_compliant')
     @patch('azure.mgmt.policyinsights.PolicyInsightsClient._send_request')
     def test_policy_components_count(self, send_request):
         send_request.return_value.json.return_value = component_response(

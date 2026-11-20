@@ -778,6 +778,10 @@ class PolicyComponentsFilter(ListItemFilter):
     default window. The Kubernetes add-on reports every 15 minutes and comfortably fits
     inside it; a mode evaluated on the slower standard cycle may not.
 
+    A component is reported once per assignment that reaches it, so the same pod comes
+    back twice when a definition is assigned directly and again through an initiative.
+    Match on ``policyAssignmentName`` as well when counting, or the count doubles.
+
     :example:
 
     Clusters with a component that fails the host namespace sharing built-in.
