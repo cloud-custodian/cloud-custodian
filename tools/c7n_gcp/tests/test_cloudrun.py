@@ -5,11 +5,10 @@ import pytest
 
 from freezegun import freeze_time
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, capture_api_params
 from c7n.exceptions import PolicyExecutionError
 from c7n.utils import yaml_load
 
-from c7n_gcp.actions.core import MethodAction
 from c7n_gcp.resources.cloudrun import CloudRunJob, CloudRunService, knative_body
 
 # The root fields the api accepts, independent of the module under test.
@@ -32,19 +31,6 @@ def listed_resource(api_version, kind, name):
         'labels': dict(LOCATION),
         'c7n:MatchedFilters': ['metadata.name'],
     }
-
-
-def capture_api_params(test):
-    """Record the params of every api call the policy's actions make."""
-    captured = []
-    invoke_api = MethodAction.invoke_api
-
-    def record(action, client, op_name, params):
-        captured.append((op_name, params))
-        return invoke_api(action, client, op_name, params)
-
-    test.patch(MethodAction, 'invoke_api', record)
-    return captured
 
 
 def assert_replace_body(body, labels):

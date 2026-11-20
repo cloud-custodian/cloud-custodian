@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import time
+
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.actions import MethodAction
@@ -23,6 +25,11 @@ class DnsManagedZone(QueryResourceManager):
         labels = True
         labels_op = 'patch'
         labels_perm = 'update'
+        # patch drops null label values rather than deleting the key
+        labels_clear_to_remove = True
+        # Removal refreshes the zone, and wait_for_label_op polls the clear's
+        # operation.
+        labels_permissions = ('dns.managedZones.get', 'dns.managedZoneOperations.get')
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "dns.googleapis.com/ManagedZone"
         scc_type = "google.cloud.dns.ManagedZone"
@@ -31,9 +38,12 @@ class DnsManagedZone(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            return client.execute_query(
+            zone = client.execute_query(
                 'get', {'project': resource_info['project_id'],
                         'managedZone': resource_info['zone_name']})
+            # Event modes skip augment, which usually sets this.
+            zone.setdefault('project_id', resource_info['project_id'])
+            return zone
 
         @staticmethod
         def get_label_params(resource, all_labels):
@@ -42,6 +52,35 @@ class DnsManagedZone(QueryResourceManager):
                 'managedZone': resource['name'],
                 'body': {'labels': all_labels}
             }
+
+        @staticmethod
+        def refresh(client, resource):
+            return client.execute_query(
+                'get', {'project': resource['project_id'], 'managedZone': resource['name']})
+
+        @staticmethod
+        def wait_for_label_op(session_factory, resource, operation, timeout=20, interval=2):
+            """Wait for a zone update to finish before another is sent.
+
+            Zone label updates normally finish within seconds. The wait is kept
+            short since zones are processed one at a time, and a policy's
+            serverless budget has to cover all of them.
+            """
+            if operation.get('status') != 'pending':
+                return operation
+            client = local_session(session_factory).client(
+                'dns', 'v1beta2', 'managedZoneOperations')
+            deadline = time.monotonic() + timeout
+            while operation.get('status') == 'pending':
+                if time.monotonic() > deadline:
+                    raise TimeoutError(
+                        "zone %s operation %s still pending" % (resource['name'], operation['id']))
+                time.sleep(interval)
+                operation = client.execute_query('get', {
+                    'project': resource['project_id'],
+                    'managedZone': resource['name'],
+                    'operation': operation['id']})
+            return operation
 
     def augment(self, resources):
         project = local_session(self.session_factory).get_default_project()
