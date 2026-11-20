@@ -1,0 +1,99 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "flowArn": "arn:aws:appflow:us-east-1:644160558196:flow/399-appflow-red",
+        "flowName": "399-appflow-red",
+        "kmsArn": "arn:aws:kms:us-east-1:644160558196:key/fb3fc7b3-b7de-4f1b-9919-0bb551444ad7",
+        "flowStatus": "Active",
+        "sourceFlowConfig": {
+            "connectorType": "S3",
+            "sourceConnectorProperties": {
+                "S3": {
+                    "bucketName": "399-bucket-red",
+                    "bucketPrefix": "source"
+                }
+            }
+        },
+        "destinationFlowConfigList": [
+            {
+                "connectorType": "S3",
+                "destinationConnectorProperties": {
+                    "S3": {
+                        "bucketName": "399-bucket-red",
+                        "bucketPrefix": "destination",
+                        "s3OutputFormatConfig": {
+                            "fileType": "JSON",
+                            "prefixConfig": {},
+                            "aggregationConfig": {
+                                "aggregationType": "None"
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "triggerConfig": {
+            "triggerType": "OnDemand",
+            "triggerProperties": {}
+        },
+        "tasks": [
+            {
+                "sourceFields": [
+                    "title1",
+                    "title2"
+                ],
+                "connectorOperator": {
+                    "S3": "PROJECTION"
+                },
+                "taskType": "Filter",
+                "taskProperties": {}
+            },
+            {
+                "sourceFields": [
+                    "title1"
+                ],
+                "connectorOperator": {
+                    "S3": "NO_OP"
+                },
+                "destinationField": "title1",
+                "taskType": "Map",
+                "taskProperties": {}
+            },
+            {
+                "sourceFields": [
+                    "title2"
+                ],
+                "connectorOperator": {
+                    "S3": "NO_OP"
+                },
+                "destinationField": "title2",
+                "taskType": "Map",
+                "taskProperties": {}
+            }
+        ],
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2022,
+            "month": 1,
+            "day": 11,
+            "hour": 11,
+            "minute": 36,
+            "second": 21,
+            "microsecond": 792000
+        },
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2022,
+            "month": 1,
+            "day": 11,
+            "hour": 11,
+            "minute": 36,
+            "second": 21,
+            "microsecond": 792000
+        },
+        "createdBy": "arn:aws:iam::644160558196:user/Anna_Shcherbak",
+        "lastUpdatedBy": "arn:aws:iam::644160558196:user/Anna_Shcherbak",
+        "tags": {}
+    }
+}

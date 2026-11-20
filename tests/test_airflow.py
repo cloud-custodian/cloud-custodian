@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 from c7n.utils import jmespath_search
+from c7n.resources.appflow import AppFlowKmsKeyFilter
+from c7n.executor import MainThreadExecutor
 
 
 class TestApacheAirflow(BaseTest):
@@ -155,3 +157,43 @@ class TestApacheAirflow(BaseTest):
         airflow = session_factory().client('mwaa')
         call = airflow.get_environment(Name=name)
         self.assertEqual("DELETING", call['Environment'].get('Status'))
+
+
+class TestAppFlowKmsKeyFilter(BaseTest):
+    def test_appflow_kms_key_filter(self):
+        self.patch(AppFlowKmsKeyFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_appflow_kms_key_filter')
+        p = self.load_policy(
+            {
+                'name': 'app-flow',
+                'resource': 'app-flow',
+                'filters': [{
+                    'type': 'kms-key',
+                    'key': 'KeyManager',
+                    'value': 'AWS'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual('399-appflow-red', resources[0]['flowName'])
+
+    def test_appflow_kms_key_exceptions(self):
+        self.patch(AppFlowKmsKeyFilter, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data('test_appflow_kms_key_filter_exceptions')
+        p = self.load_policy(
+            {
+                'name': 'app-flow',
+                'resource': 'app-flow',
+                'filters': [{
+                    'type': 'kms-key',
+                    'key': 'KeyManager',
+                    'value': 'AWS'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
