@@ -141,8 +141,11 @@ class AccessControlTest(BaseTest):
             'resource': 'azure.roleassignment',
         })
         resources = [{'properties': {'principalId': 'abc'}}]
-        with self.assertRaises(ForbiddenCloudError):
-            p.resource_manager.augment(resources)
+        with self.assertLogs(level='ERROR') as logs:
+            with self.assertRaises(ForbiddenCloudError):
+                p.resource_manager.augment(resources)
+
+        self.assertIn('Azure AD Graph', logs.output[0])
 
         get_principal_dictionary.assert_called_once_with(
             get_session.return_value.get_session_for_resource.return_value.client.return_value,
