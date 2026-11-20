@@ -1,4 +1,10 @@
-provider "aws" {}
+provider "aws" {
+  default_tags {
+    tags = {
+      Test = "implicit-rds-cluster-filter"
+    }
+  }
+}
 
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
@@ -47,4 +53,18 @@ resource "aws_rds_cluster_instance" "main" {
   instance_class     = "db.t3.medium"
   engine             = aws_rds_cluster.main.engine
   apply_immediately  = true
+}
+
+resource "aws_db_instance" "standalone" {
+  identifier           = "standalone-test-instance"
+  engine               = "mysql"
+  engine_version       = "8.0"
+  instance_class       = "db.t3.micro"
+  allocated_storage    = 20
+  db_name              = "testdb"
+  username             = "admin"
+  password             = random_password.master.result
+  db_subnet_group_name = aws_db_subnet_group.main.name
+  skip_final_snapshot  = true
+  apply_immediately    = true
 }
