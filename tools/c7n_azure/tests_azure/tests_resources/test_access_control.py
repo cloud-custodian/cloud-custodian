@@ -126,9 +126,14 @@ class AccessControlTest(BaseTest):
     @patch('c7n_azure.resources.access_control.RoleAssignment.get_session')
     @patch('c7n_azure.resources.access_control.GraphHelper.get_principal_dictionary')
     def test_augment_graph_forbidden_emits_warning(self, get_principal_dictionary, get_session):
-        mock_response = MagicMock()
-        mock_response.status_code = 403
-        get_principal_dictionary.side_effect = CloudError(mock_response)
+        class ForbiddenCloudError(CloudError):
+            # Skip CloudError.__init__, which needs a real pipeline response to deserialize.
+            def __init__(self):
+                Exception.__init__(self, 'Forbidden')
+                self.status_code = 403
+                self.message = 'Forbidden'
+
+        get_principal_dictionary.side_effect = ForbiddenCloudError()
 
         p = self.load_policy({
             'name': 'test-assignments-by-role',
