@@ -14,6 +14,7 @@ from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
 from c7n_azure.provider import Azure, resources
 from c7n_azure.query import DescribeSource, QueryResourceManager
 from c7n_azure.utils import GraphHelper
+from msrestazure.azure_exceptions import CloudError
 
 log = logging.getLogger('custodian.azure.access_control')
 
@@ -110,7 +111,15 @@ class RoleAssignment(QueryResourceManager):
             resource['properties']['principalId'] for resource in resources
             if resource['properties']['principalId']))
 
-        principal_dics = GraphHelper.get_principal_dictionary(graph_client, object_ids)
+        try:
+            principal_dics = GraphHelper.get_principal_dictionary(
+                graph_client, object_ids, raise_on_graph_call_error=True)
+        except CloudError as e:
+            self.log.warning(
+                'Failed to resolve principal identities via Microsoft Graph for role assignments; '
+                'principalName, displayName and aadType will be missing from %d resources. '
+                'Error: %s' % (len(resources), e))
+            return resources
 
         for resource in resources:
             if resource['properties']['principalId'] in principal_dics.keys():

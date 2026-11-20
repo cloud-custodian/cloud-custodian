@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template
 from c7n_azure.resources.access_control import ScopeFilter
+from msrestazure.azure_exceptions import CloudError
 from unittest.mock import patch, MagicMock
 
 
@@ -121,6 +122,26 @@ class AccessControlTest(BaseTest):
         self.assertFalse(scope_filter.is_scope("/subscription/resourceGroups/foo", rg_type))
         self.assertFalse(scope_filter.is_scope("/foo/bar/xyz", rg_type))
         self.assertFalse(scope_filter.is_scope(resource_group_scope + "/vm/bar", rg_type))
+
+    @patch('c7n_azure.resources.access_control.RoleAssignment.get_session')
+    @patch('c7n_azure.resources.access_control.GraphHelper.get_principal_dictionary')
+    def test_augment_graph_forbidden_emits_warning(self, get_principal_dictionary, get_session):
+        mock_response = MagicMock()
+        mock_response.status_code = 403
+        get_principal_dictionary.side_effect = CloudError(mock_response)
+
+        p = self.load_policy({
+            'name': 'test-assignments-by-role',
+            'resource': 'azure.roleassignment',
+        })
+        resources = [{'properties': {'principalId': 'abc'}}]
+        with self.assertLogs(level='WARNING') as logs:
+            result = p.resource_manager.augment(resources)
+
+        self.assertEqual(result, resources)
+        self.assertNotIn('principalName', result[0])
+        self.assertTrue(any('principalName, displayName and aadType will be missing'
+                            in line for line in logs.output))
 
     def test_scope_filter_management_group(self):
         sub_scope = "/subscriptions/111-111-1111"
