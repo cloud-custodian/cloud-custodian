@@ -807,10 +807,10 @@ class FormatDate:
                     p['days'] = sign * float(i[1:-1])
                 d = d + timedelta(**p)
             fmt = fmt[run.end():]
-            # an increment with no strftime of its own falls back to the
-            # configured default, so a policy can say {now:-7d} alone.
-            if not fmt and self._default_format:
-                fmt = self._default_format
+        # with no strftime of its own the configured default applies, offset or
+        # not, so {now} and {now:-7d} come out the same shape.
+        if not fmt and self._default_format:
+            fmt = self._default_format
         return d.__format__(fmt)
 
 

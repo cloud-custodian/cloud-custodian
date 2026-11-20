@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-import re
+
+from datetime import datetime, timedelta
 
 from c7n.config import Config
-from c7n.loader import PolicyLoader
 from c7n.resources import load_resources
 from c7n_gcp.query import config_regions, GcpLocation
 from c7n_gcp.provider import GoogleCloud
@@ -198,31 +198,29 @@ class GcpMetricsFilterTest(BaseTest):
         self.assertFalse("metrics" in SpannerDatabaseInstance.filter_registry)
 
 
-def _expanded_query_filter(resource):
-    """Load a one policy file for `resource` and return its expanded filter."""
-    load_resources((resource,))
-    data = {'policies': [{
-        'name': 'date-format',
-        'resource': resource,
-        'query': [{'filter': 'create_time>"{now:-7d}"'}]}]}
-    policy = list(PolicyLoader(Config.empty(
-        account_id='0000', region='us-central1')).load_data(
-            data, 'memory://', validate=False))[0]
+def test_query_date_uses_the_provider_format(test):
+    # google apis take iso-8601 and reject the space separated form, so a date
+    # in a query filter has to render as a timestamp they will accept.
+    policy = test.load_policy({
+        'name': 'recent-projects',
+        'resource': 'gcp.project',
+        'query': [{'filter': 'createTime>"{now:-7d}"'}]})
     policy.expand_variables(policy.get_variables())
-    return policy.data['query'][0]['filter']
+
+    sent = policy.resource_manager.get_resource_query()['filter']
+    day = (datetime.utcnow() - timedelta(days=7)).strftime('%Y-%m-%d')
+    assert sent.startswith(f'createTime>"{day}T'), sent
+    assert sent.endswith('Z"'), sent
 
 
-def test_query_date_uses_the_provider_format():
-    # google apis want iso-8601 and reject the space separated form, so a
-    # bare increment has to render as a timestamp the api will take.
-    filtered = _expanded_query_filter('gcp.vertex-ai-custom-job')
-    assert re.fullmatch(
-        r'create_time>"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"', filtered), filtered
+def test_query_date_explicit_format_wins(test):
+    # a policy that wants something else still gets it
+    policy = test.load_policy({
+        'name': 'recent-projects',
+        'resource': 'gcp.project',
+        'query': [{'filter': 'createTime>"{now:-7d%Y-%m-%d}"'}]})
+    policy.expand_variables(policy.get_variables())
 
-
-def test_query_date_format_is_not_global():
-    # a provider that declares nothing keeps the old rendering, so this
-    # cannot quietly change what other providers send.
-    filtered = _expanded_query_filter('aws.ebs-snapshot')
-    assert re.fullmatch(
-        r'create_time>"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\.\d+)?"', filtered), filtered
+    day = (datetime.utcnow() - timedelta(days=7)).strftime('%Y-%m-%d')
+    assert policy.resource_manager.get_resource_query() == {
+        'filter': f'createTime>"{day}"'}

@@ -470,28 +470,33 @@ class UtilTest(BaseTest):
         self.assertEqual(str(d), '2018-02-02 12:00:00')
 
     def test_format_date_default_format(self):
+        # the configured default applies if and only if no strftime survives
+        # the spec, so every form without one comes out the same shape
         d = parse_date("2018-02-02 12:00")
         iso = "%Y-%m-%dT%H:%M:%SZ"
-
-        # an increment with no format of its own takes the default
-        self.assertEqual(
-            "{:-7d}".format(utils.FormatDate(d, iso)), "2018-01-26T12:00:00Z")
-        self.assertEqual(
-            "{:+7d}".format(utils.FormatDate(d, iso)), "2018-02-09T12:00:00Z")
-
-        # an explicit format still wins
-        self.assertEqual(
-            "{:-7d%Y-%m-%d}".format(utils.FormatDate(d, iso)), "2018-01-26")
-
-        # no increment means no default, so {now} is unchanged
-        self.assertEqual(
-            "{}".format(utils.FormatDate(d, iso)), "2018-02-02 12:00:00")
-        self.assertEqual(
-            "{:%Y-%m-%d}".format(utils.FormatDate(d, iso)), "2018-02-02")
-
-        # and without a default the increment behaves as it did before
-        self.assertEqual(
-            "{:-7d}".format(utils.FormatDate(d)), "2018-01-26 12:00:00")
+        cases = [
+            # spec, rendered without a default, rendered with one
+            ("", "2018-02-02 12:00:00", "2018-02-02T12:00:00Z"),
+            ("-7d", "2018-01-26 12:00:00", "2018-01-26T12:00:00Z"),
+            ("+2d", "2018-02-04 12:00:00", "2018-02-04T12:00:00Z"),
+            ("+0d", "2018-02-02 12:00:00", "2018-02-02T12:00:00Z"),
+            ("-5h", "2018-02-02 07:00:00", "2018-02-02T07:00:00Z"),
+            ("-5M", "2018-02-02 11:55:00", "2018-02-02T11:55:00Z"),
+            ("-1d+2h", "2018-02-01 14:00:00", "2018-02-01T14:00:00Z"),
+            # a strftime wins, whether the author wrote it after an offset,
+            # on its own, or the spec merely happens to contain one
+            ("%Y-%m-%d", "2018-02-02", "2018-02-02"),
+            ("-7d%Y-%m-%d", "2018-01-26", "2018-01-26"),
+            ("-1d+2h%Y-%m-%dT%H", "2018-02-01T14", "2018-02-01T14"),
+            ("%Y-7d", "2018-7d", "2018-7d"),
+            ("retain-30d_%Y%m%d", "retain-30d_20180202", "retain-30d_20180202"),
+        ]
+        for spec, without_default, with_default in cases:
+            with self.subTest(spec=spec):
+                self.assertEqual(
+                    f"{{:{spec}}}".format(utils.FormatDate(d)), without_default)
+                self.assertEqual(
+                    f"{{:{spec}}}".format(utils.FormatDate(d, iso)), with_default)
 
     def test_format_date_literal_hyphen(self):
         # an increment only counts at the start of the spec, so a hyphen
@@ -507,14 +512,6 @@ class UtilTest(BaseTest):
         self.assertEqual(
             "{:%Y-7d}".format(utils.FormatDate(d, "%Y-%m-%dT%H:%M:%SZ")),
             "2018-7d")
-
-    def test_format_date_multiple_increments(self):
-        d = parse_date("2018-02-02 12:00")
-        self.assertEqual(
-            "{:-1d+2h%Y-%m-%dT%H}".format(utils.FormatDate(d)), "2018-02-01T14")
-        self.assertEqual(
-            "{:-1d+2h}".format(utils.FormatDate(d, "%Y-%m-%dT%H:%M:%SZ")),
-            "2018-02-01T14:00:00Z")
 
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]

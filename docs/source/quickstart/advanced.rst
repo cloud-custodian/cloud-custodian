@@ -183,6 +183,55 @@ service or automation identity matching a complex regular expression.
 
 
 
+.. _policy_date_variables:
+
+Dates in policies
+-----------------
+
+The ``{now}`` variable interpolates the time of the run into policy values. It
+takes an optional offset, an optional strftime, or both, in that order.
+
+.. code-block:: yaml
+
+  policies:
+
+    - name: expiring-soon
+      resource: aws.ec2
+      actions:
+        - type: tag
+          key: expires
+          # offset and strftime
+          value: "retire after {now:+30d%Y-%m-%d}"
+
+The offset is a sign, a number and a unit, where the unit is ``d`` for days,
+``h`` for hours or ``M`` for minutes. ``+30d`` is thirty days from now and
+``-7d`` is seven days ago. Several can be combined, so ``{now:-1d+2h}`` is
+yesterday plus two hours.
+
+An offset only counts at the front of the spec. A hyphen later in one is
+literal, so ``{now:retain-30d_%Y%m%d}`` keeps the ``retain-30d_`` and a
+strftime width such as ``%-3d`` is left to strftime.
+
+With no strftime of its own, ``{now}`` renders in whatever format the resource
+declares, and otherwise as a plain datetime. Google Cloud resources ask for
+RFC 3339, since that is what its APIs accept in a ``query`` filter.
+
+.. code-block:: yaml
+
+  policies:
+
+    - name: recent-custom-jobs
+      resource: gcp.vertex-ai-custom-job
+      query:
+        # renders as create_time>"2026-08-20T00:00:00Z"
+        - filter: 'create_time>"{now:-90d}"'
+
+.. note::
+
+   ``{now}`` is not expanded during serverless execution, so an offset in a
+   policy deployed as a function reaches the provider API unresolved. Use it in
+   pull mode policies.
+
 .. _policy_resource_limits:
 
 Limiting how many resources custodian affects
