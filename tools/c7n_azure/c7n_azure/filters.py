@@ -18,10 +18,11 @@ from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil.parser import parse
 from azure.core.exceptions import HttpResponseError
+from azure.core.rest import HttpRequest
 from msrestazure.tools import parse_resource_id
 
 from c7n_azure.provider import resources
-from c7n.filters import Filter, FilterValidationError, ValueFilter
+from c7n.filters import Filter, FilterValidationError, ListItemFilter, ValueFilter
 from c7n.filters.core import PolicyValidationError
 from c7n.exceptions import PolicyExecutionError
 from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
@@ -744,14 +745,94 @@ class PolicyCompliantFilter(Filter):
         # Find non-compliant resources
         client = s.client('azure.mgmt.policyinsights.PolicyInsightsClient')
         query = client.policy_states.list_query_results_for_subscription(
-            policy_states_resource='latest', subscription_id=s.subscription_id).value
-        non_compliant = [f.resource_id.lower() for f in query
-                         if not definition_ids or f.policy_definition_id.lower() in definition_ids]
+            policy_states_resource='latest', subscription_id=s.subscription_id)
+        # 'latest' returns compliant states alongside non-compliant ones, so the state
+        # itself has to be checked; matching on the definition alone matches everything.
+        non_compliant = [
+            f.resource_id.lower() for f in query
+            if f.compliance_state and f.compliance_state.lower() == 'noncompliant'
+            and (not definition_ids or f.policy_definition_id.lower() in definition_ids)]
 
         if self.compliant:
             return [r for r in resources if r['id'].lower() not in non_compliant]
         else:
             return [r for r in resources if r['id'].lower() in non_compliant]
+
+
+class PolicyComponentsFilter(ListItemFilter):
+    """Filter resources on the Azure Policy compliance of their components
+
+    Azure Policy definitions in a Resource Provider mode -- the ``Microsoft.*.Data``
+    modes -- are evaluated against a resource's components rather than against the
+    resource itself, and write no record to the policy states that ``policy-compliant``
+    reads. Component compliance is only available through this filter.
+
+    What a component is depends on the mode: pods and containers under
+    ``Microsoft.Kubernetes.Data``, certificates and keys under ``Microsoft.KeyVault.Data``.
+    Each item is a component compliance record carrying ``componentId``, ``componentType``,
+    ``complianceState`` and the definition that produced it; for Kubernetes ``componentId``
+    is ``namespace/name``. Unless ``count`` is used, the components that matched are
+    annotated onto the resource under ``c7n:PolicyComponents``.
+
+    Only states evaluated in the last 24 hours are considered, which is the query's own
+    default window. The Kubernetes add-on reports every 15 minutes and comfortably fits
+    inside it; a mode evaluated on the slower standard cycle may not.
+
+    A component is reported once per assignment that reaches it, so the same pod comes
+    back twice when a definition is assigned directly and again through an initiative.
+    Match on ``policyAssignmentName`` as well when counting, or the count doubles.
+
+    :example:
+
+    Clusters with a component that fails the host namespace sharing built-in.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: aks-pods-sharing-host-namespaces
+            resource: azure.aks
+            filters:
+              - type: policy-components
+                attrs:
+                  - complianceState: NonCompliant
+                  - policyDefinitionName: 47a1ee2f-2a2a-4576-bf2a-e0e36709c2b8
+    """
+
+    schema = type_schema(
+        'policy-components',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+    )
+    annotate_items = True
+    item_annotation_key = 'c7n:PolicyComponents'
+
+    # policyStates can expand component detail, but only at resource scope, and the
+    # expansion carries just id/type/name/timestamp/complianceState -- no per-component
+    # policy definition, so a definition cannot be named. Kubernetes mode also writes no
+    # parent policy state for the expansion to hang off. Hence componentPolicyStates.
+    #
+    # It has no operation group in azure-mgmt-policyinsights 1.0.1, and the 1.1.0bN
+    # previews that add one paginate with GET, while ARM serves this endpoint by POST
+    # only. So issue the request directly rather than take that dependency. Going through
+    # the client keeps the session's auth, retry and api-stats policies.
+    api_version = '2024-10-01'
+
+    def get_item_values(self, resource):
+        client = self.manager.get_session().client(
+            'azure.mgmt.policyinsights.PolicyInsightsClient')
+        url = (f"{resource['id']}/providers/Microsoft.PolicyInsights"
+               "/componentPolicyStates/latest/queryResults")
+        response = client._send_request(HttpRequest(
+            'POST', url, params={'api-version': self.api_version}))
+        # A failed query is left to raise. The permission it needs is held at the
+        # subscription, so the ordinary failure is every resource rather than one, and
+        # answering "no non-compliant components" because the components could not be
+        # read is the silence this filter exists to remove.
+        response.raise_for_status()
+        # Unlike policyStates, this query carries no nextLink in its contract, so the
+        # whole set comes back in one body.
+        return response.json().get('value', [])
 
 
 class AzureOffHour(OffHour):

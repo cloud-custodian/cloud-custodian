@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {
+        "clusterName": "cctestakspolicy"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ContainerService/managedClusters",
+            "apiVersion": "2024-09-01",
+            "name": "[variables('clusterName')]",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "dnsPrefix": "[variables('clusterName')]",
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "count": 1,
+                        "vmSize": "Standard_D2s_v3",
+                        "osType": "Linux",
+                        "mode": "System"
+                    }
+                ],
+                "addonProfiles": {
+                    "azurepolicy": {
+                        "enabled": true
+                    }
+                },
+                "enableRBAC": true
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2022-06-01",
+            "name": "cctestakshostnamespaces",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerService/managedClusters', variables('clusterName'))]"
+            ],
+            "properties": {
+                "displayName": "cctest kubernetes containers should not share host namespaces",
+                "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/47a1ee2f-2a2a-4576-bf2a-e0e36709c2b8",
+                "parameters": {
+                    "effect": {
+                        "value": "Audit"
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -57,6 +57,45 @@ class KeyVaultTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_policy_components_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-keyvault',
+                'resource': 'azure.keyvault',
+                'filters': [
+                    {'type': 'policy-components',
+                     'attrs': [{'complianceState': 'NonCompliant'}]}]
+            }, validate=True)
+            assert p
+
+    @arm_template('keyvault.json')
+    @cassette_name('common')
+    @patch('azure.mgmt.policyinsights.PolicyInsightsClient._send_request')
+    def test_policy_components(self, send_request):
+        # componentType is deliberately absent: the field exists, but its value under
+        # Microsoft.KeyVault.Data has not been measured and nothing here reads it.
+        send_request.return_value.json.return_value = {'value': [
+            {'componentId': 'cert-ok', 'complianceState': 'Compliant'},
+            {'componentId': 'cert-expiring-soon', 'complianceState': 'NonCompliant'}]}
+
+        resources = self.load_policy({
+            'name': 'test-azure-keyvault',
+            'resource': 'azure.keyvault',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cckeyvault1*'},
+                {'type': 'policy-components',
+                 'attrs': [{'complianceState': 'NonCompliant'}]}]
+        }).run()
+
+        assert len(resources) == 1
+        assert [c['componentId'] for c in resources[0]['c7n:PolicyComponents']] == [
+            'cert-expiring-soon']
+        assert send_request.call_args.args[0].url.startswith(resources[0]['id'])
+
     def test_compare_permissions(self):
         p1 = {"keys": ['get'], "secrets": ['get'], "certificates": ['get']}
         p2 = {"keys": ['Get', 'List'], "secrets": ['Get', 'List'], "certificates": ['Get', 'List']}

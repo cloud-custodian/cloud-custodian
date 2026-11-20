@@ -8,7 +8,8 @@ import logging
 from azure.mgmt.keyvault import models
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.constants import GRAPH_AUTH_ENDPOINT
-from c7n_azure.filters import FirewallBypassFilter, FirewallRulesFilter
+from c7n_azure.filters import (
+    FirewallBypassFilter, FirewallRulesFilter, PolicyComponentsFilter)
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.session import Session
@@ -514,3 +515,8 @@ class KeyVaultUpdateAction(AzureBaseAction):
             vault_name=resource["name"],
             parameters=params
         )
+
+
+# Vaults are assessed by Microsoft.KeyVault.Data definitions, which report against
+# their certificates and keys rather than the vault.
+KeyVault.filter_registry.register('policy-components', PolicyComponentsFilter)
