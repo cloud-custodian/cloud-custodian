@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
-import re
 from functools import lru_cache
 from pathlib import Path
 from collections import defaultdict
@@ -12,7 +11,7 @@ from googleapiclient.errors import HttpError
 import yaml
 
 from c7n.exceptions import PolicyValidationError
-from c7n.policy import PullMode, ServerlessExecutionMode
+from c7n.policy import PullMode
 from c7n.utils import local_session, jmespath_search, type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
@@ -122,6 +121,10 @@ class VertexAIQueryManager(QueryResourceManager):
         # policy file would mean two different things. Ask what the mode does
         # rather than what it is called: gcp-periodic subclasses PullMode, and
         # so will any later mode that enumerates.
+        #
+        # gcp-periodic is also serverless, so a {now} in the filter is never
+        # expanded and reaches the API verbatim. That is #11368, and it is not
+        # Vertex specific, so it is not guarded here.
         if params and not isinstance(self.ctx.policy.get_execution_mode(), PullMode):
             mode = self.data.get('mode', {}).get('type')
             raise PolicyValidationError(
@@ -145,39 +148,6 @@ class VertexAIQueryManager(QueryResourceManager):
             raise PolicyValidationError(
                 f"{self.type} query location {value!r} is not a Vertex AI "
                 f"region")
-
-        self._validate_deferred_now(key, value)
-
-    # {now} itself, not {nowindow}. The trailing class covers the whole field:
-    # a bare {now}, a format spec after :, and a conversion after !, since
-    # {now!s} renders the deferred string as the word now.
-    #
-    # An escaped {{now}} is a known gap rather than an oversight. Expansion
-    # collapses it to {now} before validate runs under `custodian run`, so by
-    # then it cannot be told from the variable. It survives `custodian
-    # validate`, which does not expand. A Vertex filter wanting that literal
-    # is not a case worth carrying escape state through expansion for.
-    NOW_VARIABLE = re.compile(r'(?<!\{)\{now[!:}]')
-
-    def _validate_deferred_now(self, key, value):
-        """A mode can both enumerate and defer {now}, which sends it raw.
-
-        gcp-periodic is a PullMode, so the query reaches the list call, and a
-        ServerlessExecutionMode, so get_variables leaves {now} deferred and
-        nothing expands it inside the function. Modes that only defer are
-        caught by the enumeration check in validate instead, which says the
-        more useful thing.
-        """
-        mode = self.ctx.policy.get_execution_mode()
-        if not (isinstance(mode, PullMode)
-                and isinstance(mode, ServerlessExecutionMode)):
-            return
-
-        if self.NOW_VARIABLE.search(value):
-            raise PolicyValidationError(
-                f"{self.type} query {key} uses {{now}}, which "
-                f"{self.data.get('mode', {}).get('type')} defers and never "
-                f"expands, so it would reach the API unexpanded")
 
     def get_resource_query(self):
         """location entries pick regions, every other key is a list parameter."""
