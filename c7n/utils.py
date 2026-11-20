@@ -664,12 +664,14 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), formatter=Non
     if isinstance(obj, dict):
         new = {}
         for key in obj.keys():
-            new[key] = format_string_values(obj[key], formatter=formatter, *args, **kwargs)
+            new[key] = format_string_values(
+                obj[key], err_fallback, formatter, *args, **kwargs)
         return new
     elif isinstance(obj, list):
         new = []
         for item in obj:
-            new.append(format_string_values(item, formatter=formatter, *args, **kwargs))
+            new.append(format_string_values(
+                item, err_fallback, formatter, *args, **kwargs))
         return new
     elif isinstance(obj, str):
         try:
@@ -767,13 +769,20 @@ class DeferredFormatString(UserString):
 class FormatDate:
     """a datetime wrapper with extended pyformat syntax"""
 
-    date_increment = re.compile(r'\+[0-9]+[Mdh]')
+    # increments only count as a leading run, so a literal hyphen later in
+    # the spec stays literal. '%-3d' is a strftime width, not minus 3 days.
+    date_prefix = re.compile(r'^(?:[-+][0-9]+[Mdh])+')
+    date_increment = re.compile(r'[-+][0-9]+[Mdh]')
 
-    def __init__(self, d=None):
+    def __init__(self, d=None, default_format=None):
         self._d = d
+        self._default_format = default_format
 
     def __str__(self):
-        return str(self._d)
+        # varfmt hands back this object, not a string, when a value is exactly
+        # "{now}". str() has to agree with format() or that one spelling comes
+        # out in a different shape from every other.
+        return format(self)
 
     @property
     def datetime(self):
@@ -788,18 +797,23 @@ class FormatDate:
 
     def __format__(self, fmt=None):
         d = self._d
-        increments = self.date_increment.findall(fmt)
-        for i in increments:
-            p = {}
-            if i[-1] == 'M':
-                p['minutes'] = float(i[1:-1])
-            if i[-1] == 'h':
-                p['hours'] = float(i[1:-1])
-            if i[-1] == 'd':
-                p['days'] = float(i[1:-1])
-            d = d + timedelta(**p)
-        if increments:
-            fmt = self.date_increment.sub("", fmt)
+        run = self.date_prefix.match(fmt)
+        if run:
+            for i in self.date_increment.findall(run.group(0)):
+                p = {}
+                sign = -1 if i[0] == '-' else 1
+                if i[-1] == 'M':
+                    p['minutes'] = sign * float(i[1:-1])
+                if i[-1] == 'h':
+                    p['hours'] = sign * float(i[1:-1])
+                if i[-1] == 'd':
+                    p['days'] = sign * float(i[1:-1])
+                d = d + timedelta(**p)
+            fmt = fmt[run.end():]
+        # with no strftime of its own the configured default applies, offset or
+        # not, so {now} and {now:-7d} come out the same shape.
+        if not fmt and self._default_format:
+            fmt = self._default_format
         return d.__format__(fmt)
 
 

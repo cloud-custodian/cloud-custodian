@@ -401,6 +401,11 @@ class TypeInfo(metaclass=TypeMeta):
     # domain wide delegation when GOOGLE_WORKSPACE_SUBJECT is set.
     scopes = None
 
+    # strftime a bare date increment renders with, so a policy can write
+    # {now:-7d} in a query filter. google apis take iso-8601 timestamps,
+    # and reject the space separated form.
+    date_format = '%Y-%m-%dT%H:%M:%SZ'
+
     # resource enumeration parameters
 
     scope = 'project'
