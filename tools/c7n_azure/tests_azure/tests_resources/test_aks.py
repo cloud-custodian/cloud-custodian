@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from unittest.mock import patch
 
+import pytest
 from azure.core.exceptions import HttpResponseError
 
 from ..azure_common import BaseTest, arm_template, cassette_name
@@ -113,20 +114,22 @@ class AksTest(BaseTest):
     @arm_template('aks.json')
     @cassette_name('test_find_aks_by_name')
     @patch('azure.mgmt.policyinsights.PolicyInsightsClient._send_request')
-    def test_policy_components_query_failure_skips_the_resource(self, send_request):
-        send_request.side_effect = HttpResponseError(message='Forbidden')
+    def test_policy_components_query_failure_raises(self, send_request):
+        send_request.return_value.raise_for_status.side_effect = HttpResponseError(
+            message='Forbidden')
 
-        # A failed query must not abort the policy and discard every other resource.
-        resources = self.load_policy({
+        p = self.load_policy({
             'name': 'test-azure-aks',
             'resource': 'azure.aks',
             'filters': [
                 {'type': 'policy-components',
                  'attrs': [{'complianceState': 'NonCompliant'}]}]
-        }).run()
+        })
 
-        assert resources == []
-        send_request.assert_called_once()
+        # Swallowing this would report the cluster as having no non-compliant
+        # components, which is the wrong answer the filter exists to stop.
+        with pytest.raises(HttpResponseError):
+            p.run()
 
     @arm_template('aks.json')
     @cassette_name('test_find_aks_by_name')

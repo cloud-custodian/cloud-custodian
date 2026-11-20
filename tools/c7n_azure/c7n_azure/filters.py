@@ -819,16 +819,13 @@ class PolicyComponentsFilter(ListItemFilter):
             'azure.mgmt.policyinsights.PolicyInsightsClient')
         url = (f"{resource['id']}/providers/Microsoft.PolicyInsights"
                "/componentPolicyStates/latest/queryResults")
-        try:
-            response = client._send_request(HttpRequest(
-                'POST', url, params={'api-version': self.api_version}))
-            response.raise_for_status()
-        except HttpResponseError:
-            # Raising here would abort the policy and discard every other resource's
-            # result, so skip this one and leave the reason in the log.
-            self.log.exception(
-                f"Could not get component policy states on {resource['id']}")
-            return []
+        response = client._send_request(HttpRequest(
+            'POST', url, params={'api-version': self.api_version}))
+        # A failed query is left to raise. The permission it needs is held at the
+        # subscription, so the ordinary failure is every resource rather than one, and
+        # answering "no non-compliant components" because the components could not be
+        # read is the silence this filter exists to remove.
+        response.raise_for_status()
         # Unlike policyStates, this query carries no nextLink in its contract, so the
         # whole set comes back in one body.
         return response.json().get('value', [])
