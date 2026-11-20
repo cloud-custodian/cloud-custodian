@@ -32,6 +32,10 @@ different policy, they support the same configuration options:
  - **fallback-schedule**: If a resource doesn't support tagging or doesn't provide
    a tag you can supply a default schedule that will be used. When the tag is provided
    this will be ignored. See :ref:`ScheduleParser Time Specifications <scheduleparser-time-spec>`.
+ - **schedules**: a mapping of names to schedules. A resource whose tag value
+   (or the **fallback-schedule**) is one of these names uses that schedule.
+   Names are not case sensitive.
+   See :ref:`Tag Value Restrictions <offhours-tag-restrictions>`.
  - **tag**: which resource tag name to use for per-resource configuration
    (schedule and timezone overrides and opt-in/opt-out); default is
    ``maid_offhours``.
@@ -97,6 +101,9 @@ The value of the tag must be one of the following:
   * ``off=(time spec)`` and/or ``on=(time spec)`` matching time specifications
     supported by :py:class:`c7n.filters.offhours.ScheduleParser` as described
     in the next section.
+- the name of a schedule defined in the policy's **schedules** option. When the
+  policy defines **schedules**, any other value without an ``=`` is logged as
+  an unknown schedule name and the resource is skipped.
 
 
 .. _scheduleparser-time-spec:
@@ -188,6 +195,8 @@ As a result of this, if custodian stops an instance or suspends an ASG and you
 need to start/resume it, you can safely do so manually and custodian won't touch
 it again until the next day.
 
+.. _offhours-tag-restrictions:
+
 ElasticBeanstalk, EFS and Other Services with Tag Value Restrictions
 ====================================================================
 
@@ -197,10 +206,34 @@ stalk/latest/dg/using-features.tagging.html>`_ and `EFS <http://docs.aws.amazon.
 com/efs/latest/ug/API_Tag.html>`_. In particular, these services do not allow
 parenthesis, square brackets, commas, or semicolons, or empty tag values. This
 proves to be problematic with the tag-based schedule configuration described
-above. The best current workaround is to define a separate policy with a unique
-``tag`` name for each unique schedule that you want to use, and then tag
-resources with that tag name and a value of ``on``. Note that this can only be
-used in opt-in mode, not opt-out.
+above. To avoid this, name each schedule in the policy with the **schedules**
+option, and tag each resource with the name of its schedule:
+
+.. code-block:: yaml
+
+   policies:
+     - name: rds-offhours-stop
+       resource: rds
+       filters:
+         - type: offhour
+           default_tz: et
+           offhour: 19
+           tag: downtime
+           schedules:
+             business: "off=(M-F,19);on=(M-F,7)"
+             late: "off=[(M-F,22),(S,13)];on=(M-F,8);tz=pt"
+       actions:
+         - stop
+
+An instance tagged ``downtime: business`` is stopped at 19:00 Eastern time on
+weekdays, and one tagged ``downtime: late`` at 22:00 Pacific time on weekdays
+and 13:00 on Saturdays. The matching onhour policy needs the same
+**schedules**. Names can not be ``on`` or ``off``, or contain the escape
+sequences listed below.
+
+Without **schedules**, you can define a separate policy with a unique ``tag``
+name for each schedule, and tag resources with that tag name and a value of
+``on``. This only works in opt-in mode.
 
 Another option is to escape the tag value with the following mapping, generated
 with the char's unicode number `"u" + hex(ord(the_char))[2:]`.
@@ -283,6 +316,8 @@ class Time(Filter):
             'default_tz': {'type': 'string'},
             'fallback-schedule': {'type': 'string'},
             'fallback_schedule': {'type': 'string'},
+            'schedules': {
+                'type': 'object', 'additionalProperties': {'type': 'string'}},
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
@@ -352,6 +387,11 @@ class Time(Filter):
             self.data.get('fallback-schedule') or
             self.data.get('fallback_schedule')
         )
+        # tag values are compared and parsed in lower case, and empty segments
+        # are dropped as in process_resource_schedule
+        self.schedules = {
+            str(k).lower(): ';'.join(filter(None, v.lower().split(';')))
+            for k, v in self.data.get('schedules', {}).items()}
         self.default_schedule = self.get_default_schedule()
         self.parser = ScheduleParser(self.default_schedule)
 
@@ -370,6 +410,21 @@ class Time(Filter):
         if hour not in self.parser.VALID_HOURS:
             raise PolicyValidationError(
                 "Invalid hour specified %s" % (hour,))
+        for name, schedule in self.data.get('schedules', {}).items():
+            # yaml reads unquoted on/off/yes/no and numbers as other types
+            if not isinstance(name, str):
+                raise PolicyValidationError(
+                    "Schedule name %r is not a string, quote it" % (name,))
+            key = name.lower()
+            if key in ('', 'on', 'off') or any(
+                    e in key for e in self.TAG_RESTRICTIONS_ESCAPE):
+                raise PolicyValidationError(
+                    "Schedule name '%s' is reserved or contains a tag escape "
+                    "sequence" % name)
+            parsed = self.parser.parse(self.schedules[key])
+            if parsed is None or self.get_tz(parsed['tz']) is None:
+                raise PolicyValidationError(
+                    "Invalid schedule %s: %s" % (name, schedule))
         if 'skip-days' in self.data and 'skip-days-from' in self.data:
             raise PolicyValidationError(
                 "Cannot specify two sets of skip days %s" % (
@@ -414,6 +469,15 @@ class Time(Filter):
         else:
             self.enabled_count += 1
 
+        if value in self.schedules:
+            value = self.schedules[value]
+        elif self.schedules and value not in ('', 'on') and '=' not in value:
+            # most likely a misspelled name, don't fall back to the default
+            log.warning(
+                "Unknown schedule name on resource:%s value:%s",
+                i[self.id_key], value)
+            self.parse_errors.append((i[self.id_key], value))
+            return False
         try:
             return self.process_resource_schedule(i, value, self.time_type)
         except Exception:
