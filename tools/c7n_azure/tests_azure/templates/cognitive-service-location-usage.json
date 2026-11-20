@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "westusAccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'wus')]",
+        "westus3AccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'wus3')]",
+        "globalAccountName": "[concat('cctestlocusage', parameters('uniqueId'), 'glb')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2025-06-01",
+            "name": "[variables('westusAccountName')]",
+            "location": "westus",
+            "kind": "OpenAI",
+            "sku": {
+                "name": "S0"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2025-06-01",
+            "name": "[variables('westus3AccountName')]",
+            "location": "westus3",
+            "kind": "OpenAI",
+            "sku": {
+                "name": "S0"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2025-06-01",
+            "name": "[variables('globalAccountName')]",
+            "location": "global",
+            "kind": "TextTranslation",
+            "sku": {
+                "name": "S1"
+            },
+            "properties": {}
+        }
+    ]
+}
