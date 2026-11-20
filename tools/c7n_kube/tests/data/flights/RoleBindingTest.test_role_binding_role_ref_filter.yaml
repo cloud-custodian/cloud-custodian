@@ -1,0 +1,70 @@
+interactions:
+- request:
+    body: null
+    headers: &id001
+      Accept: application/json
+      Content-Type: application/json
+      User-Agent: Swagger-Codegen/10.0.1/python
+    method: GET
+    uri: https://ghost/apis/rbac.authorization.k8s.io/v1/rolebindings
+  response:
+    body:
+      string: '{"kind": "RoleBindingList", "apiVersion": "rbac.authorization.k8s.io/v1",
+        "items": [{"metadata": {"name": "wildcard-binding", "namespace": "kube-system"},
+        "roleRef": {"apiGroup": "rbac.authorization.k8s.io", "kind": "Role", "name":
+        "wildcard-role"}, "subjects": [{"kind": "ServiceAccount", "name": "test-sa",
+        "namespace": "kube-system"}]}, {"metadata": {"name": "scoped-binding", "namespace":
+        "kube-system"}, "roleRef": {"apiGroup": "rbac.authorization.k8s.io", "kind":
+        "Role", "name": "scoped-role"}, "subjects": [{"kind": "ServiceAccount", "name":
+        "test-sa", "namespace": "kube-system"}]}, {"metadata": {"name": "webhook-binding",
+        "namespace": "cert-manager"}, "roleRef": {"apiGroup": "rbac.authorization.k8s.io",
+        "kind": "Role", "name": "webhook-role"}, "subjects": [{"kind": "ServiceAccount",
+        "name": "test-sa", "namespace": "cert-manager"}]}]}
+
+
+        '
+    headers: &id002
+      Cache-Control: no-cache, private
+      Content-Type: application/json
+      Date: Tue, 25 Oct 2022 13:31:34 GMT
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: *id001
+    method: GET
+    uri: https://ghost/apis/rbac.authorization.k8s.io/v1/clusterroles
+  response:
+    body:
+      string: '{"kind": "ClusterRoleList", "apiVersion": "rbac.authorization.k8s.io/v1",
+        "items": []}
+
+
+        '
+    headers: *id002
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: *id001
+    method: GET
+    uri: https://ghost/apis/rbac.authorization.k8s.io/v1/roles
+  response:
+    body:
+      string: '{"kind": "RoleList", "apiVersion": "rbac.authorization.k8s.io/v1",
+        "items": [{"metadata": {"name": "wildcard-role", "namespace": "kube-system"},
+        "rules": [{"verbs": ["*"], "apiGroups": ["*"], "resources": ["*"]}]}, {"metadata":
+        {"name": "scoped-role", "namespace": "kube-system"}, "rules": [{"verbs": ["get"],
+        "apiGroups": [""], "resources": ["configmaps"]}]}, {"metadata": {"name": "webhook-role",
+        "namespace": "cert-manager"}, "rules": [{"verbs": ["get"], "apiGroups": [""],
+        "resources": ["secrets"]}]}]}
+
+
+        '
+    headers: *id002
+    status:
+      code: 200
+      message: OK
+version: 1

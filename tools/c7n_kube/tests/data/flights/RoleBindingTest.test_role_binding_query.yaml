@@ -1,0 +1,36 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/10.0.1/python
+    method: GET
+    uri: https://ghost/apis/rbac.authorization.k8s.io/v1/rolebindings
+  response:
+    body:
+      string: '{"kind":"RoleBindingList","apiVersion":"rbac.authorization.k8s.io/v1","metadata":{"resourceVersion":"1156147"},"items":[{"metadata":{"name":"cert-manager-cainjector:leaderelection","namespace":"kube-system","uid":"9f0a3b5e-4a7d-4e1e-c26b-4d5e6f708192","resourceVersion":"15746","creationTimestamp":"2022-10-10T18:46:55Z","labels":{"app":"cainjector","app.kubernetes.io/component":"cainjector","app.kubernetes.io/instance":"cert-manager","app.kubernetes.io/name":"cainjector"}},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"cert-manager-cainjector:leaderelection"},"subjects":[{"kind":"ServiceAccount","name":"cert-manager-cainjector","namespace":"cert-manager"}]},{"metadata":{"name":"system::leader-locking-kube-controller-manager","namespace":"kube-system","uid":"a0b1c4d6-5b8e-4f2f-d37c-5e6f708192a3","resourceVersion":"184","creationTimestamp":"2022-10-10T15:02:29Z","labels":{"kubernetes.io/bootstrapping":"rbac-defaults"},"annotations":{"rbac.authorization.kubernetes.io/autoupdate":"true"}},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"system::leader-locking-kube-controller-manager"},"subjects":[{"kind":"User","apiGroup":"rbac.authorization.k8s.io","name":"system:kube-controller-manager"}]},{"metadata":{"name":"cert-manager-webhook:dynamic-serving","namespace":"cert-manager","uid":"b1c2d5e7-6c9f-403f-e48d-6f708192a3b4","resourceVersion":"15747","creationTimestamp":"2022-10-10T18:46:55Z","labels":{"app":"webhook","app.kubernetes.io/component":"webhook","app.kubernetes.io/instance":"cert-manager","app.kubernetes.io/name":"webhook"}},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"cert-manager-webhook:dynamic-serving"},"subjects":[{"kind":"ServiceAccount","name":"cert-manager-webhook","namespace":"cert-manager"}]}]}
+
+        '
+    headers:
+      Audit-Id:
+      - c2d3e4f5-6789-4a1b-92cd-bcdef1234567
+      Cache-Control:
+      - no-cache, private
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 25 Oct 2022 13:31:34 GMT
+      Transfer-Encoding:
+      - chunked
+      X-Kubernetes-Pf-Flowschema-Uid:
+      - 6934332f-22cd-43ef-a389-9620e5d58cb6
+      X-Kubernetes-Pf-Prioritylevel-Uid:
+      - 2ff72234-6653-4ad6-9a50-8b48c49c6a7e
+    status:
+      code: 200
+      message: OK
+version: 1
