@@ -12,3 +12,4 @@ Topics for advanced usage of the Azure provider
   azurepolicy
   blobstorage
   contribute
+  setup-notify-prereqs
