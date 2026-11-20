@@ -1,0 +1,67 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueryExecution": {
+            "QueryExecutionId": "a7a48fea-a9c7-4bb3-becf-192f5e5fb17b",
+            "Query": "SELECT * FROM \"aws_pricing\".\"amazonec2\" limit 10",
+            "StatementType": "DML",
+            "ResultConfiguration": {
+                "OutputLocation": "s3://athenaqueryresults/Unsaved/2025/09/03/a7a48fea-a9c7-4bb3-becf-192f5e5fb17b.csv",
+                "AclConfiguration": {
+                    "S3AclOption": "BUCKET_OWNER_FULL_CONTROL"
+                }
+            },
+            "ResultReuseConfiguration": {
+                "ResultReuseByAgeConfiguration": {
+                    "Enabled": false
+                }
+            },
+            "QueryExecutionContext": {
+                "Database": "aws_pricing",
+                "Catalog": "awsdatacatalog"
+            },
+            "Status": {
+                "State": "SUCCEEDED",
+                "SubmissionDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 3,
+                    "hour": 13,
+                    "minute": 57,
+                    "second": 10,
+                    "microsecond": 952000
+                },
+                "CompletionDateTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 9,
+                    "day": 3,
+                    "hour": 13,
+                    "minute": 57,
+                    "second": 12,
+                    "microsecond": 390000
+                }
+            },
+            "Statistics": {
+                "EngineExecutionTimeInMillis": 1174,
+                "DataScannedInBytes": 0,
+                "TotalExecutionTimeInMillis": 1438,
+                "QueryQueueTimeInMillis": 161,
+                "ServicePreProcessingTimeInMillis": 74,
+                "QueryPlanningTimeInMillis": 820,
+                "ServiceProcessingTimeInMillis": 29,
+                "ResultReuseInformation": {
+                    "ReusedPreviousResult": false
+                }
+            },
+            "WorkGroup": "primary",
+            "EngineVersion": {
+                "SelectedEngineVersion": "AUTO",
+                "EffectiveEngineVersion": "Athena engine version 3"
+            },
+            "SubstatementType": "SELECT"
+        },
+        "ResponseMetadata": {}
+    }
+}
