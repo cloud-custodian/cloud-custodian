@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "resourceGroupName": "test_subscription-diagnostic-storage",
+    "storageAccountName": "[concat('cctestsubdiag', substring(uniqueString(subscription().id), 0, 8))]",
+    "diagnosticSettingName": "cctest-subscription-diagnostic-storage"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[variables('resourceGroupName')]",
+      "location": "southcentralus"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "cctest-subscription-diagnostic-storage-account",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('resourceGroupName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-01-01",
+              "name": "[variables('storageAccountName')]",
+              "location": "southcentralus",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": false,
+                "supportsHttpsTrafficOnly": true
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[variables('diagnosticSettingName')]",
+      "dependsOn": [
+        "[resourceId(subscription().subscriptionId, variables('resourceGroupName'), 'Microsoft.Resources/deployments', 'cctest-subscription-diagnostic-storage-account')]"
+      ],
+      "properties": {
+        "storageAccountId": "[resourceId(subscription().subscriptionId, variables('resourceGroupName'), 'Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+        "logs": [
+          {
+            "category": "Administrative",
+            "enabled": true
+          }
+        ]
+      }
+    }
+  ]
+}
