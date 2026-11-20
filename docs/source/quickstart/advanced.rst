@@ -213,25 +213,36 @@ literal, so ``{now:retain-30d_%Y%m%d}`` keeps the ``retain-30d_`` and a
 strftime width such as ``%-3d`` is left to strftime.
 
 With no strftime of its own, ``{now}`` renders in whatever format the resource
-declares, and otherwise as a plain datetime. Google Cloud resources ask for
-RFC 3339, since that is what its APIs accept in a ``query`` filter.
+declares, and otherwise as a plain datetime. Google Cloud resources declare RFC
+3339, ``2026-08-22T14:31:07Z``, because that is the shape its APIs return
+timestamps in.
+
+That matters when a date is compared as a string. The timestamps Google returns
+sort correctly against each other, but a plain datetime does not sort against
+them: ``2026-08-22 14:31:07`` is lower than every time on the same day, because
+a space sorts below the ``T``. So the comparison below quietly matches jobs that
+are older than the cutoff unless ``{now}`` comes out in the same shape as the
+field it is compared to.
 
 .. code-block:: yaml
 
   policies:
 
-    - name: recently-created-projects
-      resource: gcp.project
-      # the offset keeps the time of day, so this renders as something like
-      # createTime>"2026-08-20T14:31:07Z"
-      query:
-        - filter: 'createTime>"{now:-90d}"'
+    - name: custom-jobs-from-the-last-90-days
+      resource: gcp.vertex-ai-custom-job
+      filters:
+        - type: value
+          key: createTime
+          op: greater-than
+          # renders as 2026-08-22T14:31:07Z, the same shape as createTime
+          value: "{now:-90d}"
 
 .. note::
 
-   ``{now}`` is not expanded during serverless execution, so an offset in a
-   policy deployed as a function reaches the provider API unresolved. Use it in
-   pull mode policies.
+   ``{now}`` is not expanded during serverless execution. The tag and notify
+   actions resolve it themselves when they run, so a tag value still gets the
+   time of the run. Anywhere else, such as the filter above, it reaches the
+   policy unresolved, so use it in pull mode policies.
 
 .. _policy_resource_limits:
 

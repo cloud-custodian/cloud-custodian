@@ -490,6 +490,10 @@ class UtilTest(BaseTest):
             ("-1d+2h%Y-%m-%dT%H", "2018-02-01T14", "2018-02-01T14"),
             ("%Y-7d", "2018-7d", "2018-7d"),
             ("retain-30d_%Y%m%d", "retain-30d_20180202", "retain-30d_20180202"),
+            # a leading offset is taken off the front, so an increment shaped
+            # literal after it survives instead of being stripped too
+            ("-1d_retain-30d_%Y", "_retain-30d_2018", "_retain-30d_2018"),
+            ("-1d%Y-2d", "2018-2d", "2018-2d"),
         ]
         for spec, without_default, with_default in cases:
             with self.subTest(spec=spec):
@@ -512,6 +516,37 @@ class UtilTest(BaseTest):
         self.assertEqual(
             "{:%Y-7d}".format(utils.FormatDate(d, "%Y-%m-%dT%H:%M:%SZ")),
             "2018-7d")
+
+    def test_format_date_malformed_offset_is_literal(self):
+        # an offset is a sign, digits and one of M/d/h. anything else isn't an
+        # offset at all, so it stays in the spec as strftime text and the
+        # configured default never applies. this is the shape of a typo, and
+        # it fails quietly, so pin it.
+        d = parse_date("2018-02-02 12:00")
+        iso = "%Y-%m-%dT%H:%M:%SZ"
+        for spec, rendered in (
+                ("-7", "-7"),            # no unit
+                ("-7y", "-7y"),          # unit that doesn't exist
+                ("+7D", "+7D"),          # right unit, wrong case
+                ("-0.5d", "-0.5d"),      # fractions aren't accepted
+                ("7d", "7d"),            # no sign
+                ("--7d", "--7d"),
+                (" -7d", " -7d"),        # a leading space stops the match
+                ("-7d ", " "),           # a trailing one leaves the spec non empty
+        ):
+            with self.subTest(spec=spec):
+                self.assertEqual(
+                    f"{{:{spec}}}".format(utils.FormatDate(d)), rendered)
+                self.assertEqual(
+                    f"{{:{spec}}}".format(utils.FormatDate(d, iso)), rendered)
+
+    def test_format_date_str_matches_format(self):
+        # varfmt hands back the object rather than a string when a value is
+        # exactly "{now}", so str() has to render the same way format() does
+        d = parse_date("2018-02-02 12:00")
+        self.assertEqual(str(utils.FormatDate(d)), "2018-02-02 12:00:00")
+        self.assertEqual(
+            str(utils.FormatDate(d, "%Y-%m-%dT%H:%M:%SZ")), "2018-02-02T12:00:00Z")
 
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]

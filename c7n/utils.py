@@ -664,14 +664,12 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), formatter=Non
     if isinstance(obj, dict):
         new = {}
         for key in obj.keys():
-            new[key] = format_string_values(
-                obj[key], err_fallback, formatter, *args, **kwargs)
+            new[key] = format_string_values(obj[key], formatter=formatter, *args, **kwargs)
         return new
     elif isinstance(obj, list):
         new = []
         for item in obj:
-            new.append(format_string_values(
-                item, err_fallback, formatter, *args, **kwargs))
+            new.append(format_string_values(item, formatter=formatter, *args, **kwargs))
         return new
     elif isinstance(obj, str):
         try:
@@ -779,7 +777,10 @@ class FormatDate:
         self._default_format = default_format
 
     def __str__(self):
-        return str(self._d)
+        # varfmt hands back this object, not a string, when a value is exactly
+        # "{now}". str() has to agree with format() or that one spelling comes
+        # out in a different shape from every other.
+        return format(self)
 
     @property
     def datetime(self):

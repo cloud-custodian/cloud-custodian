@@ -198,34 +198,49 @@ class GcpMetricsFilterTest(BaseTest):
         self.assertFalse("metrics" in SpannerDatabaseInstance.filter_registry)
 
 
-def test_query_date_uses_the_provider_format(test):
-    # google apis take iso-8601 and reject the space separated form, so a date
-    # in a query filter has to render as a timestamp they will accept.
+def test_date_renders_in_the_shape_the_api_returns(test):
+    # google apis return rfc 3339, and a value filter compares those as plain
+    # strings. a space separated datetime sorts below every time on the same
+    # day, because a space sorts below the "T", so without the provider format
+    # this silently matches records older than the cutoff.
     policy = test.load_policy({
-        'name': 'recent-projects',
-        'resource': 'gcp.project',
-        'query': [{'filter': 'createTime>"{now:-7d}"'}]})
+        'name': 'recent-custom-jobs',
+        'resource': 'gcp.vertex-ai-custom-job',
+        'filters': [{'type': 'value', 'key': 'createTime',
+                     'op': 'greater-than', 'value': '{now:-90d}'}]})
     # bracket the expansion, so a run crossing utc midnight isn't a failure
     before = datetime.utcnow()
     policy.expand_variables(policy.get_variables())
     after = datetime.utcnow()
 
-    sent = policy.resource_manager.get_resource_query()['filter']
-    days = {(t - timedelta(days=7)).strftime('%Y-%m-%d') for t in (before, after)}
-    assert any(sent.startswith(f'createTime>"{d}T') for d in days), sent
-    assert sent.endswith('Z"'), sent
+    cutoff = policy.data['filters'][0]['value']
+    # strptime pins the whole shape, not just the ends, so a format that drops
+    # the Z or the colons or fixes the time at midnight fails here
+    rendered = datetime.strptime(cutoff, '%Y-%m-%dT%H:%M:%SZ')
+    # bracket on real timestamps, so a run crossing utc midnight isn't a
+    # failure. strftime truncates the microseconds rather than rounding.
+    assert (before.replace(microsecond=0) - timedelta(days=90)
+            <= rendered
+            <= after.replace(microsecond=0) - timedelta(days=90)), cutoff
+
+    # midnight on the cutoff day is at or before the cutoff either way, so an
+    # older job must not match. it does when the cutoff carries a space.
+    older = {'createTime': f'{cutoff[:10]}T00:00:00Z'}
+    value_filter = policy.resource_manager.filters[0]
+    value_filter.annotate = False
+    assert not value_filter(older), (cutoff, older)
 
 
-def test_query_date_explicit_format_wins(test):
+def test_date_explicit_format_wins(test):
     # a policy that wants something else still gets it
     policy = test.load_policy({
-        'name': 'recent-projects',
-        'resource': 'gcp.project',
-        'query': [{'filter': 'createTime>"{now:-7d%Y-%m-%d}"'}]})
+        'name': 'recent-custom-jobs',
+        'resource': 'gcp.vertex-ai-custom-job',
+        'filters': [{'type': 'value', 'key': 'createTime',
+                     'op': 'greater-than', 'value': '{now:-90d%Y-%m-%d}'}]})
     before = datetime.utcnow()
     policy.expand_variables(policy.get_variables())
     after = datetime.utcnow()
 
-    days = {(t - timedelta(days=7)).strftime('%Y-%m-%d') for t in (before, after)}
-    sent = policy.resource_manager.get_resource_query()['filter']
-    assert sent in {f'createTime>"{d}"' for d in days}, sent
+    days = {(t - timedelta(days=90)).strftime('%Y-%m-%d') for t in (before, after)}
+    assert policy.data['filters'][0]['value'] in days
