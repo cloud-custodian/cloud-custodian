@@ -20,6 +20,16 @@ log = logging.getLogger('custodian.resolver')
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 
+def headers_digest(headers):
+    """Hash request headers so credentials never reach the on-disk cache key."""
+    # header names are case insensitive, canonicalize before hashing
+    canonical = json.dumps(
+        sorted((k.lower(), v) for k, v in headers.items()),
+        separators=(',', ':'),
+    )
+    return hashlib.sha256(canonical.encode('utf8')).hexdigest()
+
+
 class URIResolver:
     # Class-level registry for URI scheme providers
     _uri_providers = {}
@@ -49,13 +59,7 @@ class URIResolver:
         """
         if not headers:
             return ("uri-resolver", uri)
-        # header names are case insensitive, canonicalize before hashing
-        canonical = json.dumps(
-            sorted((k.lower(), v) for k, v in headers.items()),
-            separators=(',', ':'),
-        )
-        digest = hashlib.sha256(canonical.encode('utf8')).hexdigest()
-        return ("uri-resolver", uri, digest)
+        return ("uri-resolver", uri, headers_digest(headers))
 
     def resolve(self, uri, headers):
         cache_key = self.get_cache_key(uri, headers)
@@ -230,6 +234,8 @@ class ValuesFrom:
 
     def get_values(self):
         cache_key = [self.data.get(i) for i in ('url', 'format', 'expr', 'headers', 'query')]
+        if self.data.get('headers'):
+            cache_key[3] = headers_digest(self.data['headers'])
         with self.cache:
             # use these values as a key to cache the result so if we have
             # the same filter happening across many resources, we can reuse
