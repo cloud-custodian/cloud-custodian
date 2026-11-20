@@ -289,6 +289,12 @@ def validate(options):
         sys.exit(1)
 
 
+def is_lambda_grouped(policy):
+    return (policy.provider_name == 'aws' and
+            policy.execution_mode == 'cloudtrail' and
+            bool(policy.data['mode'].get('group')))
+
+
 @policy_command
 def run(options, policies: List[Policy]) -> None:
     exit_code = 0
@@ -306,6 +312,15 @@ def run(options, policies: List[Policy]) -> None:
             sys.exit(1)
 
     errored_policies: List[str] = []
+    grouped = [p for p in policies if is_lambda_grouped(p)]
+    if grouped and not options.dryrun:
+        from c7n.mu import PolicyLambdaGroupManager
+        errored_policies.extend(
+            PolicyLambdaGroupManager([p for p in grouped if p.is_runnable()]).publish())
+        if errored_policies:
+            exit_code = 2
+        policies = [p for p in policies if not is_lambda_grouped(p)]
+
     for policy in policies:
         try:
             policy()
