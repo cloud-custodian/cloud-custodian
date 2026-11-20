@@ -16,7 +16,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.policystatement import HasStatementFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
-from c7n.resources.aws import shape_schema
+from c7n.resources.aws import get_service_shape, shape_schema
 from c7n import query, utils
 from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search, get_partition
 
@@ -1156,34 +1156,30 @@ class DomainNameRemediateTls(BaseAction):
                 securityPolicy: SecurityPolicy_TLS13_1_2_PFS_PQ_2025_09
     """
 
-    LEGACY_POLICIES = ('TLS_1_0', 'TLS_1_2')
-    EDGE_POLICIES = (
-        'SecurityPolicy_TLS13_2025_EDGE',
-        'SecurityPolicy_TLS12_PFS_2025_EDGE',
-        'SecurityPolicy_TLS12_2018_EDGE')
-    REGIONAL_POLICIES = (
-        'SecurityPolicy_TLS13_1_3_2025_09',
-        'SecurityPolicy_TLS13_1_3_FIPS_2025_09',
-        'SecurityPolicy_TLS13_1_2_PFS_PQ_2025_09',
-        'SecurityPolicy_TLS13_1_2_FIPS_PQ_2025_09',
-        'SecurityPolicy_TLS13_1_2_FIPS_PFS_PQ_2025_09',
-        'SecurityPolicy_TLS13_1_2_Ext2_PQ_2025_09',
-        'SecurityPolicy_TLS13_1_2_Ext2_FIPS_PQ_2025_09',
-        'SecurityPolicy_TLS13_1_2_PQ_2025_09',
-        'SecurityPolicy_TLS13_1_2_2021_06')
-
     schema = type_schema(
         'update-security',
-        securityPolicy={'type': 'string', 'enum': list(
-            LEGACY_POLICIES + REGIONAL_POLICIES + EDGE_POLICIES)},
-        endpointAccessMode={'enum': ['BASIC', 'STRICT']},
+        securityPolicy={'type': 'string',
+                        'enum': get_service_shape('apigateway', 'SecurityPolicy').enum},
+        endpointAccessMode={'type': 'string',
+                            'enum': get_service_shape('apigateway', 'EndpointAccessMode').enum},
         required=['securityPolicy'])
 
     permissions = ('apigateway:PATCH',)
 
+    # The service model does not group security policies, so classify by name:
+    # legacy policies lack the SecurityPolicy_ prefix, EDGE policies end in
+    # _EDGE and every other enhanced policy is REGIONAL.
+    @staticmethod
+    def is_legacy_policy(policy):
+        return not policy.startswith('SecurityPolicy_')
+
+    @staticmethod
+    def is_edge_policy(policy):
+        return policy.endswith('_EDGE')
+
     def validate(self):
         if (self.data.get('endpointAccessMode') and
-                self.data['securityPolicy'] in self.LEGACY_POLICIES):
+                self.is_legacy_policy(self.data['securityPolicy'])):
             raise PolicyValidationError(
                 'update-security: endpointAccessMode requires an enhanced '
                 'securityPolicy, not %s' % self.data['securityPolicy'])
@@ -1193,19 +1189,19 @@ class DomainNameRemediateTls(BaseAction):
         types = (r.get('endpointConfiguration') or {}).get('types') or []
         if len(types) > 1:
             return 'multiple endpoint types %s' % ','.join(types)
-        if policy in self.LEGACY_POLICIES:
+        if self.is_legacy_policy(policy):
             return None
         if r.get('mutualTlsAuthentication'):
             return 'mutual TLS is enabled'
-        if types == ['EDGE'] and policy not in self.EDGE_POLICIES:
+        if types == ['EDGE'] and not self.is_edge_policy(policy):
             return '%s is not valid for an EDGE domain' % policy
-        if types and types != ['EDGE'] and policy in self.EDGE_POLICIES:
+        if types and types != ['EDGE'] and self.is_edge_policy(policy):
             return '%s is not valid for a %s domain' % (policy, types[0])
         return None
 
     def get_patch_operations(self, r, policy):
         ops = [{'op': 'replace', 'path': '/securityPolicy', 'value': policy}]
-        if policy in self.LEGACY_POLICIES:
+        if self.is_legacy_policy(policy):
             return ops
         mode = self.data.get('endpointAccessMode') or 'BASIC'
         if r.get('endpointAccessMode') == 'STRICT':

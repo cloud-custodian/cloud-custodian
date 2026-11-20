@@ -1262,16 +1262,6 @@ class TestCustomDomainName(BaseTest):
         self.assertEqual(len(client.calls), 3)
 
     def test_action_update_security_schema(self):
-        import botocore.session
-        from c7n.resources.apigw import DomainNameRemediateTls
-
-        model = botocore.session.get_session().get_service_model("apigateway")
-        self.assertEqual(
-            set(DomainNameRemediateTls.schema["properties"]["securityPolicy"]["enum"]),
-            set(model.shape_for("SecurityPolicy").enum))
-        self.assertEqual(
-            set(DomainNameRemediateTls.schema["properties"]["endpointAccessMode"]["enum"]),
-            set(model.shape_for("EndpointAccessMode").enum))
         # endpointAccessMode is rejected with a legacy policy rather than ignored
         with self.assertRaises(PolicyValidationError):
             self.load_policy({
