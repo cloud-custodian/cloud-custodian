@@ -341,6 +341,88 @@ class AutoPatch(BaseAction):
                 **params)
 
 
+@filters.register('has-pending-maintenance')
+class HasPendingMaintenance(Filter):
+    """ Scan DB instances for those with pending maintenance
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-pending-maintenance
+                resource: rds
+                filters:
+                  - has-pending-maintenance
+    """
+
+    schema = type_schema('has-pending-maintenance')
+    permissions = ('rds:DescribePendingMaintenanceActions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        results = []
+        for r in resources:
+            response = client.describe_pending_maintenance_actions(
+                ResourceIdentifier=r['DBInstanceArn'])
+            if len(response.get('PendingMaintenanceActions', [])) > 0:
+                results.append(r)
+
+        return results
+
+
+@actions.register('apply-pending-maintenance')
+class RDSApplyMaintenance(BaseAction):
+    """
+    This action allows for applying pending maintenance to an RDS instance.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-apply-pending-maintenance
+                resource: rds
+                actions:
+                  - type: apply-pending-maintenance
+                    apply-action: db-upgrade
+                    opt-in-type: next-maintenance
+    """
+
+    schema = type_schema('apply-pending-maintenance', **{
+        'apply-action': {
+            'type': 'string',
+            'enum': ['system-update', 'db-upgrade'],
+            'required': True,
+        },
+        'opt-in-type': {
+            'type': 'string',
+            'enum': ['immediate', 'next-maintenance', 'undo-opt-in'],
+            'required': True,
+        },
+    })
+    permissions = ('rds:ApplyPendingMaintenanceAction',)
+
+    def apply_maintenance(self, r):
+        client = local_session(self.manager.session_factory).client('rds')
+        client.apply_pending_maintenance_action(
+            ResourceIdentifier=r['DBInstanceArn'],
+            ApplyAction=self.data['apply-action'],
+            OptInType=self.data['opt-in-type']
+        )
+
+    def process(self, rds):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.apply_maintenance, r): r for r in rds}
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception applying maintenance on %s  \n %s",
+                        futures[f]['DBInstanceIdentifier'], f.exception())
+        return rds
+
+
 @filters.register('upgrade-available')
 class UpgradeAvailable(Filter):
     """ Scan DB instances for available engine upgrades
