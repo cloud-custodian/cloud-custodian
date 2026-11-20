@@ -3014,10 +3014,9 @@ def test_vertexai_metadata_store_artifact_filtering(test, vertexai_metadata_stor
     assert resources[0]['displayName'] == 'c7n-test-artifact-unlabeled'
 
 # The query block reaches the API as request parameters, and flight data
-# cannot see that. recorder.py keys its fixture on urlparse(uri).path and
-# stores only the response, keyed on method, host and path, so a replay
-# test passes whether or not a
-# parameter is sent. These tests capture the call instead.
+# cannot see that. recorder.py keys a fixture on method, host and path, with
+# the query string dropped, and stores only the response, so a replay test
+# passes whether or not a parameter was sent. These capture the call instead.
 
 
 class _StubClient:
@@ -3183,18 +3182,6 @@ def test_vertexai_query_cache_key_varies(test):
             != cache_key(only_filter, regions=['us-east1']))
 
 
-def test_vertexai_query_rejects_unknown_key(test):
-    """A misspelled key must fail at load time. Accepting it silently
-    widened the policy from one region to every region.
-    """
-    with pytest.raises(PolicyValidationError) as caught:
-        test.load_policy(
-            {'name': 'vertexai-custom-job-typo',
-             'resource': 'gcp.vertex-ai-custom-job',
-             'query': [{'locations': 'us-central1'}]})
-    assert "got ['locations']" in str(caught.value)
-
-
 @pytest.mark.parametrize('query,expected', [
     ([{'filter': None}], 'non-empty string'),
     ([{'filter': ''}], 'non-empty string'),
@@ -3207,12 +3194,7 @@ def test_vertexai_query_rejects_unknown_key(test):
     ([{'location': ['us-central1']}], 'non-empty string'),
 ])
 def test_vertexai_query_rejects_bad_value(test, query, expected):
-    """A key the API accepts is not enough, the value has to survive too.
-
-    An unset or empty filter is the dangerous one. googleapiclient drops a
-    None parameter and the API reads an empty string as no filter, so the
-    policy quietly enumerates everything it was meant to narrow.
-    """
+    """See _validate_query_value, an empty filter is the dangerous one."""
     with pytest.raises(PolicyValidationError) as caught:
         test.load_policy(
             {'name': 'vertexai-custom-job-bad-value',
@@ -3240,12 +3222,14 @@ def test_vertexai_query_accepts_good_values(test):
     ('pageToken', 'abc'),
     ('orderBy', 'create_time desc'),
     ('gdcZone', 'us-central1-a'),
+    ('locations', 'us-central1'),   # the typo that silently widened to all
 ])
-def test_vertexai_query_rejects_unexposed_params(test, param, value):
-    """The list method takes every one of these and a policy still may not.
+def test_vertexai_query_rejects_keys_outside_the_allowlist(test, param, value):
+    """The list method takes most of these and a policy still may not.
 
-    parent and pageToken belong to c7n, and the rest cannot narrow a result
-    set or would drop fields the actions need.
+    parent and pageToken belong to c7n, the rest cannot narrow a result set
+    or would drop fields the actions need, and a near miss like locations
+    used to widen one region into every region.
     """
     with pytest.raises(PolicyValidationError) as caught:
         test.load_policy(
@@ -3255,15 +3239,20 @@ def test_vertexai_query_rejects_unexposed_params(test, param, value):
     assert f"got ['{param}']" in str(caught.value)
 
 
-def test_vertexai_query_now_allowed_in_pull_mode(test):
-    """Pull mode expands {now} before the list call, so it is fine here."""
-    policy = test.load_policy(
-        {'name': 'vertexai-custom-job-now-pull',
-         'resource': 'gcp.vertex-ai-custom-job',
-         'query': [{'filter': 'create_time>"{now:-7d}"'}]})
-    policy.expand_variables(policy.get_variables())
+@pytest.mark.parametrize('query', ['us-central1', ['us-central1'], [None]])
+def test_vertexai_query_rejects_non_object_entries(test, query):
+    """set() over a string names every character, so guard the shape first.
 
-    assert '{now' not in policy.resource_manager.get_resource_query()['filter']
+    The core schema catches this before validate under the cli, but a policy
+    built in process does not go through it.
+    """
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-custom-job-bad-shape',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'query': query},
+            validate=False)
+    assert 'objects' in str(caught.value)
 
 
 def test_vertexai_query_rejects_mixed_location_entry(test):
