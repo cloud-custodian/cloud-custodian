@@ -226,7 +226,7 @@ class SecurityHub(LambdaMode):
         result_sets = {}
         for (account_id, region), rarns in resource_sets.items():
             self.assume_member({'account': account_id, 'region': region})
-            resources = self.resolve_resources(event)
+            resources = self.resolve_resources(rarns)
             rset = result_sets.setdefault((account_id, region), [])
             if resources:
                 rset.extend(self.run_resource_set(event, resources))
@@ -235,32 +235,29 @@ class SecurityHub(LambdaMode):
     def get_resource_sets(self, event):
         # return a mapping of (account_id, region): [resource_arns]
         # per the finding in the event.
-        resource_arns = self.get_resource_arns(event)
+
         # Group resources by account_id, region for role assumes
         resource_sets = {}
-        for rarn in resource_arns:
-            resource_sets.setdefault((rarn.account_id, rarn.region), []).append(rarn)
+
+        # Loop over findings and set resource set accordingly
+        # Lazy import to avoid aws sdk runtime dep in core
+        from c7n.resources.aws import Arn
+        for finding in event['detail']['findings']:
+            resource_sets.setdefault((finding['AwsAccountId'], finding['Resources'][0]['Region']),
+                                     []).append(Arn.parse(finding['Resources'][0]['Id']))
+
         # Warn if not configured for member-role and have multiple accounts resources.
         if (not self.policy.data['mode'].get('member-role') and
                 {self.policy.options.account_id} != {
-                    rarn.account_id for rarn in resource_arns}):
+                    account_id for (account_id, region), rarns in resource_sets.items()}):
             msg = ('hub-mode not configured for multi-account member-role '
                    'but multiple resource accounts found')
             self.policy.log.warning(msg)
             raise PolicyExecutionError(msg)
         return resource_sets
 
-    def get_resource_arns(self, event):
-        event_type = event['detail-type']
-        arn_resolver = getattr(self, self.handlers[event_type])
-        arns = arn_resolver(event)
-        # Lazy import to avoid aws sdk runtime dep in core
-        from c7n.resources.aws import Arn
-        return {Arn.parse(r) for r in arns}
-
-    def resolve_resources(self, event):
+    def resolve_resources(self, resource_map):
         # For centralized setups in a hub aggregator account
-        resource_map = self.get_resource_arns(event)
 
         # sanity check on finding resources matching policy resource
         # type's service.
