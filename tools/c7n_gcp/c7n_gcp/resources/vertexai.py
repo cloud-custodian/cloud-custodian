@@ -11,7 +11,7 @@ from googleapiclient.errors import HttpError
 import yaml
 
 from c7n.exceptions import PolicyValidationError
-from c7n.policy import PullMode
+from c7n.policy import PullMode, ServerlessExecutionMode
 from c7n.utils import local_session, jmespath_search, type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
@@ -33,17 +33,6 @@ def vertexai_regions():
     """
     with open(VERTEXAI_REGION_DATA_PATH) as fh:
         return tuple(json.load(fh))
-
-
-# Parameters the Vertex AI list methods accept that a policy still may not
-# set. The reason travels with the key so a rejection explains itself, rather
-# than reading as c7n lagging the API.
-QUERY_PARAMS_WITHHELD = {
-    'parent': 'c7n builds it from the location',
-    'pageToken': 'c7n pages',
-    'readMask': 'it can omit name, which the actions and the urn read',
-    'pageSize': 'every page is drained, so it cannot narrow a result set',
-}
 
 
 # Job states a job can be cancelled from: the non-terminal JobState values.
@@ -109,12 +98,6 @@ class VertexAIQueryManager(QueryResourceManager):
         params = []
         for child in self.data.get('query', ()):
             unknown = set(child) - allowed
-            withheld = sorted(unknown & QUERY_PARAMS_WITHHELD.keys())
-            if withheld:
-                raise PolicyValidationError(
-                    f"{self.type} query withholds " + ', '.join(
-                        f"{key} ({QUERY_PARAMS_WITHHELD[key]})"
-                        for key in withheld))
             if unknown:
                 raise PolicyValidationError(
                     f"{self.type} query supports {sorted(allowed)}, "
@@ -161,6 +144,18 @@ class VertexAIQueryManager(QueryResourceManager):
             raise PolicyValidationError(
                 f"{self.type} query location {value!r} is not a Vertex AI "
                 f"region")
+
+        # A serverless mode defers {now} (c7n/policy.py), and nothing
+        # expands it again inside the deployed function, so the filter would
+        # reach the API with the braces still in it. gcp-periodic is both a
+        # PullMode and a ServerlessExecutionMode, so it passes the mode check
+        # above and still lands here.
+        if '{now' in value and isinstance(
+                self.ctx.policy.get_execution_mode(), ServerlessExecutionMode):
+            raise PolicyValidationError(
+                f"{self.type} query {key} uses {{now}}, which "
+                f"{self.data['mode']['type']} defers and never expands, so it "
+                f"would reach the API unexpanded")
 
     def get_resource_query(self):
         """location entries pick regions, every other key is a list parameter."""
@@ -285,12 +280,12 @@ class VertexAITypeInfo(TypeInfo):
     scope = 'project'
     scope_key = 'parent'
     # Request parameters a policy may set through `query:`. A deliberate
-    # subset of what the list methods accept, not a transcription of them,
-    # because nothing in c7n takes a prefix of a result set: every page is
-    # drained and max-resources aborts rather than truncates, so a parameter
-    # earns a place here only by narrowing what the API returns. See
-    # QUERY_PARAMS_WITHHELD for the ones held back and why. A subclass
-    # overrides this only if its own list method has no filter.
+    # subset of what the list methods accept, not a transcription of them.
+    # parent and pageToken belong to c7n. pageSize and orderBy cannot narrow a
+    # result set, because every page is drained and max-resources aborts
+    # rather than truncates. readMask can omit name, which the actions and the
+    # urn both read. A subclass overrides this only if its own list method has
+    # no filter.
     query_params = ('filter',)
     scope_template = None  # Handled dynamically per location
     name = id = 'name'

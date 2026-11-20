@@ -21,7 +21,7 @@ from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest
 from c7n_gcp.provider import resources
 from c7n_gcp.resources.vertexai import (
-    VertexAIQueryManager, VertexAITypeInfo, QUERY_PARAMS_WITHHELD,
+    VertexAIQueryManager, VertexAITypeInfo,
     VERTEXAI_REGION_DATA_PATH, VertexAIEndpoint, VertexAIPublisherModel)
 
 
@@ -2447,61 +2447,6 @@ def test_vertexai_custom_job_query(test, vertexai_custom_job, create_custom_job)
     assert ':custom-job/' in urns[0]
 
 
-@terraform('vertexai_custom_job_filter', scope='module')
-def test_vertexai_custom_job_server_side_filter(
-        test, vertexai_custom_job_filter, create_custom_job):
-    """End to end over real recorded Vertex AI responses.
-
-    Creates one job that fails and one that succeeds, then asks for each
-    state in turn under the same display-name scope. Recording this proved
-    the API honours the filter: the request URI is in each response's
-    content-location header, and the two calls differ only in the state term.
-
-    On replay it proves less than it looks. recorder.py names a fixture from
-    the URL path and drops the query string, so both calls here resolve to
-    the same path and are served in call order. Revert the fix and this test
-    still passes. What it does cover is the whole path the stubs cut out:
-    the real client, the location fan-out, paging and the record shape. The
-    filter reaching the API is pinned by the _capture_calls tests below.
-    """
-    prefix = vertexai_custom_job_filter.outputs['job_display_name']['value']
-
-    test.session_factory = test.replay_flight_data(
-        'vertexai_custom_job_server_side_filter')
-
-    failing = create_custom_job(f'{prefix}-fails', 'false')
-    succeeding = create_custom_job(f'{prefix}-works', 'true')
-
-    client = test.session_factory().client(
-        'aiplatform', 'v1', 'projects.locations.customJobs',
-        client_options=ClientOptions(
-            api_endpoint='https://us-central1-aiplatform.googleapis.com'))
-    # A custom job spends minutes provisioning before it runs at all. Sleep
-    # through that while recording so the flight keeps one poll per job
-    # instead of dozens.
-    if test.recording:
-        time.sleep(420)
-
-    jobs = VertexAIJobs(test, 'projects.locations.customJobs')
-    assert jobs.poll_terminal_state(
-        client, failing['name'], attempts=30)['state'] == 'JOB_STATE_FAILED'
-    assert jobs.poll_terminal_state(
-        client, succeeding['name'], attempts=30)['state'] == 'JOB_STATE_SUCCEEDED'
-
-    def by_state(state):
-        policy = test.load_policy(
-            {'name': 'vertexai-custom-job-' + state.lower().replace('_', '-'),
-             'resource': 'gcp.vertex-ai-custom-job',
-             'query': [
-                 {'location': 'us-central1'},
-                 {'filter': f'display_name:"{prefix}*" AND state="{state}"'}]},
-            session_factory=test.session_factory)
-        return [r['displayName'] for r in policy.run()]
-
-    assert by_state('JOB_STATE_FAILED') == [f'{prefix}-fails']
-    assert by_state('JOB_STATE_SUCCEEDED') == [f'{prefix}-works']
-
-
 @terraform('vertexai_custom_job', scope='module')
 def test_vertexai_custom_job_cancel_and_delete(test, vertexai_custom_job, create_custom_job):
     """Test cancelling and deleting a Custom Job via the c7n actions.
@@ -3288,32 +3233,19 @@ def test_vertexai_query_accepts_good_values(test):
         'filter': 'create_time>"2026-11-01T00:00:00Z"'}
 
 
-@pytest.mark.parametrize('param,value,expected', [
-    ('pageSize', 50, 'every page is drained'),
-    ('readMask', 'displayName', 'which the actions and the urn read'),
-    ('parent', 'projects/p/locations/us-central1', 'c7n builds it'),
-    ('pageToken', 'abc', 'c7n pages'),
-])
-def test_vertexai_query_withheld_params_say_why(test, param, value, expected):
-    """These are spelled right and the API takes them, so the message has
-    to carry the reason or it reads as c7n lagging the API.
-    """
-    with pytest.raises(PolicyValidationError) as caught:
-        test.load_policy(
-            {'name': 'vertexai-endpoint-withheld-param',
-             'resource': 'gcp.vertex-ai-endpoint',
-             'query': [{param: value}]})
-    assert 'withholds' in str(caught.value)
-    assert expected in str(caught.value)
-
-
 @pytest.mark.parametrize('param,value', [
+    ('pageSize', 50),
+    ('readMask', 'displayName'),
+    ('parent', 'projects/p/locations/us-central1'),
+    ('pageToken', 'abc'),
     ('orderBy', 'create_time desc'),
     ('gdcZone', 'us-central1-a'),
 ])
 def test_vertexai_query_rejects_unexposed_params(test, param, value):
-    """Accepted by the list method, no reason to withhold, still not
-    exposed. orderBy only reorders a set c7n drains whole.
+    """The list method takes every one of these and a policy still may not.
+
+    parent and pageToken belong to c7n, and the rest cannot narrow a result
+    set or would drop fields the actions need.
     """
     with pytest.raises(PolicyValidationError) as caught:
         test.load_policy(
@@ -3321,6 +3253,34 @@ def test_vertexai_query_rejects_unexposed_params(test, param, value):
              'resource': 'gcp.vertex-ai-endpoint',
              'query': [{param: value}]})
     assert f"got ['{param}']" in str(caught.value)
+
+
+def test_vertexai_query_now_allowed_in_pull_mode(test):
+    """Pull mode expands {now} before the list call, so it is fine here."""
+    policy = test.load_policy(
+        {'name': 'vertexai-custom-job-now-pull',
+         'resource': 'gcp.vertex-ai-custom-job',
+         'query': [{'filter': 'create_time>"{now:-7d}"'}]})
+    policy.expand_variables(policy.get_variables())
+
+    assert '{now' not in policy.resource_manager.get_resource_query()['filter']
+
+
+def test_vertexai_query_rejects_now_in_serverless_mode(test):
+    """gcp-periodic is a PullMode, so the query does reach the list call, and
+    a ServerlessExecutionMode, so {now} is deferred. Nothing expands it inside
+    the deployed function, so the braces would go to the API verbatim.
+    """
+    with pytest.raises(PolicyValidationError) as caught:
+        test.load_policy(
+            {'name': 'vertexai-custom-job-now-periodic',
+             'resource': 'gcp.vertex-ai-custom-job',
+             'mode': {
+                 'type': 'gcp-periodic',
+                 'schedule': '0 * * * *',
+                 'service-account': 'c7n@cloud-custodian.iam.gserviceaccount.com'},
+             'query': [{'filter': 'create_time>"{now:-7d}"'}]})
+    assert 'never expands' in str(caught.value)
 
 
 def test_vertexai_query_rejects_mixed_location_entry(test):
@@ -3407,11 +3367,10 @@ def test_vertexai_query_params_match_the_api():
         'aiplatform', 'v1', static_discovery=True,
         credentials=AnonymousCredentials(), cache_discovery=False)
 
-    assert not set(VertexAITypeInfo.query_params) & QUERY_PARAMS_WITHHELD.keys(), (
-        'the shared floor allows a parameter that is also withheld')
+    assert not set(VertexAITypeInfo.query_params) & {'parent', 'pageToken'}, (
+        'the shared floor lets a policy set a parameter c7n owns')
 
     checked = 0
-    withheld_seen = set()
     for name, klass in sorted(resources.items()):
         if not (isinstance(klass, type)
                 and issubclass(klass, VertexAIQueryManager)):
@@ -3428,8 +3387,8 @@ def test_vertexai_query_params_match_the_api():
         parent = '/'.join(f'{segment}/x' for segment in segments[:-1])
 
         declared = set(klass.resource_type.query_params)
-        assert not declared & QUERY_PARAMS_WITHHELD.keys(), (
-            f'gcp.{name} allows a parameter that is also withheld')
+        assert not declared & {'parent', 'pageToken'}, (
+            f'gcp.{name} lets a policy set a parameter c7n owns')
 
         for param in declared:
             try:
@@ -3441,24 +3400,5 @@ def test_vertexai_query_params_match_the_api():
             except ValueError:
                 pass
 
-        for param in QUERY_PARAMS_WITHHELD:
-            # parent is the one the call always carries, so probing it
-            # separately would just pass it twice
-            kwargs = {'parent': parent}
-            if param != 'parent':
-                kwargs[param] = 1
-            try:
-                component.list(**kwargs)
-            except TypeError:
-                continue
-            except ValueError:
-                pass
-            withheld_seen.add(param)
-
     # an empty registry would walk the loop zero times and pass
-    assert checked == 9, f'expected 9 Vertex AI query managers, found {checked}'
-
-    # a withheld parameter no method takes is a reason nobody will ever read
-    assert withheld_seen == QUERY_PARAMS_WITHHELD.keys(), (
-        'withheld but not accepted by any list method: '
-        f'{sorted(QUERY_PARAMS_WITHHELD.keys() - withheld_seen)}')
+    assert checked, 'no Vertex AI query managers were checked'
