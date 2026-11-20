@@ -16,7 +16,7 @@ class StructureParser:
     required_policy_keys = {'name', 'resource'}
     allowed_policy_keys = {'name', 'resource', 'title', 'description', 'mode',
          'tags', 'max-resources', 'metadata', 'query',
-         'filters', 'actions', 'source', 'conditions',
+         'filters', 'actions', 'source', 'conditions', 'match_trace',
          # legacy keys subject to deprecation.
          'region', 'start', 'end', 'tz', 'max-resources-percent',
          'comments', 'comment'}
