@@ -4,20 +4,16 @@
 
 
 from c7n.actions import BaseAction as Action
-from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
+from c7n.deprecated import DeprecatedResource
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.utils import type_schema
 
 
-class DescribeRemoved(DescribeSource):
-    def resources(self, query):
-        return []
-
-    def get_resources(self, resource_ids):
-        return []
-
-
 @resources.register('qldb')
+@DeprecatedResource(
+    "QLDB is no longer an available AWS service",
+    removed_after="2027-07-23", force_empty=True)
 class QLDB(QueryResourceManager):
 
     class resource_type(TypeInfo):
@@ -28,14 +24,6 @@ class QLDB(QueryResourceManager):
         universal_taggable = object()
         cfn_type = config_type = 'AWS::QLDB::Ledger'
         permissions_augment = ("qldb:ListTagsForResource",)
-
-    source_mapping = {
-        'describe': DescribeRemoved,
-        'config': ConfigSource
-    }
-
-    def get_permissions(self):
-        return []
 
 
 @QLDB.action_registry.register('delete')
