@@ -272,3 +272,76 @@ To remove the default fields and only add the desired ones, the ``--no-default-f
 flag can be specified and then specific fields can be added in, e.g.::
 
   custodian report -s out --no-default-fields --field Image=ImageId policy.yml
+
+Server-Side Filters
+-------------------
+
+The `filter` block in a Cloud Custodian policy file refers to filters that are performed client-side. In other words, a Cloud Custody policy that filters EBS snapshots for those tagged `dev` will first make an API request for _all_ EBS snapshots in an account and _then_ filter the resulting response for the snapshots with a tag that matches the policy filter. The output of this filtering is what the `action` block will be performed upon.     
+In certain cases, Cloud Custodian can support server-side filtering on limited classes of resources. For example, if the cloud infrastructure of a Cloud Custodian user includes thousands of EBS snapshots, attempting a client-side filter on those resources could result in an overwhelming volume of API calls, latency, and responses. This is a case where server-side filtering can reduce call volume and minimize latency and response size.
+
+Support for server-side filtering is provided with the addition of a `query` block to a Cloud Custodian policy file. The `query schema is defined
+here <https://github.com/cloud-custodian/cloud-custodian/blob/bb5dc8d5f1b2c9500e26d02630b64742dffcb432/c7n/resources/ebs.py#L134-L146>`_.
+
+Caution:: It is important to note that such use cases are very rare and quite specific. Cloud Custodian does _not_ support the `query` block on all resources. The `query` block works only with a limited number of resource types. Users are cautioned to carefully evaluate implementation of the `query` block since server-side filtering interferes with caching and other Cloud Custodian behavior, impacting other code functionality and possibly introducing code-breaking changes.     
+
+With a `query` block, a Cloud Custodian user can filter the response received from an API call. In the example use case of thousands of EBS snapshots, adding a `query` block that checks for a `custodian_snapashot` tag means only the snapshots with this tag will be returned in the API request-response. The snapshots returned in the `query` block are the resources Cloud Custodian will perform the `filter` block on.
+
+### Example Server-Side Filtering Use Case With Query Block
+
+For example, a Cloud Custodian user with thousands of EBS snapshots wants to write a policy named `garbage-collect-snapshots` that will filter for EBS snapshots tagged `dev` older than 7 days. The user wants to then delete the output of this filter. At first, the user's policy might look like this:
+
+.. code-block:: yaml
+
+  policies:
+    - name: garbage-collect-snapshots
+      resource: aws.ebs-snapshot
+      filters:
+          - type: age
+            days: 7
+            op: ge
+          - "tag:custodian_snapshot": present
+      actions:
+          - delete
+      
+As mentioned above, if thousands of EBS snapshots exist, using Cloud Custodian's client-side `filter` block might be inefficient and unwieldy. This is where server-side filtering might be an advantage. As noted, Cloud Custodian provides limited support of server-side filtering for a limited range of resource types.
+
+In this example, please refer to the Boto documentation for `a list of query parameters available for EC2 instances <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_snapshots>`_.
+
+Using the `query` block, a new, more efficient `garbage-collect-snapshots` policy looks like this:
+
+.. code-block:: yaml
+
+  policies:
+    - name: garbage-collect-snapshots
+      resource: aws.ebs-snapshot
+      query:
+        - Name: "tag:environment"
+          Values: ["dev"]
+
+With these changes, server-side filters make sure you only query snapshots in
+the "dev" environment without needing to send the information to the client.
+
+Now let's combine server-side and client-side filtering to create a more
+efficient method of cleaning up EBS snapshots
+
+.. code-block:: yaml
+
+  policies:
+    - name: garbage-collect-snapshots-advanced
+      resource: aws.ebs-snapshot
+      query:
+        - Name: "tag:environment"
+          Values: ["dev"]
+      filters:
+        - type: age
+          days: 7
+          op: greater-than    
+      actions:
+        - delete
+
+In this example, we are using the query block to use a server-side filter to
+check the tag-key for any snapshot tagged custodian_snapshot. 
+Custodian will then take those results, and apply it to the filters block, which
+is executed next, this time on the client. 
+
+Caution:: As stated above, use cases for the `query` block are uncommon and are very specific. In most use cases, Cloud Custodian's `filter` block is sufficient and recommended. Again, users are strongly cautioned to carefully evaluate the use of server-side filters on a case-by-case basis and not a general best practice. 
