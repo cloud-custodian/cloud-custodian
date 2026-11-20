@@ -141,6 +141,170 @@ class DeleteOpensearchServerless(BaseAction):
                 continue
 
 
+@resources.register('opensearch-serverless-network-policy')
+class AossNetworkPolicy(QueryResourceManager):
+    """OpenSearch Serverless Network Security Policy
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: aoss-network-policy-public-access
+            resource: opensearch-serverless-network-policy
+            filters:
+              - type: value
+                key: "policy[0].AllowFromPublic"
+                value: true
+    """
+
+    class resource_type(TypeInfo):
+        service = 'opensearchserverless'
+        arn_type = 'security-policy'
+        enum_spec = ('list_security_policies', 'securityPolicySummaries[]',
+                     {'type': 'network'})
+        name = id = 'name'
+        permission_prefix = 'aoss'
+        cfn_type = 'AWS::OpenSearchServerless::SecurityPolicy'
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('opensearchserverless')
+        results = []
+        for r in resources:
+            try:
+                detail = self.retry(
+                    client.get_security_policy,
+                    type='network', name=r['name']
+                )['securityPolicyDetail']
+                results.append(detail)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+        return results
+
+    def get_resources(self, ids, cache=True, augment=True):
+        client = local_session(self.session_factory).client('opensearchserverless')
+        resources = []
+        for name in ids:
+            try:
+                detail = self.retry(
+                    client.get_security_policy,
+                    type='network', name=name
+                )['securityPolicyDetail']
+                resources.append(detail)
+            except client.exceptions.ClientError:
+                continue
+        return resources
+
+
+@AossNetworkPolicy.action_registry.register('delete')
+class DeleteAossNetworkPolicy(BaseAction):
+    """Delete an OpenSearch Serverless Network Security Policy
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-aoss-network-policy
+            resource: opensearch-serverless-network-policy
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('aoss:DeleteSecurityPolicy',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('opensearchserverless')
+        for r in resources:
+            try:
+                client.delete_security_policy(type='network', name=r['name'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+@resources.register('opensearch-serverless-access-policy')
+class AossAccessPolicy(QueryResourceManager):
+    """OpenSearch Serverless Access Policy
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: aoss-access-policy-non-role
+            resource: opensearch-serverless-access-policy
+            filters:
+              - type: value
+                key: "policy[0].Principal[]"
+                op: contains
+                value_type: swap
+                value: "arn:aws:iam::"
+    """
+
+    class resource_type(TypeInfo):
+        service = 'opensearchserverless'
+        arn_type = 'access-policy'
+        enum_spec = ('list_access_policies', 'accessPolicySummaries[]',
+                     {'type': 'data'})
+        name = id = 'name'
+        permission_prefix = 'aoss'
+        cfn_type = 'AWS::OpenSearchServerless::AccessPolicy'
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('opensearchserverless')
+        results = []
+        for r in resources:
+            try:
+                detail = self.retry(
+                    client.get_access_policy,
+                    type='data', name=r['name']
+                )['accessPolicyDetail']
+                results.append(detail)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+        return results
+
+    def get_resources(self, ids, cache=True, augment=True):
+        client = local_session(self.session_factory).client('opensearchserverless')
+        resources = []
+        for name in ids:
+            try:
+                detail = self.retry(
+                    client.get_access_policy,
+                    type='data', name=name
+                )['accessPolicyDetail']
+                resources.append(detail)
+            except client.exceptions.ClientError:
+                continue
+        return resources
+
+
+@AossAccessPolicy.action_registry.register('delete')
+class DeleteAossAccessPolicy(BaseAction):
+    """Delete an OpenSearch Serverless Access Policy
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-aoss-access-policy
+            resource: opensearch-serverless-access-policy
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('aoss:DeleteAccessPolicy',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('opensearchserverless')
+        for r in resources:
+            try:
+                client.delete_access_policy(type='data', name=r['name'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
 @resources.register('opensearch-ingestion')
 class OpensearchIngestion(QueryResourceManager):
     class resource_type(TypeInfo):
