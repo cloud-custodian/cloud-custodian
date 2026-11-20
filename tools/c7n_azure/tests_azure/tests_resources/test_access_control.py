@@ -125,7 +125,7 @@ class AccessControlTest(BaseTest):
 
     @patch('c7n_azure.resources.access_control.RoleAssignment.get_session')
     @patch('c7n_azure.resources.access_control.GraphHelper.get_principal_dictionary')
-    def test_augment_graph_forbidden_emits_warning(self, get_principal_dictionary, get_session):
+    def test_augment_graph_forbidden_raises(self, get_principal_dictionary, get_session):
         class ForbiddenCloudError(CloudError):
             # Skip CloudError.__init__, which needs a real pipeline response to deserialize.
             def __init__(self):
@@ -141,13 +141,12 @@ class AccessControlTest(BaseTest):
             'resource': 'azure.roleassignment',
         })
         resources = [{'properties': {'principalId': 'abc'}}]
-        with self.assertLogs(level='WARNING') as logs:
-            result = p.resource_manager.augment(resources)
+        with self.assertRaises(ForbiddenCloudError):
+            p.resource_manager.augment(resources)
 
-        self.assertEqual(result, resources)
-        self.assertNotIn('principalName', result[0])
-        self.assertTrue(any('principalName, displayName and aadType will be missing'
-                            in line for line in logs.output))
+        get_principal_dictionary.assert_called_once_with(
+            get_session.return_value.get_session_for_resource.return_value.client.return_value,
+            ['abc'], raise_on_graph_call_error=True)
 
     def test_scope_filter_management_group(self):
         sub_scope = "/subscriptions/111-111-1111"
