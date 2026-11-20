@@ -416,17 +416,18 @@ class LambdaWebBotocoreVersionTest(BaseTest):
     def test_validate_old_botocore(self):
         for resource in ('aws.lambda-web-function', 'aws.lambda-web-endpoint'):
             with mock.patch('c7n.resources.awslambda.botocore') as botocore_mock:
-                botocore_mock.__version__ = '1.43.106'
+                botocore_mock.__version__ = '1.43.111'
                 with self.assertRaises(PolicyValidationError) as ctx:
                     self.load_policy(
                         {'name': 'lambda-web-old-botocore', 'resource': resource})
             msg = str(ctx.exception)
-            self.assertIn('requires botocore version 1.43.107', msg)
-            self.assertIn('Installed version is 1.43.106', msg)
+            self.assertIn('requires botocore version 1.43.112', msg)
+            self.assertIn('Installed version is 1.43.111', msg)
+            self.assertIn('Upgrade boto3 and botocore', msg)
             self.assertIn('mode.packages', msg)
 
     def test_validate_supported_botocore(self):
-        for version in ('1.43.107', '1.50.0'):
+        for version in ('1.43.112', '1.50.0'):
             with mock.patch('c7n.resources.awslambda.botocore') as botocore_mock:
                 botocore_mock.__version__ = version
                 for resource in ('aws.lambda-web-function', 'aws.lambda-web-endpoint'):

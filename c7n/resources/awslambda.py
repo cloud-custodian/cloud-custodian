@@ -1046,7 +1046,10 @@ class KmsEventSourceMappingFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KMSKeyArn'
 
 
-LAMBDA_WEB_MIN_BOTOCORE = '1.43.107'
+# 1.43.107/108 have the full lambda-web model, but 1.43.110 and 1.43.111 shipped
+# a stub containing only GetWebAccountSettings; 1.43.112 is the first good
+# release after the stub.
+LAMBDA_WEB_MIN_BOTOCORE = '1.43.112'
 
 
 def validate_lambda_web_botocore(resource_type):
@@ -1054,7 +1057,9 @@ def validate_lambda_web_botocore(resource_type):
         raise PolicyValidationError(
             f"{resource_type} requires botocore version {LAMBDA_WEB_MIN_BOTOCORE} "
             f"or above. Installed version is {botocore.__version__}. "
-            "For Lambda execution modes, add boto3 and botocore to mode.packages."
+            "Upgrade boto3 and botocore in the environment running custodian. "
+            "For Lambda execution modes, also add boto3 and botocore to "
+            "mode.packages so the deployed function bundles them."
         )
 
 
@@ -1098,8 +1103,9 @@ class LambdaWebFunction(query.QueryResourceManager):
     contains one or more endpoints; see ``aws.lambda-web-endpoint`` to
     evaluate endpoints individually.
 
-    Requires botocore >= 1.43.107, the first release with the ``lambda-web``
-    service. Default Lambda Python runtimes may ship an older botocore. For
+    Requires botocore >= 1.43.112, the first release with the complete
+    ``lambda-web`` service model (1.43.110 and 1.43.111 ship an incomplete
+    one). Default Lambda Python runtimes may ship an older botocore. For
     policies with a Lambda execution mode, bundle current SDKs with the
     policy:
 
@@ -1430,8 +1436,9 @@ class LambdaWebEndpoint(query.ChildResourceManager):
     - ``ApplicationManaged``: Lambda performs no authorization and does not
       evaluate the resource based policy; anyone with the URL can invoke.
 
-    Requires botocore >= 1.43.107, the first release with the ``lambda-web``
-    service. Default Lambda Python runtimes may ship an older botocore. For
+    Requires botocore >= 1.43.112, the first release with the complete
+    ``lambda-web`` service model (1.43.110 and 1.43.111 ship an incomplete
+    one). Default Lambda Python runtimes may ship an older botocore. For
     policies with a Lambda execution mode, bundle current SDKs with the
     policy:
 
