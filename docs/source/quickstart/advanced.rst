@@ -220,11 +220,12 @@ RFC 3339, since that is what its APIs accept in a ``query`` filter.
 
   policies:
 
-    - name: recent-custom-jobs
-      resource: gcp.vertex-ai-custom-job
+    - name: recently-created-projects
+      resource: gcp.project
+      # the offset keeps the time of day, so this renders as something like
+      # createTime>"2026-08-20T14:31:07Z"
       query:
-        # renders as create_time>"2026-08-20T00:00:00Z"
-        - filter: 'create_time>"{now:-90d}"'
+        - filter: 'createTime>"{now:-90d}"'
 
 .. note::
 

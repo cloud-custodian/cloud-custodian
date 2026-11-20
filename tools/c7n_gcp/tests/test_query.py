@@ -205,11 +205,14 @@ def test_query_date_uses_the_provider_format(test):
         'name': 'recent-projects',
         'resource': 'gcp.project',
         'query': [{'filter': 'createTime>"{now:-7d}"'}]})
+    # bracket the expansion, so a run crossing utc midnight isn't a failure
+    before = datetime.utcnow()
     policy.expand_variables(policy.get_variables())
+    after = datetime.utcnow()
 
     sent = policy.resource_manager.get_resource_query()['filter']
-    day = (datetime.utcnow() - timedelta(days=7)).strftime('%Y-%m-%d')
-    assert sent.startswith(f'createTime>"{day}T'), sent
+    days = {(t - timedelta(days=7)).strftime('%Y-%m-%d') for t in (before, after)}
+    assert any(sent.startswith(f'createTime>"{d}T') for d in days), sent
     assert sent.endswith('Z"'), sent
 
 
@@ -219,8 +222,10 @@ def test_query_date_explicit_format_wins(test):
         'name': 'recent-projects',
         'resource': 'gcp.project',
         'query': [{'filter': 'createTime>"{now:-7d%Y-%m-%d}"'}]})
+    before = datetime.utcnow()
     policy.expand_variables(policy.get_variables())
+    after = datetime.utcnow()
 
-    day = (datetime.utcnow() - timedelta(days=7)).strftime('%Y-%m-%d')
-    assert policy.resource_manager.get_resource_query() == {
-        'filter': f'createTime>"{day}"'}
+    days = {(t - timedelta(days=7)).strftime('%Y-%m-%d') for t in (before, after)}
+    sent = policy.resource_manager.get_resource_query()['filter']
+    assert sent in {f'createTime>"{d}"' for d in days}, sent

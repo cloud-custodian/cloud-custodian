@@ -9,7 +9,7 @@ import shutil
 import tempfile
 from unittest import mock
 
-from c7n import policy, manager
+from c7n import policy, manager, query
 from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
@@ -82,6 +82,20 @@ class PolicyMetaLint(BaseTest):
                 "tag:GetResources"
             },
         )
+
+    def test_no_provider_date_format(self):
+        # a resource_type can declare the strftime its api wants, which {now}
+        # then renders with. declaring one on a provider's base TypeInfo
+        # changes every policy on that provider, so it should be deliberate
+        # rather than inherited by accident. gcp declares one, aws does not.
+        self.assertIsNone(getattr(query.TypeInfo, 'date_format', None))
+        for name, klass in clouds['aws'].resources.items():
+            rtype = getattr(klass, 'resource_type', None)
+            if rtype is None:
+                continue
+            self.assertIsNone(
+                getattr(rtype, 'date_format', None),
+                f'aws.{name} declares a date_format')
 
     def test_resource_type_repr_with_arn_type(self):
         policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ops-item'})
