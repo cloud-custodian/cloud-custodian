@@ -1,0 +1,86 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 14 Oct 2026 18:34:51 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1732",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/pipelineJobs/7036437980369649664",
+    "displayName": "c7n-pipeline-cancel",
+    "createTime": "2026-10-14T18:34:51.466018Z",
+    "updateTime": "2026-10-14T18:34:51.466018Z",
+    "pipelineSpec": {
+      "deploymentConfig": {
+        "@type": "type.googleapis.com/ml_pipelines.PipelineDeploymentConfig",
+        "executors": {
+          "exec-task": {
+            "container": {
+              "image": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+              "command": [
+                "sh",
+                "-c",
+                "sleep 600"
+              ]
+            }
+          }
+        }
+      },
+      "components": {
+        "comp-task": {
+          "executorLabel": "exec-task"
+        }
+      },
+      "schemaVersion": "2.1.0",
+      "root": {
+        "dag": {
+          "tasks": {
+            "task": {
+              "taskInfo": {
+                "name": "task"
+              },
+              "componentRef": {
+                "name": "comp-task"
+              }
+            }
+          }
+        }
+      },
+      "sdkVersion": "kfp-2.0.0",
+      "pipelineInfo": {
+        "name": "c7n-test-pipeline"
+      },
+      "deploymentSpec": {
+        "executors": {
+          "exec-task": {
+            "container": {
+              "image": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+              "command": [
+                "sh",
+                "-c",
+                "sleep 600"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "state": "PIPELINE_STATE_PENDING",
+    "labels": {
+      "purpose": "c7n-pipeline-cancel",
+      "vertex-ai-pipelines-run-billing-id": "7036437980369649664"
+    },
+    "runtimeConfig": {
+      "gcsOutputDirectory": "gs://c7n-pipeline-33eccd5d/pipelines"
+    },
+    "serviceAccount": "123456789012-compute@developer.gserviceaccount.com"
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 14 Oct 2026 18:34:27 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2475",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-east1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-east1/pipelineJobs?alt=json"
+  },
+  "body": {
+    "pipelineJobs": [
+      {
+        "name": "projects/cloud-custodian/locations/us-east1/pipelineJobs/7765220331941265408",
+        "displayName": "c7n-pipeline-review",
+        "createTime": "2026-10-14T18:33:52.856680Z",
+        "startTime": "2026-10-14T18:33:53.777663Z",
+        "endTime": "2026-10-14T18:34:15.852911Z",
+        "updateTime": "2026-10-14T18:34:15.852911Z",
+        "pipelineSpec": {
+          "deploymentConfig": {
+            "@type": "type.googleapis.com/ml_pipelines.PipelineDeploymentConfig",
+            "executors": {
+              "exec-task": {
+                "container": {
+                  "image": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+                  "command": [
+                    "sh",
+                    "-c",
+                    "echo hello"
+                  ]
+                }
+              }
+            }
+          },
+          "components": {
+            "comp-task": {
+              "executorLabel": "exec-task"
+            }
+          },
+          "schemaVersion": "2.1.0",
+          "root": {
+            "dag": {
+              "tasks": {
+                "task": {
+                  "taskInfo": {
+                    "name": "task"
+                  },
+                  "componentRef": {
+                    "name": "comp-task"
+                  }
+                }
+              }
+            }
+          },
+          "sdkVersion": "kfp-2.0.0",
+          "pipelineInfo": {
+            "name": "c7n-test-pipeline"
+          },
+          "deploymentSpec": {
+            "executors": {
+              "exec-task": {
+                "container": {
+                  "image": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+                  "command": [
+                    "sh",
+                    "-c",
+                    "echo hello"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "state": "PIPELINE_STATE_SUCCEEDED",
+        "jobDetail": {
+          "pipelineContext": {
+            "name": "projects/cloud-custodian/locations/us-east1/metadataStores/default/contexts/c7n-test-pipeline"
+          },
+          "pipelineRunContext": {
+            "name": "projects/cloud-custodian/locations/us-east1/metadataStores/default/contexts/7765220331941265408"
+          }
+        },
+        "labels": {
+          "purpose": "c7n-pipeline-review",
+          "vertex-ai-pipelines-run-billing-id": "7765220331941265408"
+        },
+        "runtimeConfig": {
+          "gcsOutputDirectory": "gs://c7n-pipeline-120476a8/pipelines"
+        },
+        "serviceAccount": "123456789012-compute@developer.gserviceaccount.com"
+      }
+    ]
+  }
+}

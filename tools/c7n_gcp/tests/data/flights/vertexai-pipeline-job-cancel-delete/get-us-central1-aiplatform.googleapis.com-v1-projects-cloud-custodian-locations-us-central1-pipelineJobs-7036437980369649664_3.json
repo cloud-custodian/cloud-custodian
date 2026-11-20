@@ -1,0 +1,194 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 14 Oct 2026 18:35:03 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5652",
+    "-content-encoding": "gzip",
+    "content-location": "https://us-central1-aiplatform.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/pipelineJobs/7036437980369649664?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/pipelineJobs/7036437980369649664",
+    "displayName": "c7n-pipeline-cancel",
+    "createTime": "2026-10-14T18:34:51.466018Z",
+    "startTime": "2026-10-14T18:34:52.123087Z",
+    "updateTime": "2026-10-14T18:35:03.194303Z",
+    "pipelineSpec": {
+      "deploymentConfig": {
+        "@type": "type.googleapis.com/ml_pipelines.PipelineDeploymentConfig",
+        "executors": {
+          "exec-task": {
+            "container": {
+              "image": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+              "command": [
+                "sh",
+                "-c",
+                "sleep 600"
+              ]
+            }
+          }
+        }
+      },
+      "components": {
+        "comp-task": {
+          "executorLabel": "exec-task"
+        }
+      },
+      "schemaVersion": "2.1.0",
+      "root": {
+        "dag": {
+          "tasks": {
+            "task": {
+              "taskInfo": {
+                "name": "task"
+              },
+              "componentRef": {
+                "name": "comp-task"
+              }
+            }
+          }
+        }
+      },
+      "sdkVersion": "kfp-2.0.0",
+      "pipelineInfo": {
+        "name": "c7n-test-pipeline"
+      },
+      "deploymentSpec": {
+        "executors": {
+          "exec-task": {
+            "container": {
+              "image": "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+              "command": [
+                "sh",
+                "-c",
+                "sleep 600"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "state": "PIPELINE_STATE_CANCELLING",
+    "jobDetail": {
+      "pipelineContext": {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/default/contexts/c7n-test-pipeline",
+        "displayName": "c7n-test-pipeline",
+        "etag": "1792002892391",
+        "createTime": "2026-10-14T18:06:06.265Z",
+        "updateTime": "2026-10-14T18:34:52.391Z",
+        "schemaTitle": "system.Pipeline",
+        "schemaVersion": "0.0.1",
+        "metadata": {}
+      },
+      "pipelineRunContext": {
+        "name": "projects/cloud-custodian/locations/us-central1/metadataStores/default/contexts/7036437980369649664",
+        "displayName": "7036437980369649664",
+        "etag": "1792002892478",
+        "createTime": "2026-10-14T18:34:52.478Z",
+        "updateTime": "2026-10-14T18:34:52.478Z",
+        "parentContexts": [
+          "projects/cloud-custodian/locations/us-central1/metadataStores/default/contexts/c7n-test-pipeline"
+        ],
+        "schemaTitle": "system.PipelineRun",
+        "schemaVersion": "0.0.1",
+        "metadata": {}
+      },
+      "taskDetails": [
+        {
+          "taskId": "-8735570181318770688",
+          "taskName": "7036437980369649664",
+          "createTime": "2026-10-14T18:34:52.123087Z",
+          "startTime": "2026-10-14T18:34:52.729759Z",
+          "executorDetail": {},
+          "state": "CANCEL_PENDING",
+          "execution": {
+            "name": "projects/cloud-custodian/locations/us-central1/metadataStores/default/executions/4090357070726058999",
+            "displayName": "7036437980369649664",
+            "state": "RUNNING",
+            "etag": "1792002892679",
+            "createTime": "2026-10-14T18:34:52.679Z",
+            "updateTime": "2026-10-14T18:34:52.679Z",
+            "schemaTitle": "system.Run",
+            "schemaVersion": "0.0.1",
+            "metadata": {
+              "vmlmd_lineage_integration": {
+                "pipeline_run_component": {
+                  "pipeline_run_id": "7036437980369649664",
+                  "location_id": "us-central1",
+                  "project_id": "cloud-custodian",
+                  "task_name": "7036437980369649664",
+                  "parent_task_names": []
+                }
+              }
+            }
+          },
+          "pipelineTaskStatus": [
+            {
+              "updateTime": "2026-10-14T18:35:03.299695280Z",
+              "state": "CANCEL_PENDING"
+            }
+          ],
+          "taskUniqueName": "7036437980369649664"
+        },
+        {
+          "taskId": "-6862072736332644352",
+          "taskName": "task",
+          "createTime": "2026-10-14T18:34:52.729759Z",
+          "startTime": "2026-10-14T18:34:53.086874Z",
+          "executorDetail": {
+            "containerDetail": {
+              "mainJob": "projects/cloud-custodian/locations/us-central1/customJobs/5271094005239644160"
+            }
+          },
+          "state": "CANCEL_PENDING",
+          "execution": {
+            "name": "projects/cloud-custodian/locations/us-central1/metadataStores/default/executions/7092294697569634587",
+            "displayName": "task",
+            "state": "RUNNING",
+            "etag": "1792002893056",
+            "createTime": "2026-10-14T18:34:52.841Z",
+            "updateTime": "2026-10-14T18:34:53.056Z",
+            "schemaTitle": "system.ContainerExecution",
+            "schemaVersion": "0.0.1",
+            "metadata": {
+              "vmlmd_lineage_integration": {
+                "pipeline_run_component": {
+                  "pipeline_run_id": "7036437980369649664",
+                  "parent_task_names": [
+                    "7036437980369649664"
+                  ],
+                  "project_id": "cloud-custodian",
+                  "location_id": "us-central1",
+                  "task_name": "task"
+                }
+              }
+            }
+          },
+          "parentTaskId": "-8735570181318770688",
+          "pipelineTaskStatus": [
+            {
+              "updateTime": "2026-10-14T18:35:03.206663330Z",
+              "state": "CANCEL_PENDING"
+            }
+          ],
+          "taskUniqueName": "task"
+        }
+      ]
+    },
+    "labels": {
+      "purpose": "c7n-pipeline-cancel",
+      "vertex-ai-pipelines-run-billing-id": "7036437980369649664"
+    },
+    "runtimeConfig": {
+      "gcsOutputDirectory": "gs://c7n-pipeline-33eccd5d/pipelines"
+    },
+    "serviceAccount": "123456789012-compute@developer.gserviceaccount.com"
+  }
+}
