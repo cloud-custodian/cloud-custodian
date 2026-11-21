@@ -206,22 +206,30 @@ class SnapshotAge(AgeFilter):
     date_attribute = 'StartTime'
 
 
+def _get_ami_snapshots(manager):
+    """Return the snapshot ids referenced by any owned AMI.
+
+    Disabled AMIs are excluded from DescribeImages by default, and deprecated
+    AMIs are only returned for their owner, which would cause their snapshots
+    to be treated as orphans. Explicitly request both lifecycle states.
+    """
+    # try using cache first to get a listing of all AMI snapshots and compares resources to the list
+    # This will populate the cache.
+    amis = manager.get_resource_manager('ami').resources(
+        {'IncludeDisabled': True, 'IncludeDeprecated': True})
+    ami_snaps = set()
+    for i in amis:
+        for dev in i.get('BlockDeviceMappings', ()):
+            if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
+                ami_snaps.add(dev['Ebs']['SnapshotId'])
+    return ami_snaps
+
+
 def _filter_ami_snapshots(self, snapshots):
     if not self.data.get('value', True):
         return snapshots
-    # try using cache first to get a listing of all AMI snapshots and compares resources to the list
-    # This will populate the cache.
-    amis = self.manager.get_resource_manager('ami').resources()
-    ami_snaps = []
-    for i in amis:
-        for dev in i.get('BlockDeviceMappings'):
-            if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                ami_snaps.append(dev['Ebs']['SnapshotId'])
-    matches = []
-    for snap in snapshots:
-        if snap['SnapshotId'] not in ami_snaps:
-            matches.append(snap)
-    return matches
+    ami_snaps = _get_ami_snapshots(self.manager)
+    return [snap for snap in snapshots if snap['SnapshotId'] not in ami_snaps]
 
 
 @Snapshot.filter_registry.register('cross-account')
@@ -318,13 +326,7 @@ class SnapshotUnusedFilter(Filter):
         return snap_ids
 
     def _pull_ami_snapshots(self):
-        amis = self.manager.get_resource_manager('ami').resources()
-        ami_snaps = set()
-        for i in amis:
-            for dev in i.get('BlockDeviceMappings'):
-                if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
-                    ami_snaps.add(dev['Ebs']['SnapshotId'])
-        return ami_snaps
+        return _get_ami_snapshots(self.manager)
 
     def process(self, resources, event=None):
         snaps = self._pull_asg_snapshots().union(self._pull_ami_snapshots())
