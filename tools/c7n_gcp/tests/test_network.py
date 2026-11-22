@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
+from unittest.mock import patch
 
-from c7n_gcp.resources.network import Interconnect, InterconnectAttachment
+from c7n_gcp.resources.network import Interconnect, InterconnectAttachment, SetFlowLog
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+
 from pytest_terraform import terraform
 
 
@@ -157,6 +159,135 @@ class SubnetTest(BaseTest):
                     'region': 'us-central1',
                     'subnetwork': subnet['name']})
         self.assertEqual(result['privateIpGoogleAccess'], True)
+
+
+@terraform('gcp_subnet_set_flow_log')
+def test_subnet_set_flow_log(test, gcp_subnet_set_flow_log):
+    project_id = gcp_subnet_set_flow_log['google_compute_subnetwork.default.project']
+    factory = test.replay_flight_data(
+        'subnet-set-flow-log', project_id=project_id)
+
+    subnet_name = gcp_subnet_set_flow_log['google_compute_subnetwork.default.name']
+    region = gcp_subnet_set_flow_log['google_compute_subnetwork.default.region']
+    policy = test.load_policy(
+        {
+            'name': 'gcp-subnet-set-flow-log',
+            'resource': 'gcp.subnet',
+            'filters': [
+                {'name': subnet_name},
+                {'enableFlowLogs': 'empty'},
+            ],
+            'actions': [
+                {
+                    'type': 'set-flow-log',
+                    'state': True,
+                    'aggregationInterval': 'INTERVAL_5_SEC',
+                    'flowSampling': 0.5,
+                    'metadata': 'INCLUDE_ALL_METADATA',
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    with patch.object(
+        SetFlowLog, 'invoke_api', autospec=True, side_effect=SetFlowLog.invoke_api
+    ) as invoke_api:
+        resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == subnet_name
+
+    # Replay serves canned responses regardless of request body, so check
+    # the PATCH payload the action sent.
+    _, _, op_name, params = invoke_api.call_args.args
+    assert op_name == 'patch'
+    assert params['body']['logConfig'] == {
+        'enable': True,
+        'aggregationInterval': 'INTERVAL_5_SEC',
+        'flowSampling': 0.5,
+        'metadata': 'INCLUDE_ALL_METADATA',
+    }
+
+    client = policy.resource_manager.get_client()
+    for _ in range(10):
+        subnet = client.execute_query(
+            'get', {'project': project_id, 'region': region, 'subnetwork': subnet_name}
+        )
+        if subnet.get('logConfig', {}).get('enable'):
+            break
+        if test.recording:
+            time.sleep(3)
+    else:
+        raise AssertionError('Timed out waiting for flow logs to be enabled')
+
+    assert subnet['logConfig']['enable'] is True
+    assert subnet['logConfig']['aggregationInterval'] == 'INTERVAL_5_SEC'
+    assert subnet['logConfig']['flowSampling'] == 0.5
+    assert subnet['logConfig']['metadata'] == 'INCLUDE_ALL_METADATA'
+
+
+@terraform('gcp_subnet_set_flow_log_custom_metadata')
+def test_subnet_set_flow_log_custom_metadata(test, gcp_subnet_set_flow_log_custom_metadata):
+    fixture = gcp_subnet_set_flow_log_custom_metadata
+    project_id = fixture['google_compute_subnetwork.default.project']
+    factory = test.replay_flight_data(
+        'subnet-set-flow-log-custom-metadata', project_id=project_id)
+
+    subnet_name = fixture['google_compute_subnetwork.default.name']
+    region = fixture['google_compute_subnetwork.default.region']
+    policy = test.load_policy(
+        {
+            'name': 'gcp-subnet-set-flow-log-custom-metadata',
+            'resource': 'gcp.subnet',
+            'filters': [
+                {'name': subnet_name},
+            ],
+            'actions': [
+                {
+                    'type': 'set-flow-log',
+                    'state': True,
+                    'metadata': 'CUSTOM_METADATA',
+                    'metadataFields': ['src_instance', 'dest_instance', 'src_vpc', 'dest_vpc'],
+                    'filterExpr': 'true',
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+
+    with patch.object(
+        SetFlowLog, 'invoke_api', autospec=True, side_effect=SetFlowLog.invoke_api
+    ) as invoke_api:
+        resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == subnet_name
+
+    _, _, op_name, params = invoke_api.call_args.args
+    assert op_name == 'patch'
+    assert params['body']['logConfig'] == {
+        'enable': True,
+        'metadata': 'CUSTOM_METADATA',
+        'metadataFields': ['src_instance', 'dest_instance', 'src_vpc', 'dest_vpc'],
+        'filterExpr': 'true',
+    }
+
+    client = policy.resource_manager.get_client()
+    for _ in range(10):
+        subnet = client.execute_query(
+            'get', {'project': project_id, 'region': region, 'subnetwork': subnet_name}
+        )
+        if subnet.get('logConfig', {}).get('enable'):
+            break
+        if test.recording:
+            time.sleep(3)
+    else:
+        raise AssertionError('Timed out waiting for flow logs to be enabled')
+
+    assert subnet['logConfig']['enable'] is True
+    assert subnet['logConfig']['metadata'] == 'CUSTOM_METADATA'
+    assert set(subnet['logConfig']['metadataFields']) == {
+        'src_instance', 'dest_instance', 'src_vpc', 'dest_vpc'}
+    assert subnet['logConfig']['filterExpr'] == 'true'
 
 
 class RouterTest(BaseTest):

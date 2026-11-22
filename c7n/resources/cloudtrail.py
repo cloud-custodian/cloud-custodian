@@ -2,11 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 
+from botocore.exceptions import ClientError
+
 from c7n.actions import Action, BaseAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
-from c7n.tags import universal_augment
+from c7n.tags import (
+    universal_augment, UniversalTag, UniversalUntag, UniversalTagDelayedAction)
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
@@ -80,6 +83,40 @@ class IsShadow(Filter):
         if t.get('IsMultiRegionTrail') and t['HomeRegion'] != self.manager.config.region:
             return True
         return False
+
+
+class SkipShadowTrail:
+    """Mixin for CloudTrail tag actions, which can't operate on shadow trails.
+
+    The Resource Groups Tagging API rejects a trail ARN whose region differs
+    from the region it is invoked in, so tagging a multi-region or
+    organization trail from any region other than its home region always
+    fails. Filter shadow trails out (as update-trail, set-logging and delete
+    already do) so only the modifiable origin trail is acted on.
+    """
+
+    def process(self, resources):
+        shadow_check = IsShadow({'state': False}, self.manager)
+        shadow_check.embedded = True
+        resources = shadow_check.process(resources)
+        if not resources:
+            return
+        return super().process(resources)
+
+
+@CloudTrail.action_registry.register('tag')
+class CloudTrailTag(SkipShadowTrail, UniversalTag):
+    pass
+
+
+@CloudTrail.action_registry.register('remove-tag')
+class CloudTrailRemoveTag(SkipShadowTrail, UniversalUntag):
+    pass
+
+
+@CloudTrail.action_registry.register('mark-for-op')
+class CloudTrailMarkForOp(SkipShadowTrail, UniversalTagDelayedAction):
+    pass
 
 
 @CloudTrail.filter_registry.register('status')
@@ -206,6 +243,122 @@ class UpdateTrail(Action):
             client.update_trail(
                 Name=r['Name'],
                 **self.data['attributes'])
+
+
+@CloudTrail.action_registry.register('set-event-selectors')
+class SetEventSelectors(Action):
+    """Set the event selectors of a trail.
+
+    Specify either ``event-selectors`` (basic) or
+    ``advanced-event-selectors``, not both.
+
+    This replaces all of the trail's existing selectors, of either type,
+    so include every selector the trail should keep. When pairing this
+    action with the ``event-selectors`` filter, filter on the same
+    selector type the action writes; otherwise the filter keeps matching
+    and the policy re-applies the change on every run.
+
+    See the `PutEventSelectors API reference
+    <https://docs.aws.amazon.com/awscloudtrail/latest/APIReference/API_PutEventSelectors.html>`__
+    for the syntax of both selector types, and `Logging data events
+    <https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html>`__
+    for a detailed comparison and examples.
+
+    :Example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: cloudtrail-log-s3-writes
+          resource: aws.cloudtrail
+          filters:
+           - type: is-shadow
+             state: false
+           - type: event-selectors
+             key: AdvancedEventSelectors
+             value: empty
+          actions:
+           - type: set-event-selectors
+             advanced-event-selectors:
+              - Name: Log all management events
+                FieldSelectors:
+                  - Field: eventCategory
+                    Equals: [Management]
+              - Name: Log S3 object writes
+                FieldSelectors:
+                  - Field: eventCategory
+                    Equals: [Data]
+                  - Field: resources.type
+                    Equals: [AWS::S3::Object]
+                  - Field: readOnly
+                    Equals: ["false"]
+    """
+    schema = type_schema(
+        'set-event-selectors',
+        **{
+            'event-selectors': {
+                'type': 'array', 'items': {'type': 'object'}, 'minItems': 1},
+            'advanced-event-selectors': {
+                'type': 'array', 'items': {'type': 'object'}, 'minItems': 1},
+        })
+    schema['oneOf'] = [
+        {'required': ['event-selectors']},
+        {'required': ['advanced-event-selectors']},
+    ]
+    shape = 'PutEventSelectorsRequest'
+    permissions = ('cloudtrail:PutEventSelectors',)
+
+    def get_params(self):
+        params = {}
+        if 'event-selectors' in self.data:
+            params['EventSelectors'] = self.data['event-selectors']
+        if 'advanced-event-selectors' in self.data:
+            params['AdvancedEventSelectors'] = self.data['advanced-event-selectors']
+        return params
+
+    def validate(self):
+        # mirrors the schema's oneOf/minItems, which only applies when
+        # schema validation is enabled
+        params = self.get_params()
+        if len(params) != 1 or not all(params.values()):
+            raise PolicyValidationError(
+                "set-event-selectors requires exactly one non-empty list of "
+                "event-selectors or advanced-event-selectors on %s" % (
+                    self.manager.data,))
+        params['TrailName'] = 'PolicyValidation'
+        return shape_validate(
+            params,
+            self.shape,
+            self.manager.resource_type.service)
+
+    def process(self, resources):
+        shadow_check = IsShadow({'state': False}, self.manager)
+        shadow_check.embedded = True
+        resources = shadow_check.process(resources)
+        params = self.get_params()
+
+        errors = []
+        grouped_trails = get_trail_groups(self.manager.session_factory, resources)
+        for region, (client, trails) in grouped_trails.items():
+            for t in trails:
+                try:
+                    self.manager.retry(
+                        client.put_event_selectors, TrailName=t['TrailARN'], **params)
+                except client.exceptions.TrailNotFoundException:
+                    self.log.warning(
+                        "trail %s no longer exists, skipping", t['TrailARN'])
+                    continue
+                except ClientError as e:
+                    self.log.error(
+                        "failed to set event selectors on %s: %s", t['TrailARN'], e)
+                    errors.append(t['TrailARN'])
+                    continue
+                # drop any stale filter annotation
+                t.pop(EventSelectors.annotation_key, None)
+        if errors:
+            raise PolicyExecutionError(
+                "set-event-selectors failed on %d trail(s): %s" % (
+                    len(errors), ", ".join(errors)))
 
 
 @CloudTrail.action_registry.register('set-logging')

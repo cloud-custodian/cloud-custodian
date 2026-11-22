@@ -4,6 +4,7 @@ from .common import BaseTest
 import datetime
 from dateutil import tz as tzutil
 from unittest.mock import MagicMock
+from c7n.exceptions import PolicyValidationError
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 
@@ -229,6 +230,62 @@ class DynamodbTest(BaseTest):
         self.assertEqual(
             res['PointInTimeRecoveryDescription']["PointInTimeRecoveryStatus"],
             'ENABLED')
+
+    def _set_continuous_backup(self, action):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        update = mock_factory().client('dynamodb').update_continuous_backups
+        p = self.load_policy(
+            {'name': 'cb', 'resource': 'dynamodb-table',
+             'actions': [dict(action, type='set-continuous-backup')]},
+            session_factory=mock_factory)
+        p.resource_manager.actions[0].process([
+            {'TableName': 't1', 'TableStatus': 'ACTIVE'},
+            {'TableName': 't2', 'TableStatus': 'ACTIVE'}])
+        return update
+
+    def test_continuous_backup_recovery_period(self):
+        # https://github.com/cloud-custodian/cloud-custodian/issues/10070
+        update = self._set_continuous_backup({'recovery-period': 14})
+        self.assertEqual(update.call_count, 2)
+        for name, call in zip(('t1', 't2'), update.call_args_list):
+            self.assertEqual(call.kwargs, {
+                'TableName': name,
+                'PointInTimeRecoverySpecification': {
+                    'PointInTimeRecoveryEnabled': True,
+                    'RecoveryPeriodInDays': 14}})
+
+    def test_continuous_backup_no_recovery_period_unchanged(self):
+        # without recovery-period the api default (35 days) must be left
+        # alone, so the field isn't sent at all.
+        for action, enabled in (({}, True), ({'state': True}, True), ({'state': False}, False)):
+            update = self._set_continuous_backup(action)
+            for call in update.call_args_list:
+                self.assertEqual(
+                    call.kwargs['PointInTimeRecoverySpecification'],
+                    {'PointInTimeRecoveryEnabled': enabled})
+
+    def test_continuous_backup_recovery_period_bounds(self):
+        # the dynamodb api only accepts 1 - 35 days, inclusive
+        for period in (1, 35):
+            self.load_policy({
+                'name': 'cb', 'resource': 'dynamodb-table',
+                'actions': [{'type': 'set-continuous-backup',
+                             'recovery-period': period}]})
+        for period in (0, 36, '14', 14.5):
+            with self.assertRaises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'cb', 'resource': 'dynamodb-table',
+                    'actions': [{'type': 'set-continuous-backup',
+                                 'recovery-period': period}]})
+
+    def test_continuous_backup_recovery_period_requires_enable(self):
+        # a recovery period only means something when enabling backups
+        with self.assertRaisesRegex(PolicyValidationError, "when disabling continuous backups"):
+            self.load_policy({
+                'name': 'cb', 'resource': 'dynamodb-table',
+                'actions': [{'type': 'set-continuous-backup',
+                             'state': False, 'recovery-period': 14}]})
 
     def test_continuous_backup_action_error(self):
         factory = self.replay_flight_data("test_dynamodb_continuous_backup_action")

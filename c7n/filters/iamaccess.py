@@ -258,20 +258,42 @@ class PolicyChecker:
             'IpAddress',
             'NotIpAddress')
         set_conditions = ('ForAllValues', 'ForAnyValue')
+        required_keys = self._required_condition_keys(s)
 
         for s_cond_op in list(s['Condition'].keys()):
-            if s_cond_op not in conditions:
-                if not any(s_cond_op.startswith(c) for c in set_conditions):
-                    continue
+            set_op, _, base_op = s_cond_op.rpartition(':')
+            # Set operators only restrict access when they wrap a supported
+            # positive operator. Negated (StringNotEquals, NotIpAddress) and
+            # IfExists variants match requests outside the listed values.
+            if set_op and (set_op not in set_conditions or base_op.startswith('Not')):
+                continue
+            if base_op not in conditions:
+                continue
 
             # Loop over all keys under each operator
             for key, value in s['Condition'][s_cond_op].items():
+                # ForAllValues is true when the key is absent from the request,
+                # so it only restricts access when a Null condition requires
+                # the key.
+                # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-single-vs-multi-valued-context-keys.html
+                if set_op == 'ForAllValues' and key.lower() not in required_keys:
+                    continue
                 cond = {'op': s_cond_op}
                 cond['key'] = key.lower()
                 cond['values'] = (value,) if isinstance(value, str) else value
                 s_cond.append(cond)
 
         return s_cond
+
+    @staticmethod
+    def _required_condition_keys(s):
+        """Return the lowercase condition keys a statement's Null operator requires."""
+        required = set()
+        for key, value in s['Condition'].get('Null', {}).items():
+            values = value if isinstance(value, list) else [value]
+            if values and all(str(v).lower() == 'false' for v in values):
+                required.add(key.lower())
+        return required
 
     # Condition handlers
 
@@ -382,6 +404,13 @@ class CrossAccountAccessFilter(Filter):
     each OU level you actually want to trust. ``aws:PrincipalOrgPaths`` matching
     also respects ``whitelist_orgids``. Any policy path whose leading segment
     matches a whitelisted org ID is accepted regardless of the OU whitelist.
+
+    Conditions using the ``ForAllValues`` set operator only count as
+    restricting access when the statement also requires the key with a
+    ``Null`` condition (e.g. ``"Null": {"aws:PrincipalOrgPaths": "false"}``),
+    since ``ForAllValues`` is true when the key is absent from the request.
+    Negated (``ForAnyValue:StringNotEquals``) and ``IfExists`` set operators
+    never count as restricting access.
     """
 
     schema = type_schema(

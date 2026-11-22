@@ -1,0 +1,1984 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "dee0d68e-b19c-44fa-ac31-213a185950b1"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:03 GMT"
+                    ],
+                    "content-length": [
+                        "8528"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGetSubscriptionMaximum;899"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A08C22FDBE694CB1AE6D41786401EB90 Ref B: CH1AA2020620011 Ref C: 2026-10-14T17:00:02Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestvmresize-default",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-default",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1s"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "7572b5ea-f4d0-49a6-a363-cf6784fb2fbe",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-default_disk1_b2fe9e6139ad4749aa470ffeee8b1788",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-default_disk1_b2fe9e6139ad4749aa470ffeee8b1788"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-default",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            },
+                                            "enableVMAgentPlatformUpdates": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-default-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:11.9802308+00:00"
+                                },
+                                "etag": "\"8\""
+                            },
+                            {
+                                "name": "cctestvmresize-map-b1ms",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1ms"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "95f0706a-91ba-4eef-a179-29d6724d7f5f",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-map-b1ms",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            },
+                                            "enableVMAgentPlatformUpdates": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1ms-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:11.9916035+00:00"
+                                },
+                                "etag": "\"8\""
+                            },
+                            {
+                                "name": "cctestvmresize-map-b1s",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1s"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "cb6e2a97-53e4-40ff-9e72-c46377f19315",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-map-b1s",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            },
+                                            "enableVMAgentPlatformUpdates": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1s-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:12.0123878+00:00"
+                                },
+                                "etag": "\"8\""
+                            },
+                            {
+                                "name": "cctestvmresize-map-unmapped",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-unmapped",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B2s"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "ab3e10a7-6b18-4522-8c47-76283b6cb932",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-map-unmapped_OsDisk_1_3e2d2133c2cd433687349fc1f02508ea",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-unmapped_OsDisk_1_3e2d2133c2cd433687349fc1f02508ea"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-map-unmapped",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            }
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-unmapped-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:12.0649567+00:00"
+                                },
+                                "etag": "\"5\""
+                            },
+                            {
+                                "name": "cctestvmresize-vmsize",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-vmsize",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1s"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "99c956d6-1c4f-452e-99b2-13f669e3b242",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-vmsize_OsDisk_1_f70bd18f4b314d8fb2eeaedfb5737318",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-vmsize_OsDisk_1_f70bd18f4b314d8fb2eeaedfb5737318"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-vmsize",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            },
+                                            "enableVMAgentPlatformUpdates": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-vmsize-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:12.0020458+00:00"
+                                },
+                                "etag": "\"8\""
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:03 GMT"
+                    ],
+                    "content-length": [
+                        "2191"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23999,Microsoft.Compute/LowCostGetResource;35"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 131C3248A1F24B97A7E42A890CDB5428 Ref B: CHI261140514029 Ref C: 2026-10-14T17:00:03Z"
+                    ],
+                    "etag": [
+                        "\"8\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-b1s",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B1s"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "cb6e2a97-53e4-40ff-9e72-c46377f19315",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-b1s",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    },
+                                    "enableVMAgentPlatformUpdates": true
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1s-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:12.0123878+00:00"
+                        },
+                        "etag": "\"8\""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:03 GMT"
+                    ],
+                    "content-length": [
+                        "2198"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23998,Microsoft.Compute/LowCostGetResource;35"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A5BFCB78A4A841AB8144DEA9948924EB Ref B: CHI261140506031 Ref C: 2026-10-14T17:00:04Z"
+                    ],
+                    "etag": [
+                        "\"8\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-b1ms",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B1ms"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "95f0706a-91ba-4eef-a179-29d6724d7f5f",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-b1ms",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    },
+                                    "enableVMAgentPlatformUpdates": true
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1ms-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:11.9916035+00:00"
+                        },
+                        "etag": "\"8\""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-unmapped?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:03 GMT"
+                    ],
+                    "content-length": [
+                        "2180"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23997,Microsoft.Compute/LowCostGetResource;35"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: C4C6E4D9A11546E4832BAEA9C1CDF8A0 Ref B: CHI261140506031 Ref C: 2026-10-14T17:00:04Z"
+                    ],
+                    "etag": [
+                        "\"5\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-unmapped",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-unmapped",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B2s"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "ab3e10a7-6b18-4522-8c47-76283b6cb932",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-unmapped_OsDisk_1_3e2d2133c2cd433687349fc1f02508ea",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-unmapped_OsDisk_1_3e2d2133c2cd433687349fc1f02508ea"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-unmapped",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    }
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-unmapped-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:12.0649567+00:00"
+                        },
+                        "etag": "\"5\""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "cd5a7f51-1137-49f4-b7a0-670b3266a48c"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:04 GMT"
+                    ],
+                    "content-length": [
+                        "8528"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGetSubscriptionMaximum;898"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 993D4CCD908D4B10B9ABF8A880827DDE Ref B: CHI261140504062 Ref C: 2026-10-14T17:00:04Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestvmresize-default",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-default",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1s"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "7572b5ea-f4d0-49a6-a363-cf6784fb2fbe",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-default_disk1_b2fe9e6139ad4749aa470ffeee8b1788",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-default_disk1_b2fe9e6139ad4749aa470ffeee8b1788"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-default",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            },
+                                            "enableVMAgentPlatformUpdates": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-default-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:11.9802308+00:00"
+                                },
+                                "etag": "\"8\""
+                            },
+                            {
+                                "name": "cctestvmresize-map-b1ms",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1ms"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "95f0706a-91ba-4eef-a179-29d6724d7f5f",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-map-b1ms",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            },
+                                            "enableVMAgentPlatformUpdates": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1ms-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:11.9916035+00:00"
+                                },
+                                "etag": "\"8\""
+                            },
+                            {
+                                "name": "cctestvmresize-map-b1s",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1s"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "cb6e2a97-53e4-40ff-9e72-c46377f19315",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-map-b1s",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            },
+                                            "enableVMAgentPlatformUpdates": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1s-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:12.0123878+00:00"
+                                },
+                                "etag": "\"8\""
+                            },
+                            {
+                                "name": "cctestvmresize-map-unmapped",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-unmapped",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B2s"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "ab3e10a7-6b18-4522-8c47-76283b6cb932",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-map-unmapped_OsDisk_1_3e2d2133c2cd433687349fc1f02508ea",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-unmapped_OsDisk_1_3e2d2133c2cd433687349fc1f02508ea"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-map-unmapped",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            }
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-unmapped-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:12.0649567+00:00"
+                                },
+                                "etag": "\"5\""
+                            },
+                            {
+                                "name": "cctestvmresize-vmsize",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-vmsize",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                },
+                                "properties": {
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1s"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "vmId": "99c956d6-1c4f-452e-99b2-13f669e3b242",
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "0001-com-ubuntu-server-jammy",
+                                            "sku": "22_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "22.04.202608060"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvmresize-vmsize_OsDisk_1_f70bd18f4b314d8fb2eeaedfb5737318",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-vmsize_OsDisk_1_f70bd18f4b314d8fb2eeaedfb5737318"
+                                            },
+                                            "deleteOption": "Delete",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [],
+                                        "diskControllerType": "SCSI"
+                                    },
+                                    "osProfile": {
+                                        "computerName": "cctestvmresize-vmsize",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false,
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault",
+                                                "assessmentMode": "ImageDefault"
+                                            },
+                                            "enableVMAgentPlatformUpdates": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true,
+                                        "adminUsername": "testuser"
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-vmsize-nic"
+                                            }
+                                        ]
+                                    },
+                                    "timeCreated": "2026-10-14T01:05:12.0020458+00:00"
+                                },
+                                "etag": "\"8\""
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PATCH",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms?api-version=2024-11-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/28c975ef-fbaa-43db-a292-c6bffa0440c0?p=61484f5e-bd98-4b59-8e50-ecdab74043fd&api-version=2024-11-01&t=639275940056794564&c=redacted&s=redacted&h=redacted"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "etag": [
+                        "\"9\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/UpdateVMSubscriptionMaximum;1499,Microsoft.Compute/UpdateVMResource;11"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 5E73CBFD177F44F0A6EB9F5930496B7F Ref B: CHI261140507023 Ref C: 2026-10-14T17:00:05Z"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:05 GMT"
+                    ],
+                    "azure-asyncnotification": [
+                        "Enabled"
+                    ],
+                    "content-length": [
+                        "2196"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-b1ms",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B1s"
+                            },
+                            "provisioningState": "Updating",
+                            "vmId": "95f0706a-91ba-4eef-a179-29d6724d7f5f",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-b1ms",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    },
+                                    "enableVMAgentPlatformUpdates": true
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1ms-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:11.9916035+00:00"
+                        },
+                        "etag": "\"9\""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PATCH",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s?api-version=2024-11-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/74bd5f0d-3a03-4bf2-9b98-0a8e2e2a60fd?p=61484f5e-bd98-4b59-8e50-ecdab74043fd&api-version=2024-11-01&t=639275940063330463&c=redacted&s=redacted&h=redacted"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "etag": [
+                        "\"9\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/UpdateVMSubscriptionMaximum;1498,Microsoft.Compute/UpdateVMResource;11"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B2606E4F8C934B17925A17CDFEA65AB1 Ref B: CHI261140509060 Ref C: 2026-10-14T17:00:05Z"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:06 GMT"
+                    ],
+                    "azure-asyncnotification": [
+                        "Enabled"
+                    ],
+                    "content-length": [
+                        "2191"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-b1s",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B1ms"
+                            },
+                            "provisioningState": "Updating",
+                            "vmId": "cb6e2a97-53e4-40ff-9e72-c46377f19315",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-b1s",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    },
+                                    "enableVMAgentPlatformUpdates": true
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1s-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:12.0123878+00:00"
+                        },
+                        "etag": "\"9\""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/74bd5f0d-3a03-4bf2-9b98-0a8e2e2a60fd?p=61484f5e-bd98-4b59-8e50-ecdab74043fd&api-version=2024-11-01&t=639275940063330463&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:06 GMT"
+                    ],
+                    "content-length": [
+                        "134"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/GetOperationResource;44,Microsoft.Compute/GetOperationSubscriptionMaximum;14994"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 0B1EC713CB494E8993CD8697A29ED100 Ref B: CH1AA2020610053 Ref C: 2026-10-14T17:00:06Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "startTime": "2026-10-14T17:00:06.1728535+00:00",
+                        "status": "InProgress",
+                        "name": "74bd5f0d-3a03-4bf2-9b98-0a8e2e2a60fd"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/28c975ef-fbaa-43db-a292-c6bffa0440c0?p=61484f5e-bd98-4b59-8e50-ecdab74043fd&api-version=2024-11-01&t=639275940056794564&c=redacted&s=redacted&h=redacted",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:36 GMT"
+                    ],
+                    "content-length": [
+                        "184"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/GetOperationResource;43,Microsoft.Compute/GetOperationSubscriptionMaximum;14999"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DD0EC33F69714CBCBAE4064E0D4BD602 Ref B: CHI261140512062 Ref C: 2026-10-14T17:00:36Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "startTime": "2026-10-14T17:00:05.4863038+00:00",
+                        "endTime": "2026-10-14T17:00:30.5034334+00:00",
+                        "status": "Succeeded",
+                        "name": "28c975ef-fbaa-43db-a292-c6bffa0440c0"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:36 GMT"
+                    ],
+                    "content-length": [
+                        "2197"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23999,Microsoft.Compute/LowCostGetResource;31"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 72D182A6A69C42ACA9547D618A5CCD1A Ref B: CHI261140511029 Ref C: 2026-10-14T17:00:36Z"
+                    ],
+                    "etag": [
+                        "\"9\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-b1ms",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B1s"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "95f0706a-91ba-4eef-a179-29d6724d7f5f",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-b1ms",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    },
+                                    "enableVMAgentPlatformUpdates": true
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1ms-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:11.9916035+00:00"
+                        },
+                        "etag": "\"9\""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:36 GMT"
+                    ],
+                    "content-length": [
+                        "2192"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23998,Microsoft.Compute/LowCostGetResource;35"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 53250C2A0E934F02AF5B7205F5AE9BB3 Ref B: CHI261140502036 Ref C: 2026-10-14T17:00:37Z"
+                    ],
+                    "etag": [
+                        "\"9\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-b1s",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM-RESIZE/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B1ms"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "cb6e2a97-53e4-40ff-9e72-c46377f19315",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-b1s",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    },
+                                    "enableVMAgentPlatformUpdates": true
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1s-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:12.0123878+00:00"
+                        },
+                        "etag": "\"9\""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:37 GMT"
+                    ],
+                    "content-length": [
+                        "2192"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23997,Microsoft.Compute/LowCostGetResource;34"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B21913B3F0654586895BC5E190E16FDD Ref B: CHI261140507029 Ref C: 2026-10-14T17:00:37Z"
+                    ],
+                    "etag": [
+                        "\"9\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-b1s",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1s",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B1ms"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "cb6e2a97-53e4-40ff-9e72-c46377f19315",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1s_disk1_e1fe4673e38a48b289fa3c4e9d3cb12f"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-b1s",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    },
+                                    "enableVMAgentPlatformUpdates": true
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1s-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:12.0123878+00:00"
+                        },
+                        "etag": "\"9\""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:37 GMT"
+                    ],
+                    "content-length": [
+                        "2197"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23996,Microsoft.Compute/LowCostGetResource;30"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 64D0753748B34514903241B84803AA90 Ref B: CH1AA2030813054 Ref C: 2026-10-14T17:00:37Z"
+                    ],
+                    "etag": [
+                        "\"9\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-b1ms",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-b1ms",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B1s"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "95f0706a-91ba-4eef-a179-29d6724d7f5f",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-b1ms_disk1_be27e6f9e3e543939b8443380fb7c2b5"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-b1ms",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    },
+                                    "enableVMAgentPlatformUpdates": true
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-b1ms-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:11.9916035+00:00"
+                        },
+                        "etag": "\"9\""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-unmapped?api-version=2024-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": ""
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "date": [
+                        "Wed, 14 Oct 2026 17:00:37 GMT"
+                    ],
+                    "content-length": [
+                        "2180"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGetSubscriptionMaximum;23995,Microsoft.Compute/LowCostGetResource;34"
+                    ],
+                    "x-ms-need-to-refresh-epl-cache": [
+                        "False"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 892E08EB48D047AE8231DD40A80EA3FB Ref B: CHI261140511036 Ref C: 2026-10-14T17:00:38Z"
+                    ],
+                    "etag": [
+                        "\"5\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cctestvmresize-map-unmapped",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/virtualMachines/cctestvmresize-map-unmapped",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_B2s"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "ab3e10a7-6b18-4522-8c47-76283b6cb932",
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "0001-com-ubuntu-server-jammy",
+                                    "sku": "22_04-lts-gen2",
+                                    "version": "latest",
+                                    "exactVersion": "22.04.202608060"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvmresize-map-unmapped_OsDisk_1_3e2d2133c2cd433687349fc1f02508ea",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Compute/disks/cctestvmresize-map-unmapped_OsDisk_1_3e2d2133c2cd433687349fc1f02508ea"
+                                    },
+                                    "deleteOption": "Delete",
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [],
+                                "diskControllerType": "SCSI"
+                            },
+                            "osProfile": {
+                                "computerName": "cctestvmresize-map-unmapped",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false,
+                                    "provisionVMAgent": true,
+                                    "patchSettings": {
+                                        "patchMode": "ImageDefault",
+                                        "assessmentMode": "ImageDefault"
+                                    }
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true,
+                                "adminUsername": "testuser"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm-resize/providers/Microsoft.Network/networkInterfaces/cctestvmresize-map-unmapped-nic"
+                                    }
+                                ]
+                            },
+                            "timeCreated": "2026-10-14T01:05:12.0649567+00:00"
+                        },
+                        "etag": "\"5\""
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,297 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "archive_file": {
+            "app_source": {
+                "exclude_symlink_directories": null,
+                "excludes": null,
+                "id": "c981baa1a06a699682fa5ab144b1011fbad11663",
+                "output_base64sha256": "a4xZl8g8wdhTVh8CfoTYiU74w2wOjpPLHyCAFY/xFGg=",
+                "output_base64sha512": "FqGgnGyHrkJjXl4w1ULrfnVL2XBXr4faRg7HC/yr39jqAsLGTrrjrEmBDTK24zzFJ//VmD75i7+nasbmWglHrQ==",
+                "output_file_mode": null,
+                "output_md5": "ac8fd586b5c601edb997fc3e17f1136f",
+                "output_path": "./.terraform/app.zip",
+                "output_sha": "c981baa1a06a699682fa5ab144b1011fbad11663",
+                "output_sha256": "6b8c5997c83cc1d853561f027e84d8894ef8c36c0e8e93cb1f2080158ff11468",
+                "output_sha512": "16a1a09c6c87ae42635e5e30d542eb7e754bd97057af87da460ec70bfcabdfd8ea02c2c64ebae3ac49810d32b6e33cc527ffd5983ef98bbfa76ac6e65a0947ad",
+                "output_size": 426,
+                "source": [],
+                "source_content": null,
+                "source_content_filename": null,
+                "source_dir": "./app",
+                "source_file": null,
+                "type": "zip"
+            }
+        },
+        "google_app_engine_standard_app_version": {
+            "secure_always": {
+                "app_engine_apis": false,
+                "app_engine_bundled_services": null,
+                "automatic_scaling": [
+                    {
+                        "max_concurrent_requests": 0,
+                        "max_idle_instances": 0,
+                        "max_pending_latency": "",
+                        "min_idle_instances": 0,
+                        "min_pending_latency": "",
+                        "standard_scheduler_settings": [
+                            {
+                                "max_instances": 20,
+                                "min_instances": 0,
+                                "target_cpu_utilization": 0,
+                                "target_throughput_utilization": 0
+                            }
+                        ]
+                    }
+                ],
+                "basic_scaling": [],
+                "delete_service_on_destroy": false,
+                "deletion_policy": "DELETE",
+                "deployment": [
+                    {
+                        "files": [],
+                        "zip": [
+                            {
+                                "files_count": 0,
+                                "source_url": "https://storage.googleapis.com/c7n-app-engine-default-fd72/app-ac8fd586b5c601edb997fc3e17f1136f.zip"
+                            }
+                        ]
+                    }
+                ],
+                "entrypoint": [
+                    {
+                        "shell": "node app.js"
+                    }
+                ],
+                "env_variables": null,
+                "handlers": [
+                    {
+                        "auth_fail_action": "AUTH_FAIL_ACTION_REDIRECT",
+                        "login": "LOGIN_OPTIONAL",
+                        "redirect_http_response_code": "REDIRECT_HTTP_RESPONSE_CODE_301",
+                        "script": [
+                            {
+                                "script_path": "auto"
+                            }
+                        ],
+                        "security_level": "SECURE_ALWAYS",
+                        "static_files": [],
+                        "url_regex": "/.*"
+                    },
+                    {
+                        "auth_fail_action": "",
+                        "login": "LOGIN_OPTIONAL",
+                        "redirect_http_response_code": "",
+                        "script": [
+                            {
+                                "script_path": "auto"
+                            }
+                        ],
+                        "security_level": "SECURE_OPTIONAL",
+                        "static_files": [],
+                        "url_regex": ".*"
+                    }
+                ],
+                "id": "apps/cloud-custodian/services/default/versions/c7n-always-fd72",
+                "inbound_services": null,
+                "instance_class": "F1",
+                "libraries": [],
+                "manual_scaling": [],
+                "name": "apps/cloud-custodian/services/default/versions/c7n-always-fd72",
+                "noop_on_destroy": false,
+                "project": "cloud-custodian",
+                "runtime": "nodejs24",
+                "runtime_api_version": "",
+                "service": "default",
+                "service_account": "cloud-custodian@appspot.gserviceaccount.com",
+                "threadsafe": null,
+                "timeouts": null,
+                "version_id": "c7n-always-fd72",
+                "vpc_access_connector": []
+            },
+            "secure_optional": {
+                "app_engine_apis": false,
+                "app_engine_bundled_services": null,
+                "automatic_scaling": [
+                    {
+                        "max_concurrent_requests": 0,
+                        "max_idle_instances": 0,
+                        "max_pending_latency": "",
+                        "min_idle_instances": 0,
+                        "min_pending_latency": "",
+                        "standard_scheduler_settings": [
+                            {
+                                "max_instances": 20,
+                                "min_instances": 0,
+                                "target_cpu_utilization": 0,
+                                "target_throughput_utilization": 0
+                            }
+                        ]
+                    }
+                ],
+                "basic_scaling": [],
+                "delete_service_on_destroy": false,
+                "deletion_policy": "DELETE",
+                "deployment": [
+                    {
+                        "files": [],
+                        "zip": [
+                            {
+                                "files_count": 0,
+                                "source_url": "https://storage.googleapis.com/c7n-app-engine-default-fd72/app-ac8fd586b5c601edb997fc3e17f1136f.zip"
+                            }
+                        ]
+                    }
+                ],
+                "entrypoint": [
+                    {
+                        "shell": "node app.js"
+                    }
+                ],
+                "env_variables": null,
+                "handlers": [
+                    {
+                        "auth_fail_action": "AUTH_FAIL_ACTION_REDIRECT",
+                        "login": "LOGIN_OPTIONAL",
+                        "redirect_http_response_code": "",
+                        "script": [
+                            {
+                                "script_path": "auto"
+                            }
+                        ],
+                        "security_level": "SECURE_OPTIONAL",
+                        "static_files": [],
+                        "url_regex": "/.*"
+                    },
+                    {
+                        "auth_fail_action": "",
+                        "login": "LOGIN_OPTIONAL",
+                        "redirect_http_response_code": "",
+                        "script": [
+                            {
+                                "script_path": "auto"
+                            }
+                        ],
+                        "security_level": "SECURE_OPTIONAL",
+                        "static_files": [],
+                        "url_regex": ".*"
+                    }
+                ],
+                "id": "apps/cloud-custodian/services/default/versions/c7n-optional-fd72",
+                "inbound_services": null,
+                "instance_class": "F1",
+                "libraries": [],
+                "manual_scaling": [],
+                "name": "apps/cloud-custodian/services/default/versions/c7n-optional-fd72",
+                "noop_on_destroy": false,
+                "project": "cloud-custodian",
+                "runtime": "nodejs24",
+                "runtime_api_version": "",
+                "service": "default",
+                "service_account": "cloud-custodian@appspot.gserviceaccount.com",
+                "threadsafe": null,
+                "timeouts": null,
+                "version_id": "c7n-optional-fd72",
+                "vpc_access_connector": []
+            }
+        },
+        "google_storage_bucket": {
+            "source": {
+                "autoclass": [],
+                "cors": [],
+                "custom_placement_config": [],
+                "default_event_based_hold": false,
+                "deletion_policy": "DELETE",
+                "effective_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "enable_object_retention": false,
+                "encryption": [],
+                "force_destroy": true,
+                "hierarchical_namespace": [
+                    {
+                        "enabled": false
+                    }
+                ],
+                "id": "c7n-app-engine-default-fd72",
+                "ip_filter": [],
+                "labels": null,
+                "lifecycle_rule": [],
+                "location": "US",
+                "logging": [],
+                "name": "c7n-app-engine-default-fd72",
+                "project": "cloud-custodian",
+                "project_number": 123456789012,
+                "public_access_prevention": "inherited",
+                "requester_pays": false,
+                "retention_policy": [],
+                "rpo": "DEFAULT",
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-app-engine-default-fd72",
+                "soft_delete_policy": [
+                    {
+                        "effective_time": "2026-10-01T19:33:00.633Z",
+                        "retention_duration_seconds": 604800
+                    }
+                ],
+                "storage_class": "STANDARD",
+                "terraform_labels": {
+                    "goog-terraform-provisioned": "true"
+                },
+                "time_created": "2026-10-01T19:33:00.633Z",
+                "timeouts": null,
+                "uniform_bucket_level_access": true,
+                "updated": "2026-10-01T19:33:00.633Z",
+                "url": "gs://c7n-app-engine-default-fd72",
+                "versioning": [],
+                "website": []
+            }
+        },
+        "google_storage_bucket_object": {
+            "source": {
+                "bucket": "c7n-app-engine-default-fd72",
+                "cache_control": "",
+                "content": null,
+                "content_disposition": "",
+                "content_encoding": "",
+                "content_language": "",
+                "content_type": "application/zip",
+                "contexts": [],
+                "crc32c": "dndRpw==",
+                "customer_encryption": [],
+                "deletion_policy": "DELETE",
+                "detect_md5hash": "rI/VhrXGAe25l/w+F/ETbw==",
+                "event_based_hold": false,
+                "force_empty_content_type": null,
+                "generation": 1790883181370580,
+                "id": "c7n-app-engine-default-fd72-app-ac8fd586b5c601edb997fc3e17f1136f.zip",
+                "kms_key_name": "",
+                "md5hash": "rI/VhrXGAe25l/w+F/ETbw==",
+                "md5hexhash": "ac8fd586b5c601edb997fc3e17f1136f",
+                "media_link": "https://storage.googleapis.com/download/storage/v1/b/c7n-app-engine-default-fd72/o/app-ac8fd586b5c601edb997fc3e17f1136f.zip?generation=1790883181370580&alt=media",
+                "metadata": null,
+                "name": "app-ac8fd586b5c601edb997fc3e17f1136f.zip",
+                "output_name": "app-ac8fd586b5c601edb997fc3e17f1136f.zip",
+                "retention": [],
+                "self_link": "https://www.googleapis.com/storage/v1/b/c7n-app-engine-default-fd72/o/app-ac8fd586b5c601edb997fc3e17f1136f.zip",
+                "source": "./.terraform/app.zip",
+                "source_md5hash": "",
+                "storage_class": "STANDARD",
+                "temporary_hold": false,
+                "timeouts": null
+            }
+        },
+        "random_id": {
+            "suffix": {
+                "b64_std": "/XI=",
+                "b64_url": "_XI",
+                "byte_length": 2,
+                "dec": "64882",
+                "hex": "fd72",
+                "id": "_XI",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

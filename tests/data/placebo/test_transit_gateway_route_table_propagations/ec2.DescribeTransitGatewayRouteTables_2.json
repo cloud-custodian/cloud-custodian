@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransitGatewayRouteTables": [
+            {
+                "TransitGatewayRouteTableId": "tgw-rtb-00000000000000001",
+                "TransitGatewayId": "tgw-00000000000000001",
+                "State": "available",
+                "DefaultAssociationRouteTable": true,
+                "DefaultPropagationRouteTable": true,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 21,
+                    "minute": 12,
+                    "second": 1,
+                    "microsecond": 0
+                },
+                "Tags": []
+            },
+            {
+                "TransitGatewayRouteTableId": "tgw-rtb-00000000000000002",
+                "TransitGatewayId": "tgw-00000000000000001",
+                "State": "available",
+                "DefaultAssociationRouteTable": false,
+                "DefaultPropagationRouteTable": false,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 21,
+                    "minute": 12,
+                    "second": 31,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test-available-rt"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

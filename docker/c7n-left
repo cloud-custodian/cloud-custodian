@@ -1,4 +1,4 @@
-ARG UV_VERSION="0.7.12"
+ARG UV_VERSION="0.12.19"
 
 # BuildKit does not expand variables in `COPY --from`, so pull uv in as a
 # named stage and copy from that instead.

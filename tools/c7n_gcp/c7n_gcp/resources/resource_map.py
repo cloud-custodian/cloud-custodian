@@ -130,11 +130,13 @@ ResourceMap = {
     "gcp.vertex-ai-evaluation-run": "c7n_gcp.resources.vertexai.VertexAIEvaluationRun",
     "gcp.vertex-ai-hyperparameter-tuning-job": (
         "c7n_gcp.resources.vertexai.VertexAIHyperparameterTuningJob"),
+    "gcp.vertex-ai-index-endpoint": "c7n_gcp.resources.vertexai.VertexAIIndexEndpoint",
     "gcp.vertex-ai-location": "c7n_gcp.resources.vertexai.VertexAILocation",
     "gcp.vertex-ai-model": "c7n_gcp.resources.vertexai.VertexAIModel",
     "gcp.vertex-ai-metadata-store-artifact": (
         "c7n_gcp.resources.vertexai.VertexAIMetadataStoreArtifact"),
     "gcp.vpc": "c7n_gcp.resources.network.Network",
+    "gcp.workspace-user": "c7n_gcp.resources.workspace.WorkspaceUser",
     "gcp.zone": "c7n_gcp.resources.compute.Zone",
 }
 # SPDX-License-Identifier: Apache-2.0

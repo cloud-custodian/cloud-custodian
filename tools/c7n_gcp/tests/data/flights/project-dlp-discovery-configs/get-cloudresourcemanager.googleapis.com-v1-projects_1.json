@@ -1,0 +1,36 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 02 Oct 2026 14:02:37 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=277",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "393",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudresourcemanager.googleapis.com/v1/projects?filter=id%3Acloud-custodian&alt=json"
+  },
+  "body": {
+    "projects": [
+      {
+        "projectNumber": "400632884532",
+        "projectId": "cloud-custodian",
+        "lifecycleState": "ACTIVE",
+        "name": "cloud-custodian",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "createTime": "2026-09-10T20:26:52.526Z",
+        "parent": {
+          "type": "organization",
+          "id": "728386023487"
+        }
+      }
+    ]
+  }
+}

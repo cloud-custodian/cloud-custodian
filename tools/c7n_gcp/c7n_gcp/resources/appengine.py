@@ -171,17 +171,34 @@ class AppEngineService(ChildResourceManager):
                                         'servicesId': service_id})
 
 
+VERSION_NAME_RE = re.compile(
+    r'(?:.*/)?apps/(?P<appsId>[^/]+)'
+    r'/services/(?P<servicesId>[^/]+)'
+    r'/versions/(?P<versionsId>[^/]+)$')
+
+
+def parse_version_name(name):
+    """Split a version name into its appsId, servicesId and versionsId path params."""
+    if match := VERSION_NAME_RE.match(name):
+        return match.groupdict()
+    raise ValueError(f"Couldn't parse app, service and version from {name}")
+
+
 @resources.register('app-engine-service-version')
 class AppEngineServiceVersion(ChildResourceManager):
     """GCP Resource
     https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions
     """
 
+    def _get_parent_resource_info(self, child_instance):
+        ids = parse_version_name(child_instance['name'])
+        return {'resourceName': f"apps/{ids['appsId']}/services/{ids['servicesId']}"}
+
     class resource_type(AppEngineChildTypeInfo):
         component = 'apps.services.versions'
         name = 'name'
         id = 'id'
-        enum_spec = ('list', 'versions[]', None)
+        enum_spec = ('list', 'versions[]', {'view': 'FULL'})
         default_report_fields = ['name', 'instanceClass', 'runtime', 'runtimeChannel', 'vm']
         urn_component = "versions"
         asset_type = "appengine.googleapis.com/Version"
@@ -192,3 +209,8 @@ class AppEngineServiceVersion(ChildResourceManager):
                 ('name', 'appsId', 'regex', r'/(.*?)/')
             ]
         }
+
+        @staticmethod
+        def get(client, resource_info):
+            ids = parse_version_name(resource_info['resourceName'])
+            return client.execute_query('get', {**ids, 'view': 'FULL'})

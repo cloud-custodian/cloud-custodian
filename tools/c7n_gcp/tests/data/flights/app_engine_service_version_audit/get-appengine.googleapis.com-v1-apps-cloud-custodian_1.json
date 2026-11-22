@@ -1,0 +1,35 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 01 Oct 2026 19:34:20 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "599",
+    "-content-encoding": "gzip",
+    "content-location": "https://appengine.googleapis.com/v1/apps/cloud-custodian?alt=json"
+  },
+  "body": {
+    "name": "apps/cloud-custodian",
+    "id": "cloud-custodian",
+    "authDomain": "gmail.com",
+    "locationId": "us-central",
+    "codeBucket": "staging.cloud-custodian.appspot.com",
+    "servingStatus": "SERVING",
+    "defaultHostname": "cloud-custodian.uc.r.appspot.com",
+    "defaultBucket": "cloud-custodian.appspot.com",
+    "serviceAccount": "cloud-custodian@appspot.gserviceaccount.com",
+    "gcrDomain": "us.gcr.io",
+    "databaseType": "CLOUD_DATASTORE_COMPATIBILITY",
+    "featureSettings": {
+      "splitHealthChecks": true,
+      "useContainerOptimizedOs": true
+    },
+    "sslPolicy": "MODERN"
+  }
+}

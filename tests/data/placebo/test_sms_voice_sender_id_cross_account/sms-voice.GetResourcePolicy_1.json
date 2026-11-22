@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourceArn": "arn:aws:sms-voice:us-east-1:644160558196:sender-id/C7NSHARED/DE",
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"c7nCrossAccount\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"sms-voice:DescribeSenderIds\",\"Resource\":\"arn:aws:sms-voice:us-east-1:644160558196:sender-id/C7NSHARED/DE\"}]}",
+        "CreatedTimestamp": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 11,
+            "day": 5,
+            "hour": 15,
+            "minute": 39,
+            "second": 31,
+            "microsecond": 809000
+        },
+        "ResponseMetadata": {}
+    }
+}
