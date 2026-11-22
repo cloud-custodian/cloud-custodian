@@ -3,6 +3,7 @@
 
 import base64
 import collections.abc
+import functools
 from collections import namedtuple
 import json
 import logging
@@ -153,7 +154,9 @@ class CloudFunctionManager:
         return self.client.get_http()
 
     def _delta_source(self, archive, func_name):
-        checksum = archive.get_checksum(hasher=hashlib.md5)
+        # gcs wants an md5 for the x-goog-hash header, this isn't a security use.
+        checksum = archive.get_checksum(
+            hasher=functools.partial(hashlib.md5, usedforsecurity=False))
         source_info = self.client.execute_command(
             'generateDownloadUrl', {'name': func_name, 'body': {}})
         http = self._get_http_client(self.client)
@@ -176,15 +179,16 @@ class CloudFunctionManager:
                 region)}).get('uploadUrl')
         log.debug("uploading function code %s", url)
         http = self._get_http_client(self.client)
-        headers, response = http.request(
-            url, method='PUT',
-            headers={
-                'content-type': 'application/zip',
-                'Content-Length': '%d' % archive.size,
-                'x-goog-content-length-range': '0,104857600'
-            },
-            body=open(archive.path, 'rb')
-        )
+        with open(archive.path, 'rb') as body:
+            headers, response = http.request(
+                url, method='PUT',
+                headers={
+                    'content-type': 'application/zip',
+                    'Content-Length': '%d' % archive.size,
+                    'x-goog-content-length-range': '0,104857600'
+                },
+                body=body
+            )
         log.info("function code uploaded")
         if headers['status'] != '200':
             raise RuntimeError("%s\n%s" % (headers, response))

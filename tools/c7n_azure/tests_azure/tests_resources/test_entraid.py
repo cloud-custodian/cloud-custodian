@@ -7,6 +7,8 @@ import requests
 from datetime import datetime, timezone
 from pytest_terraform import terraform
 
+from c7n.testing import local_timezone
+
 from c7n_azure.resources.entraid_user import (
     EntraIDUser
 )
@@ -437,6 +439,22 @@ client.return_value = mock_client
 
             days = self.manager._calculate_last_signin_days(user)
             self.assertEqual(days, 90)  # Approximately 90 days between Jan 1 and April 1
+
+    def test_calculate_days_on_non_utc_host(self):
+        """now() must be taken in the timestamp's zone, not local wall time
+        relabelled as utc"""
+        from datetime import timedelta
+
+        twelve_hours_ago = (
+            datetime.now(timezone.utc) - timedelta(hours=12)).strftime('%Y-%m-%dT%H:%M:%SZ')
+        # utc+14, local wall time is 14 hours ahead of utc
+        with local_timezone('Pacific/Kiritimati'):
+            self.assertEqual(
+                self.manager._calculate_last_signin_days(
+                    {'signInActivity': {'lastSignInDateTime': twelve_hours_ago}}), 0)
+            self.assertEqual(
+                self.manager._calculate_password_age(
+                    {'lastPasswordChangeDateTime': twelve_hours_ago}), 0)
 
     def test_calculate_last_signin_days_never_signed_in(self):
         """Test _calculate_last_signin_days when user never signed in"""

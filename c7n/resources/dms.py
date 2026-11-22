@@ -29,7 +29,7 @@ class InstanceDescribe(DescribeSource):
             futures = []
             for resource_set in chunks(resources, 20):
                 futures.append(
-                    w.submit(self.process_resource_set, client, resources))
+                    w.submit(self.process_resource_set, client, resource_set))
 
             for f in as_completed(futures):
                 if f.exception():

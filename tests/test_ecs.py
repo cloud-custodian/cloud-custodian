@@ -5,6 +5,7 @@ from .common import BaseTest
 import fnmatch
 import os
 import time
+from unittest import mock
 
 from c7n.exceptions import PolicyExecutionError
 from c7n.resources.aws import Arn
@@ -388,6 +389,26 @@ class TestEcsService(BaseTest):
         resources = p.resource_manager.filter_resources(services)
         self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0]['serviceName'], 'test-yes-tag')
+
+    def test_ecs_service_tag_old_arn_warns(self):
+        # Logger.warn is deprecated, and our own deprecation warnings are
+        # errors under the test config
+        old = {"serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test-no-tag",
+               "serviceName": "test-no-tag"}
+        p = self.load_policy({
+            "name": "ecs-service-tag-old-arn",
+            "resource": "ecs-service",
+            "actions": [
+                {"type": "tag", "key": "k", "value": "v"},
+                {"type": "remove-tag", "tags": ["k"]}]})
+        client = mock.MagicMock()
+        tag, untag = p.resource_manager.actions
+        with self.assertLogs(tag.log, level="WARNING") as logs:
+            tag.process_resource_set(client, [old], [{"Key": "k", "Value": "v"}])
+            untag.process_resource_set(client, [old], ["k"])
+        self.assertEqual(len(logs.output), 2)
+        client.tag_resource.assert_not_called()
+        client.untag_resource.assert_not_called()
 
     def test_ecs_service_subnet(self):
         session_factory = self.replay_flight_data("test_ecs_service_subnet")

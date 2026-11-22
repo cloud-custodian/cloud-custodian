@@ -376,14 +376,27 @@ class WAFV2LoggingFilter(ValueFilter):
     """
 
     schema = type_schema('logging', rinherit=ValueFilter.schema)
-    permissions = ('wafv2:GetLoggingConfiguration',)
+    permissions = ('wafv2:GetLoggingConfiguration', 'wafv2:ListLoggingConfigurations')
     annotation_key = 'c7n:WafV2LoggingConfiguration'
+
+    def list_logging_configurations(self, client):
+        # wafv2 has no botocore paginator here and pages on NextMarker, which
+        # it may hand back on the last page too, so stop on a missing marker
+        # or on an empty page, whichever comes first.
+        results = []
+        params = {'Scope': self.manager.scope}
+        while True:
+            response = self.manager.retry(client.list_logging_configurations, **params)
+            page = response.get('LoggingConfigurations', [])
+            results.extend(page)
+            marker = response.get('NextMarker')
+            if not marker or not page or marker == params.get('NextMarker'):
+                return results
+            params['NextMarker'] = marker
 
     def process(self, resources, event=None):
         client = self.manager.get_client()
-        logging_confs = client.list_logging_configurations(Scope=self.manager.scope)[
-            'LoggingConfigurations'
-        ]
+        logging_confs = self.list_logging_configurations(client)
         resource_map = {r['ARN']: r for r in resources}
         for lc in logging_confs:
             if lc['ResourceArn'] in resource_map:

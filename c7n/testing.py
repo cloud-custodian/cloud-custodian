@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import contextlib
 import datetime
 import functools
 import io
@@ -8,8 +9,10 @@ import logging
 import os
 import re
 import shutil
+import sys
 import tempfile
 import textwrap
+import time
 import unittest
 from unittest import mock
 
@@ -22,6 +25,7 @@ from c7n import deprecated, policy
 from c7n.exceptions import DeprecationError
 from c7n.loader import PolicyLoader
 from c7n.ctx import ExecutionContext
+from c7n import utils
 from c7n.utils import reset_session_cache, jmespath_search
 from c7n.config import Bag, Config
 
@@ -279,10 +283,33 @@ class TextTestIO(io.StringIO):
         return super(TextTestIO, self).write(b)
 
 
+@contextlib.contextmanager
+def local_timezone(name):
+    """Run the block with the process's local timezone set to name.
+
+    time.tzset only exists on unix, so the enclosing test is skipped elsewhere.
+    """
+    if not hasattr(time, 'tzset'):
+        raise unittest.SkipTest('time.tzset is not available on this platform')
+    previous = os.environ.get('TZ')
+    os.environ['TZ'] = name
+    time.tzset()
+    try:
+        yield
+    finally:
+        if previous is None:
+            os.environ.pop('TZ', None)
+        else:
+            os.environ['TZ'] = previous
+        time.tzset()
+
+
 # Per http://blog.xelnor.net/python-mocking-datetime/
 # naive implementation has issues with pypy
 
 real_datetime_class = datetime.datetime
+# module name prefixes mock_datetime_now searches for utcnow_naive imports
+_UTCNOW_NAIVE_PACKAGES = ('c7n', 'tests')
 
 
 def mock_datetime_now(tgt, dt):
@@ -309,4 +336,54 @@ def mock_datetime_now(tgt, dt):
         (BaseMockedDatetime,),
         {},
     )
-    return mock.patch.object(dt, "datetime", MockedDatetime)
+
+    def mocked_utcnow_naive():
+        # match the real helper, which always returns naive utc
+        t = MockedDatetime.target
+        if t.tzinfo is not None:
+            t = t.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+        return t
+
+    patches = []
+    if hasattr(dt, "datetime"):
+        patches.append(mock.patch.object(dt, "datetime", MockedDatetime))
+    if hasattr(dt, "utcnow_naive"):
+        patches.append(mock.patch.object(dt, "utcnow_naive", mocked_utcnow_naive))
+    if dt is datetime:
+        # patching the datetime module is a global mock, utcnow_naive is
+        # imported into module namespaces, so patch each of its users.
+        # Only look in custodian's own packages (c7n, the c7n_* providers
+        # and tools) and test packages (tests, tests_azure): a getattr on
+        # an arbitrary third party module can run its __getattr__ hook.
+        for name, mod in list(sys.modules.items()):
+            if mod is None or not name.startswith(_UTCNOW_NAIVE_PACKAGES):
+                continue
+            # includes c7n.utils itself, for callers that go through the
+            # module (utils.utcnow_naive()) and for FormatDate.utcnow
+            if getattr(mod, "utcnow_naive", None) is utils.utcnow_naive:
+                patches.append(mock.patch.object(mod, "utcnow_naive", mocked_utcnow_naive))
+    if not patches:
+        raise ValueError(
+            "mock_datetime_now: %r has neither a datetime class nor utcnow_naive to patch" % (
+                dt,))
+    return _MockedPatches(patches, MockedDatetime)
+
+
+class _MockedPatches:
+    """Apply a set of mock patches as a single context manager."""
+
+    def __init__(self, patches, target):
+        self.patches = patches
+        self.target = target
+
+    def __enter__(self):
+        # if a patch fails to apply, undo the ones already applied
+        with contextlib.ExitStack() as stack:
+            for p in self.patches:
+                stack.enter_context(p)
+            self._stack = stack.pop_all()
+        return self.target
+
+    def __exit__(self, *args):
+        stack, self._stack = self._stack, None
+        return stack.__exit__(*args)

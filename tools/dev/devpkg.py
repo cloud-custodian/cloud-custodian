@@ -18,7 +18,7 @@ def project_roots(root):
     for l in lines:
         if not l.startswith('PKG_SET '):
             continue
-        pkgs = [p.strip('tools/') for p in l.split(':=')[1].split()]
+        pkgs = [p.removeprefix('tools/') for p in l.split(':=')[1].split()]
     pkgs.append('')
 
     for config_path in Path(root).rglob("pyproject.toml"):

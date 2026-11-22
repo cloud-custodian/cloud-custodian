@@ -84,11 +84,12 @@ class VariableResolver:
 
     @contextlib.contextmanager
     def get_variables(self):
-        self.resolved_files["default"] = self.get_default_var_files()
-        self.resolved_files["user"] = self.get_user_var_files()
-        self.resolved_files["uninitialized"] = self.get_uninitialized_var_files()
-
+        # resolving writes temp files into the module as it goes, clean them
+        # up if it fails part way as well.
         try:
+            self.resolved_files["default"] = self.get_default_var_files()
+            self.resolved_files["user"] = self.get_user_var_files()
+            self.resolved_files["uninitialized"] = self.get_uninitialized_var_files()
             yield list(itertools.chain(*self.resolved_files.values()))
         finally:
             for t in self.temp_files:
@@ -197,7 +198,7 @@ class VariableResolver:
         for v in var_files:
             if not v.is_absolute() and (self.source_dir / v).exists():
                 resolved_files.append(v)
-            elif v.is_absolute() and str(v).startswith(str(self.source_dir)):
+            elif v.is_absolute() and v.is_relative_to(self.source_dir):
                 resolved_files.append(v.relative_to(self.source_dir))
             else:
                 suffix = str(v).endswith(".tfvars.json") and ".tfvars.json" or ".tfvars"

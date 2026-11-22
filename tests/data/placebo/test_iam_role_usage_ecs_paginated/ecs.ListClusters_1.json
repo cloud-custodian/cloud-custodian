@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:123456789012:cluster/app"
+        ],
+        "nextToken": "clusters-2",
+        "ResponseMetadata": {}
+    }
+}

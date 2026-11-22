@@ -2,11 +2,28 @@
 # SPDX-License-Identifier: Apache-2.0
 import datetime
 from collections import namedtuple
+from types import SimpleNamespace
 
 from ..azure_common import BaseTest, arm_template, cassette_name
 from unittest.mock import patch
 
 from c7n.exceptions import PolicyValidationError
+
+
+class _HostLocalNow(datetime.datetime):
+    instant = datetime.datetime(2024, 1, 14, 20, 0, tzinfo=datetime.timezone.utc)
+
+    @classmethod
+    def now(cls, tz=None):
+        if tz is None:
+            local = datetime.timezone(datetime.timedelta(hours=9))
+            return cls.instant.astimezone(local).replace(tzinfo=None)
+        return cls.instant.astimezone(tz)
+
+
+# stands in for the datetime module inside cost_management_export
+HostLocalDatetime = SimpleNamespace(
+    datetime=_HostLocalNow, timedelta=datetime.timedelta, timezone=datetime.timezone)
 
 
 class CostManagementExportTest(BaseTest):
@@ -48,7 +65,7 @@ class CostManagementExportTest(BaseTest):
     # There is no guarantee we have or don't have some real execution, so we will simulate possible
     # scenarios using patch
     @patch('azure.mgmt.costmanagement.operations.ExportsOperations.get_execution_history',
-           return_value=MockExecutionHistory([datetime.datetime.now()]))
+           return_value=MockExecutionHistory([datetime.datetime.now(datetime.timezone.utc)]))
     @arm_template('cost-management-export.json')
     @cassette_name('common')
     def test_last_execution_mock(self, _1):
@@ -57,10 +74,24 @@ class CostManagementExportTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @patch('azure.mgmt.costmanagement.operations.ExportsOperations.get_execution_history',
-           return_value=MockExecutionHistory([datetime.datetime.now()]))
+           return_value=MockExecutionHistory([datetime.datetime.now(datetime.timezone.utc)]))
     @arm_template('cost-management-export.json')
     @cassette_name('common')
     def test_last_execution_mock_large_age(self, _1):
+        p = self._get_policy(filters=[{'type': 'last-execution', 'age': 1}])
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    # ran at 01:00 utc on the 14th; it is now 20:00 utc on the 14th, and the
+    # host's local clock (utc+9) already reads the 15th
+    @patch('azure.mgmt.costmanagement.operations.ExportsOperations.get_execution_history',
+           return_value=MockExecutionHistory([
+               datetime.datetime(2024, 1, 14, 1, 0, tzinfo=datetime.timezone.utc)]))
+    @patch('c7n_azure.resources.cost_management_export.datetime', HostLocalDatetime)
+    @arm_template('cost-management-export.json')
+    @cassette_name('common')
+    def test_last_execution_age_in_utc(self, _1):
+        # it ran within the last day in utc, so it isn't stale
         p = self._get_policy(filters=[{'type': 'last-execution', 'age': 1}])
         resources = p.run()
         self.assertEqual(len(resources), 0)

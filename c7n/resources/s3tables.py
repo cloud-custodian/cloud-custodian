@@ -25,9 +25,10 @@ class TableBucket(QueryResourceManager):
         service = 's3tables'
         enum_spec = ('list_table_buckets', 'tableBuckets', None)
         arn = id = 'arn'
+        arn_type = 'bucket'
         name = 'name'
         date = 'createdAt'
-        cfn_type = 'AWS::S3Tables::TableBucket'
+        config_type = cfn_type = 'AWS::S3Tables::TableBucket'
         universal_taggable = object()
 
     source_mapping = {'describe': DescribeWithResourceTags}

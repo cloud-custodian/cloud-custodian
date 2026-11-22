@@ -22,6 +22,8 @@ CUSTODIAN_ORG_IMAGE = os.environ.get("CUSTODIAN_C7N_ORG_IMAGE")
 CUSTODIAN_IMAGE = os.environ.get("CUSTODIAN_C7N_IMAGE")
 CUSTODIAN_MAILER_IMAGE = os.environ.get("CUSTODIAN_MAILER_IMAGE")
 CUSTODIAN_PSTREAM_IMAGE = os.environ.get("CUSTODIAN_POLICYSTREAM_IMAGE")
+CUSTODIAN_KUBE_IMAGE = os.environ.get("CUSTODIAN_C7N_KUBE_IMAGE")
+CUSTODIAN_LEFT_IMAGE = os.environ.get("CUSTODIAN_C7N_LEFT_IMAGE")
 
 
 @pytest.fixture
@@ -125,6 +127,8 @@ def test_org_run_aws(custodian_org_dir, custodian_env_creds):
                 CUSTODIAN_ORG_IMAGE,
                 CUSTODIAN_MAILER_IMAGE,
                 CUSTODIAN_PSTREAM_IMAGE,
+                CUSTODIAN_KUBE_IMAGE,
+                CUSTODIAN_LEFT_IMAGE,
             ],
         )
     ),
@@ -134,7 +138,9 @@ def test_image_metadata(image_name):
     image = client.images.get(image_name)
     labels = set(image.labels)
     labels.discard("org.opencontainers.image.ref.name")
-    assert labels == {
+    # base images may carry their own labels (e.g. chainguard/wolfi-base for
+    # c7n-left adds dev.chainguard.* and vendor/authors), so only require ours.
+    expected = {
         "name",
         "repository",
         "org.opencontainers.image.created",
@@ -147,6 +153,7 @@ def test_image_metadata(image_name):
         "org.opencontainers.image.url",
         "org.opencontainers.image.version",
     }
+    assert expected <= labels, sorted(expected - labels)
 
 
 @pytest.mark.skipif(
@@ -167,6 +174,26 @@ def test_cli_providers_available():
     resources = yaml.safe_load(output.strip())["resources"]
     found_providers = {r.split(".", 1)[0] for r in resources}
     assert providers == found_providers
+
+
+@pytest.mark.skipif(
+    not (TEST_DOCKER and CUSTODIAN_KUBE_IMAGE), reason="docker testing not requested"
+)
+def test_kube_help():
+    # containers.run raises ContainerError on a non zero exit
+    client = docker.from_env()
+    output = client.containers.run(CUSTODIAN_KUBE_IMAGE, "--help", stderr=True).decode("utf8")
+    assert "Cloud Custodian Admission Controller" in output
+
+
+@pytest.mark.skipif(
+    not (TEST_DOCKER and CUSTODIAN_LEFT_IMAGE), reason="docker testing not requested"
+)
+def test_left_help():
+    # containers.run raises ContainerError on a non zero exit
+    client = docker.from_env()
+    output = client.containers.run(CUSTODIAN_LEFT_IMAGE, "--help", stderr=True).decode("utf8")
+    assert "Shift Left Policy" in output
 
 
 @pytest.mark.skipif(

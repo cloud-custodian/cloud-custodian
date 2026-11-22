@@ -1,0 +1,62 @@
+{
+    "status_code": 200, 
+    "data": {
+        "failedSet": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c92c12cf-2f74-11e7-8171-f787f6681129", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c92c12cf-2f74-11e7-8171-f787f6681129", 
+                "date": "Tue, 02 May 2017 20:20:29 GMT", 
+                "content-length": "2540", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "successfulSet": [
+            {
+                "event": {
+                    "lastUpdatedTime": {
+                        "hour": 0, 
+                        "__class__": "datetime", 
+                        "month": 4, 
+                        "second": 4, 
+                        "microsecond": 143000, 
+                        "year": 2017, 
+                        "day": 27, 
+                        "minute": 59
+                    }, 
+                    "service": "EC2", 
+                    "eventTypeCode": "AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED", 
+                    "startTime": {
+                        "hour": 0, 
+                        "__class__": "datetime", 
+                        "month": 5, 
+                        "second": 0, 
+                        "microsecond": 0, 
+                        "year": 2017, 
+                        "day": 11, 
+                        "minute": 0
+                    }, 
+                    "eventTypeCategory": "scheduledChange", 
+                    "endTime": {
+                        "hour": 0, 
+                        "__class__": "datetime", 
+                        "month": 5, 
+                        "second": 0, 
+                        "microsecond": 0, 
+                        "year": 2017, 
+                        "day": 11, 
+                        "minute": 0
+                    }, 
+                    "region": "us-west-2", 
+                    "arn": "arn:aws:health:us-west-2::event/AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED12345678-1234-1234-1234-123456789012", 
+                    "statusCode": "upcoming"
+                }, 
+                "eventDescription": {
+                    "latestDescription": "EC2 has detected degradation of the underlying hardware hosting your Amazon EC2 instance associated with this event in the us-west-2 region. Due to this degradation, your instance could already be unreachable. After 2017-05-11 04:00 UTC your instance, which has an EBS volume as the root device, will be stopped.\n\nYou can see more information on your instances that are scheduled for retirement in the AWS Management Console (https://console.aws.amazon.com/ec2/v2/home?region=us-west-2#Events)\n\n* How does this affect you?\nYour instance's root device is an EBS volume and the instance will be stopped after the specified retirement date. You can start it again at any time. Note that if you have EC2 instance store volumes attached to the instance, any data on these volumes will be lost when the instance is stopped or terminated as these volumes are physically attached to the host computer\n\n* What do you need to do?\nYou may still be able to access the instance. We recommend that you replace the instance by creating an AMI of your instance and launch a new instance from the AMI. For more information please see Amazon Machine Images (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) in the EC2 User Guide. In case of difficulties stopping your EBS-backed instance, please see the Instance FAQ (http://aws.amazon.com/instance-help/#ebs-stuck-stopping).\n\n* Why retirement?\nAWS may schedule instances for retirement in cases where there is an unrecoverable issue with the underlying hardware. For more information about scheduled retirement events please see the EC2 user guide (http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-retirement.html). To avoid single points of failure within critical applications, please refer to our architecture center for more information on implementing fault-tolerant architectures: http://aws.amazon.com/architecture\n\nIf you have any questions or concerns, you can contact the AWS Support Team on the community forums and via AWS Premium Support at: http://aws.amazon.com/support"
+                }
+            }
+        ]
+    }
+}

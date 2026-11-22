@@ -62,6 +62,21 @@ class EventBusTest(BaseTest):
         self.assertEqual(len(remainder), 1)
         self.assertNotEqual(remainder[0]["Name"], "test-event-bus")
 
+    def test_event_bus_paginated(self):
+        factory = self.replay_flight_data("test_event_bus_paginated")
+        p = self.load_policy(
+            {
+                "name": "query-event-buses",
+                "resource": "aws.event-bus",
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted(r["Name"] for r in resources),
+            ["c7n-test-bus-page-one", "c7n-test-bus-page-two"])
+
 
 class EventRuleTest(BaseTest):
 
@@ -385,6 +400,21 @@ class ApiDestinationTest(BaseTest):
         self.assertEqual(resources[0]["Name"], "test-delete-me")
         self.assertEqual(resources[0]["ApiDestinationState"], "ACTIVE")
 
+    def test_api_destination_paginated(self):
+        factory = self.replay_flight_data("test_api_destination_paginated")
+        p = self.load_policy(
+            {
+                "name": "query-api-destinations",
+                "resource": "aws.event-api-destination",
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted(r["Name"] for r in resources),
+            ["c7n-test-dest-page-one", "c7n-test-dest-page-two"])
+
 
 class ConnectionTest(BaseTest):
 
@@ -426,3 +456,23 @@ class ConnectionTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["AuthorizationType"], "BASIC")
         self.assertEqual(resources[0]["Name"], "c7n-test-conn-basic")
+
+    def test_event_connection_paginated(self):
+        factory = self.replay_flight_data("test_event_connection_paginated")
+        p = self.load_policy(
+            {
+                "name": "query-connections",
+                "resource": "aws.event-connection",
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted(r["Name"] for r in resources),
+            ["c7n-test-conn-page-one", "c7n-test-conn-page-two"])
+        # id lookups (event modes) have to see the second page too. go via
+        # the source so the replayed describe_connection detail calls don't
+        # wrap around and overwrite the match.
+        found = p.resource_manager.source.get_resources(["c7n-test-conn-page-two"])
+        self.assertEqual([r["Name"] for r in found], ["c7n-test-conn-page-two"])

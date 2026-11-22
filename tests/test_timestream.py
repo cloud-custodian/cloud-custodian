@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
+from .common import BaseTest, record_api_params
 from c7n.testing import mock_datetime_now
 import c7n.filters.backup
 from dateutil import parser
@@ -100,6 +100,23 @@ class TestTimestreamDatabase(BaseTest):
         client = session_factory().client('timestream-write')
         dbs = client.list_databases()['Databases']
         self.assertEqual(len(dbs), 0)
+
+    def test_timestream_database_delete_force_paginated(self):
+        # the database's tables span two pages, all of them are deleted
+        session_factory = self.replay_flight_data(
+            'test_timestream_database_delete_force_paginated')
+        deleted = record_api_params(session_factory, 'timestream-write', 'DeleteTable')
+        p = self.load_policy(
+            {
+                'name': 'test-timestream-db-delete-force',
+                'resource': 'aws.timestream-database',
+                'filters': [{"TableCount": 1}],
+                'actions': [{'type': 'delete', 'force': True}]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual([d['TableName'] for d in deleted], ['IoTMulti', 'IoTSecond'])
 
 
 class TestTimestreamTable(BaseTest):

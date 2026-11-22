@@ -1,0 +1,43 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Clusters": [
+            {
+                "Status": "creating", 
+                "SubnetGroup": "c7n-dax-subnet-group", 
+                "NodeType": "dax.t2.small", 
+                "ClusterName": "c7n-test", 
+                "ActiveNodes": 0, 
+                "TotalNodes": 1, 
+                "IamRoleArn": "arn:aws:iam::644160558196:role/aws-service-role/dax.amazonaws.com/AWSServiceRoleForDAX", 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupIdentifier": "sg-4b9ada34"
+                    }
+                ], 
+                "ClusterArn": "arn:aws:dax:us-east-1:644160558196:cache/c7n-test", 
+                "ClusterDiscoveryEndpoint": {
+                    "Port": 8111
+                }, 
+                "ParameterGroup": {
+                    "NodeIdsToReboot": [], 
+                    "ParameterGroupName": "default.dax1.0", 
+                    "ParameterApplyStatus": "in-sync"
+                }, 
+                "PreferredMaintenanceWindow": "tue:06:00-tue:07:00"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d8cb201f-5dbe-11e8-99ea-b3663f070979", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d8cb201f-5dbe-11e8-99ea-b3663f070979", 
+                "date": "Tue, 22 May 2018 12:51:29 GMT", 
+                "content-length": "604", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

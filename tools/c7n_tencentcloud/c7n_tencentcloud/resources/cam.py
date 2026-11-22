@@ -130,7 +130,9 @@ class GroupMembership(ValueFilter):
             for user_set in chunks([r for r in resources if self.group_field_name not in r]):
                 futures.append(w.submit(self.get_user_groups, user_set))
             for f in as_completed(futures):
-                pass
+                if f.exception():
+                    self.log.error(
+                        "Error retrieving groups for users: %s", f.exception())
 
         matched = []
         for r in resources:

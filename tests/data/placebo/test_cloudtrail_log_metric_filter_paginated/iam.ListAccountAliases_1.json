@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "AccountAliases": [
+            "foo"
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

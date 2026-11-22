@@ -3,9 +3,10 @@
 import json
 import logging
 import os
+from unittest import mock
 
 
-from c7n.query import ResourceQuery, RetryPageIterator, TypeInfo
+from c7n.query import ResourceQuery, RetryPageIterator, TypeInfo, paginate_op
 from c7n.resources.vpc import InternetGateway
 
 from botocore.config import Config
@@ -130,6 +131,36 @@ class ConfigSourceTest(BaseTest):
         p.data['query'] = [{'clause': "configuration.imageId = 'xyz'"}]
         self.assertIn("imageId = 'xyz'", source.get_query_params(None)['expr'])
 
+    def test_config_listed_resources_chunk_failure_raises(self):
+        # a failed chunk must not produce a silently partial (and then
+        # cached) resource list, every chunk is still attempted and logged.
+        p = self.load_policy({'name': 'x', 'resource': 'ec2'})
+        source = p.resource_manager.get_source('config')
+        ids = ['i-%03d' % i for i in range(120)]
+        client = mock.MagicMock()
+        client.get_paginator.return_value.paginate.return_value.build_full_result.return_value = {
+            'resourceIdentifiers': [{'resourceId': i} for i in ids]}
+
+        attempted = []
+
+        def get_resources(resource_set):
+            attempted.append(list(resource_set))
+            if 'i-060' in resource_set:
+                raise ValueError('config chunk failed')
+            return [{'InstanceId': i} for i in resource_set]
+
+        source.get_resources = get_resources
+        log = self.capture_logging('custodian.resources', level=logging.ERROR)
+        with self.assertRaises(ValueError):
+            source.get_listed_resources(client)
+        self.assertEqual(len(attempted), 3)
+        self.assertIn('config chunk failed', log.getvalue())
+
+        # and without failures every chunk is returned
+        source.get_resources = lambda rset: [{'InstanceId': i} for i in rset]
+        self.assertEqual(
+            sorted(r['InstanceId'] for r in source.get_listed_resources(client)), ids)
+
 
 class QueryResourceManagerTest(BaseTest):
 
@@ -198,3 +229,142 @@ class QueryResourceManagerTest(BaseTest):
         # Check that the warning message was logged
         self.assertTrue("Resource not found: get_core_network using" in output.getvalue())
         self.assertTrue(resources[0]["CoreNetworkArn"] not in output.getvalue())
+
+
+class GenericPaginationTest(BaseTest):
+    """enum ops with a page token but no botocore paginator get paged."""
+
+    def stubbed(self, service, method, pages, **params):
+        import boto3
+        from botocore.stub import Stubber
+        client = boto3.Session(region_name='us-east-1').client(
+            service, aws_access_key_id='x', aws_secret_access_key='x')
+        self.assertFalse(client.can_paginate(method))
+        stubber = Stubber(client)
+        for expected, page in pages:
+            stubber.add_response(method, page, dict(params, **expected))
+        stubber.activate()
+        self.addCleanup(stubber.deactivate)
+        return client, stubber
+
+    def test_next_token(self):
+        client, stubber = self.stubbed('athena', 'list_work_groups', [
+            ({}, {'WorkGroups': [{'Name': 'a'}], 'NextToken': 't1'}),
+            ({'NextToken': 't1'}, {'WorkGroups': [{'Name': 'b'}]})])
+        data = ResourceQuery(None)._invoke_client_enum(
+            client, 'list_work_groups', {}, 'WorkGroups')
+        self.assertEqual([w['Name'] for w in data], ['a', 'b'])
+        stubber.assert_no_pending_responses()
+
+    def test_marker_and_flattened_path(self):
+        client, stubber = self.stubbed('rds', 'describe_db_shard_groups', [
+            ({}, {'DBShardGroups': [{'DBShardGroupIdentifier': 'a'}], 'Marker': 'm1'}),
+            ({'Marker': 'm1'}, {'DBShardGroups': [{'DBShardGroupIdentifier': 'b'}]})])
+        data = ResourceQuery(None)._invoke_client_enum(
+            client, 'describe_db_shard_groups', {}, 'DBShardGroups[]')
+        self.assertEqual([g['DBShardGroupIdentifier'] for g in data], ['a', 'b'])
+        stubber.assert_no_pending_responses()
+
+    def test_no_shared_token_single_call(self):
+        # wafv2 hands back NextMarker even on single page listings, it is
+        # deliberately not paged on
+        client, stubber = self.stubbed('wafv2', 'list_web_acls', [
+            ({}, {'WebACLs': [{'Name': 'a'}], 'NextMarker': 'a'})], Scope='REGIONAL')
+        data = ResourceQuery(None)._invoke_client_enum(
+            client, 'list_web_acls', {'Scope': 'REGIONAL'}, 'WebACLs')
+        self.assertEqual([w['Name'] for w in data], ['a'])
+        stubber.assert_no_pending_responses()
+
+    def test_complex_path_single_call(self):
+        client, stubber = self.stubbed('athena', 'list_work_groups', [
+            ({}, {'WorkGroups': [{'Name': 'a'}], 'NextToken': 't1'})])
+        data = ResourceQuery(None)._invoke_client_enum(
+            client, 'list_work_groups', {}, 'WorkGroups[].Name')
+        self.assertEqual(data, ['a'])
+        stubber.assert_no_pending_responses()
+
+    def test_retry_only_when_asked(self):
+        # like the botocore paginator path, the generic one only retries
+        # when the manager passes its retry
+        def pages():
+            # fresh each time, build_full_result extends the first page's list
+            return [
+                ({}, {'WorkGroups': [{'Name': 'a'}], 'NextToken': 't1'}),
+                ({'NextToken': 't1'}, {'WorkGroups': [{'Name': 'b'}]})]
+        calls = []
+
+        def retry(func, *args, **kw):
+            calls.append(kw)
+            return func(*args, **kw)
+
+        with mock.patch.object(RetryPageIterator, 'retry', staticmethod(retry)):
+            client, stubber = self.stubbed('athena', 'list_work_groups', pages())
+            ResourceQuery(None)._invoke_client_enum(
+                client, 'list_work_groups', {}, 'WorkGroups')
+            self.assertEqual(calls, [])
+            client, stubber = self.stubbed('athena', 'list_work_groups', pages())
+            data = ResourceQuery(None)._invoke_client_enum(
+                client, 'list_work_groups', {}, 'WorkGroups', retry)
+        self.assertEqual([w['Name'] for w in data], ['a', 'b'])
+        self.assertEqual(len(calls), 2)
+        stubber.assert_no_pending_responses()
+
+
+class PaginateOpTest(BaseTest):
+
+    def stubbed(self, service, method, pages, **params):
+        import boto3
+        from botocore.stub import Stubber
+        client = boto3.Session(region_name='us-east-1').client(
+            service, aws_access_key_id='x', aws_secret_access_key='x')
+        stubber = Stubber(client)
+        for expected, page in pages:
+            stubber.add_response(method, page, dict(params, **expected))
+        stubber.activate()
+        self.addCleanup(stubber.deactivate)
+        return client, stubber
+
+    def test_botocore_paginator(self):
+        client, stubber = self.stubbed('logs', 'describe_metric_filters', [
+            ({}, {'metricFilters': [{'filterName': 'a'}], 'nextToken': 't1'}),
+            ({'nextToken': 't1'}, {'metricFilters': [{'filterName': 'b'}]})],
+            logGroupName='trail')
+        self.assertTrue(client.can_paginate('describe_metric_filters'))
+        self.assertEqual(
+            [f['filterName'] for f in paginate_op(
+                client, 'describe_metric_filters', 'metricFilters', logGroupName='trail')],
+            ['a', 'b'])
+        stubber.assert_no_pending_responses()
+
+    def test_generic_paginator(self):
+        client, stubber = self.stubbed('lakeformation', 'list_resources', [
+            ({}, {'ResourceInfoList': [{'ResourceArn': 'arn:aws:s3:::a'}], 'NextToken': 't1'}),
+            ({'NextToken': 't1'}, {'ResourceInfoList': [{'ResourceArn': 'arn:aws:s3:::b'}]})])
+        self.assertFalse(client.can_paginate('list_resources'))
+        self.assertEqual(
+            [r['ResourceArn'] for r in paginate_op(client, 'list_resources', 'ResourceInfoList')],
+            ['arn:aws:s3:::a', 'arn:aws:s3:::b'])
+        stubber.assert_no_pending_responses()
+
+    def test_no_page_token_single_call(self):
+        # NextMarker is not a token the generic paginator pages on
+        client, stubber = self.stubbed('wafv2', 'list_logging_configurations', [
+            ({}, {'LoggingConfigurations': [], 'NextMarker': 'm1'})], Scope='REGIONAL')
+        self.assertEqual(
+            paginate_op(
+                client, 'list_logging_configurations', 'LoggingConfigurations',
+                Scope='REGIONAL'),
+            [])
+        stubber.assert_no_pending_responses()
+
+    def test_missing_result_key(self):
+        client, stubber = self.stubbed('ecs', 'list_clusters', [({}, {})])
+        self.assertEqual(paginate_op(client, 'list_clusters', 'clusterArns'), [])
+        stubber.assert_no_pending_responses()
+
+    def test_nested_result_key_rejected(self):
+        # .get() can't follow a path, it would always come back empty
+        client, stubber = self.stubbed('ecs', 'list_clusters', [])
+        for key in ('Outer.clusterArns', 'clusterArns[]'):
+            with self.assertRaisesRegex(ValueError, 'top level key'):
+                paginate_op(client, 'list_clusters', key)

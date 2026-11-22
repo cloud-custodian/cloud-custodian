@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-0877401c93c294001",
+                "LaunchTemplateName": "test",
+                "VersionNumber": 2,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 25,
+                    "second": 48,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/Samson.Shi@capitalone.com",
+                "DefaultVersion": false,
+                "LaunchTemplateData": {
+                    "ImageId": "ami-04bfee437f38a691e",
+                    "InstanceType": "t1.micro",
+                    "SecurityGroupIds": [
+                        "sg-02ec691909b2a4753"
+                    ]
+                }
+            }
+        ],
+        "NextToken": "versions-2",
+        "ResponseMetadata": {}
+    }
+}

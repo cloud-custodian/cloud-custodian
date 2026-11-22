@@ -793,3 +793,28 @@ class TestReservedCacheNodes(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['State'], 'active')
+
+
+class ElastiCacheSnapshotDeleteTest(BaseTest):
+
+    def test_delete_logs_each_failed_set_once(self):
+        from unittest import mock
+        from c7n.resources import elasticache
+        p = self.load_policy({
+            'name': 'cache-snapshot-delete', 'resource': 'cache-snapshot',
+            'actions': ['delete']})
+        action = p.resource_manager.actions[0]
+        snapshots = [{'SnapshotName': 's%03d' % i} for i in range(60)]
+        client = mock.MagicMock()
+
+        def delete_snapshot(SnapshotName):
+            # reversed order, so the first set submitted holds s059..s010
+            if SnapshotName == 's059':
+                raise ValueError('delete failed')
+
+        client.delete_snapshot.side_effect = delete_snapshot
+        self.patch(elasticache, 'local_session', lambda factory: mock.MagicMock(
+            client=mock.MagicMock(return_value=client)))
+        with self.assertLogs(action.log, level='ERROR') as logs:
+            action.process(snapshots)
+        self.assertEqual(len(logs.output), 1)

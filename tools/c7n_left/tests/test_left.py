@@ -1020,6 +1020,30 @@ def test_graph_var_file_abs(tmp_path, var_tf_setup):
     assert resources[0][1][0]["load_balancer_type"] == "network"
 
 
+def test_graph_var_file_sibling_dir_sharing_prefix(tmp_path, var_tf_setup):
+    # tf-vars/ starts with the same characters as tf/ but isn't inside it
+    (tmp_path / "tf-vars").mkdir()
+    (tmp_path / "tf-vars" / "vars.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(tmp_path / "tf", (tmp_path / "tf-vars" / "vars.tfvars",))
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]["load_balancer_type"] == "network"
+    assert list((tmp_path / "tf").glob("c7n-left-*")) == []
+
+
+def test_var_file_resolution_failure_removes_temp_files(tmp_path, var_tf_setup):
+    # the first var file is copied into the module as a temp file before
+    # the second, missing, one fails
+    (tmp_path / "vars.tfvars").write_text('balancer_type = "network"')
+    resolver = VariableResolver(
+        tmp_path / "tf", [tmp_path / "vars.tfvars", tmp_path / "missing.tfvars"]
+    )
+    with pytest.raises(FileNotFoundError):
+        with resolver.get_variables():
+            pass
+    assert len(resolver.temp_files) == 1
+    assert list((tmp_path / "tf").glob("c7n-left-*")) == []
+
+
 def test_graph_var_file(tmp_path, var_tf_setup):
     (tmp_path / "tf" / "vars.tfvars").write_text('balancer_type = "network"')
     graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tfvars",))

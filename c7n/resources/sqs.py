@@ -390,10 +390,10 @@ class SetEncryption(BaseAction):
         if not self.data.get('enabled', True):
             params['SqsManagedSseEnabled'] = 'false'
             params['KmsMasterKeyId'] = ''
-        elif self.data.get('enable', True) and not key:
+        elif self.data.get('enabled', True) and not key:
             params['SqsManagedSseEnabled'] = 'true'
             params['KmsMasterKeyId'] = ''
-        elif self.data.get('enable', True) and key:
+        elif self.data.get('enabled', True) and key:
             params['SqsManagedSseEnabled'] = 'false'
             params['KmsMasterKeyId'] = key
             params['KmsDataKeyReusePeriodSeconds'] = str(reuse_period)

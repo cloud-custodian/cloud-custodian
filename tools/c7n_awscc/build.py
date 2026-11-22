@@ -60,7 +60,7 @@ ServiceMap = {
     "cassandra": "keyspaces",
     "certificatemanager": "acm",
     "codestarconnections": "codestar-connections",
-    "codestarnotification": "codestar-notifications",
+    "codestarnotifications": "codestar-notifications",
     "cognito": "cognito-identity",
     "customerprofiles": "customer-profiles",
     "devopsguru": "devops-guru",

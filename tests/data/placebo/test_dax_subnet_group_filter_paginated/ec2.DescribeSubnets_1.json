@@ -1,0 +1,63 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Subnets": [
+            {
+                "AvailabilityZone": "us-east-1c", 
+                "Tags": [
+                    {
+                        "Value": "tagfanncyvalue", 
+                        "Key": "tagfancykey"
+                    }, 
+                    {
+                        "Value": "FancyTestSubnetC", 
+                        "Key": "Name"
+                    }
+                ], 
+                "AvailableIpAddressCount": 27, 
+                "DefaultForAz": false, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-f1516b97", 
+                "State": "available", 
+                "MapPublicIpOnLaunch": false, 
+                "SubnetId": "subnet-05cf9b60", 
+                "CidrBlock": "10.0.42.64/27", 
+                "AssignIpv6AddressOnCreation": false
+            }, 
+            {
+                "AvailabilityZone": "us-east-1a", 
+                "Tags": [
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }, 
+                    {
+                        "Value": "FancyTestSubnetPublic", 
+                        "Key": "Name"
+                    }
+                ], 
+                "AvailableIpAddressCount": 27, 
+                "DefaultForAz": false, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-f1516b97", 
+                "State": "available", 
+                "MapPublicIpOnLaunch": false, 
+                "SubnetId": "subnet-ecfb30a4", 
+                "CidrBlock": "10.0.42.0/27", 
+                "AssignIpv6AddressOnCreation": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "83b95332-f64b-4913-97f1-04ea58514187", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 22 May 2018 12:51:31 GMT"
+            }
+        }
+    }
+}

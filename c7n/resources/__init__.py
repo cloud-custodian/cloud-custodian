@@ -3,7 +3,11 @@
 #
 # AWS resources to manage
 #
+import logging
+
 from c7n.provider import clouds
+
+log = logging.getLogger('c7n.resources')
 
 LOADED = set()
 
@@ -39,18 +43,58 @@ def should_load_provider(name, provider_types, no_wild=False):
 
 PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s', 'openstack', 'awscc', 'tencentcloud', 'oci', 'terraform')
 
+# the distribution package each provider is implemented in, used to tell an
+# uninstalled provider apart from a broken one.
+PROVIDER_PACKAGES = {
+    'aws': 'c7n',
+    'awscc': 'c7n_awscc',
+    'azure': 'c7n_azure',
+    'gcp': 'c7n_gcp',
+    'k8s': 'c7n_kube',
+    'oci': 'c7n_oci',
+    'openstack': 'c7n_openstack',
+    'tencentcloud': 'c7n_tencentcloud',
+    'terraform': 'c7n_left',
+}
+
+
+def is_provider_missing(provider, err):
+    """Is this ImportError the provider itself being absent?
+
+    Only a ModuleNotFoundError for the provider's top level package counts.
+    Anything else - a missing dependency of an installed provider, a typo in
+    one of its modules (``c7n_gcp.resources.foo``), a bad ``from x import y``
+    - means the provider is installed but broken, which is worth saying out
+    loud rather than reporting as "not installed".
+    """
+    if provider == 'aws':
+        # aws lives in c7n itself, if we're running it's installed
+        return False
+    return isinstance(err, ModuleNotFoundError) and err.name == PROVIDER_PACKAGES[provider]
+
 
 def load_available(resources=True):
     """Load available installed providers
 
-    Unlike load_resources() this will catch ImportErrors on uninstalled
-    providers.
+    Unlike load_resources() this skips providers that fail to import.
+
+    A provider whose own package is absent simply isn't installed, and is
+    skipped quietly. A provider that is installed but fails to import -
+    a missing dependency, a broken module - is skipped too, but logged at
+    warning, so the user finds out why its resource types disappeared. We
+    don't raise: every custodian command loads every provider, and one
+    broken optional provider shouldn't take down an unrelated policy run.
     """
     found = []
     for provider in PROVIDER_NAMES:
         try:
             load_providers((provider,))
-        except ImportError: # pragma: no cover
+        except ImportError as err:
+            if is_provider_missing(provider, err):
+                log.debug("provider %s not installed (%s)", provider, err)
+            else:
+                log.warning(
+                    "provider %s is installed but failed to import: %s", provider, err)
             continue
         else:
             found.append(provider)

@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "GroupId": "sg-0first",
+                "GroupName": "first",
+                "Description": "first",
+                "VpcId": "vpc-0stale",
+                "OwnerId": "123456789012",
+                "IpPermissions": [],
+                "IpPermissionsEgress": []
+            },
+            {
+                "GroupId": "sg-0second",
+                "GroupName": "second",
+                "Description": "second",
+                "VpcId": "vpc-0stale",
+                "OwnerId": "123456789012",
+                "IpPermissions": [],
+                "IpPermissionsEgress": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

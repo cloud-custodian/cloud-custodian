@@ -24,7 +24,7 @@ from azure.identity import ManagedIdentityCredential
 from azure.keyvault.secrets import SecretClient, SecretProperties
 from azure.mgmt.web.models import NameValuePair
 from c7n.output import record_api_call
-from c7n.utils import chunks, local_session
+from c7n.utils import chunks, local_session, utcnow_naive
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
@@ -115,7 +115,7 @@ class StringUtils:
 def utcnow():
     """The datetime object for the current time in UTC
     """
-    return datetime.datetime.utcnow()
+    return utcnow_naive()
 
 
 def now(tz=None):

@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "The database contains 1 table(s). You must delete these tables before deleting the database.",
+            "Code": "ValidationException"
+        },
+        "ResponseMetadata": {},
+        "Message": "The database contains 1 table(s). You must delete these tables before deleting the database."
+    }
+}
