@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import time
+from pathlib import Path
 from .common import BaseTest, functional, event_data, load_data
 from unittest.mock import MagicMock
 
@@ -2520,7 +2521,7 @@ class SecurityGroupTest(BaseTest):
                  {'type': 'subnet',
                   'key': 'tag:Location',
                   'op': 'in',
-                  'value_from': {'url': 'file://' + values, 'format': 'json'}}]})
+                  'value_from': {'url': Path(values).as_uri(), 'format': 'json'}}]})
         f = p.resource_manager.filters[0]
         f.route_tables = {}
         subnet = {'SubnetId': 'subnet-1', 'VpcId': 'vpc-1', 'Tags': []}

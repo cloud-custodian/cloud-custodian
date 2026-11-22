@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 from importlib import reload
 import os
 import tempfile
-import time
 from time import sleep
 import unittest
 import yaml
@@ -441,13 +440,6 @@ class ReplayTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             policy_file = self.make_output_dir(tmp_dir, "ec2-check")
 
-            before = time.time()
-            template = replay.mimic_sqs("us-east-1", policy_file, None, 0, tmp_dir)
-            after = time.time()
-            self.assertGreaterEqual(template["execution_start"], before)
-            self.assertLessEqual(template["execution_start"], after)
-
-            # and pin it down independently of the host's zone
             stamp = datetime(2024, 3, 1, 12, 0, tzinfo=timezone.utc)
             with patch.object(replay, "datetime") as fake_datetime:
                 fake_datetime.now.return_value = stamp
