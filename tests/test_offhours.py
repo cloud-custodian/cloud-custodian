@@ -530,6 +530,12 @@ class OffHoursFilterTest(BaseTest):
             f = OffHour({"default_tz": tz})
             self.assertEqual(f.validate(), f)
 
+    def test_tz_empty_resolve(self):
+        # an empty value must not fall through to gettz, which would
+        # silently return the local timezone
+        self.assertIsNone(Time.get_tz(None))
+        self.assertIsNone(Time.get_tz(''))
+
     def test_empty_tag(self):
         t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)

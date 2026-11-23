@@ -254,6 +254,9 @@ class MarkForOpTimezoneTest(BaseTest):
         with self.assertRaisesRegex(
                 PolicyValidationError, 'Invalid timezone specified not-a-zone'):
             self.mark_policy(tz='not-a-zone', hours=1)
+        with self.assertRaisesRegex(
+                PolicyValidationError, 'Invalid timezone specified'):
+            self.mark_policy(tz='', hours=1)
 
     def test_marked_for_op_tz_validation(self):
         def marked_policy(tz):
