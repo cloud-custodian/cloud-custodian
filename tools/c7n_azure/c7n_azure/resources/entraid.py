@@ -17,3 +17,5 @@ from c7n_azure.resources.entraid_conditional_access import EntraIDConditionalAcc
 from c7n_azure.resources.entraid_security_defaults import EntraIDSecurityDefaults  # noqa: F401
 from c7n_azure.resources.entraid_authorization_policy import EntraIDAuthorizationPolicy  # noqa: F401
 from c7n_azure.resources.entraid_named_locations import EntraIDNamedLocation  # noqa: F401
+from c7n_azure.resources.entraid_application import EntraIDApplication  # noqa: F401
+from c7n_azure.resources.entraid_application import EntraIDServicePrincipal  # noqa: F401

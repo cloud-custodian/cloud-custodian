@@ -1,0 +1,38 @@
+{
+  "status_code": 200,
+  "data": {
+    "SecurityGroups": [
+      {
+        "GroupId": "sg-0prod00000000000a",
+        "GroupName": "fsx-prod",
+        "Description": "fsx-prod",
+        "OwnerId": "644160558196",
+        "VpcId": "vpc-d2d616b5",
+        "IpPermissions": [],
+        "IpPermissionsEgress": [],
+        "Tags": [
+          {
+            "Key": "Env",
+            "Value": "Prod"
+          }
+        ]
+      },
+      {
+        "GroupId": "sg-0stag00000000000b",
+        "GroupName": "fsx-staging",
+        "Description": "fsx-staging",
+        "OwnerId": "644160558196",
+        "VpcId": "vpc-d2d616b5",
+        "IpPermissions": [],
+        "IpPermissionsEgress": [],
+        "Tags": [
+          {
+            "Key": "Env",
+            "Value": "Staging"
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

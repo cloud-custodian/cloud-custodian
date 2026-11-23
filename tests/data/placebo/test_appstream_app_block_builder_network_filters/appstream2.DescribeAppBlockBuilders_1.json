@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "AppBlockBuilders": [
+            {
+                "Arn": "arn:aws:appstream:us-east-1:644160558196:app-block-builder/c7n-test-abb",
+                "Name": "c7n-test-abb",
+                "Platform": "WINDOWS_SERVER_2019",
+                "InstanceType": "stream.standard.small",
+                "EnableDefaultInternetAccess": false,
+                "VpcConfig": {
+                    "SubnetIds": [
+                        "subnet-00577da7461ff5a4c",
+                        "subnet-011b4785e8543b12d"
+                    ],
+                    "SecurityGroupIds": [
+                        "sg-0ae85023b20e10ca7"
+                    ]
+                },
+                "State": "STOPPED",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 16,
+                    "minute": 14,
+                    "second": 11,
+                    "microsecond": 138000
+                },
+                "DisableIMDSV1": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

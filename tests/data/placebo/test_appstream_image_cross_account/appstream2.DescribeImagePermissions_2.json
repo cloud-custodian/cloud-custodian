@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "c7n-test-image",
+        "SharedImagePermissionsList": [
+            {
+                "sharedAccountId": "123456789012",
+                "imagePermissions": {
+                    "allowFleet": true,
+                    "allowImageBuilder": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

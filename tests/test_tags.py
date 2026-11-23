@@ -578,6 +578,38 @@ class CopyRelatedResourceTag(BaseTest):
                 found = True
         self.assertTrue(found)
 
+    def test_copy_related_tag_resourcegroupstaggingapi_batches(self):
+        # GetResources accepts between 1 and 100 arns per call
+        policy = self.load_policy({
+            "name": "copy-tags-from-tags",
+            "resource": "aws.ec2",
+            "actions": [{
+                "type": "copy-related-tag",
+                "resource": "resourcegroupstaggingapi",
+                "key": "tag:Foo",
+                "tags": "*"
+            }]
+        })
+        action = policy.resource_manager.actions[0]
+        client = MagicMock()
+        client.get_resources.side_effect = lambda ResourceARNList: {
+            "ResourceTagMappingList": [
+                {"ResourceARN": arn, "Tags": [{"Key": "App", "Value": arn}]}
+                for arn in ResourceARNList]}
+        arns = ["arn:aws:sqs:us-east-1:123456789012:q%d" % i for i in range(250)]
+
+        with patch.object(tagmod.utils, "local_session") as local_session:
+            local_session.return_value.client.return_value = client
+            tag_map = action.get_resource_tag_map_universal(arns)
+            self.assertEqual(
+                [len(c.kwargs["ResourceARNList"]) for c in client.get_resources.call_args_list],
+                [100, 100, 50])
+            self.assertEqual(tag_map, {arn: {"App": arn} for arn in arns})
+
+            client.get_resources.reset_mock()
+            self.assertEqual(action.get_resource_tag_map_universal([]), {})
+            client.get_resources.assert_not_called()
+
     def test_copy_related_tag_validate_aws_prefix(self):
         policy = {
             'name': 'copy-related-tag-aws-prefix',
