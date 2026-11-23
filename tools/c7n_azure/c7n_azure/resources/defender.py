@@ -1,8 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from azure.mgmt.security.models import Extension
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta, TypeInfo
+
+from c7n.exceptions import PolicyValidationError
+from c7n.utils import type_schema
 
 
 @resources.register("defender-pricing")
@@ -41,6 +46,150 @@ class DefenderPricing(QueryResourceManager, metaclass=QueryMeta):
             return {
                 'scope_id': f'subscriptions/{resource_manager.get_session().get_subscription_id()}'
             }
+
+
+@DefenderPricing.action_registry.register('set-pricing-tier')
+class DefenderPricingSetTierAction(AzureBaseAction):
+    """Set the pricing tier of a subscription-level Microsoft Defender plan.
+
+    Setting ``pricing-tier: Standard`` turns the plan on and ``Free`` turns it
+    off. ``sub-plan``, ``enforce`` and ``extensions`` are optional and only
+    change when set. Each ``extensions`` entry uses Azure's API casing and
+    updates the extension with that name, leaving the plan's other extensions
+    alone. Azure doesn't allow a sub-plan or extensions on the ``Free`` tier,
+    so setting ``Free`` clears them.
+
+    Changing ``sub-plan`` keeps the plan's current extensions. If the new
+    sub-plan doesn't support one of them, such as moving Defender for Servers
+    from ``P2`` to ``P1``, Azure may reject the update, so list those
+    extensions in ``extensions`` with ``isEnabled: false``.
+
+    Azure replaces the whole pricing on update, so the action reads the
+    current pricing first and writes it back with only the requested fields
+    changed.
+
+    The caller needs ``Microsoft.Security/pricings/write`` on the subscription.
+
+    Azure doesn't document every plan name in one place. To see the plans a
+    subscription has, with their tier, sub-plan and whether they're
+    deprecated, run:
+
+    .. code-block:: shell
+
+        az security pricing list -o table --query \\
+          "value[].{name:name, tier:pricingTier, subPlan:subPlan, deprecated:deprecated}"
+
+    :example:
+
+    Turn on Microsoft Defender for App Service if it isn't already on.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-defender-app-services-enabled
+            resource: azure.defender-pricing
+            filters:
+              - name: AppServices
+              - type: value
+                key: properties.pricingTier
+                op: not-equal
+                value: Standard
+            actions:
+              - type: set-pricing-tier
+                pricing-tier: Standard
+
+    Turn off Microsoft Defender for Containers if it's on.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-defender-containers-disabled
+            resource: azure.defender-pricing
+            filters:
+              - name: Containers
+              - properties.pricingTier: Standard
+            actions:
+              - type: set-pricing-tier
+                pricing-tier: Free
+    """
+    permissions = ('Microsoft.Security/pricings/write',)
+
+    schema = type_schema(
+        'set-pricing-tier',
+        required=['pricing-tier'],
+        **{
+            'pricing-tier': {'type': 'string', 'enum': ['Free', 'Standard']},
+            'sub-plan': {'type': 'string', 'minLength': 1},
+            'enforce': {'type': 'boolean'},
+            'extensions': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['name', 'isEnabled'],
+                    'properties': {
+                        'name': {'type': 'string', 'minLength': 1},
+                        'isEnabled': {'type': 'boolean'},
+                        'additionalExtensionProperties': {'type': 'object'},
+                    },
+                },
+            },
+        }
+    )
+
+    def validate(self):
+        if self.data['pricing-tier'] == 'Free':
+            for key in ('sub-plan', 'extensions'):
+                if key in self.data:
+                    raise PolicyValidationError(
+                        f"{self.type}: {key} is not supported with pricing-tier 'Free'")
+        return self
+
+    def _process_resources(self, resources, event):
+        # The base class logs and swallows errors outside pytest, so a failed
+        # update would leave the run looking successful. Set the rest, then raise.
+        self._prepare_processing()
+        failures = []
+        for resource in resources:
+            try:
+                self._log_modified_resource(resource, self._process_resource(resource))
+            except Exception as e:
+                self.log.error(
+                    f"Setting pricing tier '{self.data['pricing-tier']}' on "
+                    f"'{resource.get('name')}' failed: {e}",
+                    exc_info=True, extra=self._get_action_log_metadata(resource))
+                failures.append(e)
+        if failures:
+            raise failures[0]
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+        self.scope_id = f'subscriptions/{self.manager.get_session().get_subscription_id()}'
+
+    def _process_resource(self, resource):
+        pricing = self.client.pricings.get(self.scope_id, resource['name'])
+        pricing.pricing_tier = self.data['pricing-tier']
+        if pricing.pricing_tier == 'Free':
+            # Azure rejects a sub-plan or extensions on the Free tier
+            pricing.sub_plan = None
+            pricing.extensions = None
+        elif 'sub-plan' in self.data:
+            pricing.sub_plan = self.data['sub-plan']
+        # Azure takes "True"/"False" strings for these flags
+        if 'enforce' in self.data:
+            pricing.enforce = str(self.data['enforce'])
+        if 'extensions' in self.data:
+            extensions = {e.name: e for e in pricing.extensions or []}
+            for ext in self.data['extensions']:
+                current = extensions.setdefault(
+                    ext['name'], Extension(name=ext['name'], is_enabled=None))
+                current.is_enabled = str(ext['isEnabled'])
+                if 'additionalExtensionProperties' in ext:
+                    current.additional_extension_properties = ext['additionalExtensionProperties']
+            pricing.extensions = list(extensions.values())
+
+        self.client.pricings.update(self.scope_id, resource['name'], pricing)
+        return f"Set pricing tier to '{self.data['pricing-tier']}'"
 
 
 @resources.register("defender-setting")
