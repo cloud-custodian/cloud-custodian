@@ -1595,6 +1595,246 @@ class PolicyDelete(BaseAction):
             client.delete_policy(PolicyArn=r['Arn'])
 
 
+def apply_deny_statement(statements, deny_actions, resource_scope, sid):
+    """Add or update a single managed Deny statement in a policy document.
+
+    ``resource_scope`` is the statement's resource element, either
+    ``{'Resource': [...]}`` or ``{'NotResource': [...]}``. IAM rejects a
+    statement carrying both.
+
+    Returns ``(statements, changed)``. Makes no API calls.
+    """
+    wanted = {
+        'Sid': sid,
+        'Effect': 'Deny',
+        'Action': sorted(deny_actions),
+        **resource_scope,
+    }
+    managed = [s for s in statements if s.get('Sid') == sid]
+    if managed == [wanted]:
+        return statements, False
+    if any(s.get('Effect') != 'Deny' for s in managed):
+        raise ValueError(
+            f"statement {sid} is not a Deny, refusing to overwrite it")
+    return [s for s in statements if s.get('Sid') != sid] + [wanted], True
+
+
+@Policy.action_registry.register('deny-permissions')
+class PolicyDenyPermissions(BaseAction):
+    """Append an explicit Deny for the given actions to a customer managed policy.
+
+    Deny beats any Allow, so this reaches a grant however it was written, including
+    ``Action: "*"`` and ``NotAction``. Removing the action by name only reaches a
+    policy that spells it out.
+
+    - ``actions`` the actions to deny, or ``matched`` to take them from a
+      ``check-permissions`` filter.
+    - ``resources`` the Deny's ``Resource``, default ``*``. Naming ARNs denies only
+      those and leaves the rest allowed.
+    - ``except-resources`` the Deny's ``NotResource``, denying everywhere but the ARNs
+      given. Exclusive with ``resources``.
+    - ``sid`` names the managed statement, default ``c7nDenyPermissions``. It is
+      rewritten in place, so repeat runs cost no policy versions.
+
+    AWS managed policies are skipped, and the oldest non-default version is pruned
+    when the policy sits at the five version cap.
+
+    :example:
+
+    Deny the KMS actions that AWS Config flags on customer managed policies:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-policy-deny-blocked-kms-actions
+            resource: aws.iam-policy
+            filters:
+              - type: check-permissions
+                match: allowed
+                match-operator: or
+                actions:
+                  - kms:Decrypt
+                  - kms:ReEncryptFrom
+            actions:
+              - type: deny-permissions
+                actions: matched
+
+    :example:
+
+    Keep the grant for one key and close it everywhere else:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-policy-narrow-kms-decrypt
+            resource: aws.iam-policy
+            filters:
+              - type: check-permissions
+                match: allowed
+                actions:
+                  - kms:Decrypt
+            actions:
+              - type: deny-permissions
+                actions:
+                  - kms:Decrypt
+                except-resources:
+                  - arn:aws:kms:us-east-1:111111111111:key/abc-123
+    """
+
+    schema = type_schema(
+        'deny-permissions',
+        actions={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1}]},
+        resources={'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
+        **{'except-resources': {
+            'type': 'array', 'items': {'type': 'string'}, 'minItems': 1}},
+        sid={'type': 'string', 'minLength': 1, 'pattern': '^[0-9A-Za-z]+$'},
+        required=['actions'])
+
+    permissions = (
+        'iam:GetPolicy',
+        'iam:GetPolicyVersion',
+        'iam:ListPolicyVersions',
+        'iam:CreatePolicyVersion',
+        'iam:DeletePolicyVersion',
+    )
+
+    default_sid = 'c7nDenyPermissions'
+    max_versions = 5
+
+    def validate(self):
+        if 'resources' in self.data and 'except-resources' in self.data:
+            raise PolicyValidationError(
+                f"policy:{self.manager.ctx.policy.name} action:{self.type} "
+                "cannot set both resources and except-resources, since IAM "
+                "rejects a statement carrying Resource and NotResource")
+        if self.data['actions'] == 'matched' and not any(
+                isinstance(f, CheckPermissions) for f in self.manager.iter_filters()):
+            raise PolicyValidationError(
+                f"policy:{self.manager.ctx.policy.name} action:{self.type} "
+                "with matched requires a check-permissions filter")
+        return self
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+
+        rcount = len(resources)
+        resources = [r for r in resources if Arn.parse(r['Arn']).account_id != 'aws']
+        if len(resources) != rcount:
+            self.log.warning(
+                f"Implicitly filtering AWS managed policies: {rcount} -> {len(resources)}")
+
+        error = None
+        for r in resources:
+            deny_actions = self.get_deny_actions(r)
+            if not deny_actions:
+                self.log.warning("No actions to deny on %s, skipping" % r['Arn'])
+                continue
+            try:
+                self.process_policy(client, r, deny_actions)
+            except ValueError as e:
+                self.log.warning(f"Skipping {r['Arn']}: {e}")
+                continue
+            except ClientError as e:
+                self.log.warning(
+                    f"Error denying permissions on {r['Arn']}: {e}")
+                error = e
+        if error:
+            raise error
+
+    def get_deny_actions(self, resource):
+        if self.data['actions'] != 'matched':
+            return self.data['actions']
+        matched = {e['EvalActionName']
+                   for e in resource.get(CheckPermissions.eval_annotation, ())}
+        # IAM rejects a wildcard in an action's service half, so a
+        # check-permissions filter on '*:*' cannot feed a Deny statement.
+        usable = {a for a in matched if '*' not in a.split(':', 1)[0]}
+        if usable != matched:
+            self.log.warning(
+                f"Skipping actions with a wildcard service on {resource['Arn']}: "
+                f"{sorted(matched - usable)}")
+        return usable
+
+    def get_resource_scope(self):
+        if 'except-resources' in self.data:
+            return {'NotResource': list(self.data['except-resources'])}
+        return {'Resource': list(self.data.get('resources', ['*']))}
+
+    def get_document(self, client, resource):
+        # Re-read the live default version rather than trusting the
+        # DefaultVersionId enumerated into the resource dict or the document
+        # cached on c7n:policy by check-permissions. Resources are cached for
+        # 15 minutes by default (c7n/cli.py:98), and writing a stale document
+        # back as the new default would silently revert anything changed in
+        # the meantime.
+        policy = self.manager.retry(
+            client.get_policy, PolicyArn=resource['Arn'],
+            ignore_err_codes=('NoSuchEntity',))
+        if not policy:
+            return None
+        version = self.manager.retry(
+            client.get_policy_version,
+            PolicyArn=resource['Arn'],
+            VersionId=policy['Policy']['DefaultVersionId'],
+            ignore_err_codes=('NoSuchEntity',))
+        if not version:
+            return None
+        return version['PolicyVersion'].get('Document')
+
+    def process_policy(self, client, resource, deny_actions):
+        document = self.get_document(client, resource)
+        if not document:
+            self.log.warning("No policy document for %s, skipping" % resource['Arn'])
+            return
+        statements = document['Statement']
+        if isinstance(statements, dict):
+            statements = [statements]
+        statements, changed = apply_deny_statement(
+            statements, deny_actions,
+            self.get_resource_scope(),
+            self.data.get('sid', self.default_sid))
+        if not changed:
+            return
+        new_document = json.dumps(dict(document, Statement=statements))
+        try:
+            self.write_version(client, resource['Arn'], new_document)
+        except client.exceptions.LimitExceededException:
+            # Only prune once IAM says the five version cap is in the way, so
+            # a write that fails for any other reason does not cost a
+            # rollback point.
+            self.prune_versions(client, resource['Arn'])
+            self.write_version(client, resource['Arn'], new_document)
+
+    def write_version(self, client, arn, document):
+        self.manager.retry(
+            client.create_policy_version,
+            PolicyArn=arn,
+            PolicyDocument=document,
+            SetAsDefault=True,
+            ignore_err_codes=('NoSuchEntity',))
+
+    def prune_versions(self, client, arn):
+        versions = self.manager.retry(
+            client.list_policy_versions, PolicyArn=arn,
+            ignore_err_codes=('NoSuchEntity',))
+        if not versions:
+            return
+        versions = versions['Versions']
+        if len(versions) < self.max_versions:
+            return
+        # One slot is all a create needs, and the default version cannot be
+        # deleted, so free the oldest of the rest.
+        oldest = min(
+            (v for v in versions if not v['IsDefaultVersion']),
+            key=lambda v: v['CreateDate'])
+        self.manager.retry(
+            client.delete_policy_version,
+            PolicyArn=arn, VersionId=oldest['VersionId'],
+            ignore_err_codes=('NoSuchEntity', 'DeleteConflict'))
+
+
 ###############################
 #    IAM Instance Profiles    #
 ###############################

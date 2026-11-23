@@ -1,0 +1,34 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_policy": {
+            "wildcard": {
+                "arn": "arn:aws:iam::644160558196:policy/c7n-test-deny-permissions-a1bdaab1c8f64aba",
+                "attachment_count": 0,
+                "delay_after_policy_creation_in_ms": null,
+                "description": "",
+                "id": "arn:aws:iam::644160558196:policy/c7n-test-deny-permissions-a1bdaab1c8f64aba",
+                "name": "c7n-test-deny-permissions-a1bdaab1c8f64aba",
+                "name_prefix": "",
+                "path": "/",
+                "policy": "{\"Statement\":[{\"Action\":\"*\",\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"AllowAll\"}],\"Version\":\"2012-10-17\"}",
+                "policy_id": "ANPAZL6XWCR2M5NBWPD5Q",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "random_id": {
+            "id": {
+                "b64_std": "ob2qscj2Sro=",
+                "b64_url": "ob2qscj2Sro",
+                "byte_length": 8,
+                "dec": "11654659091262229178",
+                "hex": "a1bdaab1c8f64aba",
+                "id": "ob2qscj2Sro",
+                "keepers": null,
+                "prefix": null
+            }
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": {
+            "PolicyName": "c7n-test-deny-permissions-a1bdaab1c8f64aba",
+            "PolicyId": "ANPAZL6XWCR2M5NBWPD5Q",
+            "Arn": "arn:aws:iam::644160558196:policy/c7n-test-deny-permissions-a1bdaab1c8f64aba",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 0,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 23,
+                "hour": 18,
+                "minute": 57,
+                "second": 24,
+                "microsecond": 0
+            },
+            "UpdateDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 23,
+                "hour": 18,
+                "minute": 57,
+                "second": 24,
+                "microsecond": 0
+            },
+            "Tags": []
+        },
+        "ResponseMetadata": {}
+    }
+}

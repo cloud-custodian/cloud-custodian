@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "PolicyVersion": {
+            "VersionId": "v2",
+            "IsDefaultVersion": true,
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 23,
+                "hour": 18,
+                "minute": 57,
+                "second": 25,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
