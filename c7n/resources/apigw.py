@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 import functools
 import re
-from botocore.exceptions import ClientError
+from botocore.exceptions import BotoCoreError, ClientError
 
 from concurrent.futures import as_completed
 from contextlib import suppress
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import (
     FilterRegistry, ValueFilter, MetricsFilter, WafV2FilterBase,
     WafClassicRegionalFilterBase)
@@ -16,7 +16,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.policystatement import HasStatementFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
-from c7n.resources.aws import shape_schema
+from c7n.resources.aws import get_service_shape, shape_schema
 from c7n import query, utils
 from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search, get_partition
 
@@ -1129,36 +1129,112 @@ class CustomDomainName(query.QueryResourceManager):
 
 @CustomDomainName.action_registry.register('update-security')
 class DomainNameRemediateTls(BaseAction):
+    """Update the security policy of an API Gateway custom domain name.
+
+    Legacy policies (`TLS_1_0`, `TLS_1_2`) only patch `securityPolicy`.
+    Enhanced policies (`SecurityPolicy_*`) must also carry an
+    `endpointAccessMode`: the explicit `endpointAccessMode` if given, else the
+    domain's current mode, else `BASIC`. An existing `STRICT` mode is never
+    lowered. Domains with more than one endpoint type are skipped for every
+    policy, since AWS cannot update their security policy. For enhanced
+    policies, domains with mutual TLS enabled or a policy name from the other
+    (REGIONAL vs EDGE) namespace are skipped too. Skips are logged as warnings.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: apigw-domain-regional-tls13
+            resource: aws.apigw-domain-name
+            filters:
+              - type: value
+                key: securityPolicy
+                value: TLS_1_2
+            actions:
+              - type: update-security
+                securityPolicy: SecurityPolicy_TLS13_1_2_PFS_PQ_2025_09
+    """
 
     schema = type_schema(
         'update-security',
-        securityPolicy={'type': 'string', 'enum': [
-            'TLS_1_0', 'TLS_1_2']},
+        securityPolicy={'type': 'string',
+                        'enum': get_service_shape('apigateway', 'SecurityPolicy').enum},
+        endpointAccessMode={'type': 'string',
+                            'enum': get_service_shape('apigateway', 'EndpointAccessMode').enum},
         required=['securityPolicy'])
 
     permissions = ('apigateway:PATCH',)
+
+    # The service model does not group security policies, so classify by name:
+    # legacy policies lack the SecurityPolicy_ prefix, EDGE policies end in
+    # _EDGE and every other enhanced policy is REGIONAL.
+    @staticmethod
+    def is_legacy_policy(policy):
+        return not policy.startswith('SecurityPolicy_')
+
+    @staticmethod
+    def is_edge_policy(policy):
+        return policy.endswith('_EDGE')
+
+    def validate(self):
+        if (self.data.get('endpointAccessMode') and
+                self.is_legacy_policy(self.data['securityPolicy'])):
+            raise PolicyValidationError(
+                'update-security: endpointAccessMode requires an enhanced '
+                'securityPolicy, not %s' % self.data['securityPolicy'])
+        return self
+
+    def get_skip_reason(self, r, policy):
+        types = (r.get('endpointConfiguration') or {}).get('types') or []
+        if len(types) > 1:
+            return 'multiple endpoint types %s' % ','.join(types)
+        if self.is_legacy_policy(policy):
+            return None
+        if r.get('mutualTlsAuthentication'):
+            return 'mutual TLS is enabled'
+        if types == ['EDGE'] and not self.is_edge_policy(policy):
+            return '%s is not valid for an EDGE domain' % policy
+        if types and types != ['EDGE'] and self.is_edge_policy(policy):
+            return '%s is not valid for a %s domain' % (policy, types[0])
+        return None
+
+    def get_patch_operations(self, r, policy):
+        ops = [{'op': 'replace', 'path': '/securityPolicy', 'value': policy}]
+        if self.is_legacy_policy(policy):
+            return ops
+        mode = self.data.get('endpointAccessMode') or 'BASIC'
+        if r.get('endpointAccessMode') == 'STRICT':
+            mode = 'STRICT'
+        ops.append({'op': 'replace', 'path': '/endpointAccessMode', 'value': mode})
+        return ops
 
     def process(self, resources, event=None):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
         retryable = ('TooManyRequestsException', 'ConflictException')
         retry = utils.get_retry(retryable, max_attempts=8)
+        policy = self.data['securityPolicy']
+        failed = []
 
         for r in resources:
+            reason = self.get_skip_reason(r, policy)
+            if reason:
+                self.log.warning(
+                    'update-security skipped %s: %s', r['domainName'], reason)
+                continue
             try:
                 retry(client.update_domain_name,
                       domainName=r['domainName'],
-                      patchOperations=[
-                          {
-                              'op': 'replace',
-                              'path': '/securityPolicy',
-                              'value': self.data.get('securityPolicy')
-                          },
-                      ]
-                      )
-            except ClientError as e:
-                if e.response['Error']['Code'] in retryable:
-                    continue
+                      patchOperations=self.get_patch_operations(r, policy))
+            except (ClientError, BotoCoreError) as e:
+                self.log.error(
+                    'update-security failed for %s: %s', r['domainName'], e)
+                failed.append(r['domainName'])
+
+        if failed:
+            raise PolicyExecutionError(
+                'update-security failed for domain names: %s' % ', '.join(failed))
 
 
 class ApiGwV2DescribeSource(query.DescribeSource):

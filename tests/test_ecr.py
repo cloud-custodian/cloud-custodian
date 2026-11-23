@@ -82,6 +82,23 @@ class TestECR(BaseTest):
             'repositories'][0]
         self.assertEqual(repo['imageTagMutability'], 'IMMUTABLE')
 
+    def test_ecr_lifecycle_rule_matches_any_rule(self):
+        rules = [
+            {"rulePriority": 1, "selection": {"tagStatus": "untagged"},
+             "action": {"type": "expire"}},
+            {"rulePriority": 2, "selection": {"tagStatus": "any"},
+             "action": {"type": "expire"}},
+        ]
+        p = self.load_policy({
+            'name': 'ecr-lifecycle-untagged',
+            'resource': 'aws.ecr',
+            'filters': [{
+                'type': 'lifecycle-rule',
+                'state': True,
+                'match': [{'selection.tagStatus': 'untagged'}]}]})
+        resources = [{'repositoryName': 'test', 'c7n:lifecycle-policy': {'rules': rules}}]
+        self.assertEqual(len(p.resource_manager.filters[0].process(resources)), 1)
+
     def test_ecr_lifecycle_policy(self):
         session_factory = self.replay_flight_data('test_ecr_lifecycle_update')
         rule = {

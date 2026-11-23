@@ -347,6 +347,8 @@ class MetricsFilter(Filter):
                     rvalue = rvalue * self.data['attr-multiplier']
                 all_meet_condition = True
                 for data_point in collected_metrics[key]:
+                    if 'ExtendedStatistics' in data_point:
+                        data_point = data_point['ExtendedStatistics']
                     percent = (data_point[self.statistics] / rvalue * 100)
                     if not self.op(percent, self.value):
                         all_meet_condition = False

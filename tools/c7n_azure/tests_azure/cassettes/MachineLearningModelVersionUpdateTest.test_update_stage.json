@@ -1,0 +1,2996 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:09 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "content-length": [
+                        "12959"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DCAF33814F4D45BE89E04F1E4D51854B Ref B: CYS013050704039 Ref C: 2026-10-15T19:59:10Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510",
+                                "name": "cctest-ml-update-804084596510",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.Storage/storageAccounts/cctestml804084596510",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.Keyvault/vaults/cctestmlkv804084596510",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.insights/components/cctestmlai804084596510",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2026-10-15T19:51:23.0228944Z",
+                                    "notebookInfo": {
+                                        "resourceId": "1072b998f8224527931d3360ddb0ac91",
+                                        "fqdn": "ml-cctest-m-southcentralus-9b3bd3e0-b570-4531-88ef-c6ef8a2696f2.southcentralus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "9b3bd3e0-b570-4531-88ef-c6ef8a2696f2",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://southcentralus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510",
+                                    "sdkTelemetryAppInsightsKey": "00000000-0000-0000-0000-000000000004",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "3c5b95d5-00ac-4906-88d2-81d42bde4708",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:51:23.0228944Z",
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:13.4983577Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 94739D56BC264C51B0271B11ED3A93CE Ref B: CYS013050702047 Ref C: 2026-10-15T19:59:10Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.057"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:10 GMT"
+                    ],
+                    "content-length": [
+                        "8941"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeluri",
+                                "name": "cctest-update-modeluri",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7121587+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7121587+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-description",
+                                "name": "cctest-update-description",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7069536+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7069536+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isarchived",
+                                "name": "cctest-update-isarchived",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7020841+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7020841+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-tags",
+                                "name": "cctest-update-tags",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7320702+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7320702+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage",
+                                "name": "cctest-update-stage",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7328455+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7328455+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-flavors",
+                                "name": "cctest-update-flavors",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7370401+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7370401+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-jobname",
+                                "name": "cctest-update-jobname",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.718506+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.718506+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isanonymous",
+                                "name": "cctest-update-isanonymous",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7421157+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7421157+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-properties",
+                                "name": "cctest-update-properties",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7736193+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7736193+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeltype",
+                                "name": "cctest-update-modeltype",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7078274+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7078274+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeluri/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: FF75898CAE2A4CFC8E3C57DD15F19368 Ref B: CYS013050701023 Ref C: 2026-10-15T19:59:11Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.095"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:10 GMT"
+                    ],
+                    "content-length": [
+                        "1515"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeluri/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7736413+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7736413+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-description/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B874B8A2055D4DF3B624381E39BC9659 Ref B: CYS013050703035 Ref C: 2026-10-15T19:59:11Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.083"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:11 GMT"
+                    ],
+                    "content-length": [
+                        "1517"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-description/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Updated description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7736414+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:57:28.1664182+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isarchived/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 710C46D6317349208DC11AE767301BF5 Ref B: CYS013050701053 Ref C: 2026-10-15T19:59:11Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.098"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:11 GMT"
+                    ],
+                    "content-length": [
+                        "1513"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isarchived/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": true,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Archived"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7750672+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:19.6951791+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-tags/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 617103B7222B434796179109AF109DAE Ref B: CYS013050702027 Ref C: 2026-10-15T19:59:12Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.097"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:12 GMT"
+                    ],
+                    "content-length": [
+                        "1483"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-tags/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "updated"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7909856+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:57:41.9045108+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 2BF8F73C4582447F998C54A89DF4D183 Ref B: CYS013050702037 Ref C: 2026-10-15T19:59:12Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.090"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:12 GMT"
+                    ],
+                    "content-length": [
+                        "1512"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7923031+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7923031+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-flavors/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 7EE8B1934F6F4CE6A40A7BF5CF817AD6 Ref B: CYS013050704047 Ref C: 2026-10-15T19:59:12Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.106"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:12 GMT"
+                    ],
+                    "content-length": [
+                        "1513"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-flavors/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7939153+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:32.409955+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-jobname/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 39C69745C8BE465BB448F48D8A20BA5D Ref B: CYS013050702025 Ref C: 2026-10-15T19:59:13Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.093"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:13 GMT"
+                    ],
+                    "content-length": [
+                        "1514"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-jobname/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7965933+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:44.3650647+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isanonymous/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A7295F17F14F4ACAB84861E35EAAD62A Ref B: CYS013050701029 Ref C: 2026-10-15T19:59:13Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.097"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:13 GMT"
+                    ],
+                    "content-length": [
+                        "1518"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isanonymous/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.8020143+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:08.0755592+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-properties/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 6C63D23162E24067B77B7C8451BF8BDE Ref B: CYS013050702025 Ref C: 2026-10-15T19:59:14Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.100"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:14 GMT"
+                    ],
+                    "content-length": [
+                        "1517"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-properties/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7981752+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7981752+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeltype/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: EB4BDB9DAA604E1684DB270E6824B809 Ref B: CYS013050703019 Ref C: 2026-10-15T19:59:14Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.106"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:13 GMT"
+                    ],
+                    "content-length": [
+                        "1515"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeltype/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.803902+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:56.8194724+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: D02D272CC4B147618C0F1841094E015A Ref B: CYS013050702031 Ref C: 2026-10-15T19:59:14Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.061"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:14 GMT"
+                    ],
+                    "content-length": [
+                        "1339"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1",
+                        "name": "1",
+                        "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                        "properties": {
+                            "description": "Original description",
+                            "tags": {
+                                "owner": "original",
+                                "remove": "yes"
+                            },
+                            "properties": {
+                                "reviewed": "false",
+                                "retain": "yes"
+                            },
+                            "isArchived": false,
+                            "isAnonymous": false,
+                            "flavors": {
+                                "python_function": {
+                                    "data": {
+                                        "loader_module": "original"
+                                    }
+                                }
+                            },
+                            "modelType": "custom_model",
+                            "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                            "jobName": null,
+                            "provisioningState": "Succeeded",
+                            "stage": "Development"
+                        },
+                        "systemData": {
+                            "createdAt": "2026-10-15T19:56:30.7923031+00:00",
+                            "createdBy": "Jim Fulton",
+                            "createdByType": "User",
+                            "lastModifiedAt": "2026-10-15T19:56:30.7923031+00:00",
+                            "lastModifiedBy": "Jim Fulton",
+                            "lastModifiedByType": "User"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.MachineLearningServices/workspaces?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:14 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "content-length": [
+                        "12959"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F5ACCC90ED3C4785A4C9AB1E55D227EE Ref B: CYS013050701035 Ref C: 2026-10-15T19:59:14Z"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510",
+                                "name": "cctest-ml-update-804084596510",
+                                "type": "Microsoft.MachineLearningServices/workspaces",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "etag": null,
+                                "properties": {
+                                    "friendlyName": "",
+                                    "description": "",
+                                    "storageAccount": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.Storage/storageAccounts/cctestml804084596510",
+                                    "keyVault": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.Keyvault/vaults/cctestmlkv804084596510",
+                                    "applicationInsights": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.insights/components/cctestmlai804084596510",
+                                    "hbiWorkspace": false,
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "imageBuildCompute": null,
+                                    "provisioningState": "Succeeded",
+                                    "managedNetwork": {
+                                        "changeableIsolationModes": [
+                                            "AllowInternetOutbound",
+                                            "AllowOnlyApprovedOutbound"
+                                        ],
+                                        "isolationMode": "Disabled",
+                                        "enableNetworkMonitor": false
+                                    },
+                                    "allowRoleAssignmentOnRG": true,
+                                    "v1LegacyMode": false,
+                                    "softDeleteEnabled": false,
+                                    "creationTime": "2026-10-15T19:51:23.0228944Z",
+                                    "notebookInfo": {
+                                        "resourceId": "1072b998f8224527931d3360ddb0ac91",
+                                        "fqdn": "ml-cctest-m-southcentralus-9b3bd3e0-b570-4531-88ef-c6ef8a2696f2.southcentralus.notebooks.azure.net",
+                                        "isPrivateLinkEnabled": false,
+                                        "notebookPreparationError": null
+                                    },
+                                    "storageHnsEnabled": false,
+                                    "workspaceId": "9b3bd3e0-b570-4531-88ef-c6ef8a2696f2",
+                                    "linkedModelInventoryArmId": null,
+                                    "privateLinkCount": 0,
+                                    "publicNetworkAccess": "Enabled",
+                                    "discoveryUrl": "https://southcentralus.api.azureml.ms/discovery",
+                                    "mlFlowTrackingUri": "azureml://southcentralus.api.azureml.ms/mlflow/v1.0/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510",
+                                    "sdkTelemetryAppInsightsKey": "00000000-0000-0000-0000-000000000004",
+                                    "enableDataIsolation": false
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "3c5b95d5-00ac-4906-88d2-81d42bde4708",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "kind": "Default",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:51:23.0228944Z",
+                                    "createdBy": "user@example.com",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:13.4983577Z",
+                                    "lastModifiedBy": "user@example.com",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: A7BD2464B25D42B6BBA8055FA0961D6D Ref B: CYS013050703031 Ref C: 2026-10-15T19:59:15Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.057"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:15 GMT"
+                    ],
+                    "content-length": [
+                        "8941"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeluri",
+                                "name": "cctest-update-modeluri",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7121587+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7121587+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-description",
+                                "name": "cctest-update-description",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7069536+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7069536+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isarchived",
+                                "name": "cctest-update-isarchived",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7020841+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7020841+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-tags",
+                                "name": "cctest-update-tags",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7320702+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7320702+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage",
+                                "name": "cctest-update-stage",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7328455+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7328455+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-flavors",
+                                "name": "cctest-update-flavors",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7370401+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7370401+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-jobname",
+                                "name": "cctest-update-jobname",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.718506+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.718506+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isanonymous",
+                                "name": "cctest-update-isanonymous",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7421157+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7421157+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-properties",
+                                "name": "cctest-update-properties",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7736193+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7736193+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeltype",
+                                "name": "cctest-update-modeltype",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models",
+                                "properties": {
+                                    "description": null,
+                                    "tags": {},
+                                    "properties": {},
+                                    "isArchived": false,
+                                    "latestVersion": "1",
+                                    "nextVersion": "2",
+                                    "provisioningState": "Succeeded"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7078274+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7078274+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeluri/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: B542307211D54E1CA73AF3DF63176004 Ref B: CYS013050702051 Ref C: 2026-10-15T19:59:15Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.098"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:15 GMT"
+                    ],
+                    "content-length": [
+                        "1515"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeluri/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7736413+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7736413+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-description/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 5B92F224B9F54CC8982A6CDC813F0E65 Ref B: CYS013050703051 Ref C: 2026-10-15T19:59:16Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.100"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:16 GMT"
+                    ],
+                    "content-length": [
+                        "1517"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-description/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Updated description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7736414+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:57:28.1664182+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isarchived/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 758E7440FD8947A8B7025D48AA492DCA Ref B: CYS013050702025 Ref C: 2026-10-15T19:59:16Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.085"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:16 GMT"
+                    ],
+                    "content-length": [
+                        "1513"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isarchived/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": true,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Archived"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7750672+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:19.6951791+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-tags/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 77C1B6AB2E7441ABB84FA6A01447EAB5 Ref B: CYS013050704019 Ref C: 2026-10-15T19:59:16Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.092"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:16 GMT"
+                    ],
+                    "content-length": [
+                        "1483"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-tags/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "updated"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7909856+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:57:41.9045108+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DAB3ED750C8748388302A4C1E9F4C544 Ref B: CYS013050701045 Ref C: 2026-10-15T19:59:17Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.106"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3748"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:17 GMT"
+                    ],
+                    "content-length": [
+                        "1512"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7923031+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7923031+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-flavors/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 4CCE0651D3EB4049B03798E4C639F99A Ref B: CYS013050701027 Ref C: 2026-10-15T19:59:17Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.094"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:17 GMT"
+                    ],
+                    "content-length": [
+                        "1513"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-flavors/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7939153+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:32.409955+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-jobname/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DB1131C715C64CCD9D5BF6DD84756F95 Ref B: CYS013050703009 Ref C: 2026-10-15T19:59:17Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.132"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3748"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:18 GMT"
+                    ],
+                    "content-length": [
+                        "1514"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-jobname/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7965933+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:44.3650647+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isanonymous/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 8514D0C4BE26474CB24DA5232CC7EA7F Ref B: CYS013050704017 Ref C: 2026-10-15T19:59:18Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.096"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:18 GMT"
+                    ],
+                    "content-length": [
+                        "1518"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-isanonymous/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.8020143+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:08.0755592+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-properties/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: AB40395A2CB7492AB037372872792CDA Ref B: CYS013050702027 Ref C: 2026-10-15T19:59:18Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.101"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:18 GMT"
+                    ],
+                    "content-length": [
+                        "1517"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-properties/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.7981752+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:56:30.7981752+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeltype/versions?api-version=2023-04-01&listViewType=All",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1874043C537A48C6B3757A65FDC9C282 Ref B: CYS013050702045 Ref C: 2026-10-15T19:59:18Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.080"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:18 GMT"
+                    ],
+                    "content-length": [
+                        "1515"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-modeltype/versions/1",
+                                "name": "1",
+                                "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                                "properties": {
+                                    "description": "Original description",
+                                    "tags": {
+                                        "owner": "original",
+                                        "remove": "yes"
+                                    },
+                                    "properties": {
+                                        "reviewed": "false",
+                                        "retain": "yes"
+                                    },
+                                    "isArchived": false,
+                                    "isAnonymous": false,
+                                    "flavors": {
+                                        "python_function": {
+                                            "data": {
+                                                "loader_module": "original"
+                                            }
+                                        }
+                                    },
+                                    "modelType": "custom_model",
+                                    "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                                    "jobName": null,
+                                    "provisioningState": "Succeeded",
+                                    "stage": "Development"
+                                },
+                                "systemData": {
+                                    "createdAt": "2026-10-15T19:56:30.803902+00:00",
+                                    "createdBy": "Jim Fulton",
+                                    "createdByType": "User",
+                                    "lastModifiedAt": "2026-10-15T19:58:56.8194724+00:00",
+                                    "lastModifiedBy": "Jim Fulton",
+                                    "lastModifiedByType": "User"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1ABB148B7A23406D821A0B1EDAA3CEC9 Ref B: CYS013050702037 Ref C: 2026-10-15T19:59:19Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.054"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:18 GMT"
+                    ],
+                    "content-length": [
+                        "1339"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1",
+                        "name": "1",
+                        "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                        "properties": {
+                            "description": "Original description",
+                            "tags": {
+                                "owner": "original",
+                                "remove": "yes"
+                            },
+                            "properties": {
+                                "reviewed": "false",
+                                "retain": "yes"
+                            },
+                            "isArchived": false,
+                            "isAnonymous": false,
+                            "flavors": {
+                                "python_function": {
+                                    "data": {
+                                        "loader_module": "original"
+                                    }
+                                }
+                            },
+                            "modelType": "custom_model",
+                            "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                            "jobName": null,
+                            "provisioningState": "Succeeded",
+                            "stage": "Development"
+                        },
+                        "systemData": {
+                            "createdAt": "2026-10-15T19:56:30.7923031+00:00",
+                            "createdBy": "Jim Fulton",
+                            "createdByType": "User",
+                            "lastModifiedAt": "2026-10-15T19:56:30.7923031+00:00",
+                            "lastModifiedBy": "Jim Fulton",
+                            "lastModifiedByType": "User"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1?api-version=2023-04-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-writes": [
+                        "2999"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: EA3FD28B4F434CFCAE23C31DE091904B Ref B: CYS013050701019 Ref C: 2026-10-15T19:59:19Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.291"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-02"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:19 GMT"
+                    ],
+                    "content-length": [
+                        "1338"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1",
+                        "name": "1",
+                        "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                        "properties": {
+                            "description": "Original description",
+                            "tags": {
+                                "owner": "original",
+                                "remove": "yes"
+                            },
+                            "properties": {
+                                "reviewed": "false",
+                                "retain": "yes"
+                            },
+                            "isArchived": false,
+                            "isAnonymous": false,
+                            "flavors": {
+                                "python_function": {
+                                    "data": {
+                                        "loader_module": "original"
+                                    }
+                                }
+                            },
+                            "modelType": "custom_model",
+                            "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                            "jobName": null,
+                            "provisioningState": "Succeeded",
+                            "stage": "Production"
+                        },
+                        "systemData": {
+                            "createdAt": "2026-10-15T19:56:30.7923031+00:00",
+                            "createdBy": "Jim Fulton",
+                            "createdByType": "User",
+                            "lastModifiedAt": "2026-10-15T19:59:19.8197485+00:00",
+                            "lastModifiedBy": "Jim Fulton",
+                            "lastModifiedByType": "User"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1?api-version=2023-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: E29714F7249B40D480301B2A173F4628 Ref B: CYS013050704011 Ref C: 2026-10-15T19:59:20Z"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:2d2e8e63-272e-4b3c-8598-4ee570a0e70d"
+                    ],
+                    "x-request-time": [
+                        "0.076"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "azureml-served-by-cluster": [
+                        "vienna-southcentralus-01"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "date": [
+                        "Thu, 15 Oct 2026 19:59:20 GMT"
+                    ],
+                    "content-length": [
+                        "1338"
+                    ],
+                    "x-ms-response-type": [
+                        "standard"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/providers/Microsoft.MachineLearningServices/workspaces/cctest-ml-update-804084596510/models/cctest-update-stage/versions/1",
+                        "name": "1",
+                        "type": "Microsoft.MachineLearningServices/workspaces/models/versions",
+                        "properties": {
+                            "description": "Original description",
+                            "tags": {
+                                "owner": "original",
+                                "remove": "yes"
+                            },
+                            "properties": {
+                                "reviewed": "false",
+                                "retain": "yes"
+                            },
+                            "isArchived": false,
+                            "isAnonymous": false,
+                            "flavors": {
+                                "python_function": {
+                                    "data": {
+                                        "loader_module": "original"
+                                    }
+                                }
+                            },
+                            "modelType": "custom_model",
+                            "modelUri": "azureml://subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_machine-learning-model-version-update/workspaces/cctest-ml-update-804084596510/datastores/workspaceblobstore/paths/models/original/",
+                            "jobName": null,
+                            "provisioningState": "Succeeded",
+                            "stage": "Production"
+                        },
+                        "systemData": {
+                            "createdAt": "2026-10-15T19:56:30.7923031+00:00",
+                            "createdBy": "Jim Fulton",
+                            "createdByType": "User",
+                            "lastModifiedAt": "2026-10-15T19:59:19.8197485+00:00",
+                            "lastModifiedBy": "Jim Fulton",
+                            "lastModifiedByType": "User"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -6,7 +6,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.resources.cw import LogMetricAlarmFilter
 from c7n.utils import local_session
 from .common import BaseTest, functional
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from pytest_terraform import terraform
@@ -105,6 +105,82 @@ class LogGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:CrossAccountViolations"], ["1111111111111"])
+
+    def _run_with_subscription_lookup_spy(self, policy):
+        retry = MagicMock(wraps=policy.resource_manager.retry)
+        with patch.object(policy.resource_manager, "retry", retry):
+            resources = policy.run()
+        looked_up = [
+            c.kwargs.get("logGroupName") for c in retry.call_args_list
+            if getattr(c.args[0], "__name__", "") == "describe_subscription_filters"
+        ]
+        return resources, looked_up
+
+    def test_cross_account_skips_non_standard_log_class(self):
+        factory = self.replay_flight_data("test_log_group_cross_account_log_class")
+        p = self.load_policy(
+            {
+                "name": "cross-log-class",
+                "resource": "log-group",
+                "filters": [
+                    {"type": "value", "key": "logGroupName",
+                     "op": "glob", "value": "c7n-log-class-*"},
+                    {"type": "cross-account"},
+                ],
+            },
+            session_factory=factory,
+            config={"account_id": "123456789012"},
+        )
+        resources, looked_up = self._run_with_subscription_lookup_spy(p)
+        self.assertEqual([r["logGroupName"] for r in resources], ["c7n-log-class-standard"])
+        self.assertEqual(resources[0]["c7n:CrossAccountViolations"], ["644160558196"])
+        self.assertEqual(looked_up, ["c7n-log-class-standard"])
+
+    def test_subscription_filter_skips_non_standard_log_class(self):
+        factory = self.replay_flight_data("test_log_group_subscription_filter_log_class")
+        p = self.load_policy(
+            {
+                "name": "subscription-filter-log-class",
+                "resource": "log-group",
+                "filters": [
+                    {"type": "value", "key": "logGroupName",
+                     "op": "glob", "value": "c7n-log-class-*"},
+                    {"type": "subscription-filter"},
+                ],
+            },
+            session_factory=factory,
+        )
+        resources, looked_up = self._run_with_subscription_lookup_spy(p)
+        self.assertEqual([r["logGroupName"] for r in resources], ["c7n-log-class-standard"])
+        self.assertEqual(looked_up, ["c7n-log-class-standard"])
+
+    def test_cross_account_skips_deleted_log_group(self):
+        factory = self.replay_flight_data("test_log_group_cross_account_deleted_group")
+        p = self.load_policy(
+            {
+                "name": "cross-log-deleted",
+                "resource": "log-group",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=factory,
+            config={"account_id": "123456789012"},
+        )
+        resources = p.run()
+        self.assertEqual([r["logGroupName"] for r in resources], ["c7n-log-class-standard"])
+        self.assertEqual(resources[0]["c7n:CrossAccountViolations"], ["644160558196"])
+
+    def test_subscription_filter_skips_deleted_log_group(self):
+        factory = self.replay_flight_data("test_log_group_subscription_filter_deleted_group")
+        p = self.load_policy(
+            {
+                "name": "subscription-filter-deleted",
+                "resource": "log-group",
+                "filters": [{"type": "subscription-filter"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual([r["logGroupName"] for r in resources], ["c7n-log-class-standard"])
 
     def test_kms_filter(self):
         session_factory = self.replay_flight_data('test_log_group_kms_filter')
