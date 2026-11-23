@@ -18,29 +18,31 @@ jobs:
       checks: write
     steps:
       - uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
 
-      - uses: aws-actions/configure-aws-credentials@v6
+      - uses: aws-actions/configure-aws-credentials@v6.3.0
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
 
-      - uses: hashicorp/setup-terraform@v4
+      - uses: hashicorp/setup-terraform@v4.0.1
         with:
           terraform_wrapper: false
           # last OSS version
           terraform_version: "1.5.5"
 
       - name: Install Custodian
-        uses: ./.github/composites/install
+        uses: $/.github/composites/install
         with:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
           uv-version: ${{ env.UV_VERSION }}
 
       - name: Set up cache
-        uses: actions/cache@v5
+        uses: actions/cache@v5.1.0
         id: tfcache
         with:
           path: .tfcache
@@ -55,7 +57,7 @@ jobs:
           C7N_TEST_RUN: "true"
 
       - name: Notify Slack
-        uses: ravsamhq/notify-slack-action@v2
+        uses: ravsamhq/notify-slack-action@2.5.0
         if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}
