@@ -501,6 +501,8 @@ class Time(Filter):
 
     @classmethod
     def get_tz(cls, tz):
+        if not tz:
+            return None
         found = cls.TZ_ALIASES.get(tz.lower())
         if found:
             return tzutil.gettz(found)
