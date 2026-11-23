@@ -44,7 +44,8 @@ from c7n.reports.csvout import (
 from c7n.resources import load_available, load_resources
 from c7n.schema import StructureParser
 from c7n.utils import (
-    CONN_CACHE, dumps, filter_empty, format_string_values, get_policy_provider, join_output_path)
+    CONN_CACHE, dumps, filter_empty, format_string_values, get_partition, get_partition_region,
+    get_policy_provider, join_output_path)
 
 from c7n_org.utils import environ, account_tags
 from c7n_org import orgaccounts
@@ -229,10 +230,29 @@ def init(config, use, debug, verbose, accounts, tags, policies,
     return accounts_config, custodian_config, executor
 
 
+def get_bootstrap_region(account):
+    """A region in the account's partition, used to ask which regions exist.
+
+    The partition comes from the role arn when there is one (the last role, when
+    several are chained), otherwise from the region configured on the account's
+    profile. Anything else keeps the historical us-east-1.
+    """
+    role = account.get('role')
+    if isinstance(role, (list, tuple)):
+        role = role[-1] if role else None
+    if isinstance(role, str) and role.startswith('arn:'):
+        partition = role.split(':')[1]
+    elif account.get('profile'):
+        partition = get_partition(SessionFactory(None, account['profile'])().region_name)
+    else:
+        partition = 'aws'
+    return get_partition_region(partition)
+
+
 def resolve_regions(regions, account):
     if 'all' in regions:
         try:
-            session = get_session(account, 'c7n-org', 'us-east-1')
+            session = get_session(account, 'c7n-org', get_bootstrap_region(account))
             client = session.client('ec2')
             return [region['RegionName'] for region in client.describe_regions()['Regions']]
         except ClientError as e:

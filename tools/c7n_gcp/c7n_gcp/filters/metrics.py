@@ -5,6 +5,7 @@ Monitoring Metrics suppport for resources
 """
 from datetime import datetime, timedelta
 
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters.core import Filter, OPERATORS, FilterValidationError
 from c7n.filters.metrics import METRIC_WINDOW_ALIGNMENT
 from c7n.utils import local_session, type_schema, jmespath_search, snap_to_period_start
@@ -94,6 +95,28 @@ class GCPMetricsFilter(Filter):
             value: 0.05
             op: less-than
             period-start: start-of-day
+
+    Cloud Monitoring returns a ``DISTRIBUTION``-typed metric as a histogram rather
+    than a number. The ``distribution`` key chooses how to reduce one to a scalar:
+    ``count``, ``mean``, or ``sum`` (the default), reconstructed as ``count * mean``
+    since a histogram carries no total. Scalar metrics ignore the key. Either way
+    the filter compares the most recent point in the window, so a metric left on
+    the default ``ALIGN_NONE`` is read on its latest sample, not its total.
+
+    .. code-block:: yaml
+
+      - name: tuned-model-chatty-responses
+        resource: gcp.vertex-ai-endpoint
+        filters:
+          - type: metrics
+            name: aiplatform.googleapis.com/tuned_model/online_serving/tokens
+            aligner: ALIGN_SUM
+            reducer: REDUCE_SUM
+            group-by-fields: ["resource.labels.endpoint_id"]
+            distribution: mean
+            days: 1
+            value: 100
+            op: greater-than
     """
 
     schema = type_schema(
@@ -107,6 +130,7 @@ class GCPMetricsFilter(Filter):
           'reducer': {'type': 'string', 'enum': REDUCERS},
           'aligner': {'type': 'string', 'enum': ALIGNERS},
           'value': {'type': 'number'},
+          'distribution': {'type': 'string', 'enum': ['count', 'mean', 'sum']},
           'filter': {'type': 'string'},
           'missing-value': {'type': 'number'},
           'required': ('value', 'name', 'op')})
@@ -150,6 +174,7 @@ class GCPMetricsFilter(Filter):
         self.resource_metric_dict = {}
         self.op = OPERATORS[self.data.get('op', 'less-than')]
         self.value = self.data['value']
+        self.distribution = self.data.get('distribution', 'sum')
         self.filter = self.data.get('filter', '')
         self.c7n_metric_key = "%s.%s.%s" % (self.metric, self.aligner, self.reducer)
 
@@ -237,9 +262,41 @@ class GCPMetricsFilter(Filter):
         return batched_filters
 
     def split_by_resource(self, metric_list):
-        for m in metric_list:
-            resource_name = jmespath_search(self.metric_key, m)
-            self.resource_metric_dict[resource_name] = m
+        unresolved = 0
+        for series in metric_list:
+            resource_name = jmespath_search(self.metric_key, series)
+            if resource_name is None:
+                # metric-key does not identify this series, so no resource can
+                # ever look it up.
+                unresolved += 1
+                continue
+            if resource_name in self.resource_metric_dict:
+                labels = {**series.get('resource', {}).get('labels', {}),
+                          **series.get('metric', {}).get('labels', {})}
+                raise PolicyExecutionError(
+                    f"metric {self.metric} returned multiple timeSeries for "
+                    f"{resource_name} (labels {labels}). Collapse them with "
+                    f"'group-by-fields' and a 'reducer', or select one with 'filter'")
+            self.resource_metric_dict[resource_name] = series
+        if unresolved:
+            self.log.warning(
+                f"{unresolved} timeSeries did not resolve metric-key "
+                f"{self.metric_key} for {self.metric}")
+
+    def get_point_value(self, value):
+        dist = value.get('distributionValue')
+        if dist is None:
+            return float(list(value.values())[0])
+        # count is an int64, which proto3 JSON sends as a string, and proto3
+        # omits a field holding its default, so an alignment period with no
+        # samples arrives with neither count nor mean.
+        count = int(dist.get('count', 0))
+        mean = float(dist.get('mean', 0.0))
+        if self.distribution == 'count':
+            return count
+        if self.distribution == 'mean':
+            return mean
+        return count * mean
 
     def process_resource(self, resource):
         resource_metric = resource.setdefault('c7n.metrics', {})
@@ -251,12 +308,11 @@ class GCPMetricsFilter(Filter):
         if metric is None:
             metric_value = self.missing_value
         else:
-            metric_value = float(list(metric["points"][0]["value"].values())[0])
+            metric_value = self.get_point_value(metric["points"][0]["value"])
 
         resource_metric[self.c7n_metric_key] = metric
 
-        matched = self.op(metric_value, self.value)
-        return matched
+        return self.op(metric_value, self.value)
 
     @classmethod
     def register_resources(klass, registry, resource_class):

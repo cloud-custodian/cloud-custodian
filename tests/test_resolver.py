@@ -497,6 +497,41 @@ class UrlValueTest(BaseTest):
         os.remove("test_dict.csv")
         self.assertEqual(values.get_values(), {"0", "1", "2", "3", "4"})
 
+    def test_csv_expr_using_dict_blank_rows(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": "account_id", "format": "csv2dict"},
+            "account_id,reason\n111,special\n222,\n\n444,\n",
+        )
+        self.assertEqual(values.get_values(), {"111", "222", "444"})
+
+    def test_csv_expr_using_dict_trailing_blank_rows(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": "reason", "format": "csv2dict"},
+            "account_id,reason\r\n111,special\r\n222,\r\n\r\n",
+        )
+        self.assertEqual(values.get_values(), {"special", ""})
+
+    def test_csv_expr_using_dict_blank_rows_index(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": "account_id[2]", "format": "csv2dict"},
+            "\naccount_id,reason\n111,special\n\n222,\n444,\n",
+        )
+        self.assertEqual(values.get_values(), "444")
+
+    def test_csv_no_expr_using_dict_blank_rows(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "format": "csv2dict"},
+            "account_id,reason\n111,special\n\n222,\n",
+        )
+        self.assertEqual(values.get_values(), {"111", "special", "222", ""})
+
+    def test_csv_expr_using_dict_short_rows_kept(self):
+        values = self.get_values_from(
+            {"url": "sun.csv", "expr": "account_id", "format": "csv2dict"},
+            "account_id,reason\n111,special\n222\n",
+        )
+        self.assertEqual(values.get_values(), {"111", "222"})
+
     def test_csv_column(self):
         with open("test_column.csv", "w") as out:
             writer = csv.writer(out)

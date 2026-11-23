@@ -695,16 +695,16 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-costmanagement"
-version = "1.0.0"
+version = "4.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
     { name = "azure-mgmt-core" },
-    { name = "msrest" },
+    { name = "isodate" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4b/76/f5b18800424e1817c3384cc5eae123276daf4c1024969016bce76f4d87e6/azure-mgmt-costmanagement-1.0.0.zip", hash = "sha256:bf6d8fd5cddc330d7e2204157ea72b08c01580de4aa94c97709dc117b046f482", size = 84365, upload-time = "2021-02-07T07:27:06.531Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/45/0f/fca8cc1228c4d8acb7462b8cb7fb2bd68d7fa7dec3b13f1aaf6f612a9e89/azure-mgmt-costmanagement-4.0.1.zip", hash = "sha256:a95734102450b6f01aaa938d78c00285b90fc52b866caae17efb5521ae986db7", size = 194223, upload-time = "2023-07-19T07:53:35.036Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/fe/1dcc3dcf9cf66cfaa8bc395fbc7bb27662c9783c7de302ff0868ab741843/azure_mgmt_costmanagement-1.0.0-py2.py3-none-any.whl", hash = "sha256:e825c715656b63568b6389e6d05b7249aa5bf7ce4afbeeb8100a3d8e3359e478", size = 74163, upload-time = "2021-02-07T07:27:04.328Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/ff/bafa7f1f205922d871616f19bd8d3b49020d61286015b87c13379b26a8e7/azure_mgmt_costmanagement-4.0.1-py3-none-any.whl", hash = "sha256:23e77373427555e880ce938d468f87c6a8d66a5b237d7b2b0270bb192d61586f", size = 180916, upload-time = "2023-07-19T07:53:36.551Z" },
 ]
 
 [[package]]
@@ -960,16 +960,17 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-monitor"
-version = "2.0.0"
+version = "7.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
     { name = "azure-mgmt-core" },
-    { name = "msrest" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d1/07/6109120151e9bb768a581fccea4adfc1016bcf3cfe7a167431d400b277ac/azure-mgmt-monitor-2.0.0.zip", hash = "sha256:e7f7943fe8f0efe98b3b1996cdec47c709765257a6e09e7940f7838a0f829e82", size = 701884, upload-time = "2021-01-13T08:01:32.234Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0e/12/25874f6b894e972646244f570a23298969b58f57cfb7a188e2740017b43a/azure_mgmt_monitor-7.0.0.tar.gz", hash = "sha256:b75f536441d430f69ff873a1646e5f5dbcb3080a10768a59d0adc01541623816", size = 195496, upload-time = "2025-07-28T07:46:17.031Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/92/52/012f082405ae3d9e22ee9b46474394fd74116db52deb694277613a524a70/azure_mgmt_monitor-2.0.0-py2.py3-none-any.whl", hash = "sha256:af4917df2fe685e3daf25750f3586f11ccd2e7c2da68df392ca093fc3b7b8089", size = 607381, upload-time = "2021-01-13T08:01:30.341Z" },
+    { url = "https://files.pythonhosted.org/packages/c6/d1/f6ea4731edfa02c14756770d7c3d5202b40c5c72744f15142c0d89b6d957/azure_mgmt_monitor-7.0.0-py3-none-any.whl", hash = "sha256:ad63b5d187e21d2d34366271ade6abbeea1fcf76e313ff0f83d394d9c124aa1b", size = 245243, upload-time = "2025-07-28T07:46:18.594Z" },
 ]
 
 [[package]]
@@ -1750,7 +1751,7 @@ requires-dist = [
     { name = "azure-mgmt-containerregistry", specifier = ">=14.0.0,<15.0.0" },
     { name = "azure-mgmt-containerservice", specifier = ">=15.0.0,<16.0.0" },
     { name = "azure-mgmt-cosmosdb", specifier = ">=6.1.0,<10.0.0" },
-    { name = "azure-mgmt-costmanagement", specifier = ">=1.0.0,<2.0.0" },
+    { name = "azure-mgmt-costmanagement", specifier = ">=4.0.0,<5.0.0" },
     { name = "azure-mgmt-databricks", specifier = "==1.0.0b1" },
     { name = "azure-mgmt-datafactory", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-datalake-analytics", specifier = ">=0.5.0,<1.0.0" },
@@ -1768,7 +1769,7 @@ requires-dist = [
     { name = "azure-mgmt-logic", specifier = ">=9.0.0,<10.0.0" },
     { name = "azure-mgmt-machinelearningservices", specifier = "==2.0.0b2" },
     { name = "azure-mgmt-managementgroups", specifier = "==1.0.0b1" },
-    { name = "azure-mgmt-monitor", specifier = ">=2.0.0,<3.0.0" },
+    { name = "azure-mgmt-monitor", specifier = ">=7.0.0,<8.0.0" },
     { name = "azure-mgmt-msi", specifier = ">=1.0.0,<2.0.0" },
     { name = "azure-mgmt-network", specifier = ">=28.0.0,<29.0.0" },
     { name = "azure-mgmt-policyinsights", specifier = ">=1.0.0,<2.0.0" },

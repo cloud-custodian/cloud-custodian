@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserPoolClients": [
+            {
+                "ClientId": "4eer6dkhaafmrmkac3ohaeeqv3",
+                "UserPoolId": "us-east-1_6DcUjs62w",
+                "ClientName": "c7n-compliant-client"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

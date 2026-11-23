@@ -9,9 +9,10 @@ import typing
 import yaml
 
 from c7n.actions import BaseAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
+from c7n.resources.aws import shape_schema, shape_validate
 from c7n.utils import local_session, type_schema, QueryParser
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, NetworkLocation
@@ -507,7 +508,8 @@ class SageMakerMetricsFilter(MetricsFilter):
         We don't expect most resources to have different kinds, but
         endpoint do. None when this kind doesn't publish the metric: the
         resource has no series, rather than the policy being wrong, which
-        published_dimension_sets decides.
+        published_dimension_sets decides. process passes over such a
+        resource whatever the missing value.
         """
         return (
             SAGEMAKER_METRICS
@@ -743,7 +745,32 @@ class SageMakerMetricsFilter(MetricsFilter):
         # fail on an undocumented metric name even if we weren't validated
         self.published_dimension_sets()
 
-        return super().process(resources, event)
+        # Classified before the base filter fans out to threads, so a kind
+        # needing an api call to decide makes it once rather than per chunk.
+        published = []
+        skipped = collections.Counter()
+        for resource in resources:
+            kind = self.resource_kind(resource)
+            if kind is not None:
+                resource['c7n:metrics-kind'] = kind
+            if self.resource_published_metric(resource) is None:
+                skipped[kind] += 1
+            else:
+                published.append(resource)
+
+        if skipped:
+            # A kind that doesn't publish the metric has no series to read
+            # as missing, so the missing value doesn't decide it. That only
+            # changes the outcome when there is a missing value, which is
+            # when a policy author needs telling.
+            log = self.log.warning if 'missing-value' in self.data else self.log.debug
+            log("%s skipped %d of %d %s whose kind doesn't publish %s: %s",
+                self.type, sum(skipped.values()), len(resources),
+                self.manager.type, self.data['name'],
+                ', '.join(f"{count} {kind}"
+                          for kind, count in sorted(skipped.items())))
+
+        return super().process(published, event)
 
 
 @SagemakerEndpoint.filter_registry.register('metrics')
@@ -757,6 +784,7 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     VariantName = "VariantName"
     ProductionVariants = "ProductionVariants"
     InferenceComponentName = "InferenceComponentName"
+    AsyncInferenceConfig = "AsyncInferenceConfig"
 
     permissions = MetricsFilter.permissions + (
         'sagemaker:ListInferenceComponents',)
@@ -765,7 +793,7 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     def endpoint_components(self):
         """Map each endpoint to the inference components hosted on it.
 
-        An endpoint without inference components is assumed to be a classic endpoint.
+        An endpoint without inference components is assumed to be classic or async.
         """
         client = local_session(
             self.manager.session_factory).client('sagemaker')
@@ -780,6 +808,9 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
     def resource_kind(self, resource) -> Kind:
         """How this endpoint hosts its models.
 
+        An async endpoint is classified first, since it publishes the async
+        metrics; DescribeEndpoint already carries its AsyncInferenceConfig.
+
         An endpoint built to host components but hosting none right now
         is reported classic, which costs nothing: its invocations aren't
         published per variant, and nothing is reserving the instance, so
@@ -788,6 +819,8 @@ class SagemakerEndpointMetricsFilter(SageMakerMetricsFilter):
         execution role and no variant naming a model -- would classify it
         correctly at the price of a DescribeEndpointConfig per endpoint.
         """
+        if self.AsyncInferenceConfig in resource:
+            return 'async'
         if self.endpoint_components.get(resource[self.resource_dimension_name]):
             return 'inference-component'
         return 'classic'
@@ -1797,6 +1830,103 @@ class SagemakerSpace(QueryResourceManager):
         universal_taggable = object()
 
     source_mapping = {'describe': SagemakerSpaceDescribe}
+
+
+@SagemakerSpace.action_registry.register('update')
+class UpdateSagemakerSpace(BaseAction):
+    """Update a SageMaker Studio space's settings with ``UpdateSpace``.
+
+    Options are the ``UpdateSpace`` request without ``DomainId`` and
+    ``SpaceName``, which come from each space. SageMaker merges what you send
+    into the space's current settings, so anything you leave out is kept.
+
+    App settings blocks (``JupyterLabAppSettings``, ``CodeEditorAppSettings``,
+    ``KernelGatewayAppSettings`` and ``JupyterServerAppSettings``) are only sent
+    to spaces that already have them. SageMaker rejects some blocks on some
+    spaces, which fails the whole update, and silently adds others. Only spaces
+    in the ``InService`` state are updated.
+
+    A new default instance type doesn't change an app that is already running.
+    It applies the next time the app starts.
+
+    :example:
+
+    Reset spaces whose JupyterLab default is a GPU instance to a CPU one:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-space-cpu-default
+            resource: aws.sagemaker-space
+            filters:
+              - type: value
+                key: SpaceSettings.JupyterLabAppSettings.DefaultResourceSpec.InstanceType
+                op: glob
+                value: 'ml.g*'
+            actions:
+              - type: update
+                SpaceSettings:
+                  JupyterLabAppSettings:
+                    DefaultResourceSpec:
+                      InstanceType: ml.t3.medium
+    """
+
+    schema = type_schema(
+        'update',
+        **shape_schema(
+            'sagemaker', 'UpdateSpaceRequest', drop_fields=('DomainId', 'SpaceName')),
+    )
+    permissions = ('sagemaker:UpdateSpace',)
+    shape = 'UpdateSpaceRequest'
+    valid_origin_states = ('InService',)
+    app_settings = (
+        'JupyterServerAppSettings',
+        'KernelGatewayAppSettings',
+        'CodeEditorAppSettings',
+        'JupyterLabAppSettings',
+    )
+
+    def validate(self):
+        params = {k: v for k, v in self.data.items() if k != 'type'}
+        params.update(DomainId='validate', SpaceName='validate')
+        shape_validate(params, self.shape, self.manager.resource_type.service)
+        return self
+
+    def process(self, resources):
+        resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        skipped = errors = 0
+        for r in resources:
+            update = self.fit_to_space(r)
+            if not update:
+                skipped += 1
+                continue
+            try:
+                self.manager.retry(
+                    client.update_space,
+                    DomainId=r['DomainId'], SpaceName=r['SpaceName'], **update)
+            except client.exceptions.ResourceNotFound:
+                continue
+            except Exception:
+                self.log.exception("Unable to update space %s", r['SpaceArn'])
+                errors += 1
+        if skipped:
+            self.log.warning(
+                "Skipped %d of %d spaces with none of the policy's app settings",
+                skipped, len(resources))
+        if errors:
+            raise PolicyExecutionError(
+                "%d of %d spaces failed to update" % (errors, len(resources)))
+
+    def fit_to_space(self, space):
+        update = {k: v for k, v in self.data.items() if k != 'type'}
+        current = space.get('SpaceSettings', {})
+        settings = {
+            k: v for k, v in update.pop('SpaceSettings', {}).items()
+            if k not in self.app_settings or k in current}
+        if settings:
+            update['SpaceSettings'] = settings
+        return update
 
 
 class SagemakerAppDescribe(DescribeSource):

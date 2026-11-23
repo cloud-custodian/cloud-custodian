@@ -3,8 +3,10 @@
 import sys
 import time
 import types
+from typing import List, Optional, Union
 
 import pytest
+from azure.mgmt.keyvault import models as keyvault_models
 from azure.mgmt.managementgroups.models import DescendantInfo
 from c7n_azure import utils
 from c7n_azure.tags import TagHelper
@@ -13,11 +15,15 @@ from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math,
                              custodian_azure_send_override,
                              get_keyvault_auth_endpoint, get_keyvault_secret,
                              get_service_tag_ip_space, is_resource_group,
-                             is_resource_group_id)
+                             is_resource_group_id, model_to_jsonschema,
+                             type_to_jsonschema)
 from unittest.mock import patch, Mock
 from msrestazure.azure_cloud import AZURE_CHINA_CLOUD, AZURE_PUBLIC_CLOUD
 
 from .azure_common import DEFAULT_SUBSCRIPTION_ID, BaseTest
+
+# A request as the legacy client send override receives it.
+LEGACY_REQUEST = Mock(method='GET', url='https://graph.windows.net/tenant/users')
 
 try:
     from importlib import reload
@@ -227,6 +233,14 @@ class UtilsTest(BaseTest):
         self.assertEqual(StringUtils.snake_to_camel("test_abc"), "testAbc")
         self.assertEqual(StringUtils.snake_to_camel("test_abc_def"), "testAbcDef")
 
+    def test_camel_to_snake(self):
+        self.assertEqual(StringUtils.camel_to_snake(""), "")
+        self.assertEqual(StringUtils.camel_to_snake("test"), "test")
+        self.assertEqual(StringUtils.camel_to_snake("Test"), "test")
+        self.assertEqual(StringUtils.camel_to_snake("testAbc"), "test_abc")
+        self.assertEqual(StringUtils.camel_to_snake("eventHubAuthorizationRuleId"),
+                         "event_hub_authorization_rule_id")
+
     def test_naming_hash(self):
         source = 'Lorem ipsum dolor sit amet'
         source2 = 'amet sit dolor ipsum Lorem'
@@ -252,7 +266,7 @@ class UtilsTest(BaseTest):
             'status_code': 200
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 2)
@@ -268,7 +282,7 @@ class UtilsTest(BaseTest):
             'status_code': 429
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 8)
         self.assertEqual(logger_debug.call_count, 8)
@@ -284,7 +298,7 @@ class UtilsTest(BaseTest):
             'status_code': 429
         }
         mock.orig_send.return_value = type(str('response'), (), response_dict)
-        mock.send('')
+        mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
@@ -302,7 +316,7 @@ class UtilsTest(BaseTest):
         mock.orig_send.return_value = type(str('response'), (), response_dict)
 
         with patch('time.sleep', new_callable=time.sleep(0)):
-            mock.send('')
+            mock.send(LEGACY_REQUEST)
 
         self.assertEqual(mock.orig_send.call_count, 8)
         self.assertEqual(logger_debug.call_count, 8)
@@ -380,3 +394,48 @@ class UtilsTest(BaseTest):
     def test_get_keyvault_auth_china(self):
         auth = get_keyvault_auth_endpoint(AZURE_CHINA_CLOUD)
         self.assertEqual('https://vault.azure.cn', auth)
+
+
+@pytest.mark.parametrize('input_type, expected', [
+    (str, {'type': 'string'}),
+    (int, {'type': 'integer'}),
+    (bool, {'type': 'boolean'}),
+    (Optional[str], {'type': 'string'}),
+    (str | None, {'type': 'string'}),
+    (list[str], {'type': 'array', 'items': {'type': 'string'}}),
+    (List[str], {'type': 'array', 'items': {'type': 'string'}}),
+    (Union[int, bool], {'anyOf': [{'type': 'integer'}, {'type': 'boolean'}]}),
+])
+def test_type_to_jsonschema(input_type, expected):
+    assert type_to_jsonschema(input_type) == expected
+
+
+def test_type_to_jsonschema_unresolved_reference():
+    assert type_to_jsonschema('_models.Sku') == {'type': 'object'}
+
+
+def test_type_to_jsonschema_enum():
+    assert type_to_jsonschema(keyvault_models.SkuFamily, keyvault_models) == {
+        'type': 'string', 'enum': ['A'],
+    }
+
+
+def test_model_to_jsonschema_required_fields():
+    # family has a default, name does not
+    assert model_to_jsonschema(keyvault_models.Sku, keyvault_models)['required'] == ['name']
+
+
+def test_model_to_jsonschema_nested_models():
+    schema = model_to_jsonschema(keyvault_models.NetworkRuleSet, keyvault_models)
+
+    assert 'required' not in schema
+    assert schema['additionalProperties'] is False
+    assert schema['properties']['ip_rules'] == {
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'properties': {'value': {'type': 'string'}},
+            'additionalProperties': False,
+            'required': ['value'],
+        },
+    }

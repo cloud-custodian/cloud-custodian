@@ -1179,12 +1179,19 @@ class EncryptInstanceVolumes(BaseAction):
 
     def process(self, volumes):
         original_count = len(volumes)
+        unattached = [v for v in volumes if not v['Attachments']]
+        if unattached:
+            log.warning(
+                "EncryptVolumes skipping %d unattached volumes, "
+                "only attached volumes are supported", len(unattached))
         volumes = [v for v in volumes
-                   if not v['Encrypted'] or not v['Attachments']]
+                   if not v['Encrypted'] and v['Attachments']]
         log.debug(
             "EncryptVolumes filtered from %d to %d "
             " unencrypted attached volumes" % (
                 original_count, len(volumes)))
+        if not volumes:
+            return
 
         # Group volumes by instance id
         instance_vol_map = {}
@@ -1592,10 +1599,15 @@ class ModifyableVolume(Filter):
         ec2 = self.manager.get_resource_manager('ec2')
         instance_map = {}
         for v in attached:
-            instance_map.setdefault(
-                v['Attachments'][0]['InstanceId'], []).append(v)
+            instance_id = v['Attachments'][0].get('InstanceId')
+            if instance_id is None:
+                # Volumes not attached to an ec2 instance (ie. managed by ecs)
+                # have no instance type to check.
+                results.append(v)
+                continue
+            instance_map.setdefault(instance_id, []).append(v)
 
-        instances = ec2.get_resources(list(instance_map.keys()))
+        instances = ec2.get_resources(list(instance_map.keys())) if instance_map else []
         for i in instances:
             if i['InstanceType'] in self.older_generation:
                 stats['instance-type'] += len(instance_map[i['InstanceId']])

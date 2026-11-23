@@ -1,3 +1,6 @@
+import logging
+
+from azure.core.exceptions import ResourceNotFoundError
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
@@ -6,6 +9,38 @@ from c7n.filters import ListItemFilter
 from c7n_azure.utils import ResourceIdParser
 from azure.mgmt.machinelearningservices.models import (ComputeInstanceProperties,
                                                        AmlComputeProperties)
+
+log = logging.getLogger('custodian.azure.machine_learning')
+
+
+class MachineLearningWorkspaceChildMixin:
+    """Skip workspaces that cannot have their children enumerated.
+
+    ``workspaces.list_by_subscription`` keeps returning soft-deleted
+    workspaces (``provisioningState: Deleting``) after their resource group
+    is gone, and every child request against them fails. Skip those
+    workspaces, and any other workspace that disappears mid-run, rather than
+    failing the whole policy.
+
+    Subclasses that need custom enumeration override
+    ``enumerate_workspace_children`` instead of ``enumerate_resources``.
+    """
+
+    def enumerate_resources(self, parent_resource, type_info, vault_url=None, **params):
+        if parent_resource.get('properties', {}).get('provisioningState') == 'Deleting':
+            log.warning('Skipping Machine Learning workspace %s: workspace is being deleted',
+                        parent_resource['id'])
+            return []
+        try:
+            return self.enumerate_workspace_children(
+                parent_resource, type_info, vault_url=vault_url, **params)
+        except ResourceNotFoundError as e:
+            log.warning('Skipping Machine Learning workspace %s: %s', parent_resource['id'], e)
+            return []
+
+    def enumerate_workspace_children(self, parent_resource, type_info, vault_url=None, **params):
+        return super().enumerate_resources(
+            parent_resource, type_info, vault_url=vault_url, **params)
 
 
 @resources.register('machine-learning-workspace')
@@ -57,8 +92,59 @@ class ComputeInstancesFilter(ListItemFilter):
         return [c.serialize(True) for c in computes]
 
 
+@resources.register('machine-learning-online-deployment')
+class MachineLearningOnlineDeployment(ChildArmResourceManager):
+    """Azure Machine Learning online deployment resource.
+
+    Deployments are enumerated beneath every online endpoint and include the
+    deployment's ``properties.model`` reference.
+
+    :example:
+
+    Find deployments whose model is not approved.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ml-online-deployments-for-approved-models
+            resource: azure.machine-learning-online-deployment
+            filters:
+              - type: value
+                key: properties.model
+                op: not-in
+                value:
+                  - azureml:model-a:12
+                  - azureml:model-b:4
+    """
+
+    class resource_type(ChildArmResourceManager.resource_type):
+        doc_groups = ['ML']
+        service = 'azure.mgmt.machinelearningservices'
+        client = 'MachineLearningServicesMgmtClient'
+        enum_spec = ('online_deployments', 'list', None)
+        parent_manager_name = 'machine-learning-online-endpoint'
+        resource_type = (
+            'Microsoft.MachineLearningServices/workspaces/onlineEndpoints/deployments'
+        )
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup',
+            '"c7n:parent-id"',
+            'properties.model',
+        )
+
+        @classmethod
+        def extra_args(cls, parent_resource):
+            return {
+                'resource_group_name': ResourceIdParser.get_resource_group(parent_resource['id']),
+                'workspace_name': parent_resource['c7n:parent-id'].rstrip('/').rsplit('/', 1)[-1],
+                'endpoint_name': parent_resource['name'],
+            }
+
+
 @resources.register('machine-learning-data-container')
-class MachineLearningDataContainer(ChildArmResourceManager):
+class MachineLearningDataContainer(MachineLearningWorkspaceChildMixin, ChildArmResourceManager):
     """Machine Learning Data Container Resource
 
     :example:
