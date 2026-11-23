@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-east-1a",
+                "Attachments": [],
+                "Encrypted": false,
+                "VolumeType": "io1",
+                "VolumeId": "vol-07197f6445e4e8681",
+                "State": "available",
+                "Iops": 5000,
+                "SnapshotId": "",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 1,
+                    "day": 10,
+                    "hour": 19,
+                    "minute": 30,
+                    "second": 9,
+                    "microsecond": 335000
+                },
+                "Size": 100
+            }
+        ]
+    }
+}
