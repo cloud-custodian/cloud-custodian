@@ -1171,6 +1171,8 @@ class CloudWatchEventSource(AWSEventBase):
                 })
             if self.data.get('categories', []):
                 payload['detail']['eventTypeCategory'] = self.data['categories']
+            if self.data.get('statuses', []):
+                payload['detail']['statusCode'] = self.data['statuses']
             if not payload['detail']:
                 payload.pop('detail')
         elif event_type == 'hub-finding':

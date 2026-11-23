@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "VolumeConsumedReadWriteOps",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 1,
+                    "day": 10,
+                    "hour": 19,
+                    "minute": 51,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Unit": "Count",
+                "ExtendedStatistics": {
+                    "p99": 21.0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

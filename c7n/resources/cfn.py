@@ -46,6 +46,35 @@ def _cfn_stack_updatable(stack):
 
 @resources.register('cfn')
 class CloudFormation(QueryResourceManager):
+    """CloudFormation stacks.
+
+    Tagging permissions
+    -------------------
+
+    The ``tag``, ``remove-tag`` and ``mark-for-op`` actions call
+    ``cloudformation:UpdateStack`` and send the complete resulting tag set,
+    including every tag the stack keeps. An ``aws:TagKeys`` condition on that
+    permission must allow every key in the request, not just the keys being
+    added or removed.
+
+    For example, a ``ForAllValues:StringLike`` condition that allows only
+    ``acme_*`` does not allow adding or removing ``acme_cost_center`` when the
+    stack keeps an ``Environment`` tag. Allow ``Environment`` as well as
+    ``acme_*`` to permit these requests.
+
+    A tag-key condition only limits which tag keys a request carries. It does
+    not prevent template or parameter changes made through the same
+    ``UpdateStack`` permission, and ``ForAllValues`` also matches requests that
+    carry no tags.
+
+    See the AWS `UpdateStack API reference
+    <https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_UpdateStack.html>`__,
+    the `aws:TagKeys condition key
+    <https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-tagkeys>`__
+    and `set operators for multivalued context keys
+    <https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-single-vs-multi-valued-context-keys.html>`__.
+    """
+
     class resource_type(TypeInfo):
         service = 'cloudformation'
         arn = 'StackId'  # StackId contains the ARN
