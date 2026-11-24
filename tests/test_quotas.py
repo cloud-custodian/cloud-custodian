@@ -4,7 +4,9 @@
 
 from datetime import timedelta
 
+from c7n.exceptions import PolicyExecutionError
 from c7n.executor import MainThreadExecutor
+from c7n.resources import quotas
 from c7n.resources.quotas import ServiceQuota, UsageFilter
 from c7n.utils import local_session
 
@@ -366,6 +368,87 @@ class TestQuotas(BaseTest):
         self.assertEqual(r['QuotaCode'], 'L-D05C8A75')
         self.assertEqual(r['c7n:UsageMetric']['statistic'], 'Maximum')
         self.assertEqual(r['c7n:UsageMetric']['metric'], 3500.0)
+
+    def _usage_filter_with_pages(self, pages_for):
+        calls = []
+
+        class Paginator:
+            def paginate(self, MetricDataQueries, StartTime, EndTime):
+                calls.append(MetricDataQueries)
+                return pages_for(MetricDataQueries)
+
+        class Client:
+            def get_paginator(self, name):
+                assert name == 'get_metric_data'
+                return Paginator()
+
+        class Session:
+            def client(self, name):
+                return Client()
+
+        self.patch(quotas, 'local_session', lambda factory: Session())
+        f = UsageFilter({'type': 'usage-metric', 'limit': 50})
+        f.manager = type('Manager', (), {'session_factory': None})()
+        return f, calls
+
+    def _quota(self, n, value=10.0):
+        return {
+            'ServiceCode': 'svc',
+            'QuotaCode': f'L-{n:08d}',
+            'Value': value,
+            'UsageMetric': {
+                'MetricNamespace': 'AWS/Usage',
+                'MetricName': 'ResourceCount',
+                'MetricDimensions': {'Resource': f'r{n}'},
+                'MetricStatisticRecommendation': 'Maximum',
+            },
+        }
+
+    def test_usage_filter_batches_get_metric_data(self):
+        resources = [self._quota(n) for n in range(501)]
+
+        def pages_for(queries):
+            # quota n reports a usage of n, split over two pages
+            usage = {q['Id']: float(q['MetricStat']['Metric']['Dimensions'][0]['Value'][1:])
+                     for q in queries}
+            return [
+                {'MetricDataResults': [
+                    {'Id': i, 'Values': [0.0], 'StatusCode': 'PartialData'} for i in usage]},
+                {'MetricDataResults': [
+                    {'Id': i, 'Values': [v], 'StatusCode': 'Complete'} for i, v in usage.items()]},
+            ]
+
+        f, calls = self._usage_filter_with_pages(pages_for)
+        matched = f.process(resources, None)
+
+        self.assertEqual([len(c) for c in calls], [500, 1])
+        # limit 50% of 10.0: usage above 5 matches
+        self.assertEqual(len(matched), 495)
+        self.assertEqual(matched[0]['QuotaCode'], 'L-00000006')
+        self.assertEqual(matched[0]['c7n:UsageMetric']['metric'], 6.0)
+        self.assertEqual(matched[-1]['QuotaCode'], 'L-00000500')
+        self.assertEqual(matched[-1]['c7n:UsageMetric']['metric'], 500.0)
+
+    def test_usage_filter_get_metric_data_error(self):
+        def pages_for(queries):
+            raise ValueError('boom')
+
+        f, _ = self._usage_filter_with_pages(pages_for)
+        with self.assertRaises(Exception) as e:
+            f.process([self._quota(1)], None)
+        self.assertIn('svc', str(e.exception))
+        self.assertIsInstance(e.exception.__cause__, ValueError)
+
+    def test_usage_filter_get_metric_data_failed_query(self):
+        def pages_for(queries):
+            return [{'MetricDataResults': [
+                {'Id': 'm0', 'Values': [], 'StatusCode': 'InternalError',
+                 'Messages': [{'Code': 'InternalError', 'Value': 'boom'}]}]}]
+
+        f, _ = self._usage_filter_with_pages(pages_for)
+        with self.assertRaises(PolicyExecutionError) as e:
+            f.process([self._quota(1)], None)
+        self.assertIn('InternalError collecting usage of svc L-00000001', str(e.exception))
 
     def test_usage_filter_round_up(self):
         filter = UsageFilter({})

@@ -14,7 +14,6 @@ from collections import Counter
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
-from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import time
@@ -439,7 +438,7 @@ class TagActionFilter(Filter):
             raise PolicyValidationError(
                 "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
-        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = Time.get_tz(self.data.get('tz', 'utc'))
         if not tz:
             raise PolicyValidationError(
                 "Invalid timezone specified '%s' in %s" % (
@@ -451,7 +450,7 @@ class TagActionFilter(Filter):
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
         skew_hours = self.data.get('skew_hours', 0)
-        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = Time.get_tz(self.data.get('tz', 'utc'))
 
         v = None
         for n in i.get('Tags', ()):
@@ -755,7 +754,9 @@ class TagDelayedAction(Action):
     """Tag resources for future action.
 
     The optional 'tz' parameter can be used to adjust the clock to align
-    with a given timezone. The default value is 'utc'.
+    with a given timezone. The default value is 'utc'. It accepts an alias
+    such as 'pt' or an IANA name such as 'Asia/Tokyo', like offhours
+    'default_tz'.
 
     If neither 'days' nor 'hours' is specified, Cloud Custodian will default
     to marking the resource for action 4 days in the future.
@@ -802,12 +803,11 @@ class TagDelayedAction(Action):
                 "mark-for-op specifies invalid op:%s in %s" % (
                     op, self.manager.data))
 
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        self.tz = Time.get_tz(self.data.get('tz', 'utc'))
         if not self.tz:
             raise PolicyValidationError(
                 "Invalid timezone specified %s in %s" % (
-                    self.tz, self.manager.data))
+                    self.data.get('tz'), self.manager.data))
         return self
 
     def generate_timestamp(self, days, hours):
@@ -837,7 +837,7 @@ class TagDelayedAction(Action):
 
     def process(self, resources):
         cfg = self.get_config_values()
-        self.tz = tzutil.gettz(Time.TZ_ALIASES.get(cfg['tz']))
+        self.tz = Time.get_tz(cfg['tz'])
         self.id_key = self.manager.get_model().id
 
         msg = cfg['msg'].format(
@@ -1196,8 +1196,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
     concurrency = 1
 
     def process(self, resources):
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        self.tz = Time.get_tz(self.data.get('tz', 'utc'))
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
@@ -1423,15 +1422,12 @@ class CopyRelatedResourceTag(Tag):
         client = utils.local_session(
             self.manager.session_factory).client(
                 'resourcegroupstaggingapi', region_name=related_region)
-        from c7n.query import RetryPageIterator
-        paginator = client.get_paginator('get_resources')
-        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
 
-        resource_tag_results = client.get_resources(
-            ResourceARNList=list(ids))['ResourceTagMappingList']
-        resource_tag_map = {
-            r['ResourceARN']: {r['Key']: r['Value'] for r in r['Tags']}
-            for r in resource_tag_results}
+        # GetResources takes 1 to 100 arns per call
+        resource_tag_map = {}
+        for arn_set in utils.chunks(ids, 100):
+            for r in client.get_resources(ResourceARNList=arn_set)['ResourceTagMappingList']:
+                resource_tag_map[r['ResourceARN']] = {t['Key']: t['Value'] for t in r['Tags']}
         return resource_tag_map
 
     @classmethod

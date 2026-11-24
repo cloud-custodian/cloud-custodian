@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sms-voice:us-east-1:644160558196:sender-id/C7NSHARED/DE",
+                "Tags": [
+                    {
+                        "Key": "c7n-recording",
+                        "Value": "smsvoice"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "shared"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:sms-voice:us-east-1:644160558196:sender-id/C7NQUERY/DE",
+                "Tags": [
+                    {
+                        "Key": "c7n-recording",
+                        "Value": "smsvoice"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "query"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:sms-voice:us-east-1:644160558196:sender-id/C7NPRODPOOL/DE",
+                "Tags": [
+                    {
+                        "Key": "c7n-recording",
+                        "Value": "smsvoice"
+                    },
+                    {
+                        "Key": "c7n-test",
+                        "Value": "prod-pool"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

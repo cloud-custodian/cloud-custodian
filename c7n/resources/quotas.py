@@ -189,7 +189,10 @@ class UsageFilter(MetricsFilter):
     # We systematically use a start time of 24h ago. This means the min period is always 60 seconds.
     cloudwatch_min_period = 60
 
-    permisisons = ('cloudwatch:GetMetricStatistics',)
+    # GetMetricData accepts at most 500 queries per request
+    metric_data_batch_size = 500
+
+    permissions = ('cloudwatch:GetMetricData',)
 
     annotation_key = 'c7n:UsageMetric'
 
@@ -240,12 +243,13 @@ class UsageFilter(MetricsFilter):
         end_time = datetime.utcnow()
         start_time = end_time - timedelta(1)
 
+        total_seconds = (end_time - start_time).total_seconds()
+
         limit = self.data.get('limit', 80)
         min_period = max(self.data.get('min_period', 300), self.cloudwatch_min_period)
         hard_limit = self.data.get('hard_limit', None)
 
-        result = []
-
+        queries = []
         for r in resources:
             metric = r.get('UsageMetric')
             quota = r.get('Value')
@@ -262,27 +266,19 @@ class UsageFilter(MetricsFilter):
             else:
                 period = int(timedelta(1).total_seconds())
 
-            total_seconds = (end_time - start_time).total_seconds()
             period, metric_scale = self.scale_period(total_seconds, period, min_period)
+            queries.append((r, stat, period, metric_scale))
 
-            try:
-                res = client.get_metric_statistics(
-                    Namespace=metric['MetricNamespace'],
-                    MetricName=metric['MetricName'],
-                    Dimensions=self.get_dimensions(metric),
-                    Statistics=[stat],
-                    StartTime=start_time,
-                    EndTime=end_time,
-                    Period=period,
-                )
-            except Exception as e:
-                raise Exception(
-                    f'failed to collect metric {metric["MetricName"]}'
-                    f' namespace {metric["MetricNamespace"]}'
-                    f' for service {r.get("ServiceCode")}'
-                ) from e
+        result = []
+        for i in range(0, len(queries), self.metric_data_batch_size):
+            batch = queries[i:i + self.metric_data_batch_size]
+            values = self.get_usage_values(client, batch, start_time, end_time)
 
-            if res['Datapoints']:
+            for idx, (r, stat, period, metric_scale) in enumerate(batch):
+                points = values.get(f'm{idx}')
+                if not points:
+                    continue
+                quota = r['Value']
                 if self.percentile_regex.match(stat):
                     # AWS CloudWatch supports percentile statistic as a statistic but
                     # when comparing against a dataset for service quotas we only care
@@ -294,7 +290,7 @@ class UsageFilter(MetricsFilter):
                     op = self.metric_map['Maximum']
                 else:
                     op = self.metric_map[stat]
-                m = round(op([x[stat] for x in res['Datapoints']]) / metric_scale, 2)
+                m = round(op(points) / metric_scale, 2)
                 self.log.info(f'{r.get("ServiceName")} {r.get("QuotaName")} usage: {m}/{quota}')
                 if m > (limit / 100) * quota:
                     r[self.annotation_key] = {
@@ -311,6 +307,46 @@ class UsageFilter(MetricsFilter):
                         r[self.annotation_key]['hard_limit'] = float(hard_limit)
                     result.append(r)
         return result
+
+    def get_usage_values(self, client, batch, start_time, end_time):
+        """Fetch the datapoints of a batch of quotas, keyed by query id."""
+        queries = []
+        for idx, (r, stat, period, _) in enumerate(batch):
+            metric = r['UsageMetric']
+            queries.append({
+                'Id': f'm{idx}',
+                'MetricStat': {
+                    'Metric': {
+                        'Namespace': metric['MetricNamespace'],
+                        'MetricName': metric['MetricName'],
+                        'Dimensions': self.get_dimensions(metric),
+                    },
+                    'Period': period,
+                    'Stat': stat,
+                },
+                'ReturnData': True,
+            })
+
+        values = {}
+        paginator = client.get_paginator('get_metric_data')
+        try:
+            for response in paginator.paginate(
+                    MetricDataQueries=queries, StartTime=start_time, EndTime=end_time):
+                for res in response.get('MetricDataResults', ()):
+                    if res.get('StatusCode') in ('InternalError', 'Forbidden'):
+                        r = batch[int(res['Id'][1:])][0]
+                        raise PolicyExecutionError(
+                            f'{res["StatusCode"]} collecting usage of {r.get("ServiceCode")}'
+                            f' {r.get("QuotaCode")}: {res.get("Messages")}')
+                    values.setdefault(res['Id'], []).extend(res.get('Values', ()))
+        except PolicyExecutionError:
+            raise
+        except Exception as e:
+            services = sorted({r.get('ServiceCode', '') for r, *_ in batch})
+            raise Exception(
+                f'failed to collect usage metrics for services {", ".join(services)}'
+            ) from e
+        return values
 
 
 @ServiceQuota.filter_registry.register('request-history')

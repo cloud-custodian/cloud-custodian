@@ -14,6 +14,7 @@ from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
     config_regions, QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo)
+from c7n_gcp.utils import filter_tree_has_key
 
 
 REGION_DATA_PATH = Path(__file__).parent.parent / 'regions.json'
@@ -177,7 +178,7 @@ class VertexAITypeInfo(TypeInfo):
     """Base resource_type for Vertex AI resources scoped to a location.
 
     Holds the attributes and methods shared by every regional Vertex AI
-    resource_type (endpoints, batch prediction jobs, custom jobs).
+    resource_type, such as endpoints, index endpoints, datasets and jobs.
     Resource-specific resource_type classes still need to set component,
     enum_spec, default_report_fields, asset_type, permissions, and
     urn_component.
@@ -201,6 +202,12 @@ class VertexAITypeInfo(TypeInfo):
         """Extract location from resource name."""
         # Resource name format: projects/{project}/locations/{location}/<component>/<id>
         return resource['name'].split('/')[3]
+
+    @classmethod
+    def get_metric_resource_name(cls, resource, metric_key=None):
+        # Monitoring labels Vertex AI metrics with the bare id, the last
+        # part of the full resource name.
+        return resource['name'].split('/')[-1]
 
 
 @resources.register('vertex-ai-location')
@@ -298,11 +305,6 @@ class VertexAIEndpoint(VertexAIQueryManager):
         urn_component = 'endpoint'
         metric_key = 'resource.labels.endpoint_id'
         supported_metric_keys = ('resource.labels.endpoint_id',)
-
-        @classmethod
-        def get_metric_resource_name(cls, resource, metric_key=None):
-            # Endpoint metrics are keyed by the terminal endpoint id.
-            return resource['name'].split('/')[-1]
 
 
 @VertexAIEndpoint.action_registry.register('monitor')
@@ -683,6 +685,56 @@ class VertexAIEndpointDelete(VertexAIMethodAction):
         return {'name': resource['name']}
 
 
+@resources.register('vertex-ai-index-endpoint')
+class VertexAIIndexEndpoint(VertexAIQueryManager):
+    """GCP Vertex AI Vector Search Index Endpoint Resource
+
+    Index endpoints serve Vector Search indexes. Each deployed index runs
+    dedicated replicas, billed whether or not the index receives queries.
+
+    https://docs.cloud.google.com/gemini-enterprise-agent-platform/reference/rest/v1/projects.locations.indexEndpoints
+
+    Metrics match per endpoint, so an endpoint serving one busy and one idle
+    index counts as busy.
+
+    :example:
+
+    Find index endpoints with a deployed index and no queries in 7 days:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vertexai-index-endpoint-idle
+            resource: gcp.vertex-ai-index-endpoint
+            filters:
+              - type: value
+                key: deployedIndexes
+                value: not-null
+              - type: metrics
+                name: aiplatform.googleapis.com/matching_engine/query/request_count
+                aligner: ALIGN_SUM
+                reducer: REDUCE_SUM
+                group-by-fields:
+                  - resource.labels.index_endpoint_id
+                days: 7
+                op: lte
+                value: 0
+                missing-value: 0
+    """
+
+    class resource_type(VertexAITypeInfo):
+        component = 'projects.locations.indexEndpoints'
+        enum_spec = ('list', 'indexEndpoints[]', None)
+        default_report_fields = [
+            'name', 'displayName', 'deployedIndexes[].id', 'createTime', 'updateTime'
+        ]
+        asset_type = 'aiplatform.googleapis.com/IndexEndpoint'
+        permissions = ('aiplatform.indexEndpoints.list',)
+        urn_component = 'index-endpoint'
+        metric_key = 'resource.labels.index_endpoint_id'
+        supported_metric_keys = ('resource.labels.index_endpoint_id',)
+
+
 @resources.register('vertex-ai-dataset')
 class VertexAIDataset(VertexAIQueryManager):
     """GCP Vertex AI Dataset Resource
@@ -822,8 +874,35 @@ class VertexAIEvaluationRun(VertexAIQueryManager):
         default_report_fields = [
             'name', 'displayName', 'state', 'createTime', 'completionTime'
         ]
-        permissions = ('aiplatform.evaluationRuns.list',)
+        permissions = ('aiplatform.evaluationRuns.list', 'aiplatform.evaluationRuns.get')
         urn_component = 'evaluation-run'
+
+    def _needs_completion_time(self):
+        return filter_tree_has_key(self.data.get('filters', []), 'completionTime')
+
+    def get_cache_key(self, query):
+        key = super().get_cache_key(query)
+        key['completionTime_augment'] = self._needs_completion_time()
+        return key
+
+    def _fetch_resources(self, query):
+        resources = super()._fetch_resources(query)
+        if self._needs_completion_time():
+            resources = self.augment(resources)
+        return resources
+
+    def augment(self, resources):
+        session = local_session(self.session_factory)
+
+        def _get(r):
+            location = self.resource_type._get_location(r)
+            client = self.get_location_client(session, location, self.resource_type.component)
+            detail = client.execute_query('get', verb_arguments={'name': r['name']})
+            r.update(detail)
+            return r
+
+        with self.executor_factory(max_workers=2) as w:
+            return list(w.map(_get, resources))
 
 
 @resources.register('vertex-ai-metadata-store-artifact')

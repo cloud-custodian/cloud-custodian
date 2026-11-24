@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import base64
+import collections.abc
 from collections import namedtuple
 import json
 import logging
@@ -821,6 +822,14 @@ class LogSubscriber(EventSource):
         return self.pubsub.get_config(func)
 
 
+def get_audit_record_selection(
+        mode: collections.abc.Mapping[str, object],
+) -> tuple[bool, bool]:
+    """Return the effective first/last selections for a gcp-audit mode."""
+    first = mode.get('first', False)
+    return first, mode.get('last', not first)
+
+
 class ApiSubscriber(EventSource):
     """Subscribe to individual api calls
 
@@ -842,6 +851,16 @@ class ApiSubscriber(EventSource):
         log_filter = 'logName = "%s"' % log_name
         log_filter += " AND protoPayload.methodName = (%s)" % (
             ' OR '.join(['"%s"' % m for m in self.data['methods']]))
+        first, last = get_audit_record_selection(self.data)
+        phases = ['(NOT operation.first:* AND NOT operation.last:*)']
+
+        if first:
+            phases.append('operation.first = true')
+
+        if last:
+            phases.append('operation.last = true')
+
+        log_filter += f" AND ({' OR '.join(phases)})"
         return {
             'topic': '{}audit-{}'.format(self.prefix, func.name),
             'name': '{}audit-{}'.format(self.prefix, func.name),

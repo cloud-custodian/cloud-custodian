@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "Providers": [
+            {
+                "ProviderName": "c7n-oidc",
+                "ProviderType": "OIDC",
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 4,
+                    "hour": 16,
+                    "minute": 32,
+                    "second": 13,
+                    "microsecond": 116000
+                },
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 4,
+                    "hour": 16,
+                    "minute": 32,
+                    "second": 13,
+                    "microsecond": 116000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
