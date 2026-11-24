@@ -172,6 +172,37 @@ def test_firestore_backup_schedule_get(test, firestore_database):
     test.assertTrue("c7n:firestore-database" in schedule)
 
 
+@terraform("firestore_database")
+def test_firestore_backup_schedule_update(test, firestore_database):
+    project_id = get_default_project()
+
+    session_factory = test.replay_flight_data(
+        "firestore-backup-schedule-update", project_id=project_id
+    )
+
+    policy = test.load_policy(
+        {
+            "name": "firestore-backup-schedule-update",
+            "resource": "gcp.firestore-backup-schedule",
+            "filters": [{"type": "value", "key": "retention", "value": "1209600s"}],
+            "actions": [{"type": "update", "retention": "604800s"}],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+
+    assert len(resources) == 1
+    assert resources[0]["retention"] == "1209600s"
+
+    updated = policy.resource_manager.get_resource(
+        {"resourceName": resources[0]["name"]}
+    )
+    assert updated["retention"] == "604800s"
+    # the update mask was scoped to retention, so the recurrence survived
+    assert "dailyRecurrence" in updated
+
+
 # FIELDS TESTS
 # Functional tests take ~10 minutes to run
 @terraform("firestore_fields")
@@ -366,6 +397,36 @@ class FirestoreValidationTest(BaseTest):
                 {
                     "name": "firestore-field-requires-collection-id",
                     "resource": "gcp.firestore-field",
+                }
+            )
+
+    def test_firestore_backup_schedule_update_params(self):
+        policy = self.load_policy(
+            {
+                "name": "firestore-backup-schedule-update-params",
+                "resource": "gcp.firestore-backup-schedule",
+                "actions": [{"type": "update", "retention": "604800s"}],
+            }
+        )
+        schedule = {"name": "projects/p/databases/d/backupSchedules/s"}
+
+        params = policy.resource_manager.actions[0].get_resource_params(
+            policy.resource_manager.get_model(), schedule
+        )
+
+        assert params == {
+            "name": "projects/p/databases/d/backupSchedules/s",
+            "updateMask": "retention",
+            "body": {"retention": "604800s"},
+        }
+
+    def test_firestore_backup_schedule_update_requires_retention(self):
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "firestore-backup-schedule-update-no-retention",
+                    "resource": "gcp.firestore-backup-schedule",
+                    "actions": [{"type": "update"}],
                 }
             )
 
