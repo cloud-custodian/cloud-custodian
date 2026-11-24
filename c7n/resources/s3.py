@@ -4254,10 +4254,8 @@ class S3DirectoryCrossAccountFilter(CrossAccountAccessFilter):
     """
     permissions = ('s3express:GetBucketPolicy',)
 
-    def process(self, resources, event=None):
-        for r in resources:
-            get_s3_directory_bucket_policy(self.manager, r)
-        return super().process(resources, event)
+    def get_resource_policy(self, r):
+        return get_s3_directory_bucket_policy(self.manager, r)
 
 
 @S3Directory.filter_registry.register('has-statement')
