@@ -1,0 +1,108 @@
+{
+    "status_code": 200,
+    "data": {
+        "PhoneNumbers": [
+            {
+                "PhoneNumberArn": "arn:aws:sms-voice:us-east-1:644160558196:phone-number/phone-e77ab578f2e6457c9e084380186b654e",
+                "PhoneNumberId": "phone-e77ab578f2e6457c9e084380186b654e",
+                "PhoneNumber": "+14255556322",
+                "Status": "ACTIVE",
+                "IsoCountryCode": "US",
+                "MessageType": "TRANSACTIONAL",
+                "NumberCapabilities": [
+                    "SMS"
+                ],
+                "NumberType": "SIMULATOR",
+                "MonthlyLeasingPrice": "1.00",
+                "TwoWayEnabled": false,
+                "SelfManagedOptOutsEnabled": false,
+                "OptOutListName": "Default",
+                "InternationalSendingEnabled": false,
+                "DeletionProtectionEnabled": false,
+                "MessagingLimits": {
+                    "RateLimits": {
+                        "SMS": 1
+                    }
+                },
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 18,
+                    "microsecond": 0
+                }
+            },
+            {
+                "PhoneNumberArn": "arn:aws:sms-voice:us-east-1:644160558196:phone-number/phone-b0f68a7d15104d35b13faa6e0fa82608",
+                "PhoneNumberId": "phone-b0f68a7d15104d35b13faa6e0fa82608",
+                "PhoneNumber": "+12065557560",
+                "Status": "ACTIVE",
+                "IsoCountryCode": "US",
+                "MessageType": "TRANSACTIONAL",
+                "NumberCapabilities": [
+                    "SMS"
+                ],
+                "NumberType": "SIMULATOR",
+                "MonthlyLeasingPrice": "1.00",
+                "TwoWayEnabled": false,
+                "SelfManagedOptOutsEnabled": false,
+                "OptOutListName": "Default",
+                "InternationalSendingEnabled": false,
+                "DeletionProtectionEnabled": false,
+                "PoolId": "pool-11c700d922ee467aa4f7d039f23b0275",
+                "MessagingLimits": {
+                    "RateLimits": {
+                        "SMS": 1
+                    }
+                },
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 18,
+                    "microsecond": 0
+                }
+            },
+            {
+                "PhoneNumberArn": "arn:aws:sms-voice:us-east-1:644160558196:phone-number/phone-965b8be8821d4ee79b570acc4fa9c26d",
+                "PhoneNumberId": "phone-965b8be8821d4ee79b570acc4fa9c26d",
+                "PhoneNumber": "+17015550785",
+                "Status": "ACTIVE",
+                "IsoCountryCode": "US",
+                "MessageType": "TRANSACTIONAL",
+                "NumberCapabilities": [
+                    "SMS"
+                ],
+                "NumberType": "SIMULATOR",
+                "MonthlyLeasingPrice": "1.00",
+                "TwoWayEnabled": false,
+                "SelfManagedOptOutsEnabled": false,
+                "OptOutListName": "Default",
+                "InternationalSendingEnabled": false,
+                "DeletionProtectionEnabled": false,
+                "MessagingLimits": {
+                    "RateLimits": {
+                        "SMS": 1
+                    }
+                },
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 18,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

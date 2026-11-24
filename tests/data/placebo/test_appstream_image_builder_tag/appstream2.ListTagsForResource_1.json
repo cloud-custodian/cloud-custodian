@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": {
+            "Env": "dev",
+            "Owner": "c7n"
+        },
+        "ResponseMetadata": {}
+    }
+}

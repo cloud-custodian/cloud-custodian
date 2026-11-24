@@ -3,6 +3,7 @@
 """Most tags tests within their corresponding resource tags, we use this
 module to test some universal tagging infrastructure not directly exposed.
 """
+import os
 import time
 import jsonschema
 from datetime import datetime
@@ -224,6 +225,51 @@ class UniversalTagTest(BaseTest):
               actions:
                 remove-tag: alias 'unmark' has been deprecated
             """)
+
+
+class MarkForOpTimezoneTest(BaseTest):
+
+    def mark_policy(self, **action):
+        return self.load_policy({
+            'name': 'mark-tz',
+            'resource': 'ec2',
+            'actions': [dict(type='mark-for-op', op='stop', **action)]})
+
+    @freeze_time("2026-11-17 20:00:00")
+    def test_mark_for_op_tz_names(self):
+        # use a non utc local zone, so falling back to it shows in the stamp
+        with patch.dict(os.environ, {'TZ': 'America/New_York'}):
+            for tz, days, hours, expected in [
+                ('Asia/Tokyo', 0, 1, '2026/11/18 0600 JST'),
+                ('Asia/Tokyo', 1, 0, '2026/11/19'),
+                ('UTC', 0, 1, '2026/11/17 2100 UTC'),
+                ('jst', 0, 1, '2026/11/18 0600 JST'),
+            ]:
+                policy = self.mark_policy(tz=tz, days=days, hours=hours)
+                action = policy.resource_manager.actions[0]
+                self.assertEqual(
+                    action.get_config_values()['action_date'], expected)
+
+    def test_mark_for_op_invalid_tz(self):
+        with self.assertRaisesRegex(
+                PolicyValidationError, 'Invalid timezone specified not-a-zone'):
+            self.mark_policy(tz='not-a-zone', hours=1)
+        with self.assertRaisesRegex(
+                PolicyValidationError, 'Invalid timezone specified'):
+            self.mark_policy(tz='', hours=1)
+
+    def test_marked_for_op_tz_validation(self):
+        def marked_policy(tz):
+            return self.load_policy({
+                'name': 'marked-tz',
+                'resource': 'ec2',
+                'filters': [{'type': 'marked-for-op', 'op': 'stop', 'tz': tz}]})
+
+        for tz in ('utc', 'UTC', 'Asia/Tokyo'):
+            marked_policy(tz)
+        with self.assertRaisesRegex(
+                PolicyValidationError, "Invalid timezone specified 'not-a-zone'"):
+            marked_policy('not-a-zone')
 
 
 class CoalesceCopyUserTags(BaseTest):
@@ -577,6 +623,38 @@ class CopyRelatedResourceTag(BaseTest):
             if t['Key'] == 'test-tag':
                 found = True
         self.assertTrue(found)
+
+    def test_copy_related_tag_resourcegroupstaggingapi_batches(self):
+        # GetResources accepts between 1 and 100 arns per call
+        policy = self.load_policy({
+            "name": "copy-tags-from-tags",
+            "resource": "aws.ec2",
+            "actions": [{
+                "type": "copy-related-tag",
+                "resource": "resourcegroupstaggingapi",
+                "key": "tag:Foo",
+                "tags": "*"
+            }]
+        })
+        action = policy.resource_manager.actions[0]
+        client = MagicMock()
+        client.get_resources.side_effect = lambda ResourceARNList: {
+            "ResourceTagMappingList": [
+                {"ResourceARN": arn, "Tags": [{"Key": "App", "Value": arn}]}
+                for arn in ResourceARNList]}
+        arns = ["arn:aws:sqs:us-east-1:123456789012:q%d" % i for i in range(250)]
+
+        with patch.object(tagmod.utils, "local_session") as local_session:
+            local_session.return_value.client.return_value = client
+            tag_map = action.get_resource_tag_map_universal(arns)
+            self.assertEqual(
+                [len(c.kwargs["ResourceARNList"]) for c in client.get_resources.call_args_list],
+                [100, 100, 50])
+            self.assertEqual(tag_map, {arn: {"App": arn} for arn in arns})
+
+            client.get_resources.reset_mock()
+            self.assertEqual(action.get_resource_tag_map_universal([]), {})
+            client.get_resources.assert_not_called()
 
     def test_copy_related_tag_validate_aws_prefix(self):
         policy = {
