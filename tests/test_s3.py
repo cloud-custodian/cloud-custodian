@@ -250,6 +250,25 @@ def test_s3_directory_set_inventory(test):
     assert sorted(matching[0]['OptionalFields']) == ['LastModifiedDate', 'Size']
 
 
+def test_s3_directory_set_inventory_versions_invalid(test):
+    with pytest.raises(PolicyValidationError):
+        test.load_policy(
+            {
+                'name': 's3-directory-set-inventory-bad-versions',
+                'resource': 's3-directory',
+                'actions': [
+                    {
+                        'type': 'set-inventory',
+                        'name': 'c7n-set-inventory-new',
+                        'destination': 'c7n-test-inventory-dest',
+                        'versions': 'All',
+                    }
+                ],
+            },
+            validate=True,
+        )
+
+
 def test_s3_directory_set_inventory_client_region(test):
     # this test ensures that clients for directory buckets don't carry
     # region info since directory buckets don't have a 'Location' field

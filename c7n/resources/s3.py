@@ -4210,10 +4210,12 @@ class S3DirectorySetInventory(SetInventory):
                 destination: some-bucket
                 state: enabled
     """
-    # directory buckets only support a subset of the optional fields
+    # - directory buckets only support a subset of the optional fields
     # available on general purpose buckets. passing an unsupported field
-    # raises MalformedXML from the API, so narrow the schema to catch it
-    # at policy validation time instead.
+    # raises MalformedXML from the API
+    # - directory buckets also don't support S3 Versioning at all
+    # so 'versions' is dropped from the schema with process_bucket
+    # using default version 'Current' via the parent's existing behavior.
     schema = type_schema(
         'set-inventory',
         rinherit=SetInventory.schema,
@@ -4221,7 +4223,8 @@ class S3DirectorySetInventory(SetInventory):
         fields={'type': 'array', 'items': {'enum': [
             'Size', 'LastModifiedDate', 'StorageClass', 'ETag',
             'IsMultipartUploaded', 'EncryptionStatus', 'BucketKeyStatus',
-            'ChecksumAlgorithm', 'LifecycleExpirationDate']}})
+            'ChecksumAlgorithm', 'LifecycleExpirationDate']}},
+        versions=None)
     permissions = ('s3express:PutInventoryConfiguration', 's3express:GetInventoryConfiguration')
 
     def get_client(self, bucket):
