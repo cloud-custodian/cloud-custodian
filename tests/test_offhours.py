@@ -331,6 +331,76 @@ class OffHoursFilterTest(BaseTest):
         self.assertEqual(off.parser.raw_data(off.get_tag_value(i)),
                         {'off': '[(s,1)]', 'on': '[(m,6)]', 'tz': 'pst'})
 
+    def test_named_schedules(self):
+        f = OffHour({
+            "default_tz": "et",
+            "offhour": 18,
+            "schedules": {
+                "Business": "off=(M-F,19);on=(M-F,7)",
+                "late": "off=(M-F,22);on=(M-F,9);tz=pt",
+            },
+        })
+        resources = [
+            instance(Tags=[{"Key": "maid_offhours", "Value": v}])
+            for v in ("BUSINESS", "late", "on", "bussiness")]
+        t = datetime.datetime(year=2016, month=5, day=26, minute=5)
+        expected = {
+            18: [False, False, True, False],
+            19: [True, False, False, False],
+            22: [False, True, False, False],
+        }
+        for hour, results in expected.items():
+            with mock_datetime_now(t.replace(hour=hour), datetime):
+                self.assertEqual([f(r) for r in resources], results)
+        # the misspelled name never matches and is recorded each time
+        self.assertEqual([v for _, v in f.parse_errors], ["bussiness"] * 3)
+
+    def test_named_fallback_schedule(self):
+        f = OnHour({
+            "default_tz": "et",
+            "onhour": 8,
+            "fallback-schedule": "business",
+            "schedules": {"business": "off=(M-F,19);on=(M-F,7)"},
+        })
+        t = datetime.datetime(year=2016, month=5, day=26, hour=7, minute=5)
+        with mock_datetime_now(t, datetime):
+            self.assertTrue(f(instance(Tags=[])))
+            self.assertFalse(f(instance(Tags=[{"Key": "maid_offhours", "Value": "tz=et"}])))
+
+    def test_validate_named_schedules(self):
+        for schedule in ("off=(M-F,25)", "off", "tz=nowhere"):
+            with self.assertRaisesRegex(PolicyValidationError, "Invalid schedule Bad: "):
+                OffHour({"schedules": {"Bad": schedule}}).validate()
+        # yaml gives 247 and True for unquoted 247 and on, a menu2day tag is
+        # read as men-ay, and quotes around a tag value are stripped
+        for name in (247, True, "", "On", "OFF", "menu2day", '"business"', "late'"):
+            self.assertRaises(
+                PolicyValidationError,
+                OffHour({"schedules": {name: "tz=pt"}}).validate,
+            )
+        with self.assertRaisesRegex(PolicyValidationError, "'business' is defined twice"):
+            OffHour({"schedules": {"Business": "tz=pt", "business": "tz=et"}}).validate()
+        f = OnHour({"schedules": {
+            "west": "tz=pt", "business": "off=(M-F,19);on=(M-F,7);"}})
+        self.assertEqual(f.validate(), f)
+
+    def test_named_schedules_schema(self):
+        for resource in ("ec2", "rds"):
+            policy = {
+                "name": "named-schedules",
+                "resource": resource,
+                "filters": [{
+                    "type": "offhour",
+                    "default_tz": "et",
+                    "offhour": 19,
+                    "schedules": {"business": "off=(M-F,19);on=(M-F,7)"},
+                }],
+            }
+            self.load_policy(policy)
+            for schedules in ({"business": 19}, {True: "tz=pt"}):
+                policy["filters"][0]["schedules"] = schedules
+                self.assertRaises(PolicyValidationError, self.load_policy, policy)
+
     def test_offhours(self):
         t = datetime.datetime(
             year=2015,
