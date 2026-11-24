@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AggregatorsV2": [
+            {
+                "AggregatorV2Arn": "arn:aws:securityhub:us-east-1:644160558196:aggregatorv2/b8d10761-4d42-9810-3c62-bf13db6afd13"
+            }
+        ]
+    }
+}
