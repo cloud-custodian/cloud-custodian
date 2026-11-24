@@ -1,0 +1,12 @@
+{
+    "status_code": 409,
+    "data": {
+        "Error": {
+            "Message": "Security Hub V2 is not enabled for 644160558196",
+            "Code": "ConflictException"
+        },
+        "ResponseMetadata": {},
+        "Message": "Security Hub V2 is not enabled for 644160558196",
+        "Code": "ConflictException"
+    }
+}
