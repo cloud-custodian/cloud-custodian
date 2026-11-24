@@ -820,6 +820,19 @@ class HubMasterFilter(ValueFilter):
         return results
 
 
+class DescribeFindingAggregator(DescribeSource):
+    # error code raised when Security Hub is not enabled in the account/region
+    not_enabled_error = 'InvalidAccessException'
+
+    def resources(self, query=None):
+        try:
+            return super().resources(query)
+        except ClientError as e:
+            if e.response['Error']['Code'] == self.not_enabled_error:
+                return []
+            raise
+
+
 @resources.register("finding-aggregator")
 class SecurityHubFindingAggregator(query.QueryResourceManager):
     """AWS Security Hub cross-region finding aggregator.
@@ -845,16 +858,11 @@ class SecurityHubFindingAggregator(query.QueryResourceManager):
         arn_type = "finding-aggregator"
         cfn_type = "AWS::SecurityHub::FindingAggregator"
 
+    source_mapping = {"describe": DescribeFindingAggregator}
 
-class DescribeFindingAggregatorV2(DescribeSource):
-    def resources(self, query=None):
-        try:
-            return super().resources(query)
-        except ClientError as e:
-            # raised when Security Hub v2 is not enabled in the account
-            if e.response['Error']['Code'] == 'ConflictException':
-                return []
-            raise
+
+class DescribeFindingAggregatorV2(DescribeFindingAggregator):
+    not_enabled_error = 'ConflictException'
 
 
 @resources.register("finding-aggregator-v2")

@@ -290,6 +290,15 @@ class SecurityHubTest(BaseTest):
         )
         self.assertEqual(policy.run(), [])
 
+    def test_security_hub_finding_aggregator_not_enabled(self):
+        factory = self.replay_flight_data(
+            'test_security_hub_finding_aggregator_not_enabled')
+        policy = self.load_policy(
+            {'name': 'security-hub-aggregator', 'resource': 'aws.finding-aggregator'},
+            session_factory=factory,
+        )
+        self.assertEqual(policy.run(), [])
+
     def test_bucket(self):
         factory = self.replay_flight_data("test_security_hub_bucket")
         policy = self.load_policy(
