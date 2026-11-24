@@ -1,6 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-# from c7n.filters import revisions
+from unittest import mock
+
+import jsonpatch
+
+from c7n.filters.revisions import JsonDiff
 from c7n.resources.vpc import SecurityGroupDiff, SecurityGroupPatch
 from .common import BaseTest
 
@@ -67,59 +71,19 @@ class SGDiffLibTest(BaseTest):
             session_factory=factory,
         )
 
-        resources = p.run()
-        self.maxDiff = None
+        # jsonpatch versions differ in the patch they emit for the same
+        # change, so check that the patch is correct, not its exact ops.
+        with mock.patch.object(
+                JsonDiff, "diff", autospec=True, side_effect=JsonDiff.diff) as diff:
+            resources = p.run()
         self.assertEqual(len(resources), 1)
-        for change in [
-            {
-                u"op": u"add",
-                u"path": u"/IpPermissionsEgress/0/UserIdGroupPairs/0",
-                u"value": {u"GroupId": u"sg-a08ed1dd", u"UserId": u"644160558196"},
-            },
-            {u"op": u"replace", u"path": u"/Tags/1/Key", u"value": u"Scope"},
-            {u"op": u"replace", u"path": u"/Tags/1/Value", u"value": u"account"},
-            {
-                u"op": u"add",
-                u"path": u"/Tags/2",
-                u"value": {u"Key": u"NetworkLocation", u"Value": u"DMZ"},
-            },
-            {u"op": u"replace", u"path": u"/IpPermissions/1/FromPort", u"value": 22},
-            {
-                u"op": u"replace",
-                u"path": u"/IpPermissions/1/IpRanges/0/CidrIp",
-                u"value": u"10.0.0.0/24",
-            },
-            {u"op": u"replace", u"path": u"/IpPermissions/1/ToPort", u"value": 22},
-            {
-                u"op": u"add",
-                u"path": u"/IpPermissions/2",
-                u"value": {
-                    u"FromPort": 8485,
-                    u"IpProtocol": u"tcp",
-                    u"IpRanges": [],
-                    u"Ipv6Ranges": [],
-                    u"PrefixListIds": [],
-                    u"ToPort": 8485,
-                    u"UserIdGroupPairs": [
-                        {u"GroupId": u"sg-a38ed1de", u"UserId": u"644160558196"}
-                    ],
-                },
-            },
-            {
-                u"op": u"add",
-                u"path": u"/IpPermissions/3",
-                u"value": {
-                    u"FromPort": 443,
-                    u"IpProtocol": u"tcp",
-                    u"IpRanges": [{u"CidrIp": u"10.42.1.0/24"}],
-                    u"Ipv6Ranges": [],
-                    u"PrefixListIds": [],
-                    u"ToPort": 443,
-                    u"UserIdGroupPairs": [],
-                },
-            },
-        ]:
-            self.assertTrue(change in resources[0]["c7n:diff"])
+        self.assertEqual(diff.call_count, 1)
+        jdiff, source, target = diff.call_args.args
+        patch = resources[0]["c7n:diff"]
+        self.assertTrue(patch)
+        self.assertEqual(
+            jsonpatch.apply_patch(jdiff.sanitize_revision(source), patch),
+            jdiff.sanitize_revision(target))
 
     def test_sg_diff_pitr(self):
         factory = self.replay_flight_data("test_sg_config_diff")

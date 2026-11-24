@@ -7,6 +7,7 @@ accept = (
     'MIT',
     'MIT-0',
     'BSD',
+    'BSD-2-Clause AND Unlicense AND MIT',
     'Apache License 2.0',
     'Apache License, Version 2.0',
     'Apache 2.0',
@@ -74,8 +75,7 @@ def main():
 
         classifiers = d.metadata.get_all('Classifier') or ()
         classifiers = [c for c in classifiers if c.startswith('License')]
-        delta = set(classifiers).difference(accept_classifiers)
-        if (delta or not classifiers) and dname not in whitelist_packages:
+        if not (set(classifiers) & accept_classifiers) and dname not in whitelist_packages:
             found = True
             license = d.metadata.get('License', None) or d.metadata.get('License-Expression', None)
             print(f"{dname}: license:{license} classifiers:{classifiers}")

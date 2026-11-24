@@ -13,7 +13,8 @@ from botocore.paginate import Paginator
 @click.option('-f', '--output', default='-', type=click.File('w'))
 def main(output):
 
-    client = boto3.client('cloudformation')
+    # list types from us-east-1, which has the widest service coverage
+    client = boto3.client('cloudformation', region_name='us-east-1')
 
     paginator = Paginator(
         client.list_types,

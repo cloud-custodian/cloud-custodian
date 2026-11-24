@@ -21,6 +21,9 @@
     "account": "arn:${Partition}:account::${Account}:account",
     "accountInOrganization": "arn:${Partition}:account::${ManagementAccountId}:account/o-${OrganizationId}/${MemberAccountId}"
   },
+  "account-access": {
+    "application": "arn:${Partition}:account-access:${Region}:${Account}:application/${ResourceId}"
+  },
   "acm": {
     "acme-domain-validation": "arn:${Partition}:acm:${Region}:${Account}:acme-endpoint/${AcmeEndpointId}/acme-domain-validation/${AcmeDomainValidationId}",
     "acme-endpoint": "arn:${Partition}:acm:${Region}:${Account}:acme-endpoint/${AcmeEndpointId}",
@@ -33,11 +36,17 @@
   "aco-automation": {
     "AutomationRule": "arn:${Partition}:compute-optimizer::${Account}:automation-rule/${RuleId}"
   },
+  "agent-registry": {
+    "registry": "arn:${Partition}:agent-registry:${Region}:${Account}:registry/${RegistryId}",
+    "registry-record": "arn:${Partition}:agent-registry:${Region}:${Account}:registry/${RegistryId}/record/${RecordId}"
+  },
   "aidevops": {
     "agentspace": "arn:${Partition}:aidevops:${Region}:${Account}:agentspace/${AgentSpaceId}",
+    "asset": "arn:${Partition}:aidevops:${Region}:${Account}:agentspace/${AgentSpaceId}/asset/${AssetId}",
     "associations": "arn:${Partition}:aidevops:${Region}:${Account}:agentspace/${AgentSpaceId}/association/${AssociationId}",
     "private-connection": "arn:${Partition}:aidevops:${Region}:${Account}:private-connection/${Name}",
-    "service": "arn:${Partition}:aidevops:${Region}:${Account}:service/${ServiceId}"
+    "service": "arn:${Partition}:aidevops:${Region}:${Account}:service/${ServiceId}",
+    "trigger": "arn:${Partition}:aidevops:${Region}:${Account}:agentspace/${AgentSpaceId}/trigger/${TriggerId}"
   },
   "aiops": {
     "investigation-group": "arn:${Partition}:aiops:${Region}:${Account}:investigation-group/${InvestigationGroupId}"
@@ -76,7 +85,9 @@
   "aoss": {
     "Collection": "arn:${Partition}:aoss:${Region}:${Account}:collection/${CollectionId}",
     "CollectionGroup": "arn:${Partition}:aoss:${Region}:${Account}:collection-group/${CollectionGroupId}",
-    "Dashboards": "arn:${Partition}:aoss:${Region}:${Account}:dashboards/default"
+    "Dashboards": "arn:${Partition}:aoss:${Region}:${Account}:dashboards/default",
+    "IngestionJob": "arn:${Partition}:aoss:${Region}:${Account}:collection/${CollectionId}/ingestion-job/${IngestionJobId}",
+    "IngestionStream": "arn:${Partition}:aoss:${Region}:${Account}:collection/${CollectionId}/ingestion-stream/${IngestionStreamId}"
   },
   "apigateway": {
     "AccessLogSettings": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/stages/${StageName}/accesslogsettings",
@@ -87,16 +98,16 @@
     "ApiMapping": "arn:${Partition}:apigateway:${Region}::/domainnames/${DomainName}/apimappings/${ApiMappingId}",
     "ApiMappings": "arn:${Partition}:apigateway:${Region}::/domainnames/${DomainName}/apimappings",
     "Apis": "arn:${Partition}:apigateway:${Region}::/apis",
-    "Authorizer": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/authorizers/${AuthorizerId}",
-    "Authorizers": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/authorizers",
+    "Authorizer": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/authorizers/${AuthorizerId},arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/authorizers/${AuthorizerId}",
+    "Authorizers": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/authorizers,arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/authorizers",
     "AuthorizersCache": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/stages/${StageName}/cache/authorizers",
     "BasePathMapping": "arn:${Partition}:apigateway:${Region}::/domainnames/${DomainName}/basepathmappings/${BasePath}",
     "BasePathMappings": "arn:${Partition}:apigateway:${Region}::/domainnames/${DomainName}/basepathmappings",
     "ClientCertificate": "arn:${Partition}:apigateway:${Region}::/clientcertificates/${ClientCertificateId}",
     "ClientCertificates": "arn:${Partition}:apigateway:${Region}::/clientcertificates",
     "Cors": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/cors",
-    "Deployment": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/deployments/${DeploymentId}",
-    "Deployments": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/deployments",
+    "Deployment": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/deployments/${DeploymentId},arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/deployments/${DeploymentId}",
+    "Deployments": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/deployments,arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/deployments",
     "DocumentationPart": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/documentation/parts/${DocumentationPartId}",
     "DocumentationParts": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/documentation/parts",
     "DocumentationVersion": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/documentation/versions/${DocumentationVersionId}",
@@ -108,15 +119,15 @@
     "ExportedAPI": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/exports/${Specification}",
     "GatewayResponse": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/gatewayresponses/${ResponseType}",
     "GatewayResponses": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/gatewayresponses",
-    "Integration": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/resources/${ResourceId}/methods/${HttpMethodType}/integration",
-    "IntegrationResponse": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/resources/${ResourceId}/methods/${HttpMethodType}/integration/responses/${StatusCode}",
+    "Integration": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/integrations/${IntegrationId},arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/resources/${ResourceId}/methods/${HttpMethodType}/integration",
+    "IntegrationResponse": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/integrations/${IntegrationId}/integrationresponses/${IntegrationResponseId},arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/resources/${ResourceId}/methods/${HttpMethodType}/integration/responses/${StatusCode}",
     "IntegrationResponses": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/integrations/${IntegrationId}/integrationresponses",
     "Integrations": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/integrations",
     "Method": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/resources/${ResourceId}/methods/${HttpMethodType}",
     "MethodResponse": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/resources/${ResourceId}/methods/${HttpMethodType}/responses/${StatusCode}",
-    "Model": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/models/${ModelName}",
+    "Model": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/models/${ModelId},arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/models/${ModelName}",
     "ModelTemplate": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/models/${ModelId}/template",
-    "Models": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/models",
+    "Models": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/models,arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/models",
     "Portal": "arn:${Partition}:apigateway:${Region}:${Account}:/portals/${PortalId}",
     "PortalProduct": "arn:${Partition}:apigateway:${Region}:${Account}:/portalproducts/${PortalProductId}",
     "PrivateBasePathMapping": "arn:${Partition}:apigateway:${Region}::/domainnames/${DomainName}+${DomainIdentifier}/basepathmappings/${BasePath}",
@@ -138,8 +149,8 @@
     "Routes": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/routes",
     "RoutingRule": "arn:${Partition}:apigateway:${Region}:${Account}:/domainnames/${DomainName}/routingrules/${RoutingRuleId}",
     "Sdk": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/stages/${StageName}/sdks/${SdkType}",
-    "Stage": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/stages/${StageName}",
-    "Stages": "arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/stages",
+    "Stage": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/stages/${StageName},arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/stages/${StageName}",
+    "Stages": "arn:${Partition}:apigateway:${Region}::/apis/${ApiId}/stages,arn:${Partition}:apigateway:${Region}::/restapis/${RestApiId}/stages",
     "Tags": "arn:${Partition}:apigateway:${Region}::/tags/${UrlEncodedResourceARN}",
     "Template": "arn:${Partition}:apigateway:${Region}::/restapis/models/${ModelName}/template",
     "UsagePlan": "arn:${Partition}:apigateway:${Region}::/usageplans/${UsagePlanId}",
@@ -164,6 +175,8 @@
     "deployment": "arn:${Partition}:appconfig:${Region}:${Account}:application/${ApplicationId}/environment/${EnvironmentId}/deployment/${DeploymentNumber}",
     "deploymentstrategy": "arn:${Partition}:appconfig:${Region}:${Account}:deploymentstrategy/${DeploymentStrategyId}",
     "environment": "arn:${Partition}:appconfig:${Region}:${Account}:application/${ApplicationId}/environment/${EnvironmentId}",
+    "experimentdefinition": "arn:${Partition}:appconfig:${Region}:${Account}:application/${ApplicationId}/experimentdefinition/${ExperimentDefinitionId}",
+    "experimentrun": "arn:${Partition}:appconfig:${Region}:${Account}:application/${ApplicationId}/experimentdefinition/${ExperimentDefinitionId}/experimentrun/${ExperimentRunNumber}",
     "extension": "arn:${Partition}:appconfig:${Region}:${Account}:extension/${ExtensionId}/${ExtensionVersionNumber}",
     "extensionassociation": "arn:${Partition}:appconfig:${Region}:${Account}:extensionassociation/${ExtensionAssociationId}",
     "hostedconfigurationversion": "arn:${Partition}:appconfig:${Region}:${Account}:application/${ApplicationId}/configurationprofile/${ConfigurationProfileId}"
@@ -268,10 +281,14 @@
     "customer-agreement": "arn:${Partition}:artifact::${Account}:customer-agreement/*",
     "report": "arn:${Partition}:artifact:${Region}::report/${ReportId}:${Version}"
   },
+  "assurance": {
+    "environment": "arn:${Partition}:assurance:${Region}:${Account}:environment/${Environment}"
+  },
   "athena": {
     "capacity-reservation": "arn:${Partition}:athena:${Region}:${Account}:capacity-reservation/${CapacityReservationName}",
     "datacatalog": "arn:${Partition}:athena:${Region}:${Account}:datacatalog/${DataCatalogName}",
     "session": "arn:${Partition}:athena:${Region}:${Account}:workgroup/${WorkGroupName}/session/${SessionId}",
+    "system-table": "arn:${Partition}:athena:${Region}:${Account}:system-table/${TableName}",
     "workgroup": "arn:${Partition}:athena:${Region}:${Account}:workgroup/${WorkGroupName}"
   },
   "auditmanager": {
@@ -303,6 +320,9 @@
     "Product": "arn:${Partition}:aws-marketplace:::catalog/${CatalogName}/product/${ProductId}",
     "PurchaseOption": "arn:${Partition}:aws-marketplace:::catalog/${CatalogName}/purchaseOption/${PurchaseOptionId}",
     "SellerDashboard": "arn:${Partition}:aws-marketplace::${Account}:${Catalog}/ReportingData/${FactTable}/Dashboard/${DashboardName}",
+    "SellerDataset": "arn:${Partition}:aws-marketplace::${Account}:${Catalog}/ReportingData/${FactTable}/Dataset/${DatasetName}",
+    "TaxComplianceProfile": "arn:${Partition}:aws-marketplace:${Region}:${Account}:tax-compliance-profile/${ResourceId}",
+    "TaxComplianceProfileChangeTask": "arn:${Partition}:aws-marketplace:${Region}:${Account}:tax-compliance-profile-change-task/${ResourceId}",
     "VerificationEvidence": "arn:${Partition}:aws-marketplace:${Region}:${Account}:verification-type/${VerificationType}/verification-evidence/${ResourceId}"
   },
   "b2bi": {
@@ -312,6 +332,7 @@
     "transformer": "arn:${Partition}:b2bi:${Region}:${Account}:transformer/${ResourceId}"
   },
   "backup": {
+    "backupAccessPoint": "arn:${Partition}:backup:${Region}:${Account}:accesspoint/${AccessPointName}",
     "backupPlan": "arn:${Partition}:backup:${Region}:${Account}:backup-plan:${BackupPlanId}",
     "backupVault": "arn:${Partition}:backup:${Region}:${Account}:backup-vault:${BackupVaultName}",
     "framework": "arn:${Partition}:backup:${Region}:${Account}:framework:${FrameworkName}-${FrameworkId}",
@@ -390,10 +411,12 @@
     "model-evaluation-job": "arn:${Partition}:bedrock:${Region}:${Account}:model-evaluation-job/${ResourceId}",
     "model-import-job": "arn:${Partition}:bedrock:${Region}:${Account}:model-import-job/${ResourceId}",
     "model-invocation-job": "arn:${Partition}:bedrock:${Region}:${Account}:model-invocation-job/${JobIdentifier}",
+    "project": "arn:${Partition}:bedrock:${Region}:${Account}:project/${ResourceId}",
     "prompt": "arn:${Partition}:bedrock:${Region}:${Account}:prompt/${PromptId}",
     "prompt-router": "arn:${Partition}:bedrock:${Region}:${Account}:prompt-router/${ResourceId}",
     "prompt-version": "arn:${Partition}:bedrock:${Region}:${Account}:prompt/${PromptId}:${PromptVersion}",
     "provisioned-model": "arn:${Partition}:bedrock:${Region}:${Account}:provisioned-model/${ResourceId}",
+    "retrieval-instruction": "arn:${Partition}:bedrock:${Region}:${Account}:retrieval-instruction/${RetrievalInstructionId}",
     "session": "arn:${Partition}:bedrock:${Region}:${Account}:session/${SessionId}",
     "system-tool": "arn:${Partition}:bedrock::${Account}:system-tool/${ResourceId}"
   },
@@ -404,9 +427,12 @@
     "browser": "arn:${Partition}:bedrock-agentcore:${Region}:aws:browser/${BrowserId}",
     "browser-custom": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:browser-custom/${BrowserId}",
     "browser-profile": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:browser-profile/${BrowserProfileId}",
+    "capacity-provider": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:capacity-provider/${CapacityProviderId}",
     "code-interpreter": "arn:${Partition}:bedrock-agentcore:${Region}:aws:code-interpreter/${CodeInterpreterId}",
     "code-interpreter-custom": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:code-interpreter-custom/${CodeInterpreterId}",
     "configuration-bundle": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:configuration-bundle/${ConfigurationBundleId}",
+    "consent-portal": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:consent-portal/${ConsentPortalId}",
+    "dataset": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:dataset/${DatasetId}",
     "evaluator": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:evaluator/${EvaluatorId}",
     "gateway": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:gateway/${GatewayId}",
     "harness": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:harness/${HarnessId}",
@@ -425,6 +451,7 @@
     "runtime": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:runtime/${RuntimeId}",
     "runtime-endpoint": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:runtime/${RuntimeId}/runtime-endpoint/${Name}",
     "token-vault": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:token-vault/${TokenVaultId}",
+    "web-answer": "arn:${Partition}:bedrock-agentcore:${Region}:aws:tool/web-answer.v1",
     "web-search": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:tool/web-search.v1",
     "workload-identity": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:workload-identity-directory/${DirectoryId}/workload-identity/${WorkloadIdentityName}",
     "workload-identity-directory": "arn:${Partition}:bedrock-agentcore:${Region}:${Account}:workload-identity-directory/${DirectoryId}"
@@ -433,6 +460,9 @@
     "customized-model": "arn:${Partition}:bedrock-mantle:${Region}:${Account}:customized-model/${ResourceId}",
     "project": "arn:${Partition}:bedrock-mantle:${Region}:${Account}:project/${ResourceId}",
     "reservation": "arn:${Partition}:bedrock-mantle:${Region}:${Account}:reservation/${ResourceId}"
+  },
+  "bedrock-websearch": {
+    "tool": "arn:${Partition}:bedrock-websearch:${Region}:aws:tool/${ToolName}"
   },
   "billing": {
     "billingview": "arn:${Partition}:billing::${Account}:billingview/${ResourceId}",
@@ -582,14 +612,26 @@
     "channel": "arn:${Partition}:cloudtrail:${Region}:${Account}:channel/${ChannelId}"
   },
   "cloudwatch": {
+    "access-grant": "arn:${Partition}:cloudwatch:${Region}:${Account}:access-grant/${GrantId}",
+    "access-profile": "arn:${Partition}:cloudwatch:${Region}:${Account}:access-profile/${ProfileId}",
     "alarm": "arn:${Partition}:cloudwatch:${Region}:${Account}:alarm:${AlarmName}",
     "alarm-mute-rule": "arn:${Partition}:cloudwatch:${Region}:${Account}:alarm-mute-rule:${AlarmMuteRuleName}",
+    "alert": "arn:${Partition}:cloudwatch:${Region}:${Account}:alert/${AlertId}",
     "dashboard": "arn:${Partition}:cloudwatch::${Account}:dashboard/${DashboardName}",
     "dataset": "arn:${Partition}:cloudwatch:${Region}:${Account}:dataset/${DatasetId}",
+    "domain": "arn:${Partition}:cloudwatch:${Region}:${Account}:domain/${DomainId}",
+    "ingestion-endpoint": "arn:${Partition}:cloudwatch:${Region}:${Account}:ingestion-endpoint/${IngestionEndpointName}/${IngestionEndpointId}",
     "insight-rule": "arn:${Partition}:cloudwatch:${Region}:${Account}:insight-rule/${InsightRuleName}",
+    "integration": "arn:${Partition}:cloudwatch:${Region}:${Account}:integration/${IntegrationId}",
+    "metric-query-definition": "arn:${Partition}:cloudwatch:${Region}:${Account}:metric-query-definition/${MetricDataQueryDefinitionId}",
     "metric-stream": "arn:${Partition}:cloudwatch:${Region}:${Account}:metric-stream/${MetricStreamName}",
+    "omni-dashboard": "arn:${Partition}:cloudwatch:${Region}:${Account}:omni-dashboard/${DashboardId}",
+    "organization-access-grant": "arn:${Partition}:cloudwatch:${Region}:${Account}:organization-access-grant/${GrantId}",
+    "organization-domain": "arn:${Partition}:cloudwatch:${Region}:${Account}:organization-domain/${DomainId}",
     "service": "arn:${Partition}:cloudwatch:${Region}:${Account}:service/${ServiceName}-${UniqueAttributesHex}",
-    "slo": "arn:${Partition}:cloudwatch:${Region}:${Account}:slo/${SloName}"
+    "slo": "arn:${Partition}:cloudwatch:${Region}:${Account}:slo/${SloName}",
+    "space": "arn:${Partition}:cloudwatch:${Region}:${Account}:space/${SpaceId}",
+    "view": "arn:${Partition}:cloudwatch:${Region}:${Account}:view/${ViewName}/${ViewId}"
   },
   "codeartifact": {
     "domain": "arn:${Partition}:codeartifact:${Region}:${Account}:domain/${DomainName}",
@@ -703,6 +745,7 @@
   "connect": {
     "agent-status": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/agent-state/${AgentStatusId}",
     "ai-agent": "arn:${Partition}:wisdom:${Region}:${Account}:ai-agent/${AssistantId}/${AIAgentId}:${Version}",
+    "application": "arn:${Partition}:app-integrations:${Region}:${Account}:application/${ApplicationId}",
     "attached-file": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/file/${FileId}",
     "authentication-profile": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/authentication-profile/${AuthenticationProfileId}",
     "aws-managed-view": "arn:${Partition}:connect:${Region}:aws:view/${ViewId}",
@@ -715,16 +758,19 @@
     "data-table": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/data-table/${DataTableId}",
     "email-address": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/email-address/${EmailAddressId}",
     "evaluation-form": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/evaluation-form/${FormId}",
+    "extraction-definition": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/extraction-definition/${ExtractionDefinitionId}",
     "hierarchy-group": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/agent-group/${HierarchyGroupId}",
     "hours-of-operation": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/operating-hours/${HoursOfOperationId}",
     "instance": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}",
     "integration-association": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/integration-association/${IntegrationAssociationId}",
     "legacy-phone-number": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/phone-number/${PhoneNumberId}",
+    "metric": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/metric/${MetricId}",
     "notification": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/notification/${NotificationId}",
     "phone-number": "arn:${Partition}:connect:${Region}:${Account}:phone-number/${PhoneNumberId}",
     "prompt": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/prompt/${PromptId}",
     "qualified-aws-managed-view": "arn:${Partition}:connect:${Region}:aws:view/${ViewId}:${ViewQualifier}",
     "qualified-customer-managed-view": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/view/${ViewId}:${ViewQualifier}",
+    "qualified-metric": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/metric/${MetricId}:${MetricQualifier}",
     "queue": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/queue/${QueueId}",
     "quick-connect": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/transfer-destination/${QuickConnectId}",
     "routing-profile": "arn:${Partition}:connect:${Region}:${Account}:instance/${InstanceId}/routing-profile/${RoutingProfileId}",
@@ -748,6 +794,14 @@
   },
   "consoleapp": {
     "DeviceIdentity": "arn:${Partition}:consoleapp::${Account}:device/${DeviceId}/identity/${IdentityId}"
+  },
+  "continuum": {
+    "code-findings": "arn:${Partition}:continuum:${Region}:${Account}:environments/${EnvironmentId}/code-findings/${FindingId}",
+    "code-issues": "arn:${Partition}:continuum:${Region}:${Account}:environments/${EnvironmentId}/code-issues/${IssueId}",
+    "code-scans": "arn:${Partition}:continuum:${Region}:${Account}:environments/${EnvironmentId}/code-scans/${ScanRunId}",
+    "collectors": "arn:${Partition}:continuum:${Region}:${Account}:collectors/${CollectorId}",
+    "environments": "arn:${Partition}:continuum:${Region}:${Account}:environments/${EnvironmentId}",
+    "integrations": "arn:${Partition}:continuum:${Region}:${Account}:integrations/${IntegrationId}"
   },
   "controlcatalog": {
     "common-control": "arn:${Partition}:controlcatalog:::common-control/${CommonControlId}",
@@ -838,6 +892,7 @@
   },
   "directconnect": {
     "dx-gateway": "arn:${Partition}:directconnect::${Account}:dx-gateway/${DirectConnectGatewayId}",
+    "dx-resiliency-group": "arn:${Partition}:directconnect::${Account}:dx-resiliency-group/${ResiliencyGroupId}",
     "dxcon": "arn:${Partition}:directconnect:${Region}:${Account}:dxcon/${ConnectionId}",
     "dxlag": "arn:${Partition}:directconnect:${Region}:${Account}:dxlag/${LagId}",
     "dxvif": "arn:${Partition}:directconnect:${Region}:${Account}:dxvif/${VirtualInterfaceId}"
@@ -868,6 +923,8 @@
     "JobResource": "arn:${Partition}:drs:${Region}:${Account}:job/${JobID}",
     "LaunchConfigurationTemplateResource": "arn:${Partition}:drs:${Region}:${Account}:launch-configuration-template/${LaunchConfigurationTemplateID}",
     "RecoveryInstanceResource": "arn:${Partition}:drs:${Region}:${Account}:recovery-instance/${RecoveryInstanceID}",
+    "RecoveryPlanExecutionResource": "arn:${Partition}:drs:${Region}:${Account}:recovery-plan-execution/${RecoveryPlanExecutionID}",
+    "RecoveryPlanResource": "arn:${Partition}:drs:${Region}:${Account}:recovery-plan/${RecoveryPlanID}",
     "ReplicationConfigurationTemplateResource": "arn:${Partition}:drs:${Region}:${Account}:replication-configuration-template/${ReplicationConfigurationTemplateID}",
     "SourceNetworkResource": "arn:${Partition}:drs:${Region}:${Account}:source-network/${SourceNetworkID}",
     "SourceServerResource": "arn:${Partition}:drs:${Region}:${Account}:source-server/${SourceServerID}"
@@ -884,6 +941,7 @@
   },
   "dynamodb": {
     "backup": "arn:${Partition}:dynamodb:${Region}:${Account}:table/${TableName}/backup/${BackupName}",
+    "bulk-operation": "arn:${Partition}:dynamodb:${Region}:${Account}:bulk-operation/${BulkOperationId}",
     "export": "arn:${Partition}:dynamodb:${Region}:${Account}:table/${TableName}/export/${ExportName}",
     "global-table": "arn:${Partition}:dynamodb::${Account}:global-table/${GlobalTableName}",
     "import": "arn:${Partition}:dynamodb:${Region}:${Account}:table/${TableName}/import/${ImportName}",
@@ -895,11 +953,13 @@
     "snapshot": "arn:${Partition}:ec2:${Region}::snapshot/${SnapshotId}"
   },
   "ec2": {
+    "application-status-check": "arn:${Partition}:ec2:${Region}:${Account}:application-status-check/${ApplicationStatusCheckId}",
     "capacity-block": "arn:${Partition}:ec2:${Region}:${Account}:capacity-block/${CapacityBlockId}",
     "capacity-manager-data-export": "arn:${Partition}:ec2:${Region}:${Account}:capacity-manager-data-export/${CapacityManagerDataExportId}",
     "capacity-reservation": "arn:${Partition}:ec2:${Region}:${Account}:capacity-reservation/${CapacityReservationId}",
     "capacity-reservation-cancellation-quote": "arn:${Partition}:ec2:${Region}:${Account}:capacity-reservation-cancellation-quote/${CapacityReservationCancellationQuoteId}",
     "capacity-reservation-fleet": "arn:${Partition}:ec2:${Region}:${Account}:capacity-reservation-fleet/${CapacityReservationFleetId}",
+    "capacity-reservation-modification-quote": "arn:${Partition}:ec2:${Region}:${Account}:capacity-reservation-modification-quote/${CapacityReservationModificationQuoteId}",
     "carrier-gateway": "arn:${Partition}:ec2:${Region}:${Account}:carrier-gateway/${CarrierGatewayId}",
     "certificate": "arn:${Partition}:acm:${Region}:${Account}:certificate/${CertificateId}",
     "client-vpn-endpoint": "arn:${Partition}:ec2:${Region}:${Account}:client-vpn-endpoint/${ClientVpnEndpointId}",
@@ -928,6 +988,7 @@
     "internet-gateway": "arn:${Partition}:ec2:${Region}:${Account}:internet-gateway/${InternetGatewayId}",
     "ipam": "arn:${Partition}:ec2::${Account}:ipam/${IpamId}",
     "ipam-external-resource-verification-token": "arn:${Partition}:ec2::${Account}:ipam-external-resource-verification-token/${IpamExternalResourceVerificationTokenId}",
+    "ipam-internet-registry-association": "arn:${Partition}:ec2::${Account}:ipam-internet-registry-association/${IpamInternetRegistryAssociationId}",
     "ipam-policy": "arn:${Partition}:ec2::${Account}:ipam-policy/${IpamPolicyId}",
     "ipam-pool": "arn:${Partition}:ec2::${Account}:ipam-pool/${IpamPoolId}",
     "ipam-pool-allocation": "arn:${Partition}:ec2:${Region}:${Account}:ipam-pool-allocation/${IpamPoolAllocationId}",
@@ -1027,6 +1088,8 @@
     "daemon-deployment": "arn:${Partition}:ecs:${Region}:${Account}:daemon-deployment/${ClusterName}/${DaemonName}/${DaemonDeploymentId}",
     "daemon-revision": "arn:${Partition}:ecs:${Region}:${Account}:daemon-revision/${ClusterName}/${DaemonName}/${DaemonRevisionId}",
     "daemon-task-definition": "arn:${Partition}:ecs:${Region}:${Account}:daemon-task-definition/${DaemonTaskDefinitionFamilyName}:${DaemonTaskDefinitionRevisionNumber}",
+    "gateway": "arn:${Partition}:ecs:${Region}:${Account}:gateway/${GatewayName}/${GatewayId}",
+    "gateway-route": "arn:${Partition}:ecs:${Region}:${Account}:gateway-route/${GatewayName}/${GatewayId}/${RouteId}",
     "service": "arn:${Partition}:ecs:${Region}:${Account}:service/${ClusterName}/${ServiceName}",
     "service-deployment": "arn:${Partition}:ecs:${Region}:${Account}:service-deployment/${ClusterName}/${ServiceName}/${ServiceDeploymentId}",
     "service-revision": "arn:${Partition}:ecs:${Region}:${Account}:service-revision/${ClusterName}/${ServiceName}/${ServiceRevisionId}",
@@ -1093,6 +1156,7 @@
     "cluster": "arn:${Partition}:elasticmapreduce:${Region}:${Account}:cluster/${ClusterId}",
     "editor": "arn:${Partition}:elasticmapreduce:${Region}:${Account}:editor/${EditorId}",
     "notebook-execution": "arn:${Partition}:elasticmapreduce:${Region}:${Account}:notebook-execution/${NotebookExecutionId}",
+    "session": "arn:${Partition}:elasticmapreduce:${Region}:${Account}:cluster/${ClusterId}/session/${SessionId}",
     "studio": "arn:${Partition}:elasticmapreduce:${Region}:${Account}:studio/${StudioId}"
   },
   "elastictranscoder": {
@@ -1122,6 +1186,10 @@
     "jobRun": "arn:${Partition}:emr-serverless:${Region}:${Account}:/applications/${ApplicationId}/jobruns/${JobRunId}",
     "session": "arn:${Partition}:emr-serverless:${Region}:${Account}:/applications/${ApplicationId}/sessions/${SessionId}"
   },
+  "end-user-messaging": {
+    "brand-profile": "arn:${Partition}:end-user-messaging:${Region}:${Account}:brand-profile/${ResourceId}",
+    "notify-code-configuration": "arn:${Partition}:end-user-messaging:${Region}:${Account}:notify-code-configuration/${ResourceId}"
+  },
   "entityresolution": {
     "IdMappingWorkflow": "arn:${Partition}:entityresolution:${Region}:${Account}:idmappingworkflow/${WorkflowName}",
     "IdNamespace": "arn:${Partition}:entityresolution:${Region}:${Account}:idnamespace/${IdNamespaceName}",
@@ -1144,13 +1212,16 @@
     "create-snapshot": "arn:${Partition}:events:${Region}:${Account}:target/create-snapshot",
     "endpoint": "arn:${Partition}:events:${Region}:${Account}:endpoint/${EndpointName}",
     "event-bus": "arn:${Partition}:events:${Region}:${Account}:event-bus/${EventBusName}",
+    "event-busv2": "arn:${Partition}:events:${Region}:${Account}:event-busv2/${EventBusName}/${OpaqueId}",
     "event-source": "arn:${Partition}:events:${Region}::event-source/${EventSourceName}",
+    "event-sourcev2": "arn:${Partition}:events:${Region}:${Account}:event-sourcev2/${SourceType}/${EventSourceName}/${OpaqueId}",
     "key": "arn:${Partition}:kms:${Region}:${Account}:key/${KeyId}",
     "reboot-instance": "arn:${Partition}:events:${Region}:${Account}:target/reboot-instance",
     "replay": "arn:${Partition}:events:${Region}:${Account}:replay/${ReplayName}",
     "rule-on-custom-event-bus": "arn:${Partition}:events:${Region}:${Account}:rule/${EventBusName}/${RuleName}",
     "rule-on-default-event-bus": "arn:${Partition}:events:${Region}:${Account}:rule/${RuleName}",
     "stop-instance": "arn:${Partition}:events:${Region}:${Account}:target/stop-instance",
+    "subscriber": "arn:${Partition}:events:${Region}:${Account}:subscriber/${SubscriberName}/${OpaqueId}",
     "terminate-instance": "arn:${Partition}:events:${Region}:${Account}:target/terminate-instance"
   },
   "eventsbilltoaws": {
@@ -1299,6 +1370,7 @@
     "connectionType": "arn:${Partition}:glue:${Region}:${Account}:connectionType:${ConnectionTypeName}",
     "crawler": "arn:${Partition}:glue:${Region}:${Account}:crawler/${CrawlerName}",
     "customEntityType": "arn:${Partition}:glue:${Region}:${Account}:customEntityType/${CustomEntityTypeId}",
+    "dataQualityEvaluationConfig": "arn:${Partition}:glue:${Region}:${Account}:dataQualityEvaluationConfig/${EvaluationConfigName}",
     "dataQualityRuleset": "arn:${Partition}:glue:${Region}:${Account}:dataQualityRuleset/${RulesetName}",
     "database": "arn:${Partition}:glue:${Region}:${Account}:database/${DatabaseName}",
     "devendpoint": "arn:${Partition}:glue:${Region}:${Account}:devEndpoint/${DevEndpointName}",
@@ -1331,7 +1403,7 @@
     "coreDefinition": "arn:${Partition}:greengrass:${Region}:${Account}:/greengrass/definition/cores/${CoreDefinitionId}",
     "coreDefinitionVersion": "arn:${Partition}:greengrass:${Region}:${Account}:/greengrass/definition/cores/${CoreDefinitionId}/versions/${VersionId}",
     "coreDevice": "arn:${Partition}:greengrass:${Region}:${Account}:coreDevices:${CoreDeviceThingName}",
-    "deployment": "arn:${Partition}:greengrass:${Region}:${Account}:/greengrass/groups/${GroupId}/deployments/${DeploymentId}",
+    "deployment": "arn:${Partition}:greengrass:${Region}:${Account}:/greengrass/groups/${GroupId}/deployments/${DeploymentId},arn:${Partition}:greengrass:${Region}:${Account}:deployments:${DeploymentId}",
     "deviceDefinition": "arn:${Partition}:greengrass:${Region}:${Account}:/greengrass/definition/devices/${DeviceDefinitionId}",
     "deviceDefinitionVersion": "arn:${Partition}:greengrass:${Region}:${Account}:/greengrass/definition/devices/${DeviceDefinitionId}/versions/${VersionId}",
     "functionDefinition": "arn:${Partition}:greengrass:${Region}:${Account}:/greengrass/definition/functions/${FunctionDefinitionId}",
@@ -1358,6 +1430,8 @@
     "Satellite": "arn:${Partition}:groundstation:${Region}:${Account}:satellite/${SatelliteId}"
   },
   "guardduty": {
+    "customdetectionrule": "arn:${Partition}:guardduty::aws:detection-rule/custom/${RuleId}",
+    "customdetectionruleassociation": "arn:${Partition}:guardduty:${Region}:${Account}:detection-rule/custom/${RuleId}/association/${AssociationId}",
     "detector": "arn:${Partition}:guardduty:${Region}:${Account}:detector/${DetectorId}",
     "filter": "arn:${Partition}:guardduty:${Region}:${Account}:detector/${DetectorId}/filter/${FilterName}",
     "ipset": "arn:${Partition}:guardduty:${Region}:${Account}:detector/${DetectorId}/ipset/${IPSetId}",
@@ -1372,13 +1446,16 @@
   },
   "health-agent": {
     "Agent": "arn:${Partition}:health-agent:${Region}:${Account}:domain/${DomainId}/agent/${AgentId}",
+    "Dataset": "arn:${Partition}:health-agent:${Region}:${Account}:domain/${DomainId}/dataset/${DatasetId}",
     "Domain": "arn:${Partition}:health-agent:${Region}:${Account}:domain/${DomainId}",
     "Integration": "arn:${Partition}:health-agent:${Region}:${Account}:domain/${DomainId}/integration/${IntegrationId}",
+    "MedicalCodingJob": "arn:${Partition}:health-agent:${Region}:${Account}:domain/${DomainId}/medical-coding-job/${JobId}",
     "PatientInsightsJob": "arn:${Partition}:health-agent:${Region}:${Account}:domain/${DomainId}/patient-insights-job/${JobId}",
     "Session": "arn:${Partition}:health-agent:${Region}:${Account}:domain/${DomainId}/session/${SessionId}",
     "Subscription": "arn:${Partition}:health-agent:${Region}:${Account}:domain/${DomainId}/subscription/${SubscriptionId}"
   },
   "healthlake": {
+    "dataTransformationProfile": "arn:${Partition}:healthlake:${Region}:${Account}:dataTransformationProfile/${ProfileId}",
     "datastore": "arn:${Partition}:healthlake:${Region}:${Account}:datastore/fhir/${DatastoreId}"
   },
   "honeycode": {
@@ -1398,6 +1475,7 @@
     "oidc-provider": "arn:${Partition}:iam::${Account}:oidc-provider/${OidcProviderName}",
     "policy": "arn:${Partition}:iam::${Account}:policy/${PolicyNameWithPath}",
     "role": "arn:${Partition}:iam::${Account}:role/${RoleNameWithPath}",
+    "role-template": "arn:${Partition}:iam::aws:role-template/${AWSServicePrincipal}/${RoleTemplateName}:${RoleTemplateMajorVersion}",
     "saml-provider": "arn:${Partition}:iam::${Account}:saml-provider/${SamlProviderName}",
     "server-certificate": "arn:${Partition}:iam::${Account}:server-certificate/${CertificateNameWithPath}",
     "sms-mfa": "arn:${Partition}:iam::${Account}:sms-mfa/${MfaTokenIdWithPath}",
@@ -1529,15 +1607,19 @@
   },
   "iotsitewise": {
     "access-policy": "arn:${Partition}:iotsitewise:${Region}:${Account}:access-policy/${AccessPolicyId}",
+    "application": "arn:${Partition}:iotsitewise:${Region}:${Account}:workspace/${WorkspaceName}/application/${ApplicationId}",
     "asset": "arn:${Partition}:iotsitewise:${Region}:${Account}:asset/${AssetId}",
     "asset-model": "arn:${Partition}:iotsitewise:${Region}:${Account}:asset-model/${AssetModelId}",
     "computation-model": "arn:${Partition}:iotsitewise:${Region}:${Account}:computation-model/${ComputationModelId}",
     "dashboard": "arn:${Partition}:iotsitewise:${Region}:${Account}:dashboard/${DashboardId}",
     "dataset": "arn:${Partition}:iotsitewise:${Region}:${Account}:dataset/${DatasetId}",
     "gateway": "arn:${Partition}:iotsitewise:${Region}:${Account}:gateway/${GatewayId}",
+    "pipeline": "arn:${Partition}:iotsitewise:${Region}:${Account}:workspace/${WorkspaceName}/pipeline/${PipelineName}",
     "portal": "arn:${Partition}:iotsitewise:${Region}:${Account}:portal/${PortalId}",
     "project": "arn:${Partition}:iotsitewise:${Region}:${Account}:project/${ProjectId}",
-    "time-series": "arn:${Partition}:iotsitewise:${Region}:${Account}:time-series/${TimeSeriesId}"
+    "task": "arn:${Partition}:iotsitewise:${Region}:${Account}:workspace/${WorkspaceName}/task/${TaskName}",
+    "time-series": "arn:${Partition}:iotsitewise:${Region}:${Account}:time-series/${TimeSeriesId}",
+    "workspace": "arn:${Partition}:iotsitewise:${Region}:${Account}:workspace/${WorkspaceName}"
   },
   "iottwinmaker": {
     "componentType": "arn:${Partition}:iottwinmaker:${Region}:${Account}:workspace/${WorkspaceId}/component-type/${ComponentTypeId}",
@@ -1586,6 +1668,7 @@
     "Channel": "arn:${Partition}:ivs:${Region}:${Account}:channel/${ResourceId}",
     "Composition": "arn:${Partition}:ivs:${Region}:${Account}:composition/${ResourceId}",
     "Encoder-Configuration": "arn:${Partition}:ivs:${Region}:${Account}:encoder-configuration/${ResourceId}",
+    "Failover-Slate-Configuration": "arn:${Partition}:ivs:${Region}:${Account}:failover-slate-configuration/${ResourceId}",
     "Ingest-Configuration": "arn:${Partition}:ivs:${Region}:${Account}:ingest-configuration/${ResourceId}",
     "Playback-Key-Pair": "arn:${Partition}:ivs:${Region}:${Account}:playback-key/${ResourceId}",
     "Playback-Restriction-Policy": "arn:${Partition}:ivs:${Region}:${Account}:playback-restriction-policy/${ResourceId}",
@@ -1600,6 +1683,7 @@
     "Room": "arn:${Partition}:ivschat:${Region}:${Account}:room/${ResourceId}"
   },
   "kafka": {
+    "channel": "arn:${Partition}:kafka:${Region}:${Account}:channel/${ClusterName}/${ClusterUuid}/${ChannelName}/${Uuid}",
     "cluster": "arn:${Partition}:kafka:${Region}:${Account}:cluster/${ClusterName}/${Uuid}",
     "configuration": "arn:${Partition}:kafka:${Region}:${Account}:configuration/${ConfigurationName}/${Uuid}",
     "group": "arn:${Partition}:kafka:${Region}:${Account}:group/${ClusterName}/${ClusterUuid}/${GroupName}",
@@ -1634,6 +1718,7 @@
     "rescore-execution-plan": "arn:${Partition}:kendra-ranking:${Region}:${Account}:rescore-execution-plan/${RescoreExecutionPlanId}"
   },
   "kinesis": {
+    "channel": "arn:${Partition}:kinesis:${Region}:${Account}:channel/${ChannelId}",
     "consumer": "arn:${Partition}:kinesis:${Region}:${Account}:${StreamType}/${StreamName}/consumer/${ConsumerName}:${ConsumerCreationTimpstamp}",
     "kmsKey": "arn:${Partition}:kms:${Region}:${Account}:key/${KeyId}",
     "stream": "arn:${Partition}:kinesis:${Region}:${Account}:stream/${StreamName}"
@@ -1660,14 +1745,20 @@
     "layer": "arn:${Partition}:lambda:${Region}:${Account}:layer:${LayerName}",
     "layerVersion": "arn:${Partition}:lambda:${Region}:${Account}:layer:${LayerName}:${LayerVersion}",
     "microvmImage": "arn:${Partition}:lambda:${Region}:${Account}:microvm-image:${MicrovmImageName}",
-    "networkConnector": "arn:${Partition}:lambda:${Region}:${Account}:network-connector:${NetworkConnectorId}"
+    "networkConnector": "arn:${Partition}:lambda:${Region}:${Account}:network-connector:${NetworkConnectorId}",
+    "runtime": "arn:${Partition}:lambda:${Region}:${Account}:runtime/${RuntimeName}",
+    "runtimeAlias": "arn:${Partition}:lambda:${Region}:${Account}:runtime/${RuntimeName}/alias/${Name}",
+    "runtimeVersion": "arn:${Partition}:lambda:${Region}:${Account}:runtime/${RuntimeName}/version/${Name}",
+    "webFunction": "arn:${Partition}:lambda:${Region}:${Account}:web-function/${FunctionName}",
+    "webFunctionEndpoint": "arn:${Partition}:lambda:${Region}:${Account}:web-function/${FunctionName}/endpoint/${EndpointName}",
+    "webFunctionRevision": "arn:${Partition}:lambda:${Region}:${Account}:web-function/${FunctionName}/revision/${RevisionId}"
   },
   "launchwizard": {
     "deployment": "arn:${Partition}:launchwizard:${Region}:${Account}:deployment/${DeploymentId}"
   },
   "lex": {
-    "bot": "arn:${Partition}:lex:${Region}:${Account}:bot/${BotId}",
-    "bot alias": "arn:${Partition}:lex:${Region}:${Account}:bot-alias/${BotId}/${BotAliasId}",
+    "bot": "arn:${Partition}:lex:${Region}:${Account}:bot/${BotId},arn:${Partition}:lex:${Region}:${Account}:bot:${BotName}",
+    "bot alias": "arn:${Partition}:lex:${Region}:${Account}:bot-alias/${BotId}/${BotAliasId},arn:${Partition}:lex:${Region}:${Account}:bot:${BotName}:${BotAlias}",
     "bot version": "arn:${Partition}:lex:${Region}:${Account}:bot:${BotName}:${BotVersion}",
     "channel": "arn:${Partition}:lex:${Region}:${Account}:bot-channel:${BotName}:${BotAlias}:${ChannelName}",
     "intent version": "arn:${Partition}:lex:${Region}:${Account}:intent:${IntentName}:${IntentVersion}",
@@ -1769,6 +1860,7 @@
   },
   "mediaconnect": {
     "Bridge": "arn:${Partition}:mediaconnect:${Region}:${Account}:bridge:${BridgeId}:${BridgeName}",
+    "DestinationEndpoint": "arn:${Partition}:mediaconnect:${Region}:${Account}:destinationEndpoint:${DestinationEndpointId}",
     "Entitlement": "arn:${Partition}:mediaconnect:${Region}:${Account}:entitlement:${FlowId}:${EntitlementName}",
     "Flow": "arn:${Partition}:mediaconnect:${Region}:${Account}:flow:${FlowId}:${FlowName}",
     "Gateway": "arn:${Partition}:mediaconnect:${Region}:${Account}:gateway:${GatewayId}:${GatewayName}",
@@ -1781,6 +1873,7 @@
     "RouterNetworkInterface": "arn:${Partition}:mediaconnect:${Region}:${Account}:routerNetworkInterface:${RouterNetworkInterfaceId}",
     "RouterOutput": "arn:${Partition}:mediaconnect:${Region}:${Account}:routerOutput:${RouterOutputId}",
     "Source": "arn:${Partition}:mediaconnect:${Region}:${Account}:source:${SourceId}:${SourceName}",
+    "SourceEndpoint": "arn:${Partition}:mediaconnect:${Region}:${Account}:sourceEndpoint:${SourceEndpointId}",
     "VpcInterface": "arn:${Partition}:mediaconnect:${Region}:${Account}:flow:${FlowId}:${FlowName}/vpcInterface/${VpcInterfaceName}"
   },
   "mediaconvert": {
@@ -1871,6 +1964,8 @@
     "JobResource": "arn:${Partition}:mgn:${Region}:${Account}:job/${JobID}",
     "LaunchConfigurationTemplateResource": "arn:${Partition}:mgn:${Region}:${Account}:launch-configuration-template/${LaunchConfigurationTemplateID}",
     "NetworkMigrationDefinitionResource": "arn:${Partition}:mgn:${Region}:${Account}:network-migration-definition/${NetworkMigrationDefinitionID}",
+    "RemoteSourceActionJobResource": "arn:${Partition}:mgn:${Region}:${Account}:remote-source-action-job/${RemoteSourceActionJobID}",
+    "RemoteSourceActionResource": "arn:${Partition}:mgn:${Region}:${Account}:remote-source-action/${RemoteSourceActionID}",
     "ReplicationConfigurationTemplateResource": "arn:${Partition}:mgn:${Region}:${Account}:replication-configuration-template/${ReplicationConfigurationTemplateID}",
     "SourceServerResource": "arn:${Partition}:mgn:${Region}:${Account}:source-server/${SourceServerID}",
     "VcenterClientResource": "arn:${Partition}:mgn:${Region}:${Account}:vcenter-client/${VcenterClientID}",
@@ -1936,6 +2031,9 @@
     "ContainerAssociation": "arn:${Partition}:network-firewall:${Region}:${Account}:container-association/${Name}",
     "Firewall": "arn:${Partition}:network-firewall:${Region}:${Account}:firewall/${Name}",
     "FirewallPolicy": "arn:${Partition}:network-firewall:${Region}:${Account}:firewall-policy/${Name}",
+    "FirewallPolicyV2": "arn:${Partition}:network-firewall:${Region}:${Account}:firewall-policy-v2/${Name}",
+    "FirewallRuleGroup": "arn:${Partition}:network-firewall:${Region}:${Account}:firewall-rulegroup/${Name}",
+    "IpsRuleGroup": "arn:${Partition}:network-firewall:${Region}:${Account}:ips-rulegroup/${Name}",
     "Proxy": "arn:${Partition}:network-firewall:${Region}:${Account}:proxy/${Name}",
     "ProxyConfiguration": "arn:${Partition}:network-firewall:${Region}:${Account}:proxy-configuration/${Name}",
     "ProxyRuleGroup": "arn:${Partition}:network-firewall:${Region}:${Account}:proxy-rule-group/${Name}",
@@ -1944,8 +2042,21 @@
     "TLSInspectionConfiguration": "arn:${Partition}:network-firewall:${Region}:${Account}:tls-configuration/${Name}",
     "VpcEndpointAssociation": "arn:${Partition}:network-firewall:${Region}:${Account}:vpc-endpoint-association/${Name}"
   },
+  "network-security-manager": {
+    "deployment": "arn:${Partition}:network-security-manager:${Region}:${Account}:deployment:${DeploymentId}",
+    "deployment-snapshot": "arn:${Partition}:network-security-manager:${Region}:${Account}:deployment:${DeploymentId}:${VersionNumber}",
+    "policy": "arn:${Partition}:network-security-manager:${Region}:${Account}:policy:${PolicyId}",
+    "policy-snapshot": "arn:${Partition}:network-security-manager:${Region}:${Account}:policy:${PolicyId}:${VersionNumber}",
+    "rule": "arn:${Partition}:network-security-manager:${Region}:${Account}:rule:${RuleId}",
+    "rule-snapshot": "arn:${Partition}:network-security-manager:${Region}:${Account}:rule:${RuleId}:${VersionNumber}",
+    "scope": "arn:${Partition}:network-security-manager:${Region}:${Account}:scope:${ScopeId}",
+    "scope-snapshot": "arn:${Partition}:network-security-manager:${Region}:${Account}:scope:${ScopeId}:${VersionNumber}",
+    "template": "arn:${Partition}:network-security-manager:${Region}:${Account}:template:${TemplateId}",
+    "template-snapshot": "arn:${Partition}:network-security-manager:${Region}:${Account}:template:${TemplateId}:${VersionNumber}"
+  },
   "networkflowmonitor": {
     "monitor": "arn:${Partition}:networkflowmonitor:${Region}:${Account}:monitor/${MonitorName}",
+    "performancemonitor": "arn:${Partition}:networkflowmonitor:${Region}:${Account}:performancemonitor/${MonitorName}",
     "scope": "arn:${Partition}:networkflowmonitor:${Region}:${Account}:scope/${ScopeId}"
   },
   "networkmanager": {
@@ -1993,6 +2104,7 @@
     "Sink": "arn:${Partition}:oam:${Region}:${Account}:sink/${ResourceId}"
   },
   "observabilityadmin": {
+    "dataset-integration": "arn:${Partition}:observabilityadmin:${Region}:${Account}:dataset-integration/${DatasetIntegrationIdentifier}",
     "organization-centralization-rule": "arn:${Partition}:observabilityadmin:${Region}:${Account}:organization-centralization-rule/${CentralizationRuleName}",
     "organization-telemetry-rule": "arn:${Partition}:observabilityadmin:${Region}:${Account}:organization-telemetry-rule/${TelemetryRuleName}",
     "s3tableintegration": "arn:${Partition}:observabilityadmin:${Region}:${Account}:s3tableintegration/${S3TableIntegrationIdentifier}",
@@ -2006,6 +2118,8 @@
     "cloud-exadata-infrastructure": "arn:${Partition}:odb:${Region}:${Account}:cloud-exadata-infrastructure/${CloudExadataInfrastructureId}",
     "cloud-vm-cluster": "arn:${Partition}:odb:${Region}:${Account}:cloud-vm-cluster/${CloudVmClusterId}",
     "db-node": "arn:${Partition}:odb:${Region}:${Account}:db-node/${DbNodeId}",
+    "exadb-vm-cluster": "arn:${Partition}:odb:${Region}:${Account}:exadb-vm-cluster/${ExadbVmClusterId}",
+    "exascale-db-storage-vault": "arn:${Partition}:odb:${Region}:${Account}:exascale-db-storage-vault/${ExascaleDbStorageVaultId}",
     "odb-network": "arn:${Partition}:odb:${Region}:${Account}:odb-network/${OdbNetworkId}",
     "odb-peering-connection": "arn:${Partition}:odb:${Region}:${Account}:odb-peering-connection/${OdbPeeringConnectionId}"
   },
@@ -2073,11 +2187,13 @@
     "Benefit": "arn:${Partition}:partnercentral:${Region}::catalog/${Catalog}/benefit/${Identifier}",
     "BenefitAllocation": "arn:${Partition}:partnercentral:${Region}:${Account}:catalog/${Catalog}/benefit-allocation/${Identifier}",
     "BenefitApplication": "arn:${Partition}:partnercentral:${Region}:${Account}:catalog/${Catalog}/benefit-application/${Identifier}",
+    "BusinessPlan": "arn:${Partition}:partnercentral:${Region}:${Account}:catalog/${Catalog}/business-plan/${Identifier}",
     "ChannelHandshake": "arn:${Partition}:partnercentral:${Region}:${Account}:catalog/${Catalog}/channel-handshake/${Identifier}",
     "Connection": "arn:${Partition}:partnercentral:${Region}::catalog/${Catalog}/connection/${Identifier}",
     "ConnectionInvitation": "arn:${Partition}:partnercentral:${Region}::catalog/${Catalog}/connection-invitation/${Identifier}",
     "ConnectionPreferences": "arn:${Partition}:partnercentral:${Region}:${Account}:catalog/${Catalog}/connection-preferences",
     "Dashboard": "arn:${Partition}:partnercentral::${Account}:catalog/${Catalog}/ReportingData/${TableId}/Dashboard/${DashboardId}",
+    "Dataset": "arn:${Partition}:partnercentral::${Account}:catalog/${Catalog}/ReportingData/${Domain}/Dataset/${DatasetName}",
     "Engagement": "arn:${Partition}:partnercentral:${Region}::catalog/${Catalog}/engagement/${Identifier}",
     "MarketplaceRevenueShare": "arn:${Partition}:partnercentral:${Region}:${Account}:catalog/${Catalog}/marketplace-revenue-share/${MarketplaceProductId}",
     "Opportunity": "arn:${Partition}:partnercentral:${Region}:${Account}:catalog/${Catalog}/opportunity/${Identifier}",
@@ -2100,6 +2216,7 @@
     "key": "arn:${Partition}:payment-cryptography:${Region}:${Account}:key/${KeyId}"
   },
   "payments": {
+    "connectedaccount": "arn:${Partition}:payments::${Account}:connectedaccount/${ResourceId}",
     "payment-instrument": "arn:${Partition}:payments::${Account}:payment-instrument:${ResourceId}"
   },
   "pca-connector-ad": {
@@ -2221,10 +2338,12 @@
     "table": "arn:${Partition}:qldb:${Region}:${Account}:ledger/${LedgerName}/table/${TableId}"
   },
   "quicksight": {
+    "accessControlApplication": "arn:${Partition}:quicksight:${Region}:${Account}:access-control-application/${ResourceId}",
     "account": "arn:${Partition}:quicksight:${Region}:${Account}:account/${ResourceId}",
     "actionconnector": "arn:${Partition}:quicksight:${Region}:${Account}:action-connector/${ResourceId}",
     "agent": "arn:${Partition}:quicksight:${Region}:${Account}:agent/${ResourceId}",
     "analysis": "arn:${Partition}:quicksight:${Region}:${Account}:analysis/${ResourceId}",
+    "app": "arn:${Partition}:quicksight:${Region}:${Account}:app/${ResourceId}",
     "approvalPolicy": "arn:${Partition}:quicksight:${Region}:${Account}:approval-policy/${ResourceId}",
     "assetBundleExportJob": "arn:${Partition}:quicksight:${Region}:${Account}:asset-bundle-export-job/${ResourceId}",
     "assetBundleImportJob": "arn:${Partition}:quicksight:${Region}:${Account}:asset-bundle-import-job/${ResourceId}",
@@ -2239,11 +2358,14 @@
     "dashboardSnapshotJob": "arn:${Partition}:quicksight:${Region}:${Account}:dashboard/${DashboardId}/snapshot-job/${ResourceId}",
     "dataset": "arn:${Partition}:quicksight:${Region}:${Account}:dataset/${ResourceId}",
     "datasource": "arn:${Partition}:quicksight:${Region}:${Account}:datasource/${ResourceId}",
+    "dlpSetting": "arn:${Partition}:quicksight:${Region}:${Account}:dlpsetting/${ResourceId}",
     "emailCustomizationTemplate": "arn:${Partition}:quicksight:${Region}:${Account}:email-customization-template/${ResourceId}",
+    "extension": "arn:${Partition}:quicksight:${Region}:${Account}:extension/${ResourceId}",
     "extensionaccess": "arn:${Partition}:quicksight:${Region}:${Account}:extension-access/${ResourceId}",
     "flow": "arn:${Partition}:quicksight:${Region}:${Account}:flow/${ResourceId}",
     "folder": "arn:${Partition}:quicksight:${Region}:${Account}:folder/${ResourceId}",
     "group": "arn:${Partition}:quicksight:${Region}:${Account}:group/${ResourceId}",
+    "inboundConnector": "arn:${Partition}:quicksight:${Region}:${Account}:inbound-connector/${ResourceId}",
     "ingestion": "arn:${Partition}:quicksight:${Region}:${Account}:dataset/${DatasetId}/ingestion/${ResourceId}",
     "knowledgeBase": "arn:${Partition}:quicksight:${Region}:${Account}:knowledge-base/${ResourceId}",
     "limitsProfile": "arn:${Partition}:quicksight:${Region}:${Account}:limits-profile/${ResourceId}",
@@ -2259,7 +2381,7 @@
   },
   "ram": {
     "customer-managed-permission": "arn:${Partition}:ram:${Region}:${Account}:permission/${ResourcePath}",
-    "permission": "arn:${Partition}:ram::${Account}:permission/${ResourcePath}",
+    "permission": "arn:${Partition}:ram::aws:permission/${ResourcePath}",
     "resource-share": "arn:${Partition}:ram:${Region}:${Account}:resource-share/${ResourcePath}",
     "resource-share-invitation": "arn:${Partition}:ram:${Region}:${Account}:resource-share-invitation/${ResourcePath}"
   },
@@ -2275,6 +2397,7 @@
     "cluster-pg": "arn:${Partition}:rds:${Region}:${Account}:cluster-pg:${ClusterParameterGroupName}",
     "cluster-snapshot": "arn:${Partition}:rds:${Region}:${Account}:cluster-snapshot:${ClusterSnapshotName}",
     "db": "arn:${Partition}:rds:${Region}:${Account}:db:${DbInstanceName}",
+    "db-capacity-reservation": "arn:${Partition}:rds:${Region}:${Account}:db-capacity-reservation:${DBCapacityReservationIdentifier}",
     "deployment": "arn:${Partition}:rds:${Region}:${Account}:deployment:${BlueGreenDeploymentIdentifier}",
     "es": "arn:${Partition}:rds:${Region}:${Account}:es:${SubscriptionName}",
     "global-cluster": "arn:${Partition}:rds::${Account}:global-cluster:${GlobalCluster}",
@@ -2357,7 +2480,8 @@
     "recommendation-template": "arn:${Partition}:resiliencehub:${Region}:${Account}:recommendation-template/${RecommendationTemplateId}",
     "resiliency-policy": "arn:${Partition}:resiliencehub:${Region}:${Account}:resiliency-policy/${ResiliencyPolicyId}",
     "service": "arn:${Partition}:resiliencehub:${Region}:${Account}:service/${ServiceId}",
-    "system": "arn:${Partition}:resiliencehub:${Region}:${Account}:system/${SystemId}"
+    "system": "arn:${Partition}:resiliencehub:${Region}:${Account}:system/${SystemId}",
+    "test-template": "arn:${Partition}:resiliencehub:${Region}:${Account}:test-template/${TestTemplateId}"
   },
   "resource-explorer-2": {
     "index": "arn:${Partition}:resource-explorer-2:${Region}:${Account}:index/${IndexUuid}",
@@ -2527,6 +2651,7 @@
     "inference-component": "arn:${Partition}:sagemaker:${Region}:${Account}:inference-component/${InferenceComponentName}",
     "inference-experiment": "arn:${Partition}:sagemaker:${Region}:${Account}:inference-experiment/${InferenceExperimentName}",
     "inference-recommendations-job": "arn:${Partition}:sagemaker:${Region}:${Account}:inference-recommendations-job/${InferenceRecommendationsJobName}",
+    "inference-router": "arn:${Partition}:sagemaker:${Region}:${Account}:inference-router/${InferenceRouterName}",
     "job": "arn:${Partition}:sagemaker:${Region}:${Account}:job/${JobCategory}/${JobName}",
     "labeling-job": "arn:${Partition}:sagemaker:${Region}:${Account}:labeling-job/${LabelingJobName}",
     "lineage-group": "arn:${Partition}:sagemaker:${Region}:${Account}:lineage-group/${LineageGroupName}",
@@ -2558,6 +2683,7 @@
     "studio-lifecycle-config": "arn:${Partition}:sagemaker:${Region}:${Account}:studio-lifecycle-config/${StudioLifecycleConfigName}",
     "training-job": "arn:${Partition}:sagemaker:${Region}:${Account}:training-job/${TrainingJobName}",
     "training-plan": "arn:${Partition}:sagemaker:${Region}:${Account}:training-plan/${TrainingPlanName}",
+    "training-session": "arn:${Partition}:sagemaker:${Region}:${Account}:training-session/${SessionName}",
     "transform-job": "arn:${Partition}:sagemaker:${Region}:${Account}:transform-job/${TransformJobName}",
     "user-profile": "arn:${Partition}:sagemaker:${Region}:${Account}:user-profile/${DomainId}/${UserProfileName}",
     "workforce": "arn:${Partition}:sagemaker:${Region}:${Account}:workforce/${WorkforceName}",
@@ -2675,7 +2801,9 @@
   "signin": {
     "console": "arn:${Partition}:signin:::console/${ConsoleName}",
     "oauth2-public-client-localhost": "arn:${Partition}:signin:${Region}:${Account}:oauth2/public-client/localhost",
-    "oauth2-public-client-remote": "arn:${Partition}:signin:${Region}:${Account}:oauth2/public-client/remote"
+    "oauth2-public-client-registration": "arn:${Partition}:signin:${Region}::external-client/dcr/*",
+    "oauth2-public-client-remote": "arn:${Partition}:signin:${Region}:${Account}:oauth2/public-client/remote",
+    "oauth2-resource-service-principal": "arn:${Partition}:signin:${Region}:${Account}:service-principal/${ServicePrincipalName}"
   },
   "simspaceweaver": {
     "Simulation": "arn:${Partition}:simspaceweaver:${Region}:${Account}:simulation/${SimulationName}"
@@ -2683,10 +2811,12 @@
   "sms-voice": {
     "ConfigurationSet": "arn:${Partition}:sms-voice:${Region}:${Account}:configuration-set/${ConfigurationSetName}",
     "Message": "arn:${Partition}:sms-voice:${Region}:${Account}:message/${MessageId}",
+    "NotifyConfiguration": "arn:${Partition}:sms-voice:${Region}:${Account}:notify-configuration/${NotifyConfigurationId}",
     "OptOutList": "arn:${Partition}:sms-voice:${Region}:${Account}:opt-out-list/${OptOutListName}",
     "PhoneNumber": "arn:${Partition}:sms-voice:${Region}:${Account}:phone-number/${PhoneNumberId}",
     "Pool": "arn:${Partition}:sms-voice:${Region}:${Account}:pool/${PoolId}",
     "ProtectConfiguration": "arn:${Partition}:sms-voice:${Region}:${Account}:protect-configuration/${ProtectConfigurationId}",
+    "RcsAgent": "arn:${Partition}:sms-voice:${Region}:${Account}:rcs-agent/${RcsAgentId}",
     "Registration": "arn:${Partition}:sms-voice:${Region}:${Account}:registration/${RegistrationId}",
     "RegistrationAttachment": "arn:${Partition}:sms-voice:${Region}:${Account}:registration-attachment/${RegistrationAttachmentId}",
     "SenderId": "arn:${Partition}:sms-voice:${Region}:${Account}:sender-id/${SenderId}/${IsoCountryCode}",
@@ -2756,6 +2886,9 @@
     "component": "arn:${Partition}:ssm-sap:${Region}:${Account}:${ApplicationType}/${ApplicationId}/COMPONENT/${ComponentId}",
     "database": "arn:${Partition}:ssm-sap:${Region}:${Account}:${ApplicationType}/${ApplicationId}/DB/${DatabaseId}"
   },
+  "ssmmessages": {
+    "session": "arn:${Partition}:ssm:${Region}:${Account}:session/${SessionId}"
+  },
   "sso": {
     "Account": "arn:${Partition}:sso:::account/${AccountId}",
     "Application": "arn:${Partition}:sso::${AccountId}:application/${InstanceId}/${ApplicationId}",
@@ -2796,6 +2929,10 @@
     "root-user": "arn:${Partition}:iam::${Account}:root",
     "self-session": "arn:${Partition}:sts::${Account}:self"
   },
+  "supportauthz": {
+    "supportpermit": "arn:${Partition}:supportauthz:${Region}:${Account}:supportpermit/${ResourceId}",
+    "supportpermitrequest": "arn:${Partition}:supportauthz:${Region}:${Account}:supportpermitrequest/${ResourceId}"
+  },
   "swf": {
     "domain": "arn:${Partition}:swf::${Account}:/domain/${DomainName}"
   },
@@ -2818,6 +2955,7 @@
     "table": "arn:${Partition}:timestream:${Region}:${Account}:database/${DatabaseName}/table/${TableName}"
   },
   "timestream-influxdb": {
+    "db-backup": "arn:${Partition}:timestream-influxdb:${Region}:${Account}:db-backup/${DbBackupId}",
     "db-cluster": "arn:${Partition}:timestream-influxdb:${Region}:${Account}:db-cluster/${DbClusterId}",
     "db-instance": "arn:${Partition}:timestream-influxdb:${Region}:${Account}:db-instance/${DbInstanceIdentifier}",
     "db-parameter-group": "arn:${Partition}:timestream-influxdb:${Region}:${Account}:db-parameter-group/${DbParameterGroupIdentifier}"
@@ -2859,10 +2997,13 @@
     "analysis": "arn:${Partition}:transform-custom:${Region}:${Account}:analysis/${AnalysisId}",
     "campaign": "arn:${Partition}:transform-custom:${Region}:${Account}:campaign/${Name}",
     "finding": "arn:${Partition}:transform-custom:${Region}:${Account}:finding/${FindingId}",
+    "issue-group": "arn:${Partition}:transform-custom:${Region}:${Account}:issue-group/${IssueGroupId}",
     "knowledge-item": "arn:${Partition}:transform-custom:${Region}:${Account}:package/${TransformationPackageName}/knowledge-item/${Id}",
     "package": "arn:${Partition}:transform-custom:${Region}:${Account}:package/${Name}",
     "remediation": "arn:${Partition}:transform-custom:${Region}:${Account}:remediation/${RemediationId}",
+    "remediation-plan": "arn:${Partition}:transform-custom:${Region}:${Account}:remediation-plan/${RemediationPlanId}",
     "repository": "arn:${Partition}:transform-custom:${Region}:${Account}:repository/${RepositoryId}",
+    "skill-creation-job": "arn:${Partition}:transform-custom:${Region}:${Account}:skill-creation-job/${SkillCreationJobId}",
     "source": "arn:${Partition}:transform-custom:${Region}:${Account}:source/${Name}"
   },
   "translate": {
@@ -2955,6 +3096,8 @@
     "webacl": "arn:${Partition}:wafv2:${Region}:${Account}:${Scope}/webacl/${Name}/${Id}"
   },
   "wellarchitected": {
+    "agent-profile": "arn:${Partition}:wellarchitected:${Region}:${Account}:agent-profile/${ProfileName}",
+    "agent-recommendation": "arn:${Partition}:wellarchitected:${Region}:${Account}:agent-recommendation/${ResourceId}",
     "lens": "arn:${Partition}:wellarchitected:${Region}:${Account}:lens/${ResourceId}",
     "profile": "arn:${Partition}:wellarchitected:${Region}:${Account}:profile/${ResourceId}",
     "review-template": "arn:${Partition}:wellarchitected:${Region}:${Account}:review-template/${ResourceId}",
@@ -2997,7 +3140,7 @@
     "workspaceid": "arn:${Partition}:workspaces:${Region}:${Account}:workspace/${WorkspaceId}",
     "workspaceimage": "arn:${Partition}:workspaces:${Region}:${Account}:workspaceimage/${ImageId}",
     "workspaceipgroup": "arn:${Partition}:workspaces:${Region}:${Account}:workspaceipgroup/${GroupId}",
-    "workspacespoolid": "arn:${Partition}:workspaces:${Region}:${Account}:workspacespool/${PoolId}"
+    "workspacespool": "arn:${Partition}:workspaces:${Region}:${Account}:workspacespool/${PoolId}"
   },
   "workspaces-instances": {
     "VolumeId": "arn:${Partition}:ec2:${Region}:${Account}:volume/${VolumeId}",
