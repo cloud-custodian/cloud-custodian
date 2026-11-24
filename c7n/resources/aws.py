@@ -297,6 +297,14 @@ class Arn(namedtuple('_Arn', (
         'arn', 'partition', 'service', 'region',
         'account_id', 'resource', 'resource_type', 'separator'))):
 
+    """Basic arn parsing
+
+    the variation in arn formation across services is quite vast for
+    reliably extracting resource / resource type. this class doesn't
+    attempt anything comprehensive in that regard.
+
+    for more comprehensive arn parsing see (arnmatch on pypi)
+    """
     __slots__ = ()
 
     def __repr__(self):
