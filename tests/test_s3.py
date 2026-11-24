@@ -1015,6 +1015,20 @@ class BucketInventory(BaseTest):
             )
         )
 
+    def test_set_inventory_newer_fields(self):
+        self.load_policy({
+            "name": "s3-inv",
+            "resource": "s3",
+            "actions": [{
+                "type": "set-inventory",
+                "destination": "inv-dest",
+                "name": "inv",
+                "fields": [
+                    "LifecycleExpirationDate", "IntelligentTieringReferenceDate",
+                    "ObjectLockEventHoldStatus", "ObjectLockEventHoldDuration"],
+            }],
+        }, validate=True)
+
 
 class BucketDelete(BaseTest):
 

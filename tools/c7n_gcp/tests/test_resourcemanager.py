@@ -393,6 +393,34 @@ class ProjectTest(BaseTest):
                         },
                     )
 
+    def test_project_metric_filter_distribution(self):
+        # The subclass re-declares the whole schema, so the inherited
+        # distribution reduction needs the key declared there too.
+        policy = self.load_policy(
+            {
+                'name': 'project-metric-distribution',
+                'resource': 'gcp.project',
+                'filters': [
+                    {
+                        'type': 'metrics',
+                        'name': 'aiplatform.googleapis.com/publisher/'
+                                'online_serving/token_count',
+                        'distribution': 'mean',
+                        'op': 'gt',
+                        'value': 0,
+                    },
+                ],
+            },
+        )
+        metric_filter = policy.resource_manager.filters[0]
+        metric_filter.initialize_metric()
+        self.assertEqual(metric_filter.distribution, 'mean')
+        self.assertEqual(
+            metric_filter.get_point_value(
+                {'distributionValue': {'count': '4', 'mean': 2.5}}),
+            2.5,
+        )
+
     def test_project_metric_filter_rejects_paginated_series(self):
         policy = self.load_policy(
             {

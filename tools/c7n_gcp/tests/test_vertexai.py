@@ -11,6 +11,7 @@ import pytest
 from google.api_core.client_options import ClientOptions
 from googleapiclient.errors import HttpError
 from pytest_terraform import terraform
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters.core import FilterValidationError
 from c7n_gcp.client import get_default_project
 from gcp_common import BaseTest
@@ -489,6 +490,130 @@ def test_vertexai_evaluation_run_filtering(test):
     assert not any(r['state'] == 'SUCCEEDED' for r in resources)
 
 
+def test_vertexai_evaluation_run_augment_completion_time(test):
+    """GET augment fires only when completionTime appears in filters."""
+    test.session_factory = test.replay_flight_data('vertexai-evaluation-run-filtering')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-runs-completion-time',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value',
+              'key': 'completionTime',
+              'value_type': 'age',
+              'op': 'greater-than',
+              'value': 0}
+         ]},
+        session_factory=test.session_factory)
+
+    resources = policy.run()
+
+    assert len(resources) >= 1
+    assert all(r.get('completionTime') for r in resources), (
+        'Expected completionTime to be populated via GET augment')
+
+
+def test_vertexai_evaluation_run_no_augment_without_completion_time_filter(test):
+    """No GET augment when completionTime is absent from filters."""
+    test.session_factory = test.replay_flight_data('vertexai-evaluation-run-filtering')
+
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-runs-no-augment',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'type': 'value', 'key': 'state', 'value': 'FAILED'}
+         ]},
+        session_factory=test.session_factory)
+
+    assert not policy.resource_manager._needs_completion_time()
+    resources = policy.run()
+    assert resources
+    assert all('completionTime' not in r for r in resources)
+
+
+def test_vertexai_evaluation_run_needs_completion_time_matching():
+    """Only filter keys count: literal values are ignored, JMESPath keys match."""
+    from c7n_gcp.utils import filter_tree_has_key
+
+    literal = [{'type': 'value', 'key': 'state',
+                'value': [{'key': 'completionTime'}]}]
+    assert not filter_tree_has_key(literal, 'completionTime')
+    assert not filter_tree_has_key([{'type': 'value', 'key': 'completionTimeX'}],
+                                   'completionTime')
+    assert not filter_tree_has_key(
+        [{'type': 'value', 'key': "foo == 'completionTime'", 'value': True}],
+        'completionTime')
+    assert not filter_tree_has_key(
+        [{'type': 'value', 'key': 'labels.name[0:3]', 'value': 'x'}],
+        'completionTime')
+    assert filter_tree_has_key(
+        [{'not': [{'type': 'value', 'key': 'length(completionTime)', 'value': 1}]}],
+        'completionTime')
+
+
+def test_vertexai_evaluation_run_needs_completion_time_deeply_nested(test):
+    """_needs_completion_time() must find completionTime at any nesting depth.
+
+    The current two-level walk misses or > and > completionTime; this test
+    proves a recursive traversal is required.
+    """
+    policy = test.load_policy(
+        {'name': 'vertexai-evaluation-run-deep-filter',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': [{'location': 'us-central1'}],
+         'filters': [
+             {'or': [
+                 {'and': [
+                     {'type': 'value',
+                      'key': 'completionTime',
+                      'op': 'greater-than',
+                      'value': 30}
+                 ]}
+             ]}
+         ]})
+    assert policy.resource_manager._needs_completion_time(), (
+        '_needs_completion_time() did not find completionTime nested '
+        'inside or > and')
+
+
+def test_vertexai_evaluation_run_cache_key_differs_by_augment_need(test):
+    """Policies that need completionTime augment must get a distinct cache key.
+
+    Without this, a policy that runs first and caches unaugmented resources
+    will poison the cache for a later policy that requires completionTime.
+    """
+    query = [{'location': 'us-central1'}]
+
+    augment_policy = test.load_policy(
+        {'name': 'vertexai-evaluation-run-cache-augment',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': query,
+         'filters': [
+             {'type': 'value',
+              'key': 'completionTime',
+              'op': 'greater-than',
+              'value': 0}
+         ]})
+
+    no_augment_policy = test.load_policy(
+        {'name': 'vertexai-evaluation-run-cache-no-augment',
+         'resource': 'gcp.vertex-ai-evaluation-run',
+         'query': query,
+         'filters': [
+             {'type': 'value', 'key': 'state', 'value': 'FAILED'}
+         ]})
+
+    q = {'filter': query}
+    augment_key = augment_policy.resource_manager.get_cache_key(q)
+    no_augment_key = no_augment_policy.resource_manager.get_cache_key(q)
+
+    assert augment_key != no_augment_key, (
+        'Cache key collision: both policies map to the same key, so the '
+        'first run can poison the cache for the second')
+
+
 @terraform('vertexai_dataset', scope='module')
 def test_vertexai_dataset_multi_location(test, vertexai_dataset):
     """Test querying Vertex AI Datasets across multiple locations."""
@@ -731,18 +856,26 @@ def test_vertexai_endpoint_metric_resource_name():
     )
 
 
-def _generate_publisher_model_traffic(project_id, location, model, calls=5):
-    """Send generateContent calls to a Model Garden model.
+def _authorized_session():
+    """Return a requests session signed with the default Google credentials.
 
-    Only runs during recording, since Cloud Monitoring's token_count
-    metric has no data until the model gets requests.
+    Only the recording helpers below use it; replay never calls Google.
     """
     import google.auth
     from google.auth.transport.requests import AuthorizedSession
 
     credentials, _ = google.auth.default(
         scopes=['https://www.googleapis.com/auth/cloud-platform'])
-    session = AuthorizedSession(credentials)
+    return AuthorizedSession(credentials)
+
+
+def _generate_publisher_model_traffic(project_id, location, model, calls=5):
+    """Send generateContent calls to a Model Garden model.
+
+    Only runs during recording, since Cloud Monitoring's token_count
+    metric has no data until the model gets requests.
+    """
+    session = _authorized_session()
     url = (
         f'https://{location}-aiplatform.googleapis.com/v1/projects/'
         f'{project_id}/locations/{location}/publishers/google/models/'
@@ -754,46 +887,56 @@ def _generate_publisher_model_traffic(project_id, location, model, calls=5):
         resp.raise_for_status()
 
 
-def _wait_for_publisher_model_metric(
-        project_id, metric_type, model, timeout=600, interval=30):
-    """Poll Cloud Monitoring until ``metric_type`` has a data point for
-    ``model``. Avoids guessing a fixed propagation delay.
+def _wait_for_metric(
+        project_id, metric_filter, min_total=None, since=None, timeout=600, interval=30):
+    """Poll Cloud Monitoring until ``metric_filter`` matches a time series.
+    Avoids guessing a fixed propagation delay.
+
+    With ``min_total``, keeps polling until the points add up to at least
+    that many, so a recording doesn't capture a partial count. Pass
+    ``since`` as the time the traffic was sent, so points left over from
+    an earlier recording on the same resource don't count toward it.
 
     Keeps polling through throttling, server errors, and network errors,
     so one transient failure doesn't discard the recording.
     """
-    import google.auth
     import requests
-    from google.auth.transport.requests import AuthorizedSession
 
-    credentials, _ = google.auth.default(
-        scopes=['https://www.googleapis.com/auth/cloud-platform'])
-    session = AuthorizedSession(credentials)
+    session = _authorized_session()
     url = f'https://monitoring.googleapis.com/v3/projects/{project_id}/timeSeries'
-    now = datetime.now(timezone.utc).replace(microsecond=0)
-    params = {
-        'filter': (
-            f'metric.type = "{metric_type}" AND '
-            f'resource.labels.model_user_id = "{model}"'
-        ),
-        'interval.startTime': (now - timedelta(hours=6)).isoformat(),
-        'interval.endTime': now.isoformat(),
-        'view': 'FULL',
-    }
     deadline = time.time() + timeout
+    total = 0
     while True:
+        # Move the window forward each poll. A fixed end time never
+        # covers points stamped after polling started.
+        now = datetime.now(timezone.utc).replace(microsecond=0)
+        start = since or now - timedelta(hours=6)
+        params = {
+            'filter': metric_filter,
+            'interval.startTime': start.isoformat(),
+            'interval.endTime': now.isoformat(),
+            'view': 'FULL',
+        }
         try:
             resp = session.get(url, params=params, timeout=30)
         except (requests.ConnectionError, requests.Timeout):
             resp = None
         if resp is not None and resp.status_code != 429 and resp.status_code < 500:
             resp.raise_for_status()
-            if resp.json().get('timeSeries'):
+            series = resp.json().get('timeSeries', [])
+            total = sum(
+                int(point['value'].get('int64Value', 0))
+                for one in series for point in one['points'])
+            if series and (min_total is None or total >= min_total):
                 return
         if time.time() >= deadline:
+            if min_total is None:
+                raise TimeoutError(
+                    f'No time series matched {metric_filter} '
+                    f'within {timeout}s of polling')
             raise TimeoutError(
-                f'{metric_type} did not appear for {model} '
-                f'within {timeout}s of polling')
+                f'{metric_filter} totalled {total}, expected at least '
+                f'{min_total}, within {timeout}s of polling')
         time.sleep(interval)
 
 
@@ -803,7 +946,7 @@ def test_vertexai_publisher_model_metrics(test):
     Recording this test sends Gemini calls, then polls Cloud Monitoring
     until ``token_count`` shows up for the model, instead of a fixed
     sleep. See ``_generate_publisher_model_traffic`` and
-    ``_wait_for_publisher_model_metric`` above.
+    ``_wait_for_metric`` above.
     """
     project_id = get_default_project()
     location = 'us-central1'
@@ -815,7 +958,10 @@ def test_vertexai_publisher_model_metrics(test):
 
     if test.recording:
         _generate_publisher_model_traffic(project_id, location, model)
-        _wait_for_publisher_model_metric(project_id, metric_type, model)
+        _wait_for_metric(
+            project_id,
+            f'metric.type = "{metric_type}" AND '
+            f'resource.labels.model_user_id = "{model}"')
 
     policy = test.load_policy(
         {
@@ -932,6 +1078,105 @@ def test_vertexai_endpoint_metrics(test, vertexai_endpoint_metrics):
     assert metric_name in resources[0]["c7n.metrics"]
     assert resources[0]["c7n.metrics"][metric_name] is not None
     assert resources[0]["c7n.metrics"][metric_name]["points"]
+
+
+def test_vertexai_endpoint_tuned_model_tokens_metric_unreduced(test):
+    """
+    tuned_model/online_serving/tokens carries a type label, so one endpoint
+    returns an input series and an output series. Absent group-by-fields and a
+    reducer to collapse them, the filter holds two values with no basis for
+    choosing between them, and refuses the query. Running this test in record
+    mode is involved. See the readme in
+    tests/terraform/vertexai_tuned_model_metrics/.
+    """
+    project_id = get_default_project()
+    location = "us-central1"
+    metric_type = "aiplatform.googleapis.com/tuned_model/online_serving/tokens"
+    # Matches the tunedModelDisplayName passed to tuningJobs.create in
+    # run_tuning.py when this fixture was recorded.
+    endpoint_display_name = "c7n-11097-distribution-metric-test"
+
+    session_factory = test.replay_flight_data(
+        "vertexai_endpoint_tuned_model_tokens_metric", project_id=project_id
+    )
+
+    policy = test.load_policy(
+        {
+            "name": "vertexai-endpoint-tuned-model-tokens",
+            "resource": "gcp.vertex-ai-endpoint",
+            "query": [{"location": location}],
+            "filters": [
+                {"type": "value", "key": "displayName", "value": endpoint_display_name},
+                {
+                    "type": "metrics",
+                    "name": metric_type,
+                    "aligner": "ALIGN_SUM",
+                    "days": 1,
+                    "op": "greater-than",
+                    "value": 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    with pytest.raises(PolicyExecutionError) as excinfo:
+        policy.run()
+
+    assert "returned multiple timeSeries" in str(excinfo.value)
+
+
+def test_vertexai_endpoint_tuned_model_tokens_metric(test):
+    """
+    Regression test for GCPMetricsFilter failing on DISTRIBUTION-typed
+    metrics (issue #11097). group-by-fields and REDUCE_SUM collapse the
+    metric's input and output series server-side, so the filter receives one
+    series per endpoint and reduces its distribution to a scalar. Running this
+    test in record mode is involved. See the readme in
+    tests/terraform/vertexai_tuned_model_metrics/.
+    """
+    project_id = get_default_project()
+    location = "us-central1"
+    metric_type = "aiplatform.googleapis.com/tuned_model/online_serving/tokens"
+    # Matches the tunedModelDisplayName passed to tuningJobs.create in
+    # run_tuning.py when this fixture was recorded.
+    endpoint_display_name = "c7n-11097-distribution-metric-test"
+
+    session_factory = test.replay_flight_data(
+        "vertexai_endpoint_tuned_model_tokens_metric_reduced", project_id=project_id
+    )
+
+    policy = test.load_policy(
+        {
+            "name": "vertexai-endpoint-tuned-model-tokens",
+            "resource": "gcp.vertex-ai-endpoint",
+            "query": [{"location": location}],
+            "filters": [
+                {"type": "value", "key": "displayName", "value": endpoint_display_name},
+                {
+                    "type": "metrics",
+                    "name": metric_type,
+                    "aligner": "ALIGN_SUM",
+                    "reducer": "REDUCE_SUM",
+                    "group-by-fields": ["resource.labels.endpoint_id"],
+                    "days": 1,
+                    "op": "greater-than",
+                    "value": 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+
+    assert len(resources) == 1
+    metric_name = f"{metric_type}.ALIGN_SUM.REDUCE_SUM"
+    series = resources[0]["c7n.metrics"][metric_name]
+    distribution = series["points"][0]["value"]["distributionValue"]
+    # Matching on greater-than 0 means count * mean cleared the threshold, so
+    # the filter reduced the distribution rather than choking on the dict.
+    assert int(distribution["count"]) * float(distribution["mean"]) > 0
 
 
 def test_vertexai_endpoint_filtering(test,):
@@ -2098,6 +2343,157 @@ def test_vertexai_endpoint_get_resource(test, vertexai_endpoint_get_resource):
     resource = policy.resource_manager.get_resource({'resourceName': endpoint_name})
     assert resource['name'] == endpoint_name
     assert resource['displayName'] == display_name
+
+
+def _query_index_endpoint(endpoint, deployed_index_id, calls=5):
+    """Send findNeighbors calls to a public index endpoint.
+
+    Only runs during recording, since ``query/request_count`` has no data
+    until the endpoint gets queries.
+    """
+    session = _authorized_session()
+    url = f'https://{endpoint["public_endpoint_domain_name"]}/v1/{endpoint["id"]}:findNeighbors'
+    body = {
+        'deployedIndexId': deployed_index_id,
+        # Two values, matching the index's dimensions in main.tf.
+        'queries': [{'datapoint': {'featureVector': [0.1, 0.2]}, 'neighborCount': 1}],
+    }
+    for _ in range(calls):
+        resp = session.post(url, json=body, timeout=30)
+        resp.raise_for_status()
+
+
+@terraform('vertexai_index_endpoint', scope='session')
+def test_vertexai_index_endpoint_query(test, vertexai_index_endpoint):
+    suffix = vertexai_index_endpoint.resources['random_id']['suffix']['hex']
+    session_factory = test.replay_flight_data('vertexai_index_endpoint_query')
+    policy = test.load_policy(
+        {
+            'name': 'vertexai-index-endpoint-query',
+            'resource': 'gcp.vertex-ai-index-endpoint',
+            'query': [{'location': 'us-central1'}],
+            'filters': [
+                {'type': 'value', 'key': 'displayName', 'op': 'regex',
+                 'value': f'c7n-test-.*-{suffix}'},
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    resources = policy.run()
+
+    tf_endpoints = vertexai_index_endpoint.resources['google_vertex_ai_index_endpoint']
+    tf_deployed = vertexai_index_endpoint.resources[
+        'google_vertex_ai_index_endpoint_deployed_index']
+    deployed = {
+        r['name'].split('/')[-1]: [d['id'] for d in r.get('deployedIndexes', [])]
+        for r in resources
+    }
+    assert deployed == {
+        tf_endpoints['busy']['name']: [tf_deployed['busy']['deployed_index_id']],
+        tf_endpoints['idle']['name']: [tf_deployed['idle']['deployed_index_id']],
+        tf_endpoints['empty']['name']: [],
+    }
+    assert sorted(policy.resource_manager.get_urns(resources)) == sorted(
+        f'gcp:aiplatform:us-central1:{e["project"]}:index-endpoint/{e["name"]}'
+        for e in tf_endpoints.values())
+
+
+@terraform('vertexai_index_endpoint', scope='session')
+def test_vertexai_index_endpoint_get_resource(test, vertexai_index_endpoint):
+    endpoint = vertexai_index_endpoint.resources['google_vertex_ai_index_endpoint']['busy']
+    session_factory = test.replay_flight_data('vertexai_index_endpoint_get_resource')
+    policy = test.load_policy(
+        {'name': 'vertexai-index-endpoint-get', 'resource': 'gcp.vertex-ai-index-endpoint'},
+        session_factory=session_factory)
+
+    resource = policy.resource_manager.get_resource({'resourceName': endpoint['id']})
+
+    # The API names resources by project number, Terraform by project id.
+    assert resource['name'].endswith(f'/indexEndpoints/{endpoint["name"]}')
+    assert resource['displayName'] == endpoint['display_name']
+
+
+@terraform('vertexai_index_endpoint', scope='session')
+def test_vertexai_index_endpoint_metrics(test, vertexai_index_endpoint):
+    """Select the endpoint that is deployed but never queried.
+
+    Recording this test queries the busy endpoint, then polls Cloud
+    Monitoring until ``request_count`` shows up for it.
+    """
+    resources = vertexai_index_endpoint.resources
+    suffix = resources['random_id']['suffix']['hex']
+    busy = resources['google_vertex_ai_index_endpoint']['busy']
+    idle = resources['google_vertex_ai_index_endpoint']['idle']
+    metric_type = 'aiplatform.googleapis.com/matching_engine/query/request_count'
+    queries = 5
+    session_factory = test.replay_flight_data('vertexai_index_endpoint_metrics')
+
+    if test.recording:
+        sent_at = datetime.now(timezone.utc).replace(microsecond=0)
+        _query_index_endpoint(
+            busy,
+            resources['google_vertex_ai_index_endpoint_deployed_index']['busy'][
+                'deployed_index_id'],
+            calls=queries)
+        _wait_for_metric(
+            busy['project'],
+            f'metric.type = "{metric_type}" AND '
+            f'resource.labels.index_endpoint_id = "{busy["name"]}"',
+            min_total=queries,
+            since=sent_at)
+
+    policy = test.load_policy(
+        {
+            'name': 'vertexai-index-endpoint-metrics',
+            'resource': 'gcp.vertex-ai-index-endpoint',
+            'query': [{'location': 'us-central1'}],
+            'filters': [
+                {'type': 'value', 'key': 'displayName', 'op': 'regex',
+                 'value': f'c7n-test-.*-{suffix}'},
+                {'type': 'value', 'key': 'deployedIndexes', 'value': 'not-null'},
+                {
+                    'type': 'metrics',
+                    'name': metric_type,
+                    'aligner': 'ALIGN_SUM',
+                    'reducer': 'REDUCE_SUM',
+                    'group-by-fields': ['resource.labels.index_endpoint_id'],
+                    'days': 1,
+                    'op': 'lte',
+                    'value': 0,
+                    'missing-value': 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+    )
+
+    matched = policy.run()
+
+    assert [r['name'].split('/')[-1] for r in matched] == [idle['name']]
+    # The busy endpoint is filtered out, so read its count off the filter.
+    busy_series = policy.resource_manager.filters[-1].resource_metric_dict[busy['name']]
+    assert busy_series['points'][0]['value']['int64Value'] == str(queries)
+
+
+def test_vertexai_index_endpoint_metrics_invalid_metric_key(test):
+    with pytest.raises(
+        FilterValidationError,
+        match="metric-key 'metric.labels.deployed_index_id' not supported",
+    ):
+        test.load_policy({
+            'name': 'vertexai-index-endpoint-invalid-metric-key',
+            'resource': 'gcp.vertex-ai-index-endpoint',
+            'filters': [
+                {
+                    'type': 'metrics',
+                    'name': 'aiplatform.googleapis.com/matching_engine/query/request_count',
+                    'metric-key': 'metric.labels.deployed_index_id',
+                    'op': 'greater-than',
+                    'value': 0,
+                },
+            ],
+        }, validate=True)
 
 
 # Custom Job Tests
