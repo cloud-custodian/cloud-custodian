@@ -49,7 +49,9 @@ from c7n.resources.iam import (
     UserRemoveTag,
     UserTag,
     UserServiceSpecificCredentials,
+    apply_deny_statement,
 )
+from c7n.resources import iam as iam_module
 
 
 class UserCredentialReportTest(BaseTest):
@@ -2163,6 +2165,394 @@ def test_iam_delete_certificate_action(test, iam_delete_certificate):
     # certificate now no longer exists:
     with pytest.raises(client.exceptions.NoSuchEntityException):
         client.get_server_certificate(ServerCertificateName=iam_cert_name)
+
+
+DENY_SID = 'c7nDenyPermissions'
+
+ALLOW_ALL = {'Effect': 'Allow', 'Action': '*', 'Resource': '*'}
+
+PROBE_ARN = 'arn:aws:iam::644160558196:policy/probe'
+
+SCOPE_ALL = {'Resource': ['*']}
+
+KEY_ARN = 'arn:aws:kms:us-east-1:644160558196:key/abc-123'
+
+
+def deny_stmt(actions, sid=DENY_SID, **scope):
+    return {
+        'Sid': sid,
+        'Effect': 'Deny',
+        'Action': list(actions),
+        **(scope or {'Resource': ['*']}),
+    }
+
+
+def test_apply_deny_statement_appends_when_absent():
+    statements = [dict(ALLOW_ALL, Sid='A')]
+    result, changed = apply_deny_statement(
+        statements, ['kms:Decrypt', 'kms:ReEncryptFrom'], SCOPE_ALL, DENY_SID)
+
+    assert changed is True
+    assert result == [
+        dict(ALLOW_ALL, Sid='A'),
+        deny_stmt(['kms:Decrypt', 'kms:ReEncryptFrom']),
+    ]
+
+
+def test_apply_deny_statement_is_idempotent():
+    statements = [dict(ALLOW_ALL, Sid='A'), deny_stmt(['kms:Decrypt'])]
+    result, changed = apply_deny_statement(
+        statements, ['kms:Decrypt'], SCOPE_ALL, DENY_SID)
+
+    assert changed is False
+    # unchanged means the same list object back, not a rebuilt copy
+    assert result is statements
+
+
+def test_apply_deny_statement_ignores_action_order():
+    # The filter may hand back actions in any order; that must not cost a
+    # policy version, since a managed policy only keeps five.
+    statements = [deny_stmt(['kms:Decrypt', 'kms:ReEncryptFrom'])]
+    _, changed = apply_deny_statement(
+        statements, ['kms:ReEncryptFrom', 'kms:Decrypt'], SCOPE_ALL, DENY_SID)
+
+    assert changed is False
+
+
+def test_apply_deny_statement_replaces_rather_than_duplicating():
+    statements = [dict(ALLOW_ALL, Sid='A'), deny_stmt(['kms:Decrypt'])]
+    result, changed = apply_deny_statement(
+        statements, ['kms:Decrypt', 'kms:ReEncryptFrom'], SCOPE_ALL, DENY_SID)
+
+    assert changed is True
+    assert [s for s in result if s.get('Sid') == DENY_SID] == [
+        deny_stmt(['kms:Decrypt', 'kms:ReEncryptFrom'])]
+
+
+def test_apply_deny_statement_leaves_a_foreign_sid_alone():
+    statements = [deny_stmt(['kms:Decrypt'], sid='someone-elses')]
+    result, changed = apply_deny_statement(
+        statements, ['kms:Decrypt'], SCOPE_ALL, DENY_SID)
+
+    assert changed is True
+    assert result == [
+        deny_stmt(['kms:Decrypt'], sid='someone-elses'),
+        deny_stmt(['kms:Decrypt']),
+    ]
+
+
+class LimitExceeded(Exception):
+    pass
+
+
+def make_resource():
+    # DefaultVersionId is deliberately stale: the action must ignore it and
+    # re-read the live default, so no test here depends on its value.
+    return {'Arn': PROBE_ARN, 'DefaultVersionId': 'stale'}
+
+
+def make_client(version_count=1, statements=None, at_cap=False):
+    client = mock.MagicMock()
+    client.exceptions.LimitExceededException = LimitExceeded
+    client.get_policy.return_value = {
+        'Policy': {'DefaultVersionId': f'v{version_count}'}}
+    client.get_policy_version.return_value = {
+        'PolicyVersion': {'Document': {
+            'Version': '2012-10-17',
+            'Statement': statements if statements is not None else [dict(ALLOW_ALL)],
+        }}}
+    if at_cap:
+        # IAM only reports the cap when the write is attempted.
+        client.create_policy_version.side_effect = [LimitExceeded(), None]
+    # CreateDate deliberately runs opposite to VersionId, so a test asserting
+    # the "oldest" version was pruned pins sorting by date and not by id.
+    client.list_policy_versions.return_value = {
+        'Versions': [
+            {'VersionId': f'v{i}',
+             'IsDefaultVersion': i == version_count,
+             'CreateDate': parser.parse(f'2026-01-{version_count - i + 1:02d}T00:00:00Z')}
+            for i in range(1, version_count + 1)
+        ]}
+    return client
+
+
+def run_action(test, action_data, resource, client, filters=None):
+    policy_data = {
+        'name': 'iam-policy-deny',
+        'resource': 'aws.iam-policy',
+        'actions': [action_data]}
+    if filters is not None:
+        policy_data['filters'] = filters
+    p = test.load_policy(policy_data)
+    with mock.patch.object(iam_module, 'local_session') as ls:
+        ls.return_value.client.return_value = client
+        p.resource_manager.actions[0].process([resource])
+
+
+def test_deny_permissions_writes_the_document(test):
+    resource = make_resource()
+    client = make_client()
+
+    run_action(
+        test,
+        {'type': 'deny-permissions', 'actions': ['kms:Decrypt', 'kms:ReEncryptFrom']},
+        resource, client)
+
+    client.delete_policy_version.assert_not_called()
+    client.create_policy_version.assert_called_once()
+
+    kwargs = client.create_policy_version.call_args.kwargs
+    assert kwargs['PolicyArn'] == PROBE_ARN
+    assert kwargs['SetAsDefault'] is True
+
+    document = json.loads(kwargs['PolicyDocument'])
+    assert document['Version'] == '2012-10-17'
+    assert document['Statement'] == [
+        dict(ALLOW_ALL),
+        deny_stmt(['kms:Decrypt', 'kms:ReEncryptFrom']),
+    ]
+
+
+def test_deny_permissions_scopes_resources(test):
+    key_arn = 'arn:aws:kms:us-west-2:644160558196:key/abc'
+    resource = make_resource()
+    client = make_client()
+
+    run_action(
+        test,
+        {'type': 'deny-permissions',
+         'actions': ['kms:Decrypt'],
+         'resources': [key_arn]},
+        resource, client)
+
+    document = json.loads(client.create_policy_version.call_args.kwargs['PolicyDocument'])
+    assert document['Statement'][-1]['Resource'] == [key_arn]
+
+
+def test_deny_permissions_skips_when_already_applied(test):
+    resource = make_resource()
+    client = make_client(
+        statements=[dict(ALLOW_ALL), deny_stmt(['kms:Decrypt'])])
+
+    run_action(
+        test,
+        {'type': 'deny-permissions', 'actions': ['kms:Decrypt']},
+        resource, client)
+
+    client.create_policy_version.assert_not_called()
+    client.list_policy_versions.assert_not_called()
+
+
+def test_deny_permissions_prunes_oldest_non_default_at_cap(test):
+    resource = make_resource()
+    client = make_client(version_count=5, at_cap=True)
+
+    run_action(
+        test,
+        {'type': 'deny-permissions', 'actions': ['kms:Decrypt']},
+        resource, client)
+
+    # v5 is the default and cannot go; v4 is the oldest of the rest by CreateDate
+    client.delete_policy_version.assert_called_once_with(
+        PolicyArn=PROBE_ARN, VersionId='v4')
+    # first write hit the cap, the second landed after the prune
+    assert client.create_policy_version.call_count == 2
+
+
+def test_deny_permissions_skips_aws_managed_policies(test):
+    resource = {
+        'Arn': 'arn:aws:iam::aws:policy/AWSHealthFullAccess',
+        'DefaultVersionId': 'v1',
+        'c7n:policy': {'Document': {'Statement': [dict(ALLOW_ALL)]}},
+    }
+    client = make_client()
+
+    run_action(
+        test,
+        {'type': 'deny-permissions', 'actions': ['kms:Decrypt']},
+        resource, client)
+
+    client.create_policy_version.assert_not_called()
+
+
+def test_deny_permissions_rereads_the_live_default_version(test):
+    # The resource dict carries a stale DefaultVersionId, since c7n caches
+    # resources for 15 minutes; writing from it would revert anything changed
+    # in between.
+    resource = make_resource()
+    client = make_client(version_count=3)
+
+    run_action(
+        test,
+        {'type': 'deny-permissions', 'actions': ['kms:Decrypt']},
+        resource, client)
+
+    client.get_policy.assert_called_once_with(PolicyArn=PROBE_ARN)
+    client.get_policy_version.assert_called_once_with(
+        PolicyArn=PROBE_ARN, VersionId='v3')
+    client.create_policy_version.assert_called_once()
+
+
+def test_deny_permissions_matched_takes_actions_from_the_filter(test):
+    resource = make_resource()
+    resource['c7n:perm-matches'] = [
+        {'EvalActionName': 'kms:ReEncryptFrom', 'EvalDecision': 'allowed'},
+        {'EvalActionName': 'kms:Decrypt', 'EvalDecision': 'allowed'},
+    ]
+    client = make_client()
+
+    run_action(
+        test,
+        {'type': 'deny-permissions', 'actions': 'matched'},
+        resource, client,
+        filters=[{
+            'type': 'check-permissions',
+            'match': 'allowed',
+            'actions': ['kms:Decrypt', 'kms:ReEncryptFrom']}])
+
+    document = json.loads(client.create_policy_version.call_args.kwargs['PolicyDocument'])
+    assert document['Statement'][-1]['Action'] == ['kms:Decrypt', 'kms:ReEncryptFrom']
+
+
+def test_deny_permissions_honours_a_custom_sid(test):
+    resource = make_resource()
+    client = make_client()
+
+    run_action(
+        test,
+        {'type': 'deny-permissions', 'actions': ['kms:Decrypt'], 'sid': 'MyDeny'},
+        resource, client)
+
+    document = json.loads(client.create_policy_version.call_args.kwargs['PolicyDocument'])
+    assert document['Statement'][-1] == deny_stmt(['kms:Decrypt'], sid='MyDeny')
+
+
+def test_deny_permissions_accepts_a_bare_statement_object(test):
+    # A policy document may carry Statement as a single object, not an array.
+    resource = make_resource()
+    client = make_client(statements=dict(ALLOW_ALL))
+
+    run_action(
+        test, {'type': 'deny-permissions', 'actions': ['kms:Decrypt']}, resource, client)
+
+    document = json.loads(client.create_policy_version.call_args.kwargs['PolicyDocument'])
+    assert document['Statement'] == [dict(ALLOW_ALL), deny_stmt(['kms:Decrypt'])]
+
+
+def test_deny_permissions_skips_a_policy_deleted_mid_run(test):
+    resource = make_resource()
+    client = make_client()
+    client.get_policy.side_effect = ClientError(
+        {'Error': {'Code': 'NoSuchEntity', 'Message': 'gone'}}, 'GetPolicy')
+
+    run_action(
+        test, {'type': 'deny-permissions', 'actions': ['kms:Decrypt']}, resource, client)
+
+    client.create_policy_version.assert_not_called()
+
+
+@terraform('iam_policy_deny_permissions')
+def test_iam_policy_deny_permissions(test, iam_policy_deny_permissions):
+    policy_arn = iam_policy_deny_permissions['aws_iam_policy.wildcard.arn']
+    policy_name = iam_policy_deny_permissions['aws_iam_policy.wildcard.name']
+
+    session_factory = test.replay_flight_data('iam_policy_deny_permissions')
+    client = session_factory().client('iam')
+
+    p = test.load_policy({
+        'name': 'iam-policy-deny-permissions',
+        'resource': 'aws.iam-policy',
+        'filters': [
+            # narrow before check-permissions so the simulator runs once
+            {'type': 'value', 'key': 'PolicyName', 'value': policy_name},
+            {'type': 'check-permissions',
+             'match': 'allowed',
+             'match-operator': 'or',
+             'actions': ['kms:Decrypt', 'kms:ReEncryptFrom']}],
+        'actions': [{'type': 'deny-permissions', 'actions': 'matched'}]},
+        session_factory=session_factory)
+
+    resources = p.run()
+
+    # The document grants kms:Decrypt through Action "*" without naming it,
+    # which is why check-permissions matches and a name-based removal would not.
+    assert len(resources) == 1
+    assert resources[0]['Arn'] == policy_arn
+
+    default_version = client.get_policy(
+        PolicyArn=policy_arn)['Policy']['DefaultVersionId']
+    document = client.get_policy_version(
+        PolicyArn=policy_arn,
+        VersionId=default_version)['PolicyVersion']['Document']
+
+    assert [s for s in document['Statement'] if s.get('Sid') == DENY_SID] == [
+        deny_stmt(['kms:Decrypt', 'kms:ReEncryptFrom'])]
+    # the original grant is left in place; the Deny is what neutralises it
+    assert {'Sid': 'AllowAll', 'Effect': 'Allow',
+            'Action': '*', 'Resource': '*'} in document['Statement']
+
+
+def test_apply_deny_statement_takes_a_not_resource_scope():
+    result, changed = apply_deny_statement(
+        [], ['kms:Decrypt'], {'NotResource': [KEY_ARN]}, DENY_SID)
+
+    assert changed is True
+    assert result == [deny_stmt(['kms:Decrypt'], NotResource=[KEY_ARN])]
+    assert 'Resource' not in result[0]
+
+
+def test_deny_permissions_except_resources_writes_not_resource(test):
+    resource = make_resource()
+    client = make_client()
+
+    run_action(
+        test,
+        {'type': 'deny-permissions',
+         'actions': ['kms:Decrypt'],
+         'except-resources': [KEY_ARN]},
+        resource, client)
+
+    document = json.loads(client.create_policy_version.call_args.kwargs['PolicyDocument'])
+    assert document['Statement'][-1] == deny_stmt(
+        ['kms:Decrypt'], NotResource=[KEY_ARN])
+
+
+def test_deny_permissions_rejects_both_resource_forms(test):
+    # IAM returns InvalidInput for a statement carrying Resource and
+    # NotResource, so this has to fail at policy load instead.
+    with pytest.raises(PolicyValidationError, match='cannot set both resources'):
+        test.load_policy({
+            'name': 'iam-policy-deny',
+            'resource': 'aws.iam-policy',
+            'actions': [{
+                'type': 'deny-permissions',
+                'actions': ['kms:Decrypt'],
+                'resources': ['*'],
+                'except-resources': [KEY_ARN]}]},
+            validate=True)
+
+
+def test_deny_permissions_matched_requires_check_permissions(test):
+    with pytest.raises(PolicyValidationError, match='requires a check-permissions filter'):
+        test.load_policy({
+            'name': 'iam-policy-deny',
+            'resource': 'aws.iam-policy',
+            'actions': [{'type': 'deny-permissions', 'actions': 'matched'}]},
+            validate=True)
+
+
+def test_deny_permissions_permissions(test):
+    p = test.load_policy({
+        'name': 'iam-policy-deny',
+        'resource': 'aws.iam-policy',
+        'actions': [{'type': 'deny-permissions', 'actions': ['kms:Decrypt']}]})
+    assert set(p.resource_manager.actions[0].get_permissions()) == {
+        'iam:GetPolicy',
+        'iam:GetPolicyVersion',
+        'iam:ListPolicyVersions',
+        'iam:CreatePolicyVersion',
+        'iam:DeletePolicyVersion',
+    }
 
 
 class IamGroupTests(BaseTest):

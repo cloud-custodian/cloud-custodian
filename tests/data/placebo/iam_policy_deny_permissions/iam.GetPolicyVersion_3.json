@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "PolicyVersion": {
+            "Document": "%7B%22Statement%22%3A%20%5B%7B%22Action%22%3A%20%22%2A%22%2C%20%22Effect%22%3A%20%22Allow%22%2C%20%22Resource%22%3A%20%22%2A%22%2C%20%22Sid%22%3A%20%22AllowAll%22%7D%2C%20%7B%22Sid%22%3A%20%22c7nDenyPermissions%22%2C%20%22Effect%22%3A%20%22Deny%22%2C%20%22Action%22%3A%20%5B%22kms%3ADecrypt%22%2C%20%22kms%3AReEncryptFrom%22%5D%2C%20%22Resource%22%3A%20%5B%22%2A%22%5D%7D%5D%2C%20%22Version%22%3A%20%222012-10-17%22%7D",
+            "VersionId": "v2",
+            "IsDefaultVersion": true,
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 11,
+                "day": 23,
+                "hour": 18,
+                "minute": 57,
+                "second": 25,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
