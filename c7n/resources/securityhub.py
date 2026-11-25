@@ -9,6 +9,8 @@ import hashlib
 import logging
 import sys
 
+from botocore.exceptions import ClientError
+
 from c7n import deprecated, query
 from c7n.actions import Action
 from c7n.filters import Filter, ValueFilter
@@ -816,6 +818,81 @@ class HubMasterFilter(ValueFilter):
             if self.match(r[self.annotation_key]):
                 results.append(r)
         return results
+
+
+class DescribeFindingAggregator(DescribeSource):
+    # error code raised when Security Hub is not enabled in the account/region
+    not_enabled_error = 'InvalidAccessException'
+
+    def resources(self, query=None):
+        try:
+            return super().resources(query)
+        except ClientError as e:
+            if e.response['Error']['Code'] == self.not_enabled_error:
+                return []
+            raise
+
+
+@resources.register("finding-aggregator")
+class SecurityHubFindingAggregator(query.QueryResourceManager):
+    """AWS Security Hub cross-region finding aggregator.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: securityhub-aggregator-not-all-regions
+            resource: aws.finding-aggregator
+            filters:
+              - not:
+                - RegionLinkingMode: ALL_REGIONS
+    """
+
+    class resource_type(query.TypeInfo):
+        service = "securityhub"
+        enum_spec = ("list_finding_aggregators", "FindingAggregators", None)
+        detail_spec = (
+            "get_finding_aggregator", "FindingAggregatorArn", "FindingAggregatorArn", None)
+        arn = id = name = "FindingAggregatorArn"
+        arn_type = "finding-aggregator"
+        cfn_type = "AWS::SecurityHub::FindingAggregator"
+
+    source_mapping = {"describe": DescribeFindingAggregator}
+
+
+class DescribeFindingAggregatorV2(DescribeFindingAggregator):
+    not_enabled_error = 'ConflictException'
+
+
+@resources.register("finding-aggregator-v2")
+class SecurityHubFindingAggregatorV2(query.QueryResourceManager):
+    """AWS Security Hub (v2) cross-region aggregator.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: securityhub-v2-aggregator-missing-us-west-2
+            resource: aws.finding-aggregator-v2
+            filters:
+              - not:
+                - type: value
+                  key: LinkedRegions
+                  op: contains
+                  value: us-west-2
+    """
+
+    class resource_type(query.TypeInfo):
+        service = "securityhub"
+        enum_spec = ("list_aggregators_v2", "AggregatorsV2", None)
+        detail_spec = ("get_aggregator_v2", "AggregatorV2Arn", "AggregatorV2Arn", None)
+        arn = id = name = "AggregatorV2Arn"
+        arn_type = "aggregatorv2"
+        cfn_type = "AWS::SecurityHub::AggregatorV2"
+
+    source_mapping = {"describe": DescribeFindingAggregatorV2}
 
 
 @resources.register("securityhub-finding")

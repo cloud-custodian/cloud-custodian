@@ -220,6 +220,85 @@ class SecurityHubTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 0)
 
+    def test_security_hub_finding_aggregator_all_regions(self):
+        factory = self.replay_flight_data(
+            'test_security_hub_finding_aggregator_all_regions')
+        policy = self.load_policy(
+            {
+                'name': 'security-hub-aggregator-all-regions',
+                'resource': 'aws.finding-aggregator',
+                'filters': [{'RegionLinkingMode': 'ALL_REGIONS'}],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FindingAggregationRegion'], 'us-east-1')
+
+    def test_security_hub_finding_aggregator_specified_regions(self):
+        factory = self.replay_flight_data(
+            'test_security_hub_finding_aggregator_specified_regions')
+        policy = self.load_policy(
+            {
+                'name': 'security-hub-aggregator-not-all-regions',
+                'resource': 'aws.finding-aggregator',
+                'filters': [{'not': [{'RegionLinkingMode': 'ALL_REGIONS'}]}],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['RegionLinkingMode'], 'SPECIFIED_REGIONS')
+
+    def test_security_hub_finding_aggregator_missing(self):
+        factory = self.replay_flight_data('test_security_hub_finding_aggregator_none')
+        policy = self.load_policy(
+            {
+                'name': 'security-hub-aggregator-missing',
+                'resource': 'aws.account',
+                'filters': [{
+                    'type': 'missing',
+                    'policy': {'resource': 'aws.finding-aggregator'},
+                }],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_security_hub_finding_aggregator_v2(self):
+        factory = self.replay_flight_data('test_security_hub_finding_aggregator_v2')
+        policy = self.load_policy(
+            {
+                'name': 'security-hub-aggregator-v2-linked-region',
+                'resource': 'aws.finding-aggregator-v2',
+                'filters': [{'type': 'value', 'key': 'LinkedRegions',
+                             'op': 'contains', 'value': 'us-west-2'}],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['AggregationRegion'], 'us-east-1')
+
+    def test_security_hub_finding_aggregator_v2_not_enabled(self):
+        factory = self.replay_flight_data(
+            'test_security_hub_finding_aggregator_v2_not_enabled')
+        policy = self.load_policy(
+            {'name': 'security-hub-aggregator-v2', 'resource': 'aws.finding-aggregator-v2'},
+            session_factory=factory,
+        )
+        self.assertEqual(policy.run(), [])
+
+    def test_security_hub_finding_aggregator_not_enabled(self):
+        factory = self.replay_flight_data(
+            'test_security_hub_finding_aggregator_not_enabled')
+        policy = self.load_policy(
+            {'name': 'security-hub-aggregator', 'resource': 'aws.finding-aggregator'},
+            session_factory=factory,
+        )
+        self.assertEqual(policy.run(), [])
+
     def test_bucket(self):
         factory = self.replay_flight_data("test_security_hub_bucket")
         policy = self.load_policy(

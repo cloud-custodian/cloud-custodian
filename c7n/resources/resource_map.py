@@ -366,6 +366,8 @@ ResourceMap = {
   "aws.security-lake-subscriber": "c7n.resources.securitylake.SecurityLakeSubscriber",
   "aws.security-hub": "c7n.resources.securityhub.SecurityHub",
   "aws.securityhub-finding": "c7n.resources.securityhub.SecurityhubFinding",
+  "aws.finding-aggregator": "c7n.resources.securityhub.SecurityHubFindingAggregator",
+  "aws.finding-aggregator-v2": "c7n.resources.securityhub.SecurityHubFindingAggregatorV2",
   "aws.serverless-app": "c7n.resources.sar.ServerlessApp",
   "aws.servicediscovery-namespace": "c7n.resources.servicediscovery.ServiceDiscoveryNamespace",
   "aws.servicediscovery-service": "c7n.resources.servicediscovery.ServiceDiscoveryService",

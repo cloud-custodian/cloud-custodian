@@ -517,6 +517,25 @@ class OffHoursFilterTest(BaseTest):
             OnHour({}).get_tz('chile/easterisland'),
             easter_island)
 
+    def test_tz_mixed_case_resolve(self):
+        # default_tz is used as written in the policy, it isn't lowercased
+        # like tag values are
+        utc = tzutil.gettz("Etc/UTC")
+        self.assertEqual(Time.get_tz('UTC'), utc)
+        self.assertEqual(Time.get_tz('Etc/UTC'), utc)
+        self.assertEqual(Time.get_tz('ET'), tzutil.gettz("America/New_York"))
+        self.assertEqual(Time.get_tz('GMT'), tzutil.gettz("Etc/GMT"))
+        self.assertEqual(Time.get_tz('Asia/Tokyo'), tzutil.gettz("Asia/Tokyo"))
+        for tz in ('UTC', 'Etc/UTC', 'ET', 'GMT'):
+            f = OffHour({"default_tz": tz})
+            self.assertEqual(f.validate(), f)
+
+    def test_tz_empty_resolve(self):
+        # an empty value must not fall through to gettz, which would
+        # silently return the local timezone
+        self.assertIsNone(Time.get_tz(None))
+        self.assertIsNone(Time.get_tz(''))
+
     def test_empty_tag(self):
         t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
