@@ -81,6 +81,32 @@ class CloudRunService(QueryResourceManager):
         labels_perm = 'update'
 
         @staticmethod
+        def get(client, resource_info):
+            name = resource_info.get('resourceName')
+            if not name or not name.startswith('projects/'):
+                project = (
+                    resource_info.get('project_id')
+                    or resource_info.get('project')
+                    or resource_info.get('namespace')
+                )
+                location = resource_info.get('location')
+                service = (
+                    resource_info.get('service_name')
+                    or resource_info.get('service')
+                    or resource_info.get('name')
+                )
+                if not (project and location and service) and name:
+                    parts = name.strip('/').split('/')
+                    if len(parts) >= 4 and parts[0] == 'namespaces' and parts[2] == 'services':
+                        project = parts[1]
+                        service = parts[3]
+                if project and location and service:
+                    name = f'projects/{project}/locations/{location}/services/{service}'
+                elif not name and service:
+                    name = service
+            return client.execute_query('get', {'name': name})
+
+        @staticmethod
         def get_label_params(resource, all_labels):
             metadata = resource['metadata']
             location = metadata['labels']['cloud.googleapis.com/location']
@@ -93,6 +119,12 @@ class CloudRunService(QueryResourceManager):
                     namespace, location, svc_name),
                 'body': body
             }
+
+    def get_resource(self, resource_info):
+        resource = super().get_resource(resource_info)
+        if resource:
+            self.augment([resource])
+        return resource
 
     def augment(self, resources):
         for r in resources:
@@ -145,6 +177,31 @@ class CloudRunJob(QueryResourceManager):
         labels_perm = 'update'
 
         @staticmethod
+        def get(client, resource_info):
+            name = resource_info.get('resourceName')
+            if not name or not name.startswith('namespaces/'):
+                namespace = (
+                    resource_info.get('project_id')
+                    or resource_info.get('project')
+                    or resource_info.get('namespace')
+                )
+                job = (
+                    resource_info.get('job_name')
+                    or resource_info.get('job')
+                    or resource_info.get('name')
+                )
+                if not (namespace and job) and name:
+                    parts = name.strip('/').split('/')
+                    if len(parts) >= 6 and parts[0] == 'projects' and parts[4] == 'jobs':
+                        namespace = parts[1]
+                        job = parts[5]
+                if namespace and job:
+                    name = f'namespaces/{namespace}/jobs/{job}'
+                elif not name and job:
+                    name = job
+            return client.execute_query('get', {'name': name})
+
+        @staticmethod
         def get_label_params(resource, all_labels):
             metadata = resource['metadata']
             namespace = metadata['namespace']
@@ -155,6 +212,12 @@ class CloudRunJob(QueryResourceManager):
                 'name': 'namespaces/{}/jobs/{}'.format(namespace, job_name),
                 'body': body
             }
+
+    def get_resource(self, resource_info):
+        resource = super().get_resource(resource_info)
+        if resource:
+            self.augment([resource])
+        return resource
 
     def augment(self, resources):
         for r in resources:
@@ -180,6 +243,33 @@ class CloudRunRevision(QueryResourceManager):
         asset_type = "run.googleapis.com/Revision"
         urn_component = "revision"
         urn_id_segments = (-1,)
+
+        @staticmethod
+        def get(client, resource_info):
+            name = resource_info.get('resourceName')
+            if not name or not name.startswith('namespaces/'):
+                namespace = (
+                    resource_info.get('project_id')
+                    or resource_info.get('project')
+                    or resource_info.get('namespace')
+                )
+                revision = (
+                    resource_info.get('revision_name')
+                    or resource_info.get('revision')
+                    or resource_info.get('name')
+                )
+                if not (namespace and revision) and name:
+                    parts = name.strip('/').split('/')
+                    if parts and parts[0] == 'projects' and 'revisions' in parts:
+                        idx = parts.index('revisions')
+                        if idx + 1 < len(parts):
+                            namespace = parts[1]
+                            revision = parts[idx + 1]
+                if namespace and revision:
+                    name = f'namespaces/{namespace}/revisions/{revision}'
+                elif not name and revision:
+                    name = revision
+            return client.execute_query('get', {'name': name})
 
         @classmethod
         def get_metric_resource_name(cls, resource, metric_key=None):
