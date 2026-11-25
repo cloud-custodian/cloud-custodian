@@ -100,6 +100,36 @@ class BucketLevelAccess(MethodAction):
                 'body': {'iamConfiguration': {'uniformBucketLevelAccess': {'enabled': enabled}}}}
 
 
+@Bucket.action_registry.register('delete')
+class BucketDeleteAction(MethodAction):
+    """Action to delete GCS buckets
+
+    It is recommended to use a filter to avoid unwanted deletion of GCS buckets
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gcp-delete-testing-gcs-buckets
+                resource: gcp.bucket
+                filters:
+                  - type: value
+                    key: name
+                    op: regex
+                    value: '^(test-|demo-)'
+                actions:
+                  - type: delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('storage.buckets.delete',)
+
+    def get_resource_params(self, model, resource):
+        return {'bucket': resource['name']}
+
+
 @Bucket.action_registry.register('set-public-access-prevention')
 class BucketSetPublicAccess(MethodAction):
     '''Set public access prevention on a bucket.
