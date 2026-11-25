@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import DescribeWithResourceTags, QueryResourceManager, TypeInfo
 
 
 @resources.register('gamelift-build')
@@ -30,3 +30,7 @@ class GameLiftFleet(QueryResourceManager):
         batch_detail_spec = (
             "describe_fleet_attributes", "FleetIds", None, "FleetAttributes", None)
         cfn_type = 'AWS::GameLift::Fleet'
+        arn_type = 'fleet'
+        universal_taggable = object()
+
+    source_mapping = {'describe': DescribeWithResourceTags}

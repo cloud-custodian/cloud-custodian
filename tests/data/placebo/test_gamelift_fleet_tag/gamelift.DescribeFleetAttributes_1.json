@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "FleetAttributes": [
+            {
+                "FleetId": "fleet-1a2b3c4d-5678-90ab-cdef-1234567890ab",
+                "FleetArn": "arn:aws:gamelift:us-east-1:644160558196:fleet/fleet-1a2b3c4d-5678-90ab-cdef-1234567890ab",
+                "FleetType": "ON_DEMAND",
+                "InstanceType": "c5.large",
+                "Name": "test-fleet",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Status": "ACTIVE",
+                "OperatingSystem": "AMAZON_LINUX_2",
+                "ComputeType": "EC2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
