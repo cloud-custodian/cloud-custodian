@@ -952,6 +952,8 @@
   "AWS::Lambda::Permission",
   "AWS::Lambda::Url",
   "AWS::Lambda::Version",
+  "AWS::Lambda::WebFunction",
+  "AWS::Lambda::WebFunctionEndpoint",
   "AWS::LaunchWizard::Deployment",
   "AWS::Lex::Bot",
   "AWS::Lex::BotAlias",
