@@ -15,7 +15,7 @@ from c7n.query import (ChildDescribeSource, ChildResourceManager, ChildResourceQ
     DescribeSource, DescribeWithResourceTags, QueryResourceManager, RetryPageIterator, TypeInfo)
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
-from c7n.resources.aws import ArnResolver
+from c7n.resources.aws import Arn, ArnResolver
 from c7n.tags import RemoveTag, Tag, universal_augment
 from c7n.utils import chunks, get_retry, local_session, type_schema
 
@@ -150,12 +150,71 @@ class EventRuleSource(ChildDescribeSource):
 
     resource_query_factory = EventRuleQuery
 
+    def get_resources(self, ids, cache=True):
+        # Rule arns carry the bus name, arn:aws:events:region:account:rule/[bus/]name,
+        # so describe each rule on its bus instead of listing every bus and rule.
+        # Plain names and arns without a bus segment are on the default bus.
+        client = local_session(self.manager.session_factory).client('events')
+        results = []
+        for rule_id in ids:
+            if rule_id.startswith('arn:'):
+                rule_id = Arn.parse(rule_id).resource
+            bus, _, name = rule_id.rpartition('/')
+            bus = bus or 'default'
+            try:
+                rule = self.manager.retry(
+                    client.describe_rule, Name=name, EventBusName=bus)
+            except client.exceptions.ResourceNotFoundException:
+                self.manager.log.debug(
+                    "event rule not found name:%s bus:%s", name, bus)
+                continue
+            except botocore.exceptions.ClientError as e:
+                # keep the rules already described when one id can't be resolved
+                self.manager.log.warning(
+                    "event rule not resolved name:%s bus:%s error:%s", name, bus, e)
+                continue
+            rule.pop('ResponseMetadata', None)
+            results.append(rule)
+        return results
+
+    def get_permissions(self):
+        return super().get_permissions() + ['events:DescribeRule']
+
     def augment(self, resources):
         return universal_augment(self.manager, resources)
 
 
 @resources.register('event-rule')
 class EventRule(ChildResourceManager):
+    """EventBridge Rule Resource
+
+    Rules on any event bus can be resolved in cloudtrail mode from the
+    rule arn. Use ``responseElements.ruleArn`` as the event id, it includes
+    the bus name. A plain rule name, such as ``requestParameters.name``, is
+    looked up on the default event bus only, so it won't find a rule that
+    lives on another bus.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: tag-new-event-rules
+            resource: aws.event-rule
+            mode:
+              type: cloudtrail
+              role: arn:aws:iam::{account_id}:role/custodian-lambda
+              events:
+                - source: events.amazonaws.com
+                  event: PutRule
+                  ids: responseElements.ruleArn
+            filters:
+              - "tag:Owner": absent
+            actions:
+              - type: tag
+                key: Owner
+                value: unknown
+    """
 
     child_source = 'event-rule'
     class resource_type(TypeInfo):
@@ -170,6 +229,12 @@ class EventRule(ChildResourceManager):
         config_type = cfn_type = 'AWS::Events::Rule'
         universal_taggable = object()
         permissions_augment = ("events:ListTagsForResource",)
+        supports_trailevents = True
+
+    def get_resources(self, ids, cache=True, augment=True):
+        # ids are rule arns or bus qualified names, which can't be matched
+        # against the Name id of cached resources.
+        return super().get_resources(ids, cache=False, augment=augment)
 
 
 @EventRule.filter_registry.register('metrics')

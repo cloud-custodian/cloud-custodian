@@ -1,7 +1,13 @@
+from unittest.mock import MagicMock
+
+import boto3
+import moto
 import pytest
+from botocore.exceptions import ClientError
 from pytest_terraform import terraform
 
-from .common import BaseTest
+from .common import BaseTest, event_data
+from c7n.cache import InMemoryCache
 from c7n.resources import eventbridge
 
 
@@ -244,6 +250,119 @@ class EventRuleTest(BaseTest):
         }
         self.assertFalse(
             eventbridge.ValidEventRuleTargetFilter('event-rule').filter_unsupported_resources(r))
+
+    def test_event_rule_cloudtrail_mode(self):
+        policy = self.load_policy({
+            'name': 'event-rule-put-rule',
+            'resource': 'aws.event-rule',
+            'mode': {
+                'type': 'cloudtrail',
+                'events': [{
+                    'source': 'events.amazonaws.com',
+                    'event': 'PutRule',
+                    'ids': 'responseElements.ruleArn'}]}})
+        self.assertEqual(policy.execution_mode, 'cloudtrail')
+        self.assertIn('events:DescribeRule', policy.resource_manager.get_permissions())
+
+    def test_event_rule_cloudtrail_push(self):
+        # No ListEventBuses or ListRules flight data is recorded, so this
+        # fails if resolving the rule enumerates every bus and rule.
+        factory = self.replay_flight_data('test_event_rule_cloudtrail_push')
+        policy = self.load_policy({
+            'name': 'event-rule-put-rule',
+            'resource': 'aws.event-rule',
+            'mode': {
+                'type': 'cloudtrail',
+                'events': [{
+                    'source': 'events.amazonaws.com',
+                    'event': 'PutRule',
+                    'ids': 'responseElements.ruleArn'}]},
+            'filters': [
+                {'type': 'value', 'key': 'Name', 'op': 'regex', 'value': 'custodian-.*$'},
+                {'tag:Owner': 'absent'}]},
+            session_factory=factory)
+        resources = policy.push(
+            {'detail': event_data('event-cloud-trail-put-rule.json'), 'debug': True}, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'custodian-orders-created')
+        self.assertEqual(resources[0]['EventBusName'], 'orders-bus')
+        self.assertEqual(resources[0]['Tags'], [{'Key': 'Team', 'Value': 'orders'}])
+        self.assertNotIn('ResponseMetadata', resources[0])
+
+    @moto.mock_aws
+    def test_event_rule_get_resources(self):
+        # moto only finds a rule on the bus it was created on, so this checks
+        # the bus is read from the arn. Missing rules and buses are skipped.
+        client = boto3.client('events', region_name='us-east-1')
+        client.create_event_bus(Name='orders-bus')
+        client.put_rule(Name='nightly', ScheduleExpression='rate(1 day)')
+        client.put_rule(
+            Name='order-created', EventBusName='orders-bus',
+            EventPattern='{"source": ["orders"]}')
+        client.put_rule(Name='hourly', ScheduleExpression='rate(1 hour)')
+        policy = self.load_policy(
+            {'name': 'event-rule-get', 'resource': 'aws.event-rule'},
+            config={'region': 'us-east-1'})
+        arn = 'arn:aws:events:us-east-1:123456789012:rule/'
+        resources = policy.resource_manager.get_resources([
+            arn + 'nightly',
+            arn + 'orders-bus/order-created',
+            'hourly',
+            arn + 'gone',
+            arn + 'no-such-bus/nightly',
+        ])
+        self.assertEqual(
+            [(r['Name'], r['EventBusName']) for r in resources],
+            [('nightly', 'default'), ('order-created', 'orders-bus'), ('hourly', 'default')])
+
+    @moto.mock_aws
+    def test_event_rule_get_resources_ignores_warm_cache(self):
+        # the cache is keyed by rule Name, event ids are arns
+        boto3.client('events', region_name='us-east-1').put_rule(
+            Name='nightly', ScheduleExpression='rate(1 day)')
+        policy = self.load_policy(
+            {'name': 'event-rule-get', 'resource': 'aws.event-rule'},
+            config={'region': 'us-east-1'})
+        manager = policy.resource_manager
+        manager._cache = InMemoryCache({})
+        manager.resources()
+        resources = manager.get_resources(
+            ['arn:aws:events:us-east-1:123456789012:rule/nightly'])
+        self.assertEqual([r['Name'] for r in resources], ['nightly'])
+
+    def test_event_rule_get_resources_partner_bus(self):
+        # bus names can contain slashes, rule names can't
+        bus = 'aws.partner/example.com/1234/mybus'
+        factory = MagicMock()
+        factory.region = 'us-east-1'
+        client = factory().client('events')
+        client.describe_rule.return_value = {'Name': 'my-rule', 'EventBusName': bus, 'Arn': 'x'}
+        policy = self.load_policy(
+            {'name': 'event-rule-get', 'resource': 'aws.event-rule'},
+            session_factory=factory)
+        policy.resource_manager.source.get_resources(
+            ['arn:aws:events:us-east-1:123456789012:rule/%s/my-rule' % bus])
+        client.describe_rule.assert_called_once_with(Name='my-rule', EventBusName=bus)
+
+    def test_event_rule_get_resources_error_keeps_other_ids(self):
+        # one id that can't be described doesn't drop the rest
+        events = boto3.client('events', region_name='us-east-1')
+        not_found = events.exceptions.ResourceNotFoundException
+        factory = MagicMock()
+        factory.region = 'us-east-1'
+        client = factory().client('events')
+        client.exceptions.ResourceNotFoundException = not_found
+        client.describe_rule.side_effect = [
+            not_found({'Error': {'Code': 'ResourceNotFoundException'}}, 'DescribeRule'),
+            ClientError({'Error': {'Code': 'ValidationException'}}, 'DescribeRule'),
+            {'Name': 'nightly', 'EventBusName': 'default', 'ResponseMetadata': {}},
+        ]
+        policy = self.load_policy(
+            {'name': 'event-rule-get', 'resource': 'aws.event-rule'},
+            session_factory=factory)
+        resources = policy.resource_manager.source.get_resources(['gone', 'bad', 'nightly'])
+        self.assertEqual(resources, [{'Name': 'nightly', 'EventBusName': 'default'}])
+        self.assertEqual(client.describe_rule.call_count, 3)
 
 
 def test_event_rule_target_del_managed(test):

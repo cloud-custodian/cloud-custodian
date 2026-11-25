@@ -1,0 +1,33 @@
+{
+    "eventVersion": "1.08",
+    "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEPRINCIPAL",
+        "arn": "arn:aws:iam::644160558196:user/dev",
+        "accountId": "644160558196",
+        "accessKeyId": "AKIAEXAMPLEKEY",
+        "userName": "dev"
+    },
+    "eventTime": "2026-11-16T09:00:00Z",
+    "eventSource": "events.amazonaws.com",
+    "eventName": "PutRule",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "203.0.113.10",
+    "userAgent": "aws-cli/2.15.0",
+    "requestParameters": {
+        "name": "custodian-orders-created",
+        "eventPattern": "{\"source\":[\"orders\"]}",
+        "state": "ENABLED",
+        "eventBusName": "orders-bus"
+    },
+    "responseElements": {
+        "ruleArn": "arn:aws:events:us-east-1:644160558196:rule/orders-bus/custodian-orders-created"
+    },
+    "requestID": "4f6c0a5e-8d6b-4c1e-9a1f-2b7d3e9c0a11",
+    "eventID": "9b2f1d3c-5e7a-4b8c-a6d4-1c2e3f4a5b6c",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "644160558196",
+    "eventCategory": "Management"
+}
