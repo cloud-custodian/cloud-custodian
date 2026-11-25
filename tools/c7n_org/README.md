@@ -194,6 +194,12 @@ The `-r` flag can be specified multiple times and defaults to
 `(us-east-1, us-west-2)`.  A special value of `all` will execute across
 all regions.
 
+Regions can be skipped with the `--not-regions` flag, which accepts multiple
+values or comma separated values (for `run`, `run-script` and `report`). It is
+applied after the regions are resolved, so it also works with `all`, and is useful
+for regions that are reported as available to an account but can't be reached,
+for example `c7n-org run -r all --not-regions me-south-1 ...`.
+
 
 See `c7n-org run --help` for more information.
 
