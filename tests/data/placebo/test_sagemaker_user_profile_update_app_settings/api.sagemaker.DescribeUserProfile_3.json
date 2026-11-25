@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainId": "d-msjtvfwmgld1",
+        "UserProfileArn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-canvas-proud-tahr",
+        "UserProfileName": "c7n-canvas-proud-tahr",
+        "HomeEfsFileSystemUid": "200010",
+        "Status": "InService",
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 32,
+            "second": 7,
+            "microsecond": 987000
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2026,
+            "month": 10,
+            "day": 20,
+            "hour": 10,
+            "minute": 30,
+            "second": 11,
+            "microsecond": 46000
+        },
+        "UserSettings": {
+            "ExecutionRole": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+            "CanvasAppSettings": {
+                "TimeSeriesForecastingSettings": {
+                    "Status": "DISABLED",
+                    "AmazonForecastRoleArn": "arn:aws:iam::644160558196:role/c7n-canvas-proud-tahr"
+                },
+                "ModelRegisterSettings": {
+                    "Status": "DISABLED"
+                },
+                "WorkspaceSettings": {
+                    "S3ArtifactPath": "s3://c7n-profile-sharing-936a1c4268be9e94c4b29aa09b/canvas/",
+                    "S3KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/fe11a702-da1b-4b8d-84b9-9a4d8ce7e1f9"
+                },
+                "IdentityProviderOAuthSettings": [],
+                "DirectDeploySettings": {
+                    "Status": "DISABLED"
+                },
+                "KendraSettings": {
+                    "Status": "DISABLED"
+                },
+                "GenerativeAiSettings": {
+                    "AmazonBedrockRoleArn": "arn:aws:iam::644160558196:role/c7n-canvas-proud-tahr"
+                },
+                "EmrServerlessSettings": {
+                    "ExecutionRoleArn": "arn:aws:iam::644160558196:role/c7n-canvas-proud-tahr",
+                    "Status": "DISABLED"
+                }
+            },
+            "CustomFileSystemConfigs": [],
+            "AutoMountHomeEFS": "DefaultAsDomain"
+        },
+        "ResponseMetadata": {}
+    }
+}

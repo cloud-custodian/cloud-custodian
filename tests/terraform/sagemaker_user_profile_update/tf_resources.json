@@ -1,0 +1,1013 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {
+        "app_image_configs": {
+            "value": {
+                "CodeEditor": "c7n-codeeditor-proud-tahr",
+                "JupyterLab": "c7n-jupyterlab-proud-tahr",
+                "KernelGateway": "c7n-kernelgateway-proud-tahr",
+                "RSessionGateway": "c7n-rsession-proud-tahr"
+            },
+            "type": [
+                "object",
+                {
+                    "CodeEditor": "string",
+                    "JupyterLab": "string",
+                    "KernelGateway": "string",
+                    "RSessionGateway": "string"
+                }
+            ]
+        },
+        "jupyter_server_image": {
+            "value": "arn:aws:sagemaker:us-east-1:644160558196:image/jupyter-server-3",
+            "type": "string"
+        },
+        "lifecycle_configs": {
+            "value": {
+                "CodeEditorAppSettings": {
+                    "builtin": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-codeeditor-builtin-proud-tahr",
+                    "default": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-codeeditor-default-proud-tahr"
+                },
+                "JupyterLabAppSettings": {
+                    "builtin": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-jupyterlab-builtin-proud-tahr",
+                    "default": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-jupyterlab-default-proud-tahr"
+                },
+                "JupyterServerAppSettings": {
+                    "builtin": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-jupyterserver-builtin-proud-tahr",
+                    "default": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-jupyterserver-default-proud-tahr"
+                },
+                "KernelGatewayAppSettings": {
+                    "builtin": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-kernelgateway-builtin-proud-tahr",
+                    "default": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-kernelgateway-default-proud-tahr"
+                }
+            },
+            "type": [
+                "object",
+                {
+                    "CodeEditorAppSettings": [
+                        "object",
+                        {
+                            "builtin": "string",
+                            "default": "string"
+                        }
+                    ],
+                    "JupyterLabAppSettings": [
+                        "object",
+                        {
+                            "builtin": "string",
+                            "default": "string"
+                        }
+                    ],
+                    "JupyterServerAppSettings": [
+                        "object",
+                        {
+                            "builtin": "string",
+                            "default": "string"
+                        }
+                    ],
+                    "KernelGatewayAppSettings": [
+                        "object",
+                        {
+                            "builtin": "string",
+                            "default": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "resources": {
+        "aws_iam_policy_document": {
+            "assume_role": {
+                "id": "1147345228",
+                "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"sagemaker.amazonaws.com\"\n      }\n    }\n  ]\n}",
+                "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}]}",
+                "override_json": null,
+                "override_policy_documents": null,
+                "policy_id": null,
+                "source_json": null,
+                "source_policy_documents": null,
+                "statement": [
+                    {
+                        "actions": [
+                            "sts:AssumeRole"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [
+                            {
+                                "identifiers": [
+                                    "sagemaker.amazonaws.com"
+                                ],
+                                "type": "Service"
+                            }
+                        ],
+                        "resources": [],
+                        "sid": ""
+                    }
+                ],
+                "version": "2012-10-17"
+            },
+            "canvas_assume_role": {
+                "id": "1862292154",
+                "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": [\n          \"sagemaker.amazonaws.com\",\n          \"forecast.amazonaws.com\",\n          \"emr-serverless.amazonaws.com\",\n          \"bedrock.amazonaws.com\"\n        ]\n      }\n    }\n  ]\n}",
+                "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"sts:AssumeRole\",\"Principal\":{\"Service\":[\"sagemaker.amazonaws.com\",\"forecast.amazonaws.com\",\"emr-serverless.amazonaws.com\",\"bedrock.amazonaws.com\"]}}]}",
+                "override_json": null,
+                "override_policy_documents": null,
+                "policy_id": null,
+                "source_json": null,
+                "source_policy_documents": null,
+                "statement": [
+                    {
+                        "actions": [
+                            "sts:AssumeRole"
+                        ],
+                        "condition": [],
+                        "effect": "Allow",
+                        "not_actions": [],
+                        "not_principals": [],
+                        "not_resources": [],
+                        "principals": [
+                            {
+                                "identifiers": [
+                                    "bedrock.amazonaws.com",
+                                    "emr-serverless.amazonaws.com",
+                                    "forecast.amazonaws.com",
+                                    "sagemaker.amazonaws.com"
+                                ],
+                                "type": "Service"
+                            }
+                        ],
+                        "resources": [],
+                        "sid": ""
+                    }
+                ],
+                "version": "2012-10-17"
+            }
+        },
+        "aws_region": {
+            "current": {
+                "description": "US East (N. Virginia)",
+                "endpoint": "ec2.us-east-1.amazonaws.com",
+                "id": "us-east-1",
+                "name": "us-east-1",
+                "region": "us-east-1"
+            }
+        },
+        "aws_subnets": {
+            "default": {
+                "filter": [
+                    {
+                        "name": "vpc-id",
+                        "values": [
+                            "vpc-06149c26f4c960573"
+                        ]
+                    }
+                ],
+                "id": "us-east-1",
+                "ids": [
+                    "subnet-0a6f6f3abb8e90b2f",
+                    "subnet-006cd2b8ad66e5a41",
+                    "subnet-067e017db7e367654",
+                    "subnet-0716a2a72d6945140",
+                    "subnet-0ace79265977756b4",
+                    "subnet-0ee2c19e2088b1244"
+                ],
+                "region": "us-east-1",
+                "tags": null,
+                "timeouts": null
+            }
+        },
+        "aws_vpc": {
+            "default": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-06149c26f4c960573",
+                "cidr_block": "172.31.0.0/16",
+                "cidr_block_associations": [
+                    {
+                        "association_id": "vpc-cidr-assoc-0301c7ade0bfe0ded",
+                        "cidr_block": "172.31.0.0/16",
+                        "state": "associated"
+                    }
+                ],
+                "default": true,
+                "dhcp_options_id": "dopt-0caef10e2e26f8bde",
+                "enable_dns_hostnames": true,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "filter": null,
+                "id": "vpc-06149c26f4c960573",
+                "instance_tenancy": "default",
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_associations": [],
+                "main_route_table_id": "rtb-0dda7323bf338d504",
+                "owner_id": "644160558196",
+                "region": "us-east-1",
+                "state": null,
+                "tags": {},
+                "timeouts": null
+            }
+        },
+        "aws_ecr_repository": {
+            "image": {
+                "arn": "arn:aws:ecr:us-east-1:644160558196:repository/c7n-profile-image-proud-tahr",
+                "encryption_configuration": [
+                    {
+                        "encryption_type": "AES256",
+                        "kms_key": ""
+                    }
+                ],
+                "force_delete": true,
+                "id": "c7n-profile-image-proud-tahr",
+                "image_scanning_configuration": [
+                    {
+                        "scan_on_push": false
+                    }
+                ],
+                "image_tag_mutability": "MUTABLE",
+                "image_tag_mutability_exclusion_filter": [],
+                "name": "c7n-profile-image-proud-tahr",
+                "region": "us-east-1",
+                "registry_id": "644160558196",
+                "repository_url": "644160558196.dkr.ecr.us-east-1.amazonaws.com/c7n-profile-image-proud-tahr",
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null
+            }
+        },
+        "aws_iam_role": {
+            "canvas": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-canvas-proud-tahr",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"sagemaker.amazonaws.com\",\"forecast.amazonaws.com\",\"emr-serverless.amazonaws.com\",\"bedrock.amazonaws.com\"]}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-10-20T16:28:04Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-canvas-proud-tahr",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-canvas-proud-tahr",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAV7EQQKWX6SQII5FAK"
+            },
+            "emr_assumable": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-emr-assumable-proud-tahr",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-10-20T16:28:12Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-emr-assumable-proud-tahr",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-emr-assumable-proud-tahr",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAV7EQQKWX5RKQWKVZW"
+            },
+            "execution": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-10-20T16:28:02Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-profile-update-proud-tahr",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-profile-update-proud-tahr",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAV7EQQKWXWYPVQW35M"
+            },
+            "updated_execution": {
+                "arn": "arn:aws:iam::644160558196:role/c7n-profile-updated-proud-tahr",
+                "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sagemaker.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+                "create_date": "2026-10-20T16:28:02Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n-profile-updated-proud-tahr",
+                "inline_policy": [],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n-profile-updated-proud-tahr",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": "",
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAV7EQQKWXYHXWTEY3I"
+            }
+        },
+        "aws_iam_role_policy": {
+            "image_read": {
+                "id": "c7n-profile-update-proud-tahr:terraform-2f9a1a6e9c11fbd6b48e559d14",
+                "name": "terraform-2f9a1a6e9c11fbd6b48e559d14",
+                "name_prefix": "terraform-",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"ecr:GetAuthorizationToken\"],\"Effect\":\"Allow\",\"Resource\":\"*\"},{\"Action\":[\"ecr:BatchGetImage\",\"ecr:BatchCheckLayerAvailability\",\"ecr:GetDownloadUrlForLayer\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:ecr:us-east-1:644160558196:repository/c7n-profile-image-proud-tahr\"},{\"Action\":[\"sagemaker:DescribeImage\",\"sagemaker:DescribeImageVersion\",\"sagemaker:DescribeAppImageConfig\",\"sagemaker:DescribeStudioLifecycleConfig\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+                "role": "c7n-profile-update-proud-tahr"
+            }
+        },
+        "aws_kms_key": {
+            "sharing": {
+                "arn": "arn:aws:kms:us-east-1:644160558196:key/fe11a702-da1b-4b8d-84b9-9a4d8ce7e1f9",
+                "bypass_policy_lockout_safety_check": false,
+                "custom_key_store_id": "",
+                "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+                "deletion_window_in_days": 7,
+                "description": "SageMaker profile update test",
+                "enable_key_rotation": false,
+                "id": "fe11a702-da1b-4b8d-84b9-9a4d8ce7e1f9",
+                "is_enabled": true,
+                "key_id": "fe11a702-da1b-4b8d-84b9-9a4d8ce7e1f9",
+                "key_usage": "ENCRYPT_DECRYPT",
+                "multi_region": false,
+                "policy": "{\"Id\":\"key-default-1\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
+                "region": "us-east-1",
+                "rotation_period_in_days": 0,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "xks_key_id": ""
+            }
+        },
+        "aws_s3_bucket": {
+            "sharing": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::c7n-profile-sharing-936a1c4268be9e94c4b29aa09b",
+                "bucket": "c7n-profile-sharing-936a1c4268be9e94c4b29aa09b",
+                "bucket_domain_name": "c7n-profile-sharing-936a1c4268be9e94c4b29aa09b.s3.amazonaws.com",
+                "bucket_namespace": "global",
+                "bucket_prefix": "c7n-profile-sharing-",
+                "bucket_region": "us-east-1",
+                "bucket_regional_domain_name": "c7n-profile-sharing-936a1c4268be9e94c4b29aa09b.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "46af83c9c3bd517b24c5e1f559f1a1e4694a3a119004c8db795b301befae00ca",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "c7n-profile-sharing-936a1c4268be9e94c4b29aa09b",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "aws_sagemaker_app_image_config": {
+            "app": {
+                "app_image_config_name": "c7n-codeeditor-proud-tahr",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:app-image-config/c7n-codeeditor-proud-tahr",
+                "code_editor_app_image_config": [
+                    {
+                        "container_config": [],
+                        "file_system_config": [
+                            {
+                                "default_gid": 100,
+                                "default_uid": 1000,
+                                "mount_path": "/home/sagemaker-user"
+                            }
+                        ]
+                    }
+                ],
+                "id": "c7n-codeeditor-proud-tahr",
+                "jupyter_lab_image_config": [],
+                "kernel_gateway_image_config": [],
+                "region": "us-east-1",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_sagemaker_domain": {
+            "main": {
+                "app_network_access_type": "PublicInternetOnly",
+                "app_security_group_management": "",
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:domain/d-msjtvfwmgld1",
+                "auth_mode": "IAM",
+                "default_space_settings": [],
+                "default_user_settings": [
+                    {
+                        "auto_mount_home_efs": "Enabled",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "studio::",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "ENABLED",
+                        "studio_web_portal_settings": [
+                            {
+                                "hidden_app_types": null,
+                                "hidden_instance_types": null,
+                                "hidden_ml_tools": null
+                            }
+                        ],
+                        "tensor_board_app_settings": []
+                    }
+                ],
+                "domain_name": "c7n-profile-update-proud-tahr",
+                "domain_settings": [],
+                "home_efs_file_system_id": "fs-013326085ce18e62a",
+                "id": "d-msjtvfwmgld1",
+                "kms_key_id": "",
+                "region": "us-east-1",
+                "retention_policy": [
+                    {
+                        "home_efs_file_system": "Delete"
+                    }
+                ],
+                "security_group_id_for_domain_boundary": "",
+                "single_sign_on_application_arn": "",
+                "single_sign_on_managed_application_instance_id": "",
+                "subnet_ids": [
+                    "subnet-0a6f6f3abb8e90b2f"
+                ],
+                "tag_propagation": "DISABLED",
+                "tags": null,
+                "tags_all": {},
+                "url": "https://d-msjtvfwmgld1.studio.us-east-1.sagemaker.aws",
+                "vpc_id": "vpc-06149c26f4c960573"
+            }
+        },
+        "aws_sagemaker_image": {
+            "app": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:image/c7n-profile-image-proud-tahr",
+                "description": "",
+                "display_name": "",
+                "id": "c7n-profile-image-proud-tahr",
+                "image_name": "c7n-profile-image-proud-tahr",
+                "region": "us-east-1",
+                "role_arn": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_sagemaker_image_version": {
+            "initial": {
+                "aliases": [
+                    "1.0.0"
+                ],
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:image-version/c7n-profile-image-proud-tahr/1",
+                "base_image": "644160558196.dkr.ecr.us-east-1.amazonaws.com/c7n-profile-image-proud-tahr:initial",
+                "container_image": "644160558196.dkr.ecr.us-east-1.amazonaws.com/c7n-profile-image-proud-tahr@sha256:af51fa0f4f7da3e1b16fd5966c3409ea7711775ce98196df088feb7245c09843",
+                "horovod": false,
+                "id": "c7n-profile-image-proud-tahr,1",
+                "image_arn": "arn:aws:sagemaker:us-east-1:644160558196:image/c7n-profile-image-proud-tahr",
+                "image_name": "c7n-profile-image-proud-tahr",
+                "job_type": "",
+                "ml_framework": "",
+                "processor": "",
+                "programming_lang": "",
+                "region": "us-east-1",
+                "release_notes": "",
+                "vendor_guidance": "",
+                "version": 1
+            },
+            "updated": {
+                "aliases": [
+                    "2.0.0"
+                ],
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:image-version/c7n-profile-image-proud-tahr/2",
+                "base_image": "644160558196.dkr.ecr.us-east-1.amazonaws.com/c7n-profile-image-proud-tahr:updated",
+                "container_image": "644160558196.dkr.ecr.us-east-1.amazonaws.com/c7n-profile-image-proud-tahr@sha256:caccac14c0caf57808d0aaa11c5303465e2ac414b3bf6dc13a2359cbc66113a4",
+                "horovod": false,
+                "id": "c7n-profile-image-proud-tahr,2",
+                "image_arn": "arn:aws:sagemaker:us-east-1:644160558196:image/c7n-profile-image-proud-tahr",
+                "image_name": "c7n-profile-image-proud-tahr",
+                "job_type": "",
+                "ml_framework": "",
+                "processor": "",
+                "programming_lang": "",
+                "region": "us-east-1",
+                "release_notes": "",
+                "vendor_guidance": "",
+                "version": 2
+            }
+        },
+        "aws_sagemaker_studio_lifecycle_config": {
+            "app": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:studio-lifecycle-config/c7n-codeeditor-builtin-proud-tahr",
+                "id": "c7n-codeeditor-builtin-proud-tahr",
+                "region": "us-east-1",
+                "studio_lifecycle_config_app_type": "CodeEditor",
+                "studio_lifecycle_config_content": "IyEvYmluL2Jhc2gKZWNobyBjN24tcHJvZmlsZS11cGRhdGUK",
+                "studio_lifecycle_config_name": "c7n-codeeditor-builtin-proud-tahr",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_sagemaker_user_profile": {
+            "app": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-apps-proud-tahr",
+                "domain_id": "d-msjtvfwmgld1",
+                "home_efs_file_system_uid": "200020",
+                "id": "d-msjtvfwmgld1/c7n-apps-proud-tahr",
+                "region": "us-east-1",
+                "single_sign_on_user_identifier": "",
+                "single_sign_on_user_value": "",
+                "tags": null,
+                "tags_all": {},
+                "user_profile_name": "c7n-apps-proud-tahr",
+                "user_settings": [
+                    {
+                        "auto_mount_home_efs": "DefaultAsDomain",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "",
+                        "studio_web_portal_settings": [],
+                        "tensor_board_app_settings": []
+                    }
+                ]
+            },
+            "canvas": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-canvas-proud-tahr",
+                "domain_id": "d-msjtvfwmgld1",
+                "home_efs_file_system_uid": "200010",
+                "id": "d-msjtvfwmgld1/c7n-canvas-proud-tahr",
+                "region": "us-east-1",
+                "single_sign_on_user_identifier": "",
+                "single_sign_on_user_value": "",
+                "tags": null,
+                "tags_all": {},
+                "user_profile_name": "c7n-canvas-proud-tahr",
+                "user_settings": [
+                    {
+                        "auto_mount_home_efs": "DefaultAsDomain",
+                        "canvas_app_settings": [
+                            {
+                                "direct_deploy_settings": [
+                                    {
+                                        "status": "DISABLED"
+                                    }
+                                ],
+                                "emr_serverless_settings": [
+                                    {
+                                        "execution_role_arn": "",
+                                        "status": "DISABLED"
+                                    }
+                                ],
+                                "generative_ai_settings": [],
+                                "identity_provider_oauth_settings": [
+                                    {
+                                        "data_source_name": "SalesforceGenie",
+                                        "secret_arn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-initial-85acbb583fda086c7c0bf940df-YcMp9T",
+                                        "status": "DISABLED"
+                                    }
+                                ],
+                                "kendra_settings": [
+                                    {
+                                        "status": "DISABLED"
+                                    }
+                                ],
+                                "model_register_settings": [
+                                    {
+                                        "cross_account_model_register_role_arn": "",
+                                        "status": "DISABLED"
+                                    }
+                                ],
+                                "time_series_forecasting_settings": [
+                                    {
+                                        "amazon_forecast_role_arn": "",
+                                        "status": "DISABLED"
+                                    }
+                                ],
+                                "workspace_settings": []
+                            }
+                        ],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "",
+                        "studio_web_portal_settings": [],
+                        "tensor_board_app_settings": []
+                    }
+                ]
+            },
+            "main": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-profile-update-proud-tahr",
+                "domain_id": "d-msjtvfwmgld1",
+                "home_efs_file_system_uid": "200025",
+                "id": "d-msjtvfwmgld1/c7n-profile-update-proud-tahr",
+                "region": "us-east-1",
+                "single_sign_on_user_identifier": "",
+                "single_sign_on_user_value": "",
+                "tags": null,
+                "tags_all": {},
+                "user_profile_name": "c7n-profile-update-proud-tahr",
+                "user_settings": [
+                    {
+                        "auto_mount_home_efs": "DefaultAsDomain",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [
+                            {
+                                "app_lifecycle_management": [],
+                                "built_in_lifecycle_config_arn": "",
+                                "custom_image": [],
+                                "default_resource_spec": [
+                                    {
+                                        "instance_type": "ml.g4dn.xlarge",
+                                        "lifecycle_config_arn": "",
+                                        "sagemaker_image_arn": "",
+                                        "sagemaker_image_version_alias": "",
+                                        "sagemaker_image_version_arn": ""
+                                    }
+                                ],
+                                "lifecycle_config_arns": null
+                            }
+                        ],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+                        "jupyter_lab_app_settings": [
+                            {
+                                "app_lifecycle_management": [],
+                                "built_in_lifecycle_config_arn": "",
+                                "code_repository": [
+                                    {
+                                        "repository_url": "https://github.com/cloud-custodian/cloud-custodian"
+                                    }
+                                ],
+                                "custom_image": [],
+                                "default_resource_spec": [
+                                    {
+                                        "instance_type": "ml.g4dn.xlarge",
+                                        "lifecycle_config_arn": "",
+                                        "sagemaker_image_arn": "",
+                                        "sagemaker_image_version_alias": "",
+                                        "sagemaker_image_version_arn": ""
+                                    }
+                                ],
+                                "emr_settings": [],
+                                "lifecycle_config_arns": null
+                            }
+                        ],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [
+                            {
+                                "custom_image": [],
+                                "default_resource_spec": [
+                                    {
+                                        "instance_type": "ml.g4dn.xlarge",
+                                        "lifecycle_config_arn": "",
+                                        "sagemaker_image_arn": "",
+                                        "sagemaker_image_version_alias": "",
+                                        "sagemaker_image_version_arn": ""
+                                    }
+                                ],
+                                "lifecycle_config_arns": null
+                            }
+                        ],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "",
+                        "studio_web_portal_settings": [],
+                        "tensor_board_app_settings": []
+                    }
+                ]
+            },
+            "rstudio": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-rstudio-proud-tahr",
+                "domain_id": "d-msjtvfwmgld1",
+                "home_efs_file_system_uid": "200015",
+                "id": "d-msjtvfwmgld1/c7n-rstudio-proud-tahr",
+                "region": "us-east-1",
+                "single_sign_on_user_identifier": "",
+                "single_sign_on_user_value": "",
+                "tags": null,
+                "tags_all": {},
+                "user_profile_name": "c7n-rstudio-proud-tahr",
+                "user_settings": [
+                    {
+                        "auto_mount_home_efs": "DefaultAsDomain",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [
+                            {
+                                "access_status": "DISABLED",
+                                "user_group": ""
+                            }
+                        ],
+                        "security_groups": null,
+                        "sharing_settings": [],
+                        "space_storage_settings": [],
+                        "studio_web_portal": "",
+                        "studio_web_portal_settings": [],
+                        "tensor_board_app_settings": []
+                    }
+                ]
+            },
+            "settings": {
+                "arn": "arn:aws:sagemaker:us-east-1:644160558196:user-profile/d-msjtvfwmgld1/c7n-settings-proud-tahr",
+                "domain_id": "d-msjtvfwmgld1",
+                "home_efs_file_system_uid": "200005",
+                "id": "d-msjtvfwmgld1/c7n-settings-proud-tahr",
+                "region": "us-east-1",
+                "single_sign_on_user_identifier": "",
+                "single_sign_on_user_value": "",
+                "tags": null,
+                "tags_all": {},
+                "user_profile_name": "c7n-settings-proud-tahr",
+                "user_settings": [
+                    {
+                        "auto_mount_home_efs": "DefaultAsDomain",
+                        "canvas_app_settings": [],
+                        "code_editor_app_settings": [],
+                        "custom_file_system_config": [],
+                        "custom_posix_user_config": [],
+                        "default_landing_uri": "app:JupyterServer:",
+                        "execution_role": "arn:aws:iam::644160558196:role/c7n-profile-update-proud-tahr",
+                        "jupyter_lab_app_settings": [],
+                        "jupyter_server_app_settings": [],
+                        "kernel_gateway_app_settings": [],
+                        "r_session_app_settings": [],
+                        "r_studio_server_pro_app_settings": [],
+                        "security_groups": [
+                            "sg-0b99c92ca578e33be"
+                        ],
+                        "sharing_settings": [
+                            {
+                                "notebook_output_option": "Disabled",
+                                "s3_kms_key_id": "",
+                                "s3_output_path": ""
+                            }
+                        ],
+                        "space_storage_settings": [
+                            {
+                                "default_ebs_storage_settings": [
+                                    {
+                                        "default_ebs_volume_size_in_gb": 5,
+                                        "maximum_ebs_volume_size_in_gb": 20
+                                    }
+                                ]
+                            }
+                        ],
+                        "studio_web_portal": "ENABLED",
+                        "studio_web_portal_settings": [
+                            {
+                                "hidden_app_types": [
+                                    "Canvas"
+                                ],
+                                "hidden_instance_types": [
+                                    "ml.g5.xlarge"
+                                ],
+                                "hidden_ml_tools": [
+                                    "Experiments"
+                                ]
+                            }
+                        ],
+                        "tensor_board_app_settings": []
+                    }
+                ]
+            }
+        },
+        "aws_secretsmanager_secret": {
+            "oauth": {
+                "arn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-6aeb399fd4891ebddce95428a7-IZmAwD",
+                "description": "",
+                "force_overwrite_replica_secret": false,
+                "id": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-6aeb399fd4891ebddce95428a7-IZmAwD",
+                "kms_key_id": "",
+                "name": "c7n-profile-oauth-6aeb399fd4891ebddce95428a7",
+                "name_prefix": "c7n-profile-oauth-",
+                "policy": "",
+                "recovery_window_in_days": 0,
+                "region": "us-east-1",
+                "replica": [],
+                "tags": null,
+                "tags_all": {},
+                "type": ""
+            },
+            "oauth_initial": {
+                "arn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-initial-85acbb583fda086c7c0bf940df-YcMp9T",
+                "description": "",
+                "force_overwrite_replica_secret": false,
+                "id": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-initial-85acbb583fda086c7c0bf940df-YcMp9T",
+                "kms_key_id": "",
+                "name": "c7n-profile-oauth-initial-85acbb583fda086c7c0bf940df",
+                "name_prefix": "c7n-profile-oauth-initial-",
+                "policy": "",
+                "recovery_window_in_days": 0,
+                "region": "us-east-1",
+                "replica": [],
+                "tags": null,
+                "tags_all": {},
+                "type": ""
+            }
+        },
+        "aws_secretsmanager_secret_version": {
+            "oauth": {
+                "arn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-6aeb399fd4891ebddce95428a7-IZmAwD",
+                "has_secret_string_wo": null,
+                "id": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-6aeb399fd4891ebddce95428a7-IZmAwD|terraform-nuqxFGFAYpbFwvgeiNh0ZyoIvN",
+                "region": "us-east-1",
+                "secret_arn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-6aeb399fd4891ebddce95428a7-IZmAwD",
+                "secret_binary": "",
+                "secret_id": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-6aeb399fd4891ebddce95428a7-IZmAwD",
+                "secret_string": "{\"client_id\":\"c7n-test-client\",\"client_secret\":\"c7n-test-secret\"}",
+                "secret_string_wo": null,
+                "secret_string_wo_version": null,
+                "version_id": "terraform-nuqxFGFAYpbFwvgeiNh0ZyoIvN",
+                "version_stages": [
+                    "AWSCURRENT"
+                ]
+            },
+            "oauth_initial": {
+                "arn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-initial-85acbb583fda086c7c0bf940df-YcMp9T",
+                "has_secret_string_wo": null,
+                "id": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-initial-85acbb583fda086c7c0bf940df-YcMp9T|terraform-2ZlBcOgWiBAZovUkfJbvM80qeJ",
+                "region": "us-east-1",
+                "secret_arn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-initial-85acbb583fda086c7c0bf940df-YcMp9T",
+                "secret_binary": "",
+                "secret_id": "arn:aws:secretsmanager:us-east-1:644160558196:secret:c7n-profile-oauth-initial-85acbb583fda086c7c0bf940df-YcMp9T",
+                "secret_string": "{\"client_id\":\"c7n-test-client\",\"client_secret\":\"c7n-test-secret\"}",
+                "secret_string_wo": null,
+                "secret_string_wo_version": null,
+                "version_id": "terraform-2ZlBcOgWiBAZovUkfJbvM80qeJ",
+                "version_stages": [
+                    "AWSCURRENT"
+                ]
+            }
+        },
+        "aws_security_group": {
+            "initial": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0b99c92ca578e33be",
+                "description": "Managed by Terraform",
+                "egress": [],
+                "id": "sg-0b99c92ca578e33be",
+                "ingress": [],
+                "name": "c7n-profile-initial-4cbacf036fa91e40df700fc2aa",
+                "name_prefix": "c7n-profile-initial-",
+                "owner_id": "644160558196",
+                "region": "us-east-1",
+                "revoke_rules_on_delete": false,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-06149c26f4c960573"
+            },
+            "updated": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-0e5f64e06df76375a",
+                "description": "Managed by Terraform",
+                "egress": [],
+                "id": "sg-0e5f64e06df76375a",
+                "ingress": [],
+                "name": "c7n-profile-updated-0afe9035c06d48859b857495ab",
+                "name_prefix": "c7n-profile-updated-",
+                "owner_id": "644160558196",
+                "region": "us-east-1",
+                "revoke_rules_on_delete": false,
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "vpc_id": "vpc-06149c26f4c960573"
+            }
+        },
+        "random_pet": {
+            "profile": {
+                "id": "proud-tahr",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        },
+        "terraform_data": {
+            "image": {
+                "id": "5b4550ae-076e-c4b1-0666-624b7dc080ba",
+                "input": {
+                    "value": "644160558196.dkr.ecr.us-east-1.amazonaws.com/c7n-profile-image-proud-tahr",
+                    "type": "string"
+                },
+                "output": {
+                    "value": "644160558196.dkr.ecr.us-east-1.amazonaws.com/c7n-profile-image-proud-tahr",
+                    "type": "string"
+                },
+                "triggers_replace": null
+            },
+            "rsession_config": {
+                "id": "4183305b-beeb-b732-60bb-70417a71ef4d",
+                "input": {
+                    "value": {
+                        "name": "c7n-rsession-proud-tahr",
+                        "region": "us-east-1"
+                    },
+                    "type": [
+                        "object",
+                        {
+                            "name": "string",
+                            "region": "string"
+                        }
+                    ]
+                },
+                "output": {
+                    "value": {
+                        "name": "c7n-rsession-proud-tahr",
+                        "region": "us-east-1"
+                    },
+                    "type": [
+                        "object",
+                        {
+                            "name": "string",
+                            "region": "string"
+                        }
+                    ]
+                },
+                "triggers_replace": null
+            }
+        }
+    }
+}
