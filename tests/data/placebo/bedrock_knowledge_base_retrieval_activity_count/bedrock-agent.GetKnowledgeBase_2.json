@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "knowledgeBase": {
+            "knowledgeBaseId": "MH5KZUMFB1",
+            "name": "c7n-kb-activity-default-2b71-used",
+            "knowledgeBaseArn": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/MH5KZUMFB1",
+            "roleArn": "arn:aws:iam::644160558196:role/c7n-kb-activity-default-2b71-kb",
+            "knowledgeBaseConfiguration": {
+                "type": "VECTOR",
+                "vectorKnowledgeBaseConfiguration": {
+                    "embeddingModelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0"
+                }
+            },
+            "storageConfiguration": {
+                "type": "S3_VECTORS",
+                "s3VectorsConfiguration": {
+                    "indexArn": "arn:aws:s3vectors:us-east-1:644160558196:bucket/c7n-kb-activity-default-2b71/index/used"
+                }
+            },
+            "status": "ACTIVE",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 10,
+                "day": 8,
+                "hour": 22,
+                "minute": 12,
+                "second": 0,
+                "microsecond": 121381
+            },
+            "updatedAt": {
+                "__class__": "datetime",
+                "year": 2026,
+                "month": 10,
+                "day": 8,
+                "hour": 22,
+                "minute": 12,
+                "second": 0,
+                "microsecond": 121381
+            }
+        }
+    }
+}

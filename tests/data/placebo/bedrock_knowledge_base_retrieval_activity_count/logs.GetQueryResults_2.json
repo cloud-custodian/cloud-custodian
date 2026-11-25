@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "queryLanguage": "CWLI",
+        "results": [
+            [
+                {
+                    "field": "resources.0.ARN",
+                    "value": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/M3DS4ESUXQ"
+                },
+                {
+                    "field": "retrievals",
+                    "value": "8"
+                }
+            ],
+            [
+                {
+                    "field": "resources.0.ARN",
+                    "value": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/MH5KZUMFB1"
+                },
+                {
+                    "field": "retrievals",
+                    "value": "3"
+                }
+            ]
+        ],
+        "statistics": {
+            "recordsMatched": 11.0,
+            "recordsScanned": 13.0,
+            "estimatedRecordsSkipped": 0.0,
+            "bytesScanned": 23532.0,
+            "estimatedBytesSkipped": 0.0,
+            "logGroupsScanned": 1.0,
+            "resultCount": 2.0
+        },
+        "status": "Complete",
+        "ResponseMetadata": {}
+    }
+}
