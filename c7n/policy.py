@@ -1271,6 +1271,10 @@ class Policy:
             variables = {}
 
         partition = utils.get_partition(self.options.region)
+        # a provider or resource declares the date format its api accepts, so a
+        # policy can write {now:-7d} without knowing it.
+        date_format = getattr(
+            getattr(self.resource_manager, 'resource_type', None), 'date_format', None)
         if 'mode' in self.data:
             if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
                 self.data['mode']['role'] = "arn:%s:iam::%s:role/%s" % \
@@ -1295,7 +1299,7 @@ class Policy:
             'now': (
                 utils.DeferredFormatString('now')
                 if isinstance(self.get_execution_mode(), ServerlessExecutionMode)
-                else utils.FormatDate(datetime.utcnow())
+                else utils.FormatDate(datetime.utcnow(), date_format)
             ),
             # account increase limit action
             'service': '{service}',

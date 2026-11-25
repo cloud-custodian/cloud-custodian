@@ -183,6 +183,67 @@ service or automation identity matching a complex regular expression.
 
 
 
+.. _policy_date_variables:
+
+Dates in policies
+-----------------
+
+The ``{now}`` variable interpolates the time of the run into policy values. It
+takes an optional offset, an optional strftime, or both, in that order.
+
+.. code-block:: yaml
+
+  policies:
+
+    - name: expiring-soon
+      resource: aws.ec2
+      actions:
+        - type: tag
+          key: expires
+          # offset and strftime
+          value: "retire after {now:+30d%Y-%m-%d}"
+
+The offset is a sign, a number and a unit, where the unit is ``d`` for days,
+``h`` for hours or ``M`` for minutes. ``+30d`` is thirty days from now and
+``-7d`` is seven days ago. Several can be combined, so ``{now:-1d+2h}`` is
+yesterday plus two hours.
+
+An offset only counts at the front of the spec. A hyphen later in one is
+literal, so ``{now:retain-30d_%Y%m%d}`` keeps the ``retain-30d_`` and a
+strftime width such as ``%-3d`` is left to strftime.
+
+With no strftime of its own, ``{now}`` renders in whatever format the resource
+declares, and otherwise as a plain datetime. Google Cloud resources declare RFC
+3339, ``2026-08-22T14:31:07Z``, because that is the shape its APIs return
+timestamps in.
+
+That matters when a date is compared as a string. The timestamps Google returns
+sort correctly against each other, but a plain datetime does not sort against
+them: ``2026-08-22 14:31:07`` is lower than every time on the same day, because
+a space sorts below the ``T``. So the comparison below quietly matches jobs that
+are older than the cutoff unless ``{now}`` comes out in the same shape as the
+field it is compared to.
+
+.. code-block:: yaml
+
+  policies:
+
+    - name: custom-jobs-from-the-last-90-days
+      resource: gcp.vertex-ai-custom-job
+      filters:
+        - type: value
+          key: createTime
+          op: greater-than
+          # renders as 2026-08-22T14:31:07Z, the same shape as createTime
+          value: "{now:-90d}"
+
+.. note::
+
+   ``{now}`` is not expanded during serverless execution. The tag and notify
+   actions resolve it themselves when they run, so a tag value still gets the
+   time of the run. Anywhere else, such as the filter above, it reaches the
+   policy unresolved, so use it in pull mode policies.
+
 .. _policy_resource_limits:
 
 Limiting how many resources custodian affects

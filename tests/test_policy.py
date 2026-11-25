@@ -9,7 +9,7 @@ import shutil
 import tempfile
 from unittest import mock
 
-from c7n import policy, manager
+from c7n import policy, manager, query
 from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
@@ -82,6 +82,32 @@ class PolicyMetaLint(BaseTest):
                 "tag:GetResources"
             },
         )
+
+    def test_no_aws_base_date_format(self):
+        # a resource_type can declare the strftime its api wants, which {now}
+        # then renders with. declaring one on a provider's base TypeInfo
+        # changes every policy on that provider, so it should be deliberate
+        # rather than inherited by accident. gcp declares one, aws does not.
+        # an individual aws resource is free to declare its own.
+        self.assertIsNone(getattr(query.TypeInfo, 'date_format', None))
+
+    def test_aws_date_renders_unchanged(self):
+        # nothing on aws declares a format, so {now} keeps rendering the way
+        # it did before resource types could ask for one.
+        policy = self.load_policy({
+            'name': 'expiring',
+            'resource': 'aws.ec2',
+            'actions': [{'type': 'tag', 'key': 'expires', 'value': '{now:-7d}'}]})
+        before = datetime.utcnow()
+        policy.expand_variables(policy.get_variables())
+        after = datetime.utcnow()
+
+        value = policy.data['actions'][0]['value']
+        # a plain datetime, space separated and down to the microsecond,
+        # not an api date format
+        rendered = datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')
+        self.assertTrue(
+            before - timedelta(days=7) <= rendered <= after - timedelta(days=7), value)
 
     def test_resource_type_repr_with_arn_type(self):
         policy = self.load_policy({'name': 'ecr', 'resource': 'aws.ops-item'})

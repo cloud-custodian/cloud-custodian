@@ -456,10 +456,97 @@ class UtilTest(BaseTest):
 
         self.assertEqual("{:+5M%M}".format(utils.FormatDate(d)), "05")
 
+        self.assertEqual("{:-5h%H}".format(utils.FormatDate(d)), "07")
+
+        self.assertEqual("{:-5d%d}".format(utils.FormatDate(d)), "28")
+
+        self.assertEqual("{:-5M%M}".format(utils.FormatDate(d)), "55")
+
+        self.assertEqual("{:-7d%Y-%m-%d}".format(utils.FormatDate(d)), "2018-01-26")
+
         self.assertEqual(json.dumps(utils.FormatDate(d),
                                     cls=utils.JsonEncoder, indent=2),
                          '"2018-02-02T12:00:00"')
         self.assertEqual(str(d), '2018-02-02 12:00:00')
+
+    def test_format_date_default_format(self):
+        # the configured default applies if and only if no strftime survives
+        # the spec, so every form without one comes out the same shape
+        d = parse_date("2018-02-02 12:00")
+        iso = "%Y-%m-%dT%H:%M:%SZ"
+        cases = [
+            # spec, rendered without a default, rendered with one
+            ("", "2018-02-02 12:00:00", "2018-02-02T12:00:00Z"),
+            ("-7d", "2018-01-26 12:00:00", "2018-01-26T12:00:00Z"),
+            ("+2d", "2018-02-04 12:00:00", "2018-02-04T12:00:00Z"),
+            ("+0d", "2018-02-02 12:00:00", "2018-02-02T12:00:00Z"),
+            ("-5h", "2018-02-02 07:00:00", "2018-02-02T07:00:00Z"),
+            ("-5M", "2018-02-02 11:55:00", "2018-02-02T11:55:00Z"),
+            ("-1d+2h", "2018-02-01 14:00:00", "2018-02-01T14:00:00Z"),
+            # a strftime wins, whether the author wrote it after an offset,
+            # on its own, or the spec merely happens to contain one
+            ("%Y-%m-%d", "2018-02-02", "2018-02-02"),
+            ("-7d%Y-%m-%d", "2018-01-26", "2018-01-26"),
+            ("-1d+2h%Y-%m-%dT%H", "2018-02-01T14", "2018-02-01T14"),
+            ("%Y-7d", "2018-7d", "2018-7d"),
+            ("retain-30d_%Y%m%d", "retain-30d_20180202", "retain-30d_20180202"),
+            # a leading offset is taken off the front, so an increment shaped
+            # literal after it survives instead of being stripped too
+            ("-1d_retain-30d_%Y", "_retain-30d_2018", "_retain-30d_2018"),
+            ("-1d%Y-2d", "2018-2d", "2018-2d"),
+        ]
+        for spec, without_default, with_default in cases:
+            with self.subTest(spec=spec):
+                self.assertEqual(
+                    f"{{:{spec}}}".format(utils.FormatDate(d)), without_default)
+                self.assertEqual(
+                    f"{{:{spec}}}".format(utils.FormatDate(d, iso)), with_default)
+
+    def test_format_date_literal_hyphen(self):
+        # an increment only counts at the start of the spec, so a hyphen
+        # later in one stays literal instead of shifting the date.
+        d = parse_date("2018-02-02 12:00")
+        for spec in ("%Y-7d", "retain-30d_%Y%m%d", "%Y-%m-%dT%H:%M:%SZ"):
+            self.assertEqual(
+                f"{{:{spec}}}".format(utils.FormatDate(d)),
+                d.__format__(spec), spec)
+
+        # and a default doesn't get applied to one either, since the spec
+        # isn't empty once the leading run is taken off.
+        self.assertEqual(
+            "{:%Y-7d}".format(utils.FormatDate(d, "%Y-%m-%dT%H:%M:%SZ")),
+            "2018-7d")
+
+    def test_format_date_malformed_offset_is_literal(self):
+        # an offset is a sign, digits and one of M/d/h. anything else isn't an
+        # offset at all, so it stays in the spec as strftime text and the
+        # configured default never applies. this is the shape of a typo, and
+        # it fails quietly, so pin it.
+        d = parse_date("2018-02-02 12:00")
+        iso = "%Y-%m-%dT%H:%M:%SZ"
+        for spec, rendered in (
+                ("-7", "-7"),            # no unit
+                ("-7y", "-7y"),          # unit that doesn't exist
+                ("+7D", "+7D"),          # right unit, wrong case
+                ("-0.5d", "-0.5d"),      # fractions aren't accepted
+                ("7d", "7d"),            # no sign
+                ("--7d", "--7d"),
+                (" -7d", " -7d"),        # a leading space stops the match
+                ("-7d ", " "),           # a trailing one leaves the spec non empty
+        ):
+            with self.subTest(spec=spec):
+                self.assertEqual(
+                    f"{{:{spec}}}".format(utils.FormatDate(d)), rendered)
+                self.assertEqual(
+                    f"{{:{spec}}}".format(utils.FormatDate(d, iso)), rendered)
+
+    def test_format_date_str_matches_format(self):
+        # varfmt hands back the object rather than a string when a value is
+        # exactly "{now}", so str() has to render the same way format() does
+        d = parse_date("2018-02-02 12:00")
+        self.assertEqual(str(utils.FormatDate(d)), "2018-02-02 12:00:00")
+        self.assertEqual(
+            str(utils.FormatDate(d, "%Y-%m-%dT%H:%M:%SZ")), "2018-02-02T12:00:00Z")
 
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
@@ -771,6 +858,15 @@ class UtilTest(BaseTest):
                  'b': '{account_id}'}, account_id=21),
             {'k': '{limit}',
              'b': '21'})
+
+        # err_fallback is the caller's list of mistakes to forgive, so it has
+        # to reach a nested value too. policy data is never flat.
+        self.assertRaises(
+            IndexError, utils.format_string_values, '{1}', ())
+        self.assertRaises(
+            IndexError, utils.format_string_values, {'a': {'b': '{1}'}}, ())
+        self.assertRaises(
+            IndexError, utils.format_string_values, {'a': ['{1}']}, ())
 
     def test_get_support_region(self):
         # AWS Partition
