@@ -18,6 +18,7 @@ ResourceMap = {
     "gcp.bigtable-instance-table": "c7n_gcp.resources.bigtable.BigTableInstanceTable",
     "gcp.bigtable-instance-cluster-backup":
         "c7n_gcp.resources.bigtable.BigTableInstanceClusterBackup",
+    "gcp.billing-budget": "c7n_gcp.resources.billingbudgets.BillingBudget",
     "gcp.bq-dataset": "c7n_gcp.resources.bigquery.DataSet",
     "gcp.bq-job": "c7n_gcp.resources.bigquery.BigQueryJob",
     "gcp.bq-table": "c7n_gcp.resources.bigquery.BigQueryTable",

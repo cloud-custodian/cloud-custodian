@@ -1,0 +1,46 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 28 Sep 2026 17:46:33 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "760",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudbilling.googleapis.com/v1/billingAccounts?alt=json"
+  },
+  "body": {
+    "billingAccounts": [
+      {
+        "name": "billingAccounts/01259E-0A38CB-566CD7",
+        "open": false,
+        "displayName": "Test Billing Account 1",
+        "masterBillingAccount": "",
+        "parent": "organizations/112233445566",
+        "currencyCode": "USD"
+      },
+      {
+        "name": "billingAccounts/012D15-48F45F-54F53C",
+        "open": false,
+        "displayName": "Test Billing Account 2",
+        "masterBillingAccount": "",
+        "parent": "organizations/112233445566",
+        "currencyCode": "USD"
+      },
+      {
+        "name": "billingAccounts/0189B7-1C2253-05D127",
+        "open": true,
+        "displayName": "Test Billing Account 3",
+        "masterBillingAccount": "",
+        "parent": "organizations/112233445566",
+        "currencyCode": "USD"
+      }
+    ],
+    "nextPageToken": ""
+  }
+}
