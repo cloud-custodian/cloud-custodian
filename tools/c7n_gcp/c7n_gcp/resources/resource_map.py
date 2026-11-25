@@ -134,6 +134,7 @@ ResourceMap = {
     "gcp.vertex-ai-index-endpoint": "c7n_gcp.resources.vertexai.VertexAIIndexEndpoint",
     "gcp.vertex-ai-location": "c7n_gcp.resources.vertexai.VertexAILocation",
     "gcp.vertex-ai-model": "c7n_gcp.resources.vertexai.VertexAIModel",
+    "gcp.vertex-ai-pipeline-job": "c7n_gcp.resources.vertexai.VertexAIPipelineJob",
     "gcp.vertex-ai-metadata-store-artifact": (
         "c7n_gcp.resources.vertexai.VertexAIMetadataStoreArtifact"),
     "gcp.vpc": "c7n_gcp.resources.network.Network",
