@@ -615,6 +615,7 @@ class ValueFilter(BaseValueFilter):
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'},
             'value_path': {'type': 'string'},
+            'required': {'type': 'boolean'},
             'tag_key_transforms': {'type': 'array', 'items': {'type': 'string'}}
         }
     }
@@ -631,6 +632,10 @@ class ValueFilter(BaseValueFilter):
           - `value` must be a number
           - supports a subset of the OPERATORS list
         """
+        if 'required' in self.data:
+            raise PolicyValidationError(
+                "'required' is not supported with value_type: resource_count")
+
         for field in ('op', 'value'):
             if field not in self.data:
                 raise PolicyValidationError(
@@ -775,6 +780,9 @@ class ValueFilter(BaseValueFilter):
 
         # value extract
         r = self.get_resource_value(self.k, i)
+        # Apply presence before conversions such as size or integer replace None.
+        if r is None and 'required' in self.data:
+            return not self.data['required']
         if self.op in ('in', 'not-in') and r is None:
             r = ()
 
