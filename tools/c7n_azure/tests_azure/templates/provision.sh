@@ -323,6 +323,27 @@ deploy_resource() {
 
         az deployment sub create --location $resourceLocation --name cctest-budget \
             --template-file $file --output None
+    elif [[ "$fileName" == "roledefinition-delete.json" ]]; then
+
+        if ! az deployment sub create --location $resourceLocation --name cctest-$filenameNoExtension \
+            --template-file $file --output None; then
+            echo "Failed to deploy role definition fixture ${filenameNoExtension}"
+            exit 1
+        fi
+    elif [[ "$fileName" == "roledefinition-delete-assigned.json" ]]; then
+
+        ensure_active_principal_object_id || exit 1
+        principal_type="ServicePrincipal"
+        if [[ ${is_user} -eq 1 ]]; then
+            principal_type="User"
+        fi
+        if ! az deployment sub create --location $resourceLocation --name cctest-$filenameNoExtension \
+            --template-file $file \
+            --parameters principalId=$ASSIGNEE_OBJECT_ID principalType=$principal_type \
+            --output None; then
+            echo "Failed to deploy role definition fixture ${filenameNoExtension}"
+            exit 1
+        fi
     elif [[ "$fileName" == "ai-foundry-application.json" ]]; then
 
         unique_suffix="$(date +%s%N | tail -c 13)"

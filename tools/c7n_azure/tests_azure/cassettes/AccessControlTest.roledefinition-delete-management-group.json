@@ -1,0 +1,223 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions?api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 515599FD6FFC4E91AFDB06721EF9C17D Ref B: CHI261140511040 Ref C: 2026-11-06T18:51:27Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 06 Nov 2026 18:51:27 GMT"
+                    ],
+                    "content-length": [
+                        "1124081"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "roleName": "cctest-roledefinition-mg",
+                                    "type": "CustomRole",
+                                    "description": "",
+                                    "assignableScopes": [
+                                        "/providers/Microsoft.Management/managementGroups/cctest-roledefinition-mg",
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    ],
+                                    "permissions": [
+                                        {
+                                            "actions": [
+                                                "Microsoft.Resources/subscriptions/resourceGroups/read"
+                                            ],
+                                            "notActions": []
+                                        }
+                                    ],
+                                    "createdOn": "2026-11-06T18:51:05.9611475Z",
+                                    "updatedOn": "2026-11-06T18:51:05.9611475Z",
+                                    "createdBy": "00000000-0000-0000-0000-000000000002",
+                                    "updatedBy": "00000000-0000-0000-0000-000000000002"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000012",
+                                "type": "Microsoft.Authorization/roleDefinitions",
+                                "name": "00000000-0000-0000-0000-000000000012"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000012?api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "199"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 57DBE8CFC597434FBF84D8197BA619F3 Ref B: CH1AA2020617027 Ref C: 2026-11-06T18:51:28Z"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-deletes": [
+                        "2999"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 06 Nov 2026 18:51:29 GMT"
+                    ],
+                    "content-length": [
+                        "773"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "roleName": "cctest-roledefinition-mg",
+                            "type": "CustomRole",
+                            "description": "",
+                            "assignableScopes": [
+                                "/providers/Microsoft.Management/managementGroups/cctest-roledefinition-mg",
+                                "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                            ],
+                            "permissions": [
+                                {
+                                    "actions": [
+                                        "Microsoft.Resources/subscriptions/resourceGroups/read"
+                                    ],
+                                    "notActions": []
+                                }
+                            ],
+                            "createdOn": "2026-11-06T18:51:05.9611475Z",
+                            "updatedOn": "2026-11-06T18:51:29.3955570Z",
+                            "createdBy": "00000000-0000-0000-0000-000000000002",
+                            "updatedBy": "00000000-0000-0000-0000-000000000002"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000012",
+                        "type": "Microsoft.Authorization/roleDefinitions",
+                        "name": "00000000-0000-0000-0000-000000000012"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions?$filter=roleName%20eq%20%27cctest-roledefinition-mg%27&api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 3D41DDEDE0A24A2F8AD68D85AF30F7B4 Ref B: CHI261140502029 Ref C: 2026-11-06T18:52:00Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 06 Nov 2026 18:52:00 GMT"
+                    ],
+                    "content-length": [
+                        "12"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/providers/Microsoft.Management/managementGroups/cctest-roledefinition-mg/providers/Microsoft.Authorization/roleDefinitions?$filter=roleName%20eq%20%27cctest-roledefinition-mg%27&api-version=2015-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 8BA3216046C94E109ED86D18E028EAC1 Ref B: CHI261140509060 Ref C: 2026-11-06T18:52:01Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 06 Nov 2026 18:52:00 GMT"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        }
+    ]
+}

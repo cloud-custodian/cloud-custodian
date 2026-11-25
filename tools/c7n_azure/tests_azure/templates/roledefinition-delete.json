@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "roleName": "cctest-roledefinition-delete"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Authorization/roleDefinitions",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(subscription().id, variables('roleName'))]",
+      "properties": {
+        "roleName": "[variables('roleName')]",
+        "description": "Cloud Custodian test fixture",
+        "type": "CustomRole",
+        "permissions": [
+          {
+            "actions": [
+              "Microsoft.Resources/subscriptions/resourceGroups/read"
+            ],
+            "notActions": []
+          }
+        ],
+        "assignableScopes": [
+          "[subscription().id]"
+        ]
+      }
+    }
+  ]
+}
