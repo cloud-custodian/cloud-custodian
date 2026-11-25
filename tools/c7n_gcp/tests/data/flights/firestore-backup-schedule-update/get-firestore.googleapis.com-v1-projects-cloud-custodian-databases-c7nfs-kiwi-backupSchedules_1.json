@@ -1,0 +1,29 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "11475443605204413183;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 24 Nov 2026 18:10:59 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "323",
+    "-content-encoding": "gzip",
+    "content-location": "https://firestore.googleapis.com/v1/projects/cloud-custodian/databases/c7nfs-kiwi/backupSchedules?alt=json"
+  },
+  "body": {
+    "backupSchedules": [
+      {
+        "name": "projects/cloud-custodian/databases/c7nfs-kiwi/backupSchedules/6a0c21fa-0470-4898-b0a0-d45c2a9dca75",
+        "createTime": "2026-11-24T18:10:56.343099Z",
+        "retention": "1209600s",
+        "dailyRecurrence": {},
+        "updateTime": "2026-11-24T18:10:56.343099Z"
+      }
+    ]
+  }
+}

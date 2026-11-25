@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.exceptions import PolicyValidationError
+from c7n.utils import type_schema
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
     QueryResourceManager,
@@ -98,6 +100,58 @@ class FirestoreBackupSchedule(ChildResourceManager):
             return client.execute_command(
                 'get', {'name': resource_info['resourceName']}
             )
+
+
+@FirestoreBackupSchedule.action_registry.register('update')
+class FirestoreBackupScheduleUpdate(MethodAction):
+    r"""Update the retention period of a Firestore backup schedule.
+
+    GCP action is
+    https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.backupSchedules/patch
+
+    ``retention`` is the only field the API accepts. Patching
+    ``dailyRecurrence`` or ``weeklyRecurrence`` is rejected with ``Only the
+    retention field can be updated``, so changing a schedule's recurrence means
+    deleting it and creating a new one. The maximum retention is 14 weeks
+    (``8467200s``), enforced at run time, not by schema.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: firestore-backup-retention-too-long
+            resource: gcp.firestore-backup-schedule
+            filters:
+              - type: value
+                key: retention
+                value_regex: '^([0-9]+(?:\.[0-9]{1,9})?)s$'
+                op: gt
+                value_type: float
+                value: 2592000
+            actions:
+              - type: update
+                retention: 2592000s
+    """
+
+    schema = type_schema(
+        'update',
+        required=['retention'],
+        retention={
+            'type': 'string',
+            'pattern': r'^[0-9]+(\.[0-9]{1,9})?s$',
+        },
+    )
+    method_spec = {'op': 'patch'}
+    method_perm = 'update'
+    permissions = ('datastore.backupSchedules.update',)
+
+    def get_resource_params(self, model, resource):
+        return {
+            'name': resource['name'],
+            'updateMask': 'retention',
+            'body': {'retention': self.data['retention']},
+        }
 
 
 @resources.register('firestore-index')
