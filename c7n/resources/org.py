@@ -206,6 +206,28 @@ class OrgAccount(QueryResourceManager, OrgAccess):
 @OrgUnit.filter_registry.register("policy")
 @OrgAccount.filter_registry.register("policy")
 class PolicyFilter(PolicyTypeValidator, ListItemFilter):
+    """Filter org units or accounts by their attached organization policies
+
+    Policies of the given ``policy-type`` attached to the resource are matched
+    with ``attrs`` and ``count``. Set ``inherited: true`` to also include
+    policies attached to parent org units and the root.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: accounts-without-restrict-regions-scp
+            resource: aws.org-account
+            filters:
+              - type: policy
+                policy-type: SERVICE_CONTROL_POLICY
+                inherited: true
+                count: 0
+                attrs:
+                  - Name: RestrictRegions
+    """
+
     schema = type_schema(
         "policy",
         required=["policy-type"],

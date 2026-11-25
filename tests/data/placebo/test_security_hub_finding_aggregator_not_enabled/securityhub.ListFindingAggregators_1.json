@@ -1,0 +1,12 @@
+{
+    "status_code": 401,
+    "data": {
+        "Error": {
+            "Message": "Account 644160558196 is not subscribed to AWS Security Hub CSPM",
+            "Code": "InvalidAccessException"
+        },
+        "ResponseMetadata": {},
+        "Message": "Account 644160558196 is not subscribed to AWS Security Hub CSPM",
+        "Code": "InvalidAccessException"
+    }
+}

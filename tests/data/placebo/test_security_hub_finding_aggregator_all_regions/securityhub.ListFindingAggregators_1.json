@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FindingAggregators": [
+            {
+                "FindingAggregatorArn": "arn:aws:securityhub:us-east-1:644160558196:finding-aggregator/26d1075f-09cf-d08d-53f4-0722ce6cfff2"
+            }
+        ]
+    }
+}
