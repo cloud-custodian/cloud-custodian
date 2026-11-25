@@ -11,7 +11,12 @@ from c7n.utils import type_schema
 from c7n_azure import utils
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
-from c7n_azure.query import ChildResourceManager, ChildTypeInfo
+from c7n_azure.query import (
+    ChildResourceManager,
+    ChildTypeInfo,
+    DescribeSource,
+    QueryResourceManager,
+)
 from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 
 
@@ -159,6 +164,99 @@ class CognitiveServiceUsage(ChildResourceManager):
                 url = payload.get('nextLink')
                 query = None
         return values
+
+
+# Not the SDK's usages.list: scopeId and scopeType are only returned from
+# api-version 2026-03-01, and the SDK's Usage model (13.7.0, 14.1.0) has no
+# fields for them, so serializing it would drop them.
+class CognitiveServiceLocationUsageSource(DescribeSource):
+
+    def get_resources(self, query: list[dict] | None) -> list[dict]:
+        accounts = self.manager.get_resource_manager('azure.cognitiveservice').resources()
+        # The global location labels some Global quota rows Classic, so query it
+        # last and keep the row a region returns.
+        locations = sorted(
+            {account['location'] for account in accounts},
+            key=lambda location: (location == 'global', location),
+        )
+        session = self.manager.get_session()
+        base_url = (
+            f'{session.cloud_endpoints.endpoints.resource_manager.rstrip("/")}'
+            f'/subscriptions/{session.get_subscription_id()}'
+            '/providers/Microsoft.CognitiveServices/locations'
+        )
+        rows = {}
+        with utils.requests_session(session, max_retries=3) as http:
+            for location in locations:
+                url = f'{base_url}/{location}/usages'
+                params = {'api-version': self.manager.resource_type.api_version}
+                while url:
+                    response = http.get(url, params=params, timeout=30)
+                    response.raise_for_status()
+                    payload = response.json()
+                    for usage in payload['value']:
+                        key = (usage.get('scopeId') or location, usage['name']['value'])
+                        if key not in rows:
+                            usage['c7n:location'] = location
+                            rows[key] = usage
+                    url = payload.get('nextLink')
+                    params = None
+        return list(rows.values())
+
+
+@resources.register('cognitiveservice-location-usage')
+class CognitiveServiceLocationUsage(QueryResourceManager):
+    """Cognitive Services subscription usage and quota, per location.
+
+    Azure OpenAI model quota is assigned to the subscription per location,
+    model and deployment type, so it is listed here rather than on
+    ``azure.cognitiveservice-usage``. The locations queried are those of the
+    subscription's Cognitive Services accounts.
+
+    Global and DataZone quota rows are shared by every location in their
+    scope and are returned once. Each row's ``c7n:location`` is the first
+    location, in alphabetical order with ``global`` last, that returned it,
+    and its ``id`` names that location.
+
+    :example:
+
+    Find provisioned throughput quota with more than 50 units in use.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cognitiveservice-provisioned-quota-usage-high
+            resource: azure.cognitiveservice-location-usage
+            filters:
+              - type: value
+                key: name.value
+                op: regex
+                value: OpenAI.*ProvisionedManaged$
+              - type: value
+                key: currentValue
+                op: gt
+                value: 50
+    """
+
+    class resource_type(QueryResourceManager.resource_type):
+        doc_groups = ['AI + Machine Learning']
+        service = 'azure.mgmt.cognitiveservices'
+        client = 'CognitiveServicesManagementClient'
+        api_version = '2026-03-01'
+        name = 'name.value'
+        default_report_fields = (
+            'name.value',
+            'currentValue',
+            'limit',
+            'scopeType',
+            'scopeId',
+            '"c7n:location"',
+        )
+
+    def get_source(self, source_type):
+        if source_type == 'describe-azure':
+            return CognitiveServiceLocationUsageSource(self)
+        return super().get_source(source_type)
 
 
 @resources.register('ai-foundry-project')
