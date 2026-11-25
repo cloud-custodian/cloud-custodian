@@ -1,0 +1,766 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ContainerService/managedClusters?api-version=2021-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 9A42D04D935A4FE39D3FFC9FFB7F8A8B Ref B: CHI261140514040 Ref C: 2026-11-20T01:18:14Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 20 Nov 2026 01:18:14 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "00000000-0000-0000-0000-000000000016"
+                    ],
+                    "content-length": [
+                        "3161"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy",
+                                "location": "southcentralus",
+                                "name": "cctestakspolicy",
+                                "type": "Microsoft.ContainerService/ManagedClusters",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "powerState": {
+                                        "code": "Running"
+                                    },
+                                    "kubernetesVersion": "1.36.5",
+                                    "dnsPrefix": "cctestakspolicy",
+                                    "fqdn": "cctestakspolicy-00000000.hcp.southcentralus.azmk8s.io",
+                                    "azurePortalFQDN": "cctestakspolicy-00000000.portal.hcp.southcentralus.azmk8s.io",
+                                    "agentPoolProfiles": [
+                                        {
+                                            "name": "agentpool",
+                                            "count": 1,
+                                            "vmSize": "Standard_D2s_v3",
+                                            "osDiskSizeGB": 128,
+                                            "osDiskType": "Managed",
+                                            "kubeletDiskType": "OS",
+                                            "maxPods": 250,
+                                            "type": "VirtualMachineScaleSets",
+                                            "provisioningState": "Succeeded",
+                                            "powerState": {
+                                                "code": "Running"
+                                            },
+                                            "orchestratorVersion": "1.36.5",
+                                            "enableNodePublicIP": false,
+                                            "mode": "System",
+                                            "osType": "Linux",
+                                            "osSKU": "Ubuntu",
+                                            "nodeImageVersion": "AKSUbuntu-2404gen2containerd-202610.30.1",
+                                            "upgradeSettings": {
+                                                "maxSurge": "10%"
+                                            },
+                                            "enableFIPS": false
+                                        }
+                                    ],
+                                    "servicePrincipalProfile": {
+                                        "clientId": "msi"
+                                    },
+                                    "addonProfiles": {
+                                        "azurepolicy": {
+                                            "enabled": true,
+                                            "config": null,
+                                            "identity": {
+                                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/MC_test_aks-policy-components_cctestakspolicy_southcentralus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/azurepolicy-cctestakspolicy",
+                                                "clientId": "00000000-0000-0000-0000-000000000011",
+                                                "objectId": "00000000-0000-0000-0000-000000000012"
+                                            }
+                                        }
+                                    },
+                                    "nodeResourceGroup": "MC_test_aks-policy-components_cctestakspolicy_southcentralus",
+                                    "enableRBAC": true,
+                                    "networkProfile": {
+                                        "networkPlugin": "azure",
+                                        "loadBalancerSku": "standard",
+                                        "loadBalancerProfile": {
+                                            "managedOutboundIPs": {
+                                                "count": 1
+                                            },
+                                            "effectiveOutboundIPs": [
+                                                {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_test_aks-policy-components_cctestakspolicy_southcentralus/providers/Microsoft.Network/publicIPAddresses/00000000-0000-0000-0000-000000000015"
+                                                }
+                                            ]
+                                        },
+                                        "serviceCidr": "10.0.0.0/16",
+                                        "dnsServiceIP": "10.0.0.10",
+                                        "outboundType": "loadBalancer"
+                                    },
+                                    "maxAgentPools": 100,
+                                    "identityProfile": {
+                                        "kubeletidentity": {
+                                            "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/MC_test_aks-policy-components_cctestakspolicy_southcentralus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/cctestakspolicy-agentpool",
+                                            "clientId": "00000000-0000-0000-0000-000000000013",
+                                            "objectId": "00000000-0000-0000-0000-000000000014"
+                                        }
+                                    },
+                                    "autoUpgradeProfile": {}
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "00000000-0000-0000-0000-000000000010",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Free"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ContainerService/managedClusters?api-version=2021-03-01&%24skiptoken=c7n-test-skiptoken"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ContainerService/managedClusters?api-version=2021-03-01&%24skiptoken=c7n-test-skiptoken",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 5E327F58AD404284A1D46E7013046FE6 Ref B: CHI261140501040 Ref C: 2026-11-20T01:18:15Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 20 Nov 2026 01:18:15 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "00000000-0000-0000-0000-000000000017"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/latest/queryResults?api-version=2024-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-policy-insights-requests": [
+                        "99"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-global-reads": [
+                        "3749"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 91B3229F34B545F39A5C0C4B18B44C54 Ref B: CHI261140511036 Ref C: 2026-11-20T01:18:16Z"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 20 Nov 2026 01:18:16 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "30855"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest",
+                        "@odata.count": 16,
+                        "value": [
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057781Z",
+                                "componentId": "*",
+                                "componentName": "*",
+                                "componentType": "*",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/233a2a17-77ca-4fb1-9b6b-69223d272a44",
+                                "policyDefinitionReferenceId": "allowedserviceportsinkubernetescluster",
+                                "complianceState": "Compliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "233a2a17-77ca-4fb1-9b6b-69223d272a44",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "8.2.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057754Z",
+                                "componentId": "default/bad-hostpid",
+                                "componentName": "bad-hostpid",
+                                "componentType": "pod",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/e345eecc-fa47-480f-9e88-67dcc122b164",
+                                "policyDefinitionReferenceId": "memoryandcpulimitsinkubernetescluster",
+                                "complianceState": "NonCompliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "e345eecc-fa47-480f-9e88-67dcc122b164",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "9.3.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057725Z",
+                                "componentId": "*",
+                                "componentName": "*",
+                                "componentType": "*",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/95edb821-ddaf-4404-9732-666045e056b4",
+                                "policyDefinitionReferenceId": "privilegedcontainersshouldbeavoided",
+                                "complianceState": "Compliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "95edb821-ddaf-4404-9732-666045e056b4",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "9.2.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057704Z",
+                                "componentId": "*",
+                                "componentName": "*",
+                                "componentType": "*",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/1a5b4dca-0b6f-4cf5-907c-56316bc1bf3d",
+                                "policyDefinitionReferenceId": "kubernetesclustersshouldbeaccessibleonlyoverhttpsmonitoringeffect",
+                                "complianceState": "Compliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "1a5b4dca-0b6f-4cf5-907c-56316bc1bf3d",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "8.2.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.05763Z",
+                                "componentId": "default/bad-hostpid",
+                                "componentName": "bad-hostpid",
+                                "componentType": "pod",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/f06ddb64-5fa3-4b77-b166-acb36f7f6042",
+                                "policyDefinitionReferenceId": "mustrunasnonroot",
+                                "complianceState": "NonCompliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "f06ddb64-5fa3-4b77-b166-acb36f7f6042",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "6.2.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057541Z",
+                                "componentId": "default/bad-hostpid",
+                                "componentName": "bad-hostpid",
+                                "componentType": "pod",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/423dd1ba-798e-40e4-9c4d-b6902674b423",
+                                "policyDefinitionReferenceId": "kubernetesclustersshoulddisableautomountingapicredentialsmonitoringeffect",
+                                "complianceState": "NonCompliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "423dd1ba-798e-40e4-9c4d-b6902674b423",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "4.2.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057461Z",
+                                "componentId": "default/bad-hostpid",
+                                "componentName": "bad-hostpid",
+                                "componentType": "pod",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/febd0533-8e55-448f-b837-bd0e06f16469",
+                                "policyDefinitionReferenceId": "ensureallowedcontainerimagesinkubernetescluster",
+                                "complianceState": "NonCompliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "febd0533-8e55-448f-b837-bd0e06f16469",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "9.3.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057438Z",
+                                "componentId": "default/bad-hostpid",
+                                "componentName": "bad-hostpid",
+                                "componentType": "pod",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/9f061a12-e40d-4183-a00e-171812443373",
+                                "policyDefinitionReferenceId": "kubernetesclustersshouldnotusethedefaultnamespacemonitoringeffect",
+                                "complianceState": "NonCompliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "9f061a12-e40d-4183-a00e-171812443373",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "4.2.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057413Z",
+                                "componentId": "*",
+                                "componentName": "*",
+                                "componentType": "*",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/098fc59e-46c7-4d99-9b16-64990e543d75",
+                                "policyDefinitionReferenceId": "allowedhostpathvolumesinkubernetescluster",
+                                "complianceState": "Compliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "098fc59e-46c7-4d99-9b16-64990e543d75",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "6.4.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057388Z",
+                                "componentId": "*",
+                                "componentName": "*",
+                                "componentType": "*",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/82985f06-dc18-4a48-bc1c-b9f4f0098cfe",
+                                "policyDefinitionReferenceId": "allowedhostnetworkingandportsinkubernetescluster",
+                                "complianceState": "Compliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "82985f06-dc18-4a48-bc1c-b9f4f0098cfe",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "6.2.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057362Z",
+                                "componentId": "default/bad-hostpid",
+                                "componentName": "bad-hostpid",
+                                "componentType": "pod",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.authorization/policyassignments/cctestakshostnamespaces",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/47a1ee2f-2a2a-4576-bf2a-e0e36709c2b8",
+                                "policyDefinitionReferenceId": "",
+                                "complianceState": "NonCompliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "cctestakshostnamespaces",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components",
+                                "policyDefinitionName": "47a1ee2f-2a2a-4576-bf2a-e0e36709c2b8",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "",
+                                "policySetDefinitionName": "",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "6.0.0",
+                                "policySetDefinitionVersion": "",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057339Z",
+                                "componentId": "*",
+                                "componentName": "*",
+                                "componentType": "*",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/d2e7ea85-6b44-4317-a0be-1b951587f626",
+                                "policyDefinitionReferenceId": "kubernetesclustersshouldnotgrantcapsysadminsecuritycapabilitiesmonitoringeffect",
+                                "complianceState": "Compliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "d2e7ea85-6b44-4317-a0be-1b951587f626",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "5.1.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057254Z",
+                                "componentId": "*",
+                                "componentName": "*",
+                                "componentType": "*",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/511f5417-5d12-434d-ab2e-816901e72a5e",
+                                "policyDefinitionReferenceId": "allowedapparmorprofilesinkubernetescluster",
+                                "complianceState": "Compliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "511f5417-5d12-434d-ab2e-816901e72a5e",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "6.2.1",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057228Z",
+                                "componentId": "default/bad-hostpid",
+                                "componentName": "bad-hostpid",
+                                "componentType": "pod",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/47a1ee2f-2a2a-4576-bf2a-e0e36709c2b8",
+                                "policyDefinitionReferenceId": "nosharingsensitivehostnamespacesinkubernetes",
+                                "complianceState": "NonCompliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "47a1ee2f-2a2a-4576-bf2a-e0e36709c2b8",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "5.2.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057135Z",
+                                "componentId": "default/bad-hostpid",
+                                "componentName": "bad-hostpid",
+                                "componentType": "pod",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/df49d893-a74c-421d-bc95-c663042e5b80",
+                                "policyDefinitionReferenceId": "readonlyrootfilesysteminkubernetescluster",
+                                "complianceState": "NonCompliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "df49d893-a74c-421d-bc95-c663042e5b80",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "6.3.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            },
+                            {
+                                "@odata.id": null,
+                                "@odata.context": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/Microsoft.ContainerService/managedClusters/cctestakspolicy/providers/Microsoft.PolicyInsights/componentPolicyStates/$metadata#latest/$entity",
+                                "timestamp": "2026-11-20T01:10:34.057076Z",
+                                "componentId": "*",
+                                "componentName": "*",
+                                "componentType": "*",
+                                "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_aks-policy-components/providers/microsoft.containerservice/managedclusters/cctestakspolicy",
+                                "policyAssignmentId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.authorization/policyassignments/securitycenterbuiltin",
+                                "policyDefinitionId": "/providers/microsoft.authorization/policydefinitions/c26596ff-4d70-4e6a-9a30-c2506bd2f80c",
+                                "policyDefinitionReferenceId": "allowedcapabilitiesinkubernetescluster",
+                                "complianceState": "Compliant",
+                                "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourceType": "/Microsoft.ContainerService/managedClusters",
+                                "resourceLocation": "southcentralus",
+                                "resourceGroup": "test_aks-policy-components",
+                                "policyAssignmentName": "SecurityCenterBuiltIn",
+                                "policyAssignmentOwner": "tbd",
+                                "policyAssignmentParameters": "",
+                                "policyAssignmentScope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "policyDefinitionName": "c26596ff-4d70-4e6a-9a30-c2506bd2f80c",
+                                "policyDefinitionAction": "audit",
+                                "policyDefinitionCategory": "tbd",
+                                "policySetDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionName": "1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                "policySetDefinitionOwner": "",
+                                "policySetDefinitionCategory": "Security Center",
+                                "policySetDefinitionParameters": "",
+                                "policyDefinitionVersion": "6.2.0",
+                                "policySetDefinitionVersion": "57.60.0",
+                                "policyAssignmentVersion": "",
+                                "complianceReasonCode": ""
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
