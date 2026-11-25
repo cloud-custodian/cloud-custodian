@@ -160,10 +160,18 @@ class EventRuleSource(ChildDescribeSource):
             if rule_id.startswith('arn:'):
                 rule_id = Arn.parse(rule_id).resource
             bus, _, name = rule_id.rpartition('/')
+            bus = bus or 'default'
             try:
                 rule = self.manager.retry(
-                    client.describe_rule, Name=name, EventBusName=bus or 'default')
+                    client.describe_rule, Name=name, EventBusName=bus)
             except client.exceptions.ResourceNotFoundException:
+                self.manager.log.debug(
+                    "event rule not found name:%s bus:%s", name, bus)
+                continue
+            except botocore.exceptions.ClientError as e:
+                # keep the rules already described when one id can't be resolved
+                self.manager.log.warning(
+                    "event rule not resolved name:%s bus:%s error:%s", name, bus, e)
                 continue
             rule.pop('ResponseMetadata', None)
             results.append(rule)
@@ -181,7 +189,10 @@ class EventRule(ChildResourceManager):
     """EventBridge Rule Resource
 
     Rules on any event bus can be resolved in cloudtrail mode from the
-    rule arn.
+    rule arn. Use ``responseElements.ruleArn`` as the event id, it includes
+    the bus name. A plain rule name, such as ``requestParameters.name``, is
+    looked up on the default event bus only, so it won't find a rule that
+    lives on another bus.
 
     :example:
 
@@ -219,6 +230,11 @@ class EventRule(ChildResourceManager):
         universal_taggable = object()
         permissions_augment = ("events:ListTagsForResource",)
         supports_trailevents = True
+
+    def get_resources(self, ids, cache=True, augment=True):
+        # ids are rule arns or bus qualified names, which can't be matched
+        # against the Name id of cached resources.
+        return super().get_resources(ids, cache=False, augment=augment)
 
 
 @EventRule.filter_registry.register('metrics')
