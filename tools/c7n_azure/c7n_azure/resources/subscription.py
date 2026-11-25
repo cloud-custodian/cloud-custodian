@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from azure.core.exceptions import ResourceNotFoundError
 from azure.mgmt.resource.policy.models import PolicyAssignment
 from azure.mgmt.resource import SubscriptionClient
 
@@ -344,3 +345,234 @@ class SetActivityLogAlert(BaseAction):
             self.log.info(
                 "Set activity log alert %s in resource group %s on subscription %s",
                 self.data['name'], self.data['resource-group'], s['subscriptionId'])
+
+
+@Subscription.action_registry.register('create-bastion-host')
+class CreateBastionHost(BaseAction):
+    """Create or update an Azure Bastion host in the subscription.
+
+    Runs against the subscription rather than an ``azure.bastion-host``, so it
+    can remediate a subscription that has no Bastion host at all. The host is
+    identified by ``resource-group`` and ``name``. If that host already exists
+    it is replaced as a whole: its tags, scale units, and any other settings
+    the policy doesn't set go back to their Azure defaults.
+
+    - ``name``: the Bastion host's name.
+    - ``resource-group``: the resource group for the host, and for any network
+      resources the action creates. It must already exist.
+    - ``location``: the Azure region. It must match the virtual network's.
+    - ``subnet-id``: an existing ``AzureBastionSubnet`` to put the host in.
+    - ``virtual-network``: in place of ``subnet-id``, a virtual network in
+      ``resource-group`` to put the host in. If no network with that ``name``
+      exists, the action creates one with ``address-prefixes`` and an
+      ``AzureBastionSubnet`` of ``subnet-prefix``. If the network exists but
+      has no ``AzureBastionSubnet``, the action adds one of ``subnet-prefix``
+      and leaves the network's other subnets alone. An existing network or
+      subnet is used as it is.
+    - ``public-ip-address-id``: optional, an existing ``Standard`` SKU public
+      IP address with static allocation. Without it, the action uses the
+      public IP address ``<name>-pip`` in ``resource-group``, creating it if
+      it doesn't exist.
+    - ``sku``: optional, ``name`` is one of ``Basic``, ``Standard`` or
+      ``Premium``. Azure defaults to ``Standard``.
+    - ``scale-units``: optional, from 2 to 50. Not allowed with the ``Basic``
+      SKU, which is fixed at 2.
+    - ``tags``: optional tags for the host, and for any network resources the
+      action creates.
+
+    The host can only reach virtual machines in its own virtual network, or in
+    networks peered to it, so pick the network the virtual machines are in.
+    ``AzureBastionSubnet`` must be ``/26`` or larger and hold nothing else.
+
+    The action waits for Azure to finish provisioning the host, which can take
+    several minutes.
+
+    Needs ``Microsoft.Network/bastionHosts/write`` on the resource group, plus
+    ``Microsoft.Network/virtualNetworks/subnets/join/action`` on the subnet and
+    ``Microsoft.Network/publicIPAddresses/join/action`` on the public IP address.
+    Creating network resources also needs ``Microsoft.Network/virtualNetworks/write``,
+    ``Microsoft.Network/virtualNetworks/subnets/write`` or
+    ``Microsoft.Network/publicIPAddresses/write``.
+
+    :example:
+
+    Create a Bastion host, and the network for it, on any subscription that
+    doesn't have one:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-create-bastion-host-if-missing
+            resource: azure.subscription
+            filters:
+              - type: missing
+                policy:
+                  resource: azure.bastion-host
+            actions:
+              - type: create-bastion-host
+                name: example-bastion
+                resource-group: example-network-rg
+                location: eastus
+                virtual-network:
+                  name: example-vnet
+                  address-prefixes:
+                    - 10.10.0.0/16
+                  subnet-prefix: 10.10.0.0/26
+                sku:
+                  name: Standard
+                scale-units: 2
+                tags:
+                  managed-by: cloud-custodian
+    """
+
+    subnet_name = 'AzureBastionSubnet'
+
+    schema = type_schema(
+        'create-bastion-host',
+        required=['name', 'resource-group', 'location'],
+        # 76 leaves room for the "-pip" suffix within Azure's 80-character limit.
+        name={'type': 'string', 'minLength': 1, 'maxLength': 76},
+        location={'type': 'string', 'minLength': 1},
+        sku={
+            'type': 'object',
+            'additionalProperties': False,
+            'required': ['name'],
+            'properties': {
+                'name': {'enum': ['Basic', 'Standard', 'Premium']},
+            },
+        },
+        tags={'type': 'object', 'additionalProperties': {'type': 'string'}},
+        **{
+            'resource-group': {'type': 'string', 'minLength': 1, 'maxLength': 90},
+            'subnet-id': {'type': 'string', 'minLength': 1},
+            'virtual-network': {
+                'type': 'object',
+                'additionalProperties': False,
+                'required': ['name', 'address-prefixes', 'subnet-prefix'],
+                'properties': {
+                    'name': {'type': 'string', 'minLength': 1, 'maxLength': 64},
+                    'address-prefixes': {
+                        'type': 'array',
+                        'minItems': 1,
+                        'items': {'type': 'string', 'minLength': 1},
+                    },
+                    'subnet-prefix': {'type': 'string', 'minLength': 1},
+                },
+            },
+            'public-ip-address-id': {'type': 'string', 'minLength': 1},
+            'scale-units': {'type': 'integer', 'minimum': 2, 'maximum': 50},
+        }
+    )
+
+    def validate(self):
+        policy = self.manager.data['name']
+        if ('subnet-id' in self.data) == ('virtual-network' in self.data):
+            raise PolicyValidationError(
+                f"{self.type}: set exactly one of subnet-id or virtual-network "
+                f"on policy {policy}")
+        # Azure only rejects this at the Bastion PUT, after the network
+        # resources have been created.
+        if 'scale-units' in self.data and self.data.get('sku', {}).get('name') == 'Basic':
+            raise PolicyValidationError(
+                f"{self.type}: scale-units can't be set with the Basic sku "
+                f"on policy {policy}")
+        return self
+
+    # The bodies below follow the REST API's request shape:
+    # https://learn.microsoft.com/en-us/rest/api/virtualnetwork/
+
+    def _tagged(self, body):
+        if 'tags' in self.data:
+            body['tags'] = self.data['tags']
+        return body
+
+    def virtual_network_body(self):
+        """Return the request body that creates the virtual network."""
+        network = self.data['virtual-network']
+        return self._tagged({
+            'location': self.data['location'],
+            'properties': {
+                'addressSpace': {'addressPrefixes': network['address-prefixes']},
+                'subnets': [{
+                    'name': self.subnet_name,
+                    'properties': {'addressPrefix': network['subnet-prefix']},
+                }],
+            },
+        })
+
+    def subnet_body(self):
+        """Return the request body that adds AzureBastionSubnet to a network."""
+        return {'properties': {'addressPrefix': self.data['virtual-network']['subnet-prefix']}}
+
+    def public_ip_body(self):
+        """Return the request body that creates the public IP address."""
+        return self._tagged({
+            'location': self.data['location'],
+            'sku': {'name': 'Standard'},
+            'properties': {'publicIPAllocationMethod': 'Static'},
+        })
+
+    def bastion_body(self, subnet_id, public_ip_id):
+        """Return the request body that creates the Bastion host."""
+        properties = {
+            'ipConfigurations': [{
+                'name': 'IpConf',
+                'properties': {
+                    'subnet': {'id': subnet_id},
+                    'publicIPAddress': {'id': public_ip_id},
+                },
+            }],
+        }
+        if 'scale-units' in self.data:
+            properties['scaleUnits'] = self.data['scale-units']
+        body = {'location': self.data['location'], 'properties': properties}
+        if 'sku' in self.data:
+            body['sku'] = {'name': self.data['sku']['name']}
+        return self._tagged(body)
+
+    def _subnet_id(self, client):
+        if 'subnet-id' in self.data:
+            return self.data['subnet-id']
+
+        group = self.data['resource-group']
+        network_name = self.data['virtual-network']['name']
+        try:
+            network = client.virtual_networks.get(group, network_name)
+        except ResourceNotFoundError:
+            network = client.virtual_networks.begin_create_or_update(
+                group, network_name, self.virtual_network_body()).result()
+            self.log.info(f"Created virtual network {network_name} in resource group {group}")
+
+        subnet = next((s for s in network.subnets or [] if s.name == self.subnet_name), None)
+        if subnet is None:
+            # A PUT on the subnet alone, so the network's other subnets are untouched.
+            subnet = client.subnets.begin_create_or_update(
+                group, network_name, self.subnet_name, self.subnet_body()).result()
+            self.log.info(f"Created subnet {self.subnet_name} in virtual network {network_name}")
+        return subnet.id
+
+    def _public_ip_id(self, client):
+        if 'public-ip-address-id' in self.data:
+            return self.data['public-ip-address-id']
+
+        group = self.data['resource-group']
+        name = f"{self.data['name']}-pip"
+        try:
+            public_ip = client.public_ip_addresses.get(group, name)
+        except ResourceNotFoundError:
+            public_ip = client.public_ip_addresses.begin_create_or_update(
+                group, name, self.public_ip_body()).result()
+            self.log.info(f"Created public IP address {name} in resource group {group}")
+        return public_ip.id
+
+    def process(self, subscriptions):
+        client = self.manager.get_session().client(
+            'azure.mgmt.network.NetworkManagementClient')
+
+        for s in subscriptions:
+            body = self.bastion_body(self._subnet_id(client), self._public_ip_id(client))
+            client.bastion_hosts.begin_create_or_update(
+                self.data['resource-group'], self.data['name'], body).result()
+            self.log.info(
+                f"Created Bastion host {self.data['name']} in resource group "
+                f"{self.data['resource-group']} on subscription {s['subscriptionId']}")
