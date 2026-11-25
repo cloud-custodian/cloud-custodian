@@ -83,6 +83,11 @@ class TestGetRequiredPermissions(BaseTest):
             permissions = get_required_permissions_for_endpoint('groups/test-id', method)
             self.assertEqual(permissions, ['Group.ReadWrite.All'])
 
+    def test_write_operations_authorization_policy(self):
+        """Test write operations for the authorization policy endpoint"""
+        permissions = get_required_permissions_for_endpoint('policies/authorizationPolicy', 'PATCH')
+        self.assertEqual(permissions, ['Policy.ReadWrite.Authorization'])
+
     def test_write_operations_authentication(self):
         """Test write operations for authentication endpoints"""
         # Note: Due to current implementation, 'users' pattern matches first
@@ -479,6 +484,34 @@ class TestGraphResourceManager(BaseTest):
                     result = manager.make_graph_request('users')
 
         self.assertEqual(result, {})
+
+    def test_make_graph_request_no_content(self):
+        """Test 204 No Content from a successful PATCH"""
+        policy = self.load_policy({
+            'name': 'test-no-content',
+            'resource': 'azure.entraid-authorization-policy'
+        })
+
+        manager = policy.resource_manager
+        mock_session = self._setup_mock_session()
+
+        # A real response, so .json() on the empty body would raise
+        response = requests.models.Response()
+        response.status_code = 204
+        response._content = b''
+
+        with patch.object(manager, 'get_client', return_value=mock_session):
+            with patch('c7n_azure.graph_utils.requests.patch',
+                       return_value=response) as mock_patch:
+                result = manager.make_graph_request(
+                    'policies/authorizationPolicy', method='PATCH',
+                    data={'blockMsolPowerShell': True})
+
+        self.assertIsNone(result)
+        args, kwargs = mock_patch.call_args
+        self.assertEqual(
+            args[0], 'https://graph.microsoft.com/v1.0/policies/authorizationPolicy')
+        self.assertEqual(kwargs['json'], {'blockMsolPowerShell': True})
 
     def test_make_graph_request_url_construction(self):
         """Test URL construction with various endpoint formats"""
