@@ -1,0 +1,40 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 03 Nov 2026 21:33:50 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=143",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "597",
+    "-content-encoding": "gzip",
+    "content-location": "https://vectorsearch.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/collections/c7n-active/indexes?alt=json"
+  },
+  "body": {
+    "indexes": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/collections/c7n-active/indexes/c7n-idx",
+        "createTime": "2026-11-03T21:32:39.761711311Z",
+        "updateTime": "2026-11-03T21:32:39.761711311Z",
+        "distanceMetric": "DOT_PRODUCT",
+        "indexField": "emb",
+        "labels": {
+          "goog-terraform-provisioned": "true"
+        },
+        "dedicatedInfrastructure": {
+          "mode": "PERFORMANCE_OPTIMIZED",
+          "autoscalingSpec": {
+            "minReplicaCount": 1,
+            "maxReplicaCount": 1
+          }
+        },
+        "denseScann": {}
+      }
+    ]
+  }
+}

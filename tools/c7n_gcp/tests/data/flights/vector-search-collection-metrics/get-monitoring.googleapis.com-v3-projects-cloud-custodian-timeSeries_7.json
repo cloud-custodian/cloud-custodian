@@ -1,0 +1,47 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 03 Nov 2026 21:33:48 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "662",
+    "-content-encoding": "gzip",
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/timeSeries?filter=metric.type+%3D+%22vectorsearch.googleapis.com%2Fbatch_search%2Frequest_count%22+AND+%28+resource.labels.collection+%3D+%22c7n-active%22+%29+&interval.startTime=2026-11-02T21%3A33%3A48Z&interval.endTime=2026-11-03T21%3A33%3A48Z&aggregation.alignmentPeriod=86400.0s&aggregation.perSeriesAligner=ALIGN_SUM&aggregation.crossSeriesReducer=REDUCE_SUM&aggregation.groupByFields=resource.labels.collection&view=FULL&alt=json"
+  },
+  "body": {
+    "timeSeries": [
+      {
+        "metric": {
+          "type": "vectorsearch.googleapis.com/batch_search/request_count"
+        },
+        "resource": {
+          "type": "vectorsearch.googleapis.com/Collection",
+          "labels": {
+            "collection": "c7n-active",
+            "project_id": "cloud-custodian"
+          }
+        },
+        "metricKind": "DELTA",
+        "valueType": "INT64",
+        "points": [
+          {
+            "interval": {
+              "startTime": "2026-11-02T21:33:48Z",
+              "endTime": "2026-11-03T21:33:48Z"
+            },
+            "value": {
+              "int64Value": "1"
+            }
+          }
+        ]
+      }
+    ],
+    "unit": "{not_a_unit}"
+  }
+}
