@@ -439,6 +439,23 @@ class TestSpannerInstanceBackup(BaseTest):
         self.assertEqual(resources[0]['name'],
                          'projects/cloud-custodian/instances/spanner-instance-0/backups/backup-1')
 
+    def test_query_instance_display_name(self):
+        # The instance's displayName differs from its id, so backups
+        # have to be listed under the instance name.
+        session_factory = self.replay_flight_data('spanner-backup-query')
+        policy = self.load_policy(
+            {'name': 'spanner-backup-query',
+             'resource': 'gcp.spanner-backup'},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'],
+                         'projects/cloud-custodian/instances/spanner-instance-1/backups/backup-1')
+        self.assertEqual(resources[0]['c7n:spanner-instance']['displayName'],
+                         'Production Spanner')
+
     def test_spanner_instance_backup_filter_iam_query(self):
         factory = self.replay_flight_data(
             'spanner-instance-backup-filter-iam', project_id='cloud-custodian')
