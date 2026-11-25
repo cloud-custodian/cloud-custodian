@@ -3,7 +3,7 @@
 from .azure_common import BaseTest
 from c7n_azure.actions.base import AzureBaseAction, AzureEventAction
 from c7n_azure.session import Session
-from unittest.mock import patch, MagicMock, ANY, call
+from unittest.mock import MagicMock, ANY, call
 
 from c7n.utils import local_session
 
@@ -40,13 +40,15 @@ class AzureBaseActionTest(BaseTest):
             "Action 'test' modified 'two' in resource group 'unknown'. bar",
             extra={'properties': {'resource_id': '2', 'action': 'test'}})
 
-    @patch('sys.modules', return_value=[])
-    def test_resource_failed(self, _):
+    def test_resource_failed(self):
         action = SampleAction()
-        action.process([
-            {'id': '1', 'exception': Exception('foo'), 'name': 'bar', 'type': 'vm'},
-            {'id': '2', 'message': 'foo'}],
-            None)
+        with self.assertRaises(Exception) as cm:
+            action.process([
+                {'id': '1', 'exception': Exception('foo'), 'name': 'bar', 'type': 'vm'},
+                {'id': '2', 'message': 'foo'}],
+                None)
+
+        self.assertEqual(str(cm.exception), 'foo')
 
         action.log.exception.assert_called_once_with(
             ANY,
@@ -56,13 +58,15 @@ class AzureBaseActionTest(BaseTest):
             ANY,
             extra={'properties': {'resource_id': '2', 'action': 'test'}})
 
-    @patch('sys.modules', return_value=[])
-    def test_resource_failed_event(self, _):
+    def test_resource_failed_event(self):
         action = SampleEventAction()
-        action.process([
-            {'id': '1', 'exception': Exception('foo'), 'name': 'bar', 'type': 'vm'},
-            {'id': '2', 'message': 'foo'}],
-            None)
+        with self.assertRaises(Exception) as cm:
+            action.process([
+                {'id': '1', 'exception': Exception('foo'), 'name': 'bar', 'type': 'vm'},
+                {'id': '2', 'message': 'foo'}],
+                None)
+
+        self.assertEqual(str(cm.exception), 'foo')
 
         action.log.exception.assert_called_once_with(
             ANY,
