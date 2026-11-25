@@ -2510,6 +2510,44 @@ class LaunchTemplate(query.QueryResourceManager):
         return templates
 
 
+@resources.register('launch-template')
+class EC2LaunchTemplate(query.QueryResourceManager):
+    """EC2 launch templates, one record per template.
+
+    Tags live on the launch template rather than on its versions, so tag
+    filters and tag actions belong on this resource. Use
+    ``aws.launch-template-version`` to look at the data of individual
+    template versions.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: launch-template-missing-owner
+            resource: aws.launch-template
+            filters:
+              - "tag:Owner": absent
+            actions:
+              - type: tag
+                key: Owner
+                value: unknown
+    """
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        id = 'LaunchTemplateId'
+        id_prefix = 'lt-'
+        name = 'LaunchTemplateName'
+        date = 'CreateTime'
+        enum_spec = (
+            'describe_launch_templates', 'LaunchTemplates', None)
+        filter_name = 'LaunchTemplateIds'
+        filter_type = 'list'
+        arn_type = "launch-template"
+        cfn_type = "AWS::EC2::LaunchTemplate"
+
+
 @resources.register('ec2-reserved')
 class ReservedInstance(query.QueryResourceManager):
 
