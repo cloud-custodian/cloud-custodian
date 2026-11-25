@@ -94,10 +94,10 @@
     "category": "Security",
     "permission_prefix": "recommender.gmpProjectManagementRecommendations"
   },
-  "google.run.service.IdentityRecommendergoogle.run.service.SecurityRecommender": {
-    "name": "Cloud Run Service Security recommenders",
+  "google.run.service.SecurityRecommender": {
+    "name": "Cloud Run Service Security recommender",
     "resource": "gcp.cloud-run-service",
-    "id": "google.run.service.IdentityRecommendergoogle.run.service.SecurityRecommender",
+    "id": "google.run.service.SecurityRecommender",
     "description": "Increase Cloud Run Service security",
     "category": "Security",
     "permission_prefix": "recommender.runServiceSecurityRecommendations"
