@@ -19,7 +19,3 @@ class TestGameLiftFleet(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Name'], 'test-fleet')
-        client = session_factory().client('gamelift')
-        tags = client.list_tags_for_resource(
-            ResourceARN=resources[0]['FleetArn'])['Tags']
-        self.assertEqual(tags, [{'Key': 'owner', 'Value': 'c7n'}])

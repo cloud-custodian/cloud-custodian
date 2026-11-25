@@ -21,6 +21,26 @@
                 "Status": "ACTIVE",
                 "OperatingSystem": "AMAZON_LINUX_2",
                 "ComputeType": "EC2"
+            },
+            {
+                "FleetId": "fleet-9f8e7d6c-5432-10fe-dcba-0987654321fe",
+                "FleetArn": "arn:aws:gamelift:us-east-1:644160558196:fleet/fleet-9f8e7d6c-5432-10fe-dcba-0987654321fe",
+                "FleetType": "ON_DEMAND",
+                "InstanceType": "c5.large",
+                "Name": "owned-fleet",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 11,
+                    "day": 20,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Status": "ACTIVE",
+                "OperatingSystem": "AMAZON_LINUX_2",
+                "ComputeType": "EC2"
             }
         ],
         "ResponseMetadata": {}
