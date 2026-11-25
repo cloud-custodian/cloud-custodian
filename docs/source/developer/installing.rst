@@ -8,7 +8,7 @@ Installing Prerequisites
 
 Cloud Custodian supports Python 3.7 and above. To work on Custodian's code base, you will need:
 
-* A make/C toolchain
+* A C toolchain and the `just <https://just.systems/>`_ command runner
 * A supported release of Python 3
 * Some basic Python tools
 
@@ -134,7 +134,7 @@ Now that the repository is set up, perform a developer installation using UV:
 
 .. code-block:: bash
 
-    make install
+    just install
 
 This creates a sandboxed "virtual environment" ("venv") inside the ``cloud-custodian``
 directory, and installs the full suite of Cloud Custodian packages.
@@ -143,7 +143,7 @@ You can run tests via UV as well:
 
 .. code-block:: bash
 
-    make test
+    just python test
 
 To run executables from your UV environment, precede them with ``uv run``:
 
@@ -161,7 +161,7 @@ development environment by default:
     custodian schema
 
 You'll also be able to invoke `pytest <https://docs.pytest.org/en/latest/>`_ directly
-with the arguments of your choosing, though that requires mimicking ``make test``'s
+with the arguments of your choosing, though that requires mimicking ``just python test``'s
 environment preparation:
 
 .. code-block:: bash

@@ -6,7 +6,7 @@ Tests for c7n_oci run automatically with other Cloud Custodian tests.  See :ref:
 Running Tests
 ~~~~~~~~~~~~~
 
-You can use ``make test`` to run all tests or instead you can use ``pytest`` and run only Oracle Cloud Infrastructure (OCI) tests.
+You can use ``just python test`` to run all tests or instead you can use ``pytest`` and run only Oracle Cloud Infrastructure (OCI) tests.
 
 
 Functional (live) Tests
