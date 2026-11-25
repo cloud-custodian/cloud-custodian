@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelDeploymentSummaries": [
+            {
+                "customModelDeploymentArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model-deployment/bznji3ybtrur",
+                "customModelDeploymentName": "c7n-test-custom-model-deployment",
+                "modelArn": "arn:aws:bedrock:us-west-2:644160558196:custom-model/meta.llama3-3-70b-instruct-v1:0:128k/ooyhjc4zw7mw",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 25,
+                    "hour": 18,
+                    "minute": 11,
+                    "second": 57,
+                    "microsecond": 326000
+                },
+                "status": "Active",
+                "lastUpdatedAt": {
+                    "__class__": "datetime",
+                    "year": 2026,
+                    "month": 9,
+                    "day": 25,
+                    "hour": 18,
+                    "minute": 19,
+                    "second": 35,
+                    "microsecond": 863000
+                }
+            }
+        ]
+    }
+}
