@@ -38,6 +38,51 @@ class AzurePolicyModeTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
+    def test_cognitive_service_deployment_event_mode(self):
+        operation = 'Microsoft.CognitiveServices/accounts/deployments/write'
+        for resource in ('azure.cognitiveservice-deployment', 'azure.ai-foundry-deployment'):
+            with self.subTest(resource=resource), self.sign_out_patch():
+                policy = self.load_policy({
+                    'name': 'deployment-event',
+                    'resource': resource,
+                    'mode': {
+                        'type': FUNCTION_EVENT_TRIGGER_MODE,
+                        'events': ['CognitiveServiceDeploymentWrite'],
+                    },
+                }, validate=True)
+                mode = policy.get_execution_mode()
+                self.assertEqual(mode.subscribed_events, [operation])
+
+                with mock.patch(
+                    'c7n_azure.azure_events.AzureEventSubscription.create'
+                ) as create:
+                    mode.target_subscription_ids = [DEFAULT_SUBSCRIPTION_ID]
+                    mode._create_event_subscription(
+                        StorageAccount(id='storage-id', location='westus'), 'queue', None)
+                create.assert_called_once()
+                event_filter = create.call_args.args[4].advanced_filters[0]
+                self.assertEqual(event_filter.key, 'Data.OperationName')
+                self.assertEqual(event_filter.values_property, [operation])
+
+                parent_id = (
+                    '/subscriptions/{}/resourceGroups/test-rg/providers/'
+                    'Microsoft.CognitiveServices/accounts/test-account'
+                ).format(DEFAULT_SUBSCRIPTION_ID)
+                deployment_id = parent_id + '/deployments/test-deployment'
+                self.assertEqual(AzureModeCommon.extract_resource_id(
+                    policy, {'subject': deployment_id}), deployment_id)
+
+    def test_cognitive_service_deployment_rejects_parent_event(self):
+        with self.sign_out_patch(), self.assertRaises(PolicyValidationError):
+            self.load_policy({
+                'name': 'deployment-parent-event',
+                'resource': 'azure.cognitiveservice-deployment',
+                'mode': {
+                    'type': FUNCTION_EVENT_TRIGGER_MODE,
+                    'events': ['CognitiveServiceWrite'],
+                },
+            }, validate=True)
+
     def test_azure_function_event_mode_too_many_events_throws(self):
         with self.sign_out_patch():
             with self.assertRaises(PolicyValidationError):
