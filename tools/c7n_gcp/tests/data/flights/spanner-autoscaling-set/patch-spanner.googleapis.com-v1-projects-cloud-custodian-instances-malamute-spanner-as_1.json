@@ -1,0 +1,60 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 05 Nov 2026 23:30:14 GMT",
+    "server": "ESF",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=363",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1397",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/instances/malamute-spanner-as/operations/be29e75671ab5932",
+    "metadata": {
+      "@type": "type.googleapis.com/google.spanner.admin.instance.v1.UpdateInstanceMetadata",
+      "instance": {
+        "name": "projects/cloud-custodian/instances/malamute-spanner-as",
+        "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+        "displayName": "malamute-spanner-as",
+        "nodeCount": 1,
+        "state": "READY",
+        "labels": {
+          "env": "c7n-test",
+          "goog-terraform-provisioned": "true"
+        },
+        "processingUnits": 1000,
+        "instanceType": "PROVISIONED",
+        "createTime": "2026-11-05T23:30:06.905978Z",
+        "updateTime": "2026-11-05T23:30:06.905978Z",
+        "autoscalingConfig": {
+          "autoscalingLimits": {
+            "minNodes": 1,
+            "maxNodes": 2
+          },
+          "autoscalingTargets": {
+            "highPriorityCpuUtilizationPercent": 65,
+            "storageUtilizationPercent": 95
+          }
+        },
+        "replicaComputeCapacity": [
+          {
+            "replicaSelection": {
+              "location": "us-central1",
+              "replicaType": "READ_WRITE"
+            },
+            "nodeCount": 1
+          }
+        ],
+        "edition": "ENTERPRISE",
+        "resourceLocation": "us-central1",
+        "defaultBackupScheduleType": "AUTOMATIC"
+      },
+      "startTime": "2026-11-05T23:30:14.373108Z"
+    }
+  }
+}
