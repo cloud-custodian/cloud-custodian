@@ -583,3 +583,42 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), {"east-resource"})
         self.assertEqual(cache.saves, 1)
         self.assertEqual(cache.gets, 3)
+
+    def test_value_from_cache_key_hides_header_secrets(self):
+        cache = FakeCache()
+        values = self.get_values_from(
+            {"url": "moon", "format": "json", "headers": {"Authorization": "Bearer SECRET-123"}},
+            json.dumps(["magic"]),
+            cache=cache,
+        )
+        values.get_values()
+        self.assertEqual(cache.saves, 1)
+        self.assertFalse(any(b"SECRET-123" in key for key in cache.state))
+
+    def test_value_from_cache_separates_headers(self):
+        cache = FakeCache()
+        data = {"url": "moon", "format": "json"}
+        for token, content in (("alice", ["a"]), ("bob", ["b"])):
+            values = self.get_values_from(
+                {**data, "headers": {"Authorization": token}}, json.dumps(content), cache=cache)
+            self.assertEqual(values.get_values(), content)
+        self.assertEqual(cache.saves, 2)
+
+    def test_value_from_cache_hits_on_identical_headers(self):
+        cache = FakeCache()
+        for _ in range(2):
+            values = self.get_values_from(
+                {"url": "moon", "format": "json", "headers": {"Authorization": "alice"}},
+                json.dumps(["a"]),
+                cache=cache,
+            )
+            self.assertEqual(values.get_values(), ["a"])
+        self.assertEqual(cache.saves, 1)
+
+    def test_value_from_cache_key_without_headers_unchanged(self):
+        cache = FakeCache()
+        values = self.get_values_from(
+            {"url": "moon", "format": "json"}, json.dumps(["a"]), cache=cache)
+        values.get_values()
+        expected = pickle.dumps(("value-from", ["moon", "json", None, None, None]))
+        self.assertEqual(list(cache.state), [expected])
