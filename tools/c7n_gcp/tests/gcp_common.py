@@ -11,6 +11,7 @@ import re
 import shutil
 import time
 import typing
+import warnings
 
 from pathlib import Path
 
@@ -75,6 +76,10 @@ def audit_event_recorder(
     filtering options, file naming, and caveats around multi-entry
     operations and creation events.
     """
+    warnings.warn(
+        'audit_event_recorder is deprecated; use c7n_gcp.testing.recorded_event',
+        DeprecationWarning, stacklevel=2,
+    )
     return AuditEventRecorder(
         session_factory,
         event_file,

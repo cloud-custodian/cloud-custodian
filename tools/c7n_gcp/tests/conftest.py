@@ -7,6 +7,9 @@ from pathlib import Path
 import pytest
 from c7n_gcp.client import get_default_project
 from c7n_gcp.region import Region
+from c7n_gcp.testing import (  # noqa: F401
+    event_log_recording_directory, pytest_fixture_setup, recorded_event,
+)
 from gcp_common import PROJECT_ID, GoogleFlightRecorder
 from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
 from recorder import sanitize_project_name
