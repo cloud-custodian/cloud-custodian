@@ -249,7 +249,20 @@ def get_bootstrap_region(account):
     return get_partition_region(partition)
 
 
-def resolve_regions(regions, account):
+def resolve_regions(regions, account, not_regions=None):
+    """Regions to run in for an account, less any in ``not_regions``.
+
+    Regions that are unreachable, or permanently shut down but still reported
+    as available to an account, can be skipped even when expanding ``all``.
+    """
+    resolved = _resolve_regions(regions, account)
+    skip = comma_expand(not_regions)
+    if not skip:
+        return resolved
+    return [r for r in resolved if r not in skip]
+
+
+def _resolve_regions(regions, account):
     if 'all' in regions:
         try:
             session = get_session(account, 'c7n-org', get_bootstrap_region(account))
@@ -415,6 +428,8 @@ def report_account(account, region, policies_config, output_path, cache_path, de
 @click.option('--no-default-fields', default=False, is_flag=True)
 @click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
+@click.option('--not-regions', multiple=True, default=None,
+              help="Regions to skip, comma separated or repeated")
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('-p', '--policy', multiple=True)
@@ -424,7 +439,7 @@ def report_account(account, region, policies_config, output_path, cache_path, de
 @click.option('--resource', default=None)
 @click.option('--cache-path', required=False, type=click.Path(), default="~/.cache/c7n-org")
 def report(config, output, use, output_dir, accounts,
-           field, no_default_fields, tags, region, debug, verbose,
+           field, no_default_fields, tags, region, not_regions, debug, verbose,
            policy, policy_tags, format, resource, cache_path):
     """report on a cross account policy execution."""
     accounts_config, custodian_config, executor = init(
@@ -443,7 +458,7 @@ def report(config, output, use, output_dir, accounts,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            for r in resolve_regions(region or a.get('regions', ()), a):
+            for r in resolve_regions(region or a.get('regions', ()), a, not_regions):
                 futures[w.submit(
                     report_account,
                     a, r,
@@ -1122,10 +1137,13 @@ def run_account_script(account, region, output_dir, debug, script_args):
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
+@click.option('--not-regions', multiple=True, default=None,
+              help="Regions to skip, comma separated or repeated")
 @click.option('--echo', default=False, is_flag=True)
 @click.option('--serial', default=False, is_flag=True)
 @click.argument('script_args', nargs=-1, type=click.UNPROCESSED)
-def run_script(config, output_dir, accounts, tags, region, echo, serial, script_args):
+def run_script(config, output_dir, accounts, tags, region, not_regions, echo,
+               serial, script_args):
     """run an aws/azure/gcp script across accounts"""
     # TODO count up on success / error / error list by account
     accounts_config, _, executor = init(
@@ -1144,7 +1162,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
-            for r in resolve_regions(region or a.get('regions', ()), a):
+            for r in resolve_regions(region or a.get('regions', ()), a, not_regions):
                 futures[
                     w.submit(run_account_script, a, r, output_dir,
                              serial, script_args)] = (a, r)
@@ -1332,6 +1350,8 @@ def initialize_provider_output(policies_config, output_dir, regions):
 @click.option('--not-accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
+@click.option('--not-regions', multiple=True, default=None,
+              help="Regions to skip, comma separated or repeated")
 @click.option('-p', '--policy', multiple=True)
 @click.option('-l', '--policytags', 'policy_tags',
               multiple=True, default=None, help="Policy tag filter")
@@ -1347,7 +1367,7 @@ def initialize_provider_output(policies_config, output_dir, regions):
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def run(config, use, output_dir, accounts, not_accounts, tags, region,
+def run(config, use, output_dir, accounts, not_accounts, tags, region, not_regions,
         policy, policy_tags, cache_period, cache_path, metrics,
         dryrun, debug, verbose, metrics_uri):
     """run a custodian policy across accounts"""
@@ -1377,7 +1397,7 @@ def run(config, use, output_dir, accounts, not_accounts, tags, region,
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
-            for r in resolve_regions(region or a.get('regions', ()), a):
+            for r in resolve_regions(region or a.get('regions', ()), a, not_regions):
                 futures[w.submit(
                     run_account,
                     a, r,

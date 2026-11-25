@@ -288,6 +288,120 @@ class OrgTest(TestUtils):
                 # so check the fallback region itself
                 self.assertEqual(bootstrap, 'us-east-1')
 
+    def test_resolve_regions_not_regions(self):
+        # https://github.com/cloud-custodian/cloud-custodian/issues/11378
+        account = {"name": "dev",
+                   "account_id": "112233445566",
+                   "role": "arn:aws:iam:112233445566::/role/foobar"}
+        # explicit, repeated and comma separated
+        self.assertEqual(
+            org.resolve_regions(
+                ['us-west-2', 'eu-west-1,us-east-1'], account, ['eu-west-1']),
+            ['us-west-2', 'us-east-1'])
+        self.assertEqual(
+            org.resolve_regions(
+                ['us-west-2', 'eu-west-1', 'us-east-1'], account,
+                ('eu-west-1,us-east-1',)),
+            ['us-west-2'])
+        # the default regions
+        self.assertEqual(
+            org.resolve_regions([], account, ['us-west-2']), ['us-east-1'])
+        # regions that aren't in play are ignored
+        self.assertEqual(
+            org.resolve_regions(['us-west-2'], account, ['ap-south-1']), ['us-west-2'])
+        # skipping everything leaves nothing to run in
+        self.assertEqual(
+            org.resolve_regions(['us-west-2'], account, ['us-west-2']), [])
+        # nothing to skip leaves the result alone
+        for nothing in (None, (), ('',)):
+            self.assertEqual(
+                org.resolve_regions([], account, nothing), ('us-east-1', 'us-west-2'))
+
+    def test_resolve_regions_all_not_regions(self):
+        # a region that is still reported as available, but can't be reached
+        account = {"name": "dev",
+                   "account_id": "112233445566",
+                   "role": "arn:aws:iam::112233445566:role/foobar"}
+        session = mock.MagicMock()
+        session.client.return_value.describe_regions.return_value = {
+            'Regions': [{'RegionName': 'region-a'},
+                        {'RegionName': 'me-south-1'},
+                        {'RegionName': 'region-b'}]}
+        self.patch(org, 'get_session', mock.MagicMock(return_value=session))
+        self.assertEqual(
+            org.resolve_regions(['all'], account, ['me-south-1']),
+            ['region-a', 'region-b'])
+        self.assertEqual(
+            org.resolve_regions(['all'], account),
+            ['region-a', 'me-south-1', 'region-b'])
+
+    def test_cli_run_not_regions(self):
+        run_dir = self.setup_run_dir(accounts={'accounts': [
+            {'name': 'dev', 'account_id': '112233445566', 'tags': ['red'],
+             'regions': ['us-east-1', 'us-west-2', 'me-south-1'],
+             'role': 'arn:aws:iam:{account_id}::/role/foobar'},
+            {'name': 'qa', 'account_id': '002244668899', 'tags': ['red'],
+             'role': 'arn:aws:iam:{account_id}::/role/foobar'}]})
+        run_account = mock.MagicMock(return_value=({}, True))
+        self.patch(org, 'run_account', run_account)
+        self.change_cwd(run_dir)
+        base = ['run', '-c', 'accounts.yml', '-u', 'policies.yml', '--debug',
+                '-s', 'output', '--cache-path', 'cache']
+
+        def regions_run(*extra):
+            run_account.reset_mock()
+            result = CliRunner().invoke(org.cli, base + list(extra), catch_exceptions=False)
+            self.assertEqual(result.exit_code, 0)
+            return sorted((c.args[0]['name'], c.args[1]) for c in run_account.call_args_list)
+
+        # the account's own regions, and the default regions for an account without
+        self.assertEqual(
+            regions_run('--not-regions', 'me-south-1'),
+            [('dev', 'us-east-1'), ('dev', 'us-west-2'),
+             ('qa', 'us-east-1'), ('qa', 'us-west-2')])
+        # comma separated, repeated, and applied on top of -r
+        self.assertEqual(
+            regions_run('--not-regions', 'me-south-1,us-west-2'),
+            [('dev', 'us-east-1'), ('qa', 'us-east-1')])
+        self.assertEqual(
+            regions_run('--not-regions', 'me-south-1', '--not-regions', 'us-west-2'),
+            [('dev', 'us-east-1'), ('qa', 'us-east-1')])
+        self.assertEqual(
+            regions_run('-r', 'eu-west-1', '-r', 'me-south-1', '--not-regions', 'me-south-1'),
+            [('dev', 'eu-west-1'), ('qa', 'eu-west-1')])
+        # without the option nothing is skipped
+        self.assertIn(('dev', 'me-south-1'), regions_run())
+
+    def test_cli_run_script_not_regions(self):
+        run_dir = self.setup_run_dir()
+        run_account_script = mock.MagicMock(return_value=0)
+        self.patch(org, 'run_account_script', run_account_script)
+        self.change_cwd(run_dir)
+        result = CliRunner().invoke(
+            org.cli,
+            ['run-script', '-c', 'accounts.yml', '-s', 'output', '--serial',
+             '--not-regions', 'us-west-2', 'echo', 'hello'],
+            catch_exceptions=False)
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            sorted((c.args[0]['name'], c.args[1]) for c in run_account_script.call_args_list),
+            [('dev', 'us-east-1'), ('qa', 'us-east-1')])
+
+    def test_cli_report_not_regions(self):
+        run_dir = self.setup_run_dir()
+        report_account = mock.MagicMock(return_value=[])
+        self.patch(org, 'report_account', report_account)
+        self.change_cwd(run_dir)
+        result = CliRunner().invoke(
+            org.cli,
+            ['report', '-c', 'accounts.yml', '-u', 'policies.yml', '--debug',
+             '-s', 'output', '--resource', 'aws.ec2', '--not-regions', 'us-west-2'],
+            catch_exceptions=False)
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            sorted((c.args[0]['name'], c.args[1]) for c in report_account.call_args_list),
+            [('dev', 'us-east-1'), ('qa', 'us-east-1')])
+
     def test_filter_accounts(self):
 
         d = {'accounts': [
