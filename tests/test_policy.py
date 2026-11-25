@@ -180,7 +180,7 @@ class PolicyMetaLint(BaseTest):
             mgr = v(ctx, p)
 
             source = mgr.get_source("config")
-            if not isinstance(source, ConfigSource):
+            if not isinstance(source, ConfigSource) and not mgr.is_deprecated:
                 bad.append(k)
 
             if v.__dict__.get("augment"):
