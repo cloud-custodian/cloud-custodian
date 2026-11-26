@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "FleetIds": [
+            "fleet-1a2b3c4d-5678-90ab-cdef-1234567890ab",
+            "fleet-9f8e7d6c-5432-10fe-dcba-0987654321fe"
+        ],
+        "ResponseMetadata": {}
+    }
+}
