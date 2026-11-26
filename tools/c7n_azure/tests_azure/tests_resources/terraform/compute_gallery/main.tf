@@ -1,5 +1,5 @@
 # Terraform configuration for Compute Gallery testing
-# Creates test galleries, images, and versions for Cloud Custodian policy testing
+# Creates test galleries and images for Cloud Custodian policy testing
 
 terraform {
   required_providers {
