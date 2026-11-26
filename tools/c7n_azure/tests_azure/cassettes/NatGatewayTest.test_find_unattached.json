@@ -1,0 +1,79 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/natGateways?api-version=2024-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 18 Nov 2026 12:00:00 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1299"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestnatgw",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_nat-gateway/providers/Microsoft.Network/natGateways/cctestnatgw",
+                                "etag": "W/\"1f7c6c1e-4d0a-4a55-9d0f-3c2f1d4b8a10\"",
+                                "type": "Microsoft.Network/natGateways",
+                                "location": "southcentralus",
+                                "sku": {
+                                    "name": "Standard"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "6b0f9a2e-1f52-4c55-8f0e-0d3f6f6b7c11",
+                                    "idleTimeoutInMinutes": 4,
+                                    "publicIpAddresses": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_nat-gateway/providers/Microsoft.Network/publicIPAddresses/cctestnatgwip"
+                                        }
+                                    ],
+                                    "subnets": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_nat-gateway/providers/Microsoft.Network/virtualNetworks/cctestnatgwvnet/subnets/default"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "cctestnatgwunused",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_nat-gateway/providers/Microsoft.Network/natGateways/cctestnatgwunused",
+                                "etag": "W/\"8a3e2b71-0c9d-4e6f-b2a4-5d7e9f1c3b22\"",
+                                "type": "Microsoft.Network/natGateways",
+                                "location": "southcentralus",
+                                "sku": {
+                                    "name": "Standard"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "c2d4e6f8-0a1b-4c3d-9e5f-7a8b9c0d1e33",
+                                    "idleTimeoutInMinutes": 4
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
