@@ -7,6 +7,7 @@ import os
 
 from c7n.query import ResourceQuery, RetryPageIterator, TypeInfo
 from c7n.resources.vpc import InternetGateway
+from c7n.tags import universal_augment
 
 from botocore.config import Config
 from .common import BaseTest, placebo_dir
@@ -198,3 +199,47 @@ class QueryResourceManagerTest(BaseTest):
         # Check that the warning message was logged
         self.assertTrue("Resource not found: get_core_network using" in output.getvalue())
         self.assertTrue(resources[0]["CoreNetworkArn"] not in output.getvalue())
+
+    def test_detail_spec_access_denied(self):
+        # A resource policy that denies the Get* call on one topic must not
+        # abort the run, and the topic stays with what the list returned (#9455).
+        session_factory = self.replay_flight_data("test_detail_spec_access_denied")
+        p = self.load_policy(
+            {"name": "sns-detail-access-denied", "resource": "sns"},
+            session_factory=session_factory,
+        )
+        output = self.capture_logging(
+            name=p.resource_manager.log.name, level=logging.WARNING
+        )
+        resources = p.run()
+        denied, readable = resources
+        self.assertEqual(
+            denied,
+            {"TopicArn": "arn:aws:sns:us-east-1:644160558196:denied",
+             "c7n:DeniedMethods": ["get_topic_attributes"],
+             "Tags": []},
+        )
+        self.assertEqual(readable["TopicArn"], "arn:aws:sns:us-east-1:644160558196:readable")
+        self.assertNotIn("c7n:DeniedMethods", readable)
+        self.assertIn(
+            "Access denied: get_topic_attributes using "
+            "{'TopicArn': 'arn:aws:sns:us-east-1:644160558196:denied'}",
+            output.getvalue())
+
+    def test_detail_spec_access_denied_no_arn(self):
+        # dynamodb-table lists bare names and only the detail call returns
+        # the arn, so the denied table must not break the tag lookup.
+        session_factory = self.replay_flight_data("test_detail_spec_access_denied_no_arn")
+        p = self.load_policy(
+            {"name": "dynamodb-detail-access-denied", "resource": "dynamodb-table"},
+            session_factory=session_factory,
+        )
+        denied, readable = p.run()
+        self.assertEqual(
+            denied, {"TableName": "denied", "c7n:DeniedMethods": ["describe_table"]})
+        self.assertEqual(readable["Tags"], [{"Key": "App", "Value": "c7n"}])
+
+        # Only denied resources may skip the tag lookup; any other resource
+        # without an arn would silently read as untagged.
+        with self.assertRaises(KeyError):
+            universal_augment(p.resource_manager, [{"TableName": "described"}])

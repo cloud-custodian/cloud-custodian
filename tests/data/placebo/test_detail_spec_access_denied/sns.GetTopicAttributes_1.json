@@ -1,0 +1,14 @@
+{
+    "status_code": 403,
+    "data": {
+        "Error": {
+            "Message": "User: arn:aws:sts::644160558196:assumed-role/CloudCustodian/custodian is not authorized to perform: SNS:GetTopicAttributes on resource: arn:aws:sns:us-east-1:644160558196:denied with an explicit deny in a resource-based policy",
+            "Code": "AuthorizationError",
+            "Type": "Sender"
+        },
+        "ResponseMetadata": {
+            "HTTPStatusCode": 403,
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "User: arn:aws:sts::644160558196:assumed-role/CloudCustodian/custodian is not authorized to perform: dynamodb:DescribeTable on resource: arn:aws:dynamodb:us-east-1:644160558196:table/denied with an explicit deny in a resource-based policy",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {
+            "HTTPStatusCode": 400,
+            "RetryAttempts": 0
+        }
+    }
+}
