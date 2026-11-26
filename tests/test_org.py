@@ -352,6 +352,85 @@ def test_org_unit_moto(test, org_tree):
     assert rmap["GroupC"]["Parents"] == [org_tree["root"]["Id"], org_tree["dept_a"]["Id"]]
 
 
+def test_org_unit_get_resources(test, org_tree):
+    p = test.load_policy({"name": "units", "resource": "aws.org-unit"})
+    pulled = {r["Id"]: r for r in p.run()}
+    dept_a, group_c = org_tree["dept_a"]["Id"], org_tree["group_c"]["Id"]
+    # event ids (ie. a DetachPolicy targetId) can also be an account, the root
+    # or an ou that no longer exists.
+    resources = p.resource_manager.get_resources(
+        [
+            dept_a,
+            group_c,
+            org_tree["account_a"]["AccountId"],
+            org_tree["root"]["Id"],
+            "ou-abcd-zzzzzzzz",
+        ],
+        # p.run() filled the resource cache; skip it so the event lookup itself runs.
+        cache=False,
+    )
+    assert resources == [pulled[dept_a], pulled[group_c]]
+
+
+def test_org_unit_get_resources_skips_ou_removed_during_lookup(test, org_tree):
+    p = test.load_policy({"name": "units", "resource": "aws.org-unit"})
+    client = boto3.client("organizations", region_name="us-east-1")
+    temp = client.create_organizational_unit(
+        ParentId=org_tree["dept_a"]["Id"], Name="Temp"
+    )["OrganizationalUnit"]["Id"]
+    describe_ou = org_module.DescribeUnit.describe_ou
+
+    def describe_then_remove(self, client, ou_id):
+        ou = describe_ou(self, client, ou_id)
+        if ou_id == temp:
+            # the ou is removed between the describe and the ancestry walk
+            client.delete_organizational_unit(OrganizationalUnitId=temp)
+        return ou
+
+    with mock.patch.object(org_module.DescribeUnit, "describe_ou", describe_then_remove):
+        resources = p.resource_manager.get_resources(
+            [temp, org_tree["group_c"]["Id"]], cache=False
+        )
+    assert [r["Id"] for r in resources] == [org_tree["group_c"]["Id"]]
+
+
+def test_org_unit_cloudtrail_mode(test, policy_tree):
+    p = test.load_policy(
+        {
+            "name": "ou-policy-detached",
+            "resource": "aws.org-unit",
+            "mode": {
+                "type": "cloudtrail",
+                "events": [
+                    {
+                        "event": "DetachPolicy",
+                        "source": "organizations.amazonaws.com",
+                        "ids": "requestParameters.targetId",
+                    }
+                ],
+            },
+            "filters": [
+                {
+                    "type": "policy",
+                    "policy-type": "SERVICE_CONTROL_POLICY",
+                    "inherited": True,
+                    "attrs": [{"Name": "super-flow"}],
+                }
+            ],
+        }
+    )
+    event = {
+        "detail": {
+            "eventName": "DetachPolicy",
+            "eventSource": "organizations.amazonaws.com",
+            "requestParameters": {"targetId": policy_tree["group_c"]["Id"]},
+        }
+    }
+    resources = p.push(event, None)
+    assert [r["Name"] for r in resources] == ["GroupC"]
+    assert resources[0]["Path"] == "DeptA/GroupC"
+
+
 def test_org_account_moto(test, org_tree):
     p = test.load_policy(
         {
