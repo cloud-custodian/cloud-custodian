@@ -557,6 +557,10 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
 class LogSubscriptionFilter(ValueFilter):
     """Filters CloudWatch log groups by subscriptions
 
+    The names of the subscription filters that matched are recorded in
+    ``c7n:MatchedSubscriptionFilters``, for use with the
+    ``delete-subscription-filter`` action.
+
     :example:
 
     .. code-block:: yaml
@@ -571,6 +575,7 @@ class LogSubscriptionFilter(ValueFilter):
     """
     schema = type_schema('subscription-filter', rinherit=ValueFilter.schema)
     annotation_key = 'c7n:SubscriptionFilters'
+    matched_annotation_key = 'c7n:MatchedSubscriptionFilters'
     permissions = ('logs:DescribeSubscriptionFilters',)
 
     def process(self, resources, event=None):
@@ -588,7 +593,9 @@ class LogSubscriptionFilter(ValueFilter):
                 continue
             for f in filters:
                 r.setdefault(self.annotation_key, []).append(f)
-            if (len(self.data) == 1) or any((self.match(sub) for sub in r[self.annotation_key])):
+            matched = [f['filterName'] for f in filters if len(self.data) == 1 or self.match(f)]
+            if matched:
+                r.setdefault(self.matched_annotation_key, []).extend(matched)
                 results.append(r)
         return results
 
@@ -719,6 +726,71 @@ class SubscriptionFilter(BaseAction):
         for r in resources:
             client.put_subscription_filter(
                 logGroupName=r['logGroupName'], **params)
+
+
+@LogGroup.action_registry.register('delete-subscription-filter')
+class DeleteSubscriptionFilter(BaseAction):
+    """Delete subscription filters from a log group
+
+    ``filter_names`` selects the subscription filters to delete: ``matched``
+    (the ones matched by a ``subscription-filter`` filter in the same policy),
+    ``*`` (all of them) or a list of filter names.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cloudwatch-delete-unapproved-subscription-filter
+            resource: log-group
+            filters:
+              - type: subscription-filter
+                key: destinationArn
+                value: arn:aws:lambda:us-east-1:123456789876:function:forwarder
+            actions:
+              - type: delete-subscription-filter
+                filter_names: matched
+    """
+    schema = type_schema(
+        'delete-subscription-filter',
+        required=['filter_names'],
+        filter_names={'oneOf': [
+            {'enum': ['matched', '*']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+    permissions = ('logs:DeleteSubscriptionFilter', 'logs:DescribeSubscriptionFilters')
+
+    def validate(self):
+        if self.data.get('filter_names') != 'matched':
+            return self
+        for f in self.manager.iter_filters():
+            if isinstance(f, LogSubscriptionFilter):
+                return self
+        raise PolicyValidationError(
+            '`delete-subscription-filter` may only be used with `matched` filter_names '
+            'in conjunction with a `subscription-filter` filter on %s' % (self.manager.data,))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('logs')
+        filter_names = self.data['filter_names']
+        for r in resources:
+            if not _supports_subscription_filters(r):
+                continue
+            if filter_names == 'matched':
+                names = r.get(LogSubscriptionFilter.matched_annotation_key, ())
+            elif filter_names == '*':
+                response = self.manager.retry(
+                    client.describe_subscription_filters,
+                    logGroupName=r['logGroupName'],
+                    ignore_err_codes=('ResourceNotFoundException',)) or {}
+                names = [f['filterName'] for f in response.get('subscriptionFilters', ())]
+            else:
+                names = filter_names
+            for name in names:
+                self.manager.retry(
+                    client.delete_subscription_filter,
+                    logGroupName=r['logGroupName'],
+                    filterName=name,
+                    ignore_err_codes=('ResourceNotFoundException',))
 
 
 class DescribeDashboard(DescribeSource):

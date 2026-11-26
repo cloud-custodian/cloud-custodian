@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "subscriptionFilters": [
+            {
+                "filterName": "c7n-sub-approved",
+                "logGroupName": "c7n-sub-standard",
+                "filterPattern": "",
+                "destinationArn": "arn:aws:logs:us-east-1:644160558196:destination:c7n-approved",
+                "distribution": "ByLogStream",
+                "applyOnTransformedLogs": false,
+                "creationTime": 1793652459082
+            },
+            {
+                "filterName": "c7n-sub-unapproved",
+                "logGroupName": "c7n-sub-standard",
+                "filterPattern": "",
+                "destinationArn": "arn:aws:lambda:us-east-1:111111111111:function:forwarder",
+                "distribution": "ByLogStream",
+                "applyOnTransformedLogs": false,
+                "creationTime": 1793652460117
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

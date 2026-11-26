@@ -218,6 +218,8 @@ class LogGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:SubscriptionFilters"][0]["destinationArn"],
             "arn:aws:lambda:us-east-2:1111111111111:function:CloudCustodian")
+        self.assertEqual(resources[0]["c7n:MatchedSubscriptionFilters"],
+            ["LambdaStream_CloudCustodian"])
 
     def test_put_subscription_filter(self):
         factory = self.replay_flight_data("test_log_group_put_subscription_filter")
@@ -283,6 +285,97 @@ class LogGroupTest(BaseTest):
         self.assertEqual(subscription_filter["filterName"], filter_name)
         self.assertEqual(subscription_filter["destinationArn"], destination_arn)
         self.assertEqual(subscription_filter["distribution"], distribution)
+
+    def _run_with_delete_spy(self, policy):
+        retry = MagicMock(wraps=policy.resource_manager.retry)
+        with patch.object(policy.resource_manager, "retry", retry):
+            resources = policy.run()
+        deleted = [
+            (c.kwargs.get("logGroupName"), c.kwargs.get("filterName"))
+            for c in retry.call_args_list
+            if getattr(c.args[0], "__name__", "") == "delete_subscription_filter"
+        ]
+        return resources, deleted
+
+    def test_delete_subscription_filter_matched(self):
+        factory = self.replay_flight_data("test_log_group_delete_subscription_filter_matched")
+        p = self.load_policy(
+            {
+                "name": "delete-subscription-filter-matched",
+                "resource": "log-group",
+                "filters": [
+                    {"type": "subscription-filter",
+                     "key": "destinationArn",
+                     "value": "arn:aws:lambda:us-east-1:111111111111:function:forwarder"},
+                ],
+                "actions": [
+                    {"type": "delete-subscription-filter", "filter_names": "matched"},
+                ],
+            },
+            session_factory=factory,
+        )
+        resources, deleted = self._run_with_delete_spy(p)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:MatchedSubscriptionFilters"], ["c7n-sub-unapproved"])
+        self.assertEqual(deleted, [("c7n-sub-standard", "c7n-sub-unapproved")])
+
+    def test_delete_subscription_filter_all(self):
+        factory = self.replay_flight_data("test_log_group_delete_subscription_filter_all")
+        p = self.load_policy(
+            {
+                "name": "delete-subscription-filter-all",
+                "resource": "log-group",
+                "filters": [
+                    {"type": "value", "key": "logGroupName",
+                     "op": "glob", "value": "c7n-sub-*"},
+                ],
+                "actions": [
+                    {"type": "delete-subscription-filter", "filter_names": "*"},
+                ],
+            },
+            session_factory=factory,
+        )
+        resources, deleted = self._run_with_delete_spy(p)
+        self.assertEqual(len(resources), 2)
+        # the INFREQUENT_ACCESS group does not support subscription filters and is skipped
+        self.assertEqual(deleted, [
+            ("c7n-sub-standard", "c7n-sub-approved"),
+            ("c7n-sub-standard", "c7n-sub-unapproved"),
+        ])
+
+    def test_delete_subscription_filter_names(self):
+        factory = self.replay_flight_data("test_log_group_delete_subscription_filter_names")
+        p = self.load_policy(
+            {
+                "name": "delete-subscription-filter-names",
+                "resource": "log-group",
+                "actions": [
+                    {"type": "delete-subscription-filter",
+                     "filter_names": ["c7n-sub-unapproved", "c7n-sub-missing"]},
+                ],
+            },
+            session_factory=factory,
+        )
+        # c7n-sub-missing returns ResourceNotFoundException, which is ignored
+        resources, deleted = self._run_with_delete_spy(p)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(deleted, [
+            ("c7n-sub-standard", "c7n-sub-unapproved"),
+            ("c7n-sub-standard", "c7n-sub-missing"),
+        ])
+
+    def test_delete_subscription_filter_matched_requires_filter(self):
+        with self.assertRaises(PolicyValidationError) as ecm:
+            self.load_policy(
+                {
+                    "name": "delete-subscription-filter-invalid",
+                    "resource": "log-group",
+                    "actions": [
+                        {"type": "delete-subscription-filter", "filter_names": "matched"},
+                    ],
+                },
+            )
+        self.assertIn("in conjunction with a `subscription-filter` filter", str(ecm.exception))
 
     def test_age_normalize(self):
         factory = self.replay_flight_data("test_log_group_age_normalize")
