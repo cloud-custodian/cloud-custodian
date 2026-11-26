@@ -3,12 +3,33 @@
 
 from datetime import datetime
 
+from dateutil.parser import parse
+from dateutil.tz import tzutc
+
 from c7n.filters import Filter, AgeFilter
 from c7n.utils import type_schema, group_by
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildTypeInfo
 from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager, ArmTypeInfo
 from c7n_azure.utils import ResourceIdParser
+
+
+def get_published_date(resource):
+    """Parse the gallery image version publishedDate into a tz-aware datetime.
+
+    Azure returns seven fractional digits, which datetime.fromisoformat
+    rejects on Python < 3.11, so use dateutil here.
+    """
+    date_str = resource.get('properties', {}).get('publishingProfile', {}).get('publishedDate')
+    if not date_str:
+        return None
+    if isinstance(date_str, datetime):
+        return date_str if date_str.tzinfo else date_str.replace(tzinfo=tzutc())
+    try:
+        value = parse(date_str)
+    except (ValueError, TypeError, OverflowError):
+        return None
+    return value if value.tzinfo else value.replace(tzinfo=tzutc())
 
 
 @resources.register('compute-gallery', aliases=['image-gallery'])
@@ -234,23 +255,7 @@ class ImageVersionAgeFilter(AgeFilter):
 
     def get_resource_date(self, resource):
         """Safely extract the published date from nested resource properties."""
-        try:
-            publishing_profile = resource.get('properties', {}).get('publishingProfile', {})
-            date_str = publishing_profile.get('publishedDate')
-            if not date_str:
-                return None
-
-            # Parse ISO format datetime
-            if not isinstance(date_str, datetime):
-                from dateutil.parser import parse
-                from dateutil.tz import tzutc
-                v = parse(date_str)
-                if not v.tzinfo:
-                    v = v.replace(tzinfo=tzutc())
-                return v
-            return date_str
-        except (ValueError, AttributeError, TypeError):
-            return None
+        return get_published_date(resource)
 
 
 @ComputeGalleryImageVersion.filter_registry.register('latest')
@@ -319,13 +324,4 @@ class LatestImageVersionFilter(Filter):
 
     def _get_published_date(self, resource):
         """Extract published date from resource, defaulting to epoch if not found."""
-        try:
-            publishing_profile = resource.get('properties', {}).get('publishingProfile', {})
-            date_str = publishing_profile.get('publishedDate')
-            if date_str:
-                # Parse ISO format datetime
-                return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-        except (ValueError, AttributeError):
-            pass
-        # Return epoch as fallback for unpublished or malformed dates
-        return datetime(1970, 1, 1)
+        return get_published_date(resource) or datetime(1970, 1, 1, tzinfo=tzutc())

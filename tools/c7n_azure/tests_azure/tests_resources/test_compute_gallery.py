@@ -1,9 +1,16 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import datetime
+
 import pytest
 from pytest_terraform import terraform
+
+from c7n.testing import C7N_FUNCTIONAL
 from tests_azure.azure_common import BaseTest
+
+skip_unless_functional = pytest.mark.skipif(
+    not C7N_FUNCTIONAL, reason="terraform fixtures need recorded state or live credentials")
 
 
 class ComputeGalleryTest(BaseTest):
@@ -42,6 +49,29 @@ class ComputeGalleryImageTest(BaseTest):
                 ]
             }, validate=True)
             self.assertTrue(p)
+
+    def test_gallery_filter(self):
+        """Test that the gallery filter selects images of one gallery only"""
+        def image(name, gallery):
+            return {
+                'id': '/subscriptions/s/resourceGroups/rg/providers/'
+                      f'Microsoft.Compute/galleries/{gallery}/images/{name}',
+                'name': name,
+                'c7n:parent-id': '/subscriptions/s/resourceGroups/rg/providers/'
+                                 f'Microsoft.Compute/galleries/{gallery}',
+            }
+
+        resources = [image('image-a', 'gallery-a'), image('image-b', 'gallery-b')]
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-gallery-filter-resources',
+                'resource': 'azure.compute-gallery-image',
+                'filters': [
+                    {'type': 'gallery', 'value': 'gallery-a'}
+                ]
+            })
+            selected = p.resource_manager.filter_resources(resources)
+        self.assertEqual([r['name'] for r in selected], ['image-a'])
 
 
 class ComputeGalleryImageVersionTest(BaseTest):
@@ -130,11 +160,78 @@ class ComputeGalleryImageVersionTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
+    @staticmethod
+    def image_version(name, image, published):
+        base = ('/subscriptions/s/resourceGroups/rg/providers/'
+                'Microsoft.Compute/galleries/g/images')
+        return {
+            'id': f'{base}/{image}/versions/{name}',
+            'name': name,
+            'image_name': f'{base}/{image}',
+            'properties': {'publishingProfile': {'publishedDate': published}},
+        }
+
+    def test_latest_filter(self):
+        """Test that the latest filter selects the newest version per definition"""
+        resources = [
+            self.image_version('1.0', 'image-a', '2020-01-01T00:00:00+00:00'),
+            self.image_version('2.0', 'image-a', '2020-02-01T00:00:00.1234567+00:00'),
+            self.image_version('3.0', 'image-b', '2020-03-01T00:00:00+00:00'),
+        ]
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-latest-filter-resources',
+                'resource': 'azure.compute-gallery-image-version',
+                'filters': [{'type': 'latest', 'value': True}]
+            })
+            selected = p.resource_manager.filter_resources(resources)
+            self.assertEqual(sorted(r['name'] for r in selected), ['2.0', '3.0'])
+
+            p = self.load_policy({
+                'name': 'test-non-latest-filter-resources',
+                'resource': 'azure.compute-gallery-image-version',
+                'filters': [{'type': 'latest', 'value': False}]
+            })
+            selected = p.resource_manager.filter_resources(resources)
+        self.assertEqual([r['name'] for r in selected], ['1.0'])
+
+    def test_age_filter(self):
+        """Test that the age filter works on the published date"""
+        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        resources = [
+            self.image_version('1.0', 'image-a', '2020-01-01T00:00:00+00:00'),
+            self.image_version('2.0', 'image-a', now),
+        ]
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-age-filter-resources',
+                'resource': 'azure.compute-gallery-image-version',
+                'filters': [{'type': 'age', 'days': 30, 'op': 'greater-than'}]
+            })
+            selected = p.resource_manager.filter_resources(resources)
+        self.assertEqual([r['name'] for r in selected], ['1.0'])
+
+    def test_image_definition_filter(self):
+        """Test that the image-definition filter selects versions of one definition"""
+        resources = [
+            self.image_version('1.0', 'image-a', '2020-01-01T00:00:00+00:00'),
+            self.image_version('1.0', 'image-b', '2020-01-01T00:00:00+00:00'),
+        ]
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-image-definition-filter-resources',
+                'resource': 'azure.compute-gallery-image-version',
+                'filters': [{'type': 'image-definition', 'value': 'image-b'}]
+            })
+            selected = p.resource_manager.filter_resources(resources)
+        self.assertEqual([r['image_name'].split('/')[-1] for r in selected], ['image-b'])
+
 
 # Terraform-based functional tests (must be module-level functions)
 
 @terraform('compute_gallery')
 @pytest.mark.functional
+@skip_unless_functional
 def test_compute_gallery_discovery_terraform(test, compute_gallery):
     """Test that Cloud Custodian can discover galleries provisioned by Terraform"""
     # Verify terraform fixtures loaded successfully
@@ -160,6 +257,7 @@ def test_compute_gallery_discovery_terraform(test, compute_gallery):
 
 @terraform('compute_gallery')
 @pytest.mark.functional
+@skip_unless_functional
 def test_compute_gallery_location_filter_terraform(test, compute_gallery):
     """Test location filter on compute galleries"""
     # Filter by location
@@ -180,6 +278,7 @@ def test_compute_gallery_location_filter_terraform(test, compute_gallery):
 
 @terraform('compute_gallery')
 @pytest.mark.functional
+@skip_unless_functional
 def test_compute_gallery_image_discovery_terraform(test, compute_gallery):
     """Test that Cloud Custodian can discover image definitions"""
     linux_image = compute_gallery.outputs['linux_image']['value']
@@ -201,6 +300,7 @@ def test_compute_gallery_image_discovery_terraform(test, compute_gallery):
 
 @terraform('compute_gallery')
 @pytest.mark.functional
+@skip_unless_functional
 def test_compute_gallery_image_os_filter_terraform(test, compute_gallery):
     """Test OS type filter on image definitions"""
     linux_image = compute_gallery.outputs['linux_image']['value']
@@ -223,6 +323,7 @@ def test_compute_gallery_image_os_filter_terraform(test, compute_gallery):
 
 @terraform('compute_gallery')
 @pytest.mark.functional
+@skip_unless_functional
 def test_compute_gallery_image_gallery_filter_terraform(test, compute_gallery):
     """Test gallery filter on image definitions"""
     test_gallery = compute_gallery.outputs['test_gallery']['value']
