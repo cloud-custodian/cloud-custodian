@@ -15,7 +15,7 @@ from .utils import (
     get_resource_tag_targets,
     unique,
 )
-from .utils_email import get_mimetext_message, is_email
+from .utils_email import get_bcc_addrs, get_mimetext_message, is_email
 
 
 class EmailDelivery:
@@ -217,10 +217,19 @@ class EmailDelivery:
 
     def get_emails_to_mimetext_map(self, sqs_message):
         emails_to_resources_map = self.get_emails_to_resources_map(sqs_message)
-        emails_to_mimetext_map = {}
+        # bcc addresses receive every email, but get_mimetext_message keeps them out of the headers.
+        # They're added here rather than per resource, so slack://owners doesn't message them.
+        bcc_addrs = get_bcc_addrs(sqs_message["action"])
+        # Groups whose recipients only differ by a bcc address end up with the same recipients and
+        # the same visible To list, so they get one email covering the resources of both.
+        recipients_to_resources_map = {}
         for to_addrs, resources in emails_to_resources_map.items():
-            emails_to_mimetext_map[to_addrs] = get_mimetext_message(
-                self.config, self.logger, sqs_message, resources, list(to_addrs)
+            recipients = tuple(sorted(set(to_addrs) | set(bcc_addrs)))
+            recipients_to_resources_map.setdefault(recipients, []).extend(resources)
+        emails_to_mimetext_map = {}
+        for recipients, resources in recipients_to_resources_map.items():
+            emails_to_mimetext_map[recipients] = get_mimetext_message(
+                self.config, self.logger, sqs_message, resources, list(recipients)
             )
         # eg: { ('milton@initech.com', 'peter@initech.com'): mimetext_message }
         return emails_to_mimetext_map
@@ -243,7 +252,11 @@ class EmailDelivery:
             # use aws ses normally.
             else:
                 for emails, mimetext_msg in emails_to_mimetext_map.items():
-                    self.aws_ses.send_raw_email(RawMessage={"Data": mimetext_msg.as_string()})
+                    # bcc recipients aren't in the headers, so name all of them explicitly
+                    self.aws_ses.send_raw_email(
+                        Destinations=list(emails),
+                        RawMessage={"Data": mimetext_msg.as_string()},
+                    )
         except Exception as error:
             self.logger.error(
                 "policy:%s account:%s sending to:%s \n\n error: %s\n\n mailer.yml: %s"
