@@ -137,6 +137,13 @@ class SubnetTest(BaseTest):
                     'subnetwork': subnet['name']})
         self.assertEqual(result['enableFlowLogs'], True)
 
+    def test_subnet_set_private_api_schema(self):
+        p = self.load_policy({
+            'name': 'subnet-private-off',
+            'resource': 'gcp.subnet',
+            'actions': [{'type': 'set-private-api', 'state': False}]}, validate=True)
+        self.assertEqual(p.resource_manager.actions[0].data['state'], False)
+
     def test_subnet_set_private_api(self):
         project_id = self.project_id
         factory = self.replay_flight_data('subnet-set-private-api', project_id=project_id)

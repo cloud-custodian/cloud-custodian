@@ -197,7 +197,7 @@ class SetGcpPrivateAccess(SubnetAction):
     """Enable/Disable GCP Private IP Access for a subnet"""
 
     schema = type_schema(
-        'set-gcp-private',
+        'set-private-api',
         state={'type': 'boolean', 'default': True})
     method_spec = {'op': 'setPrivateIpGoogleAccess'}
 
