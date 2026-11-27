@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 
 import builtins
-from datetime import datetime
+from datetime import datetime, timedelta
 from importlib import reload
 import os
 from time import sleep
@@ -391,6 +391,10 @@ class OtherTests(unittest.TestCase):
         sleep(1.0)
         assert utils.get_date_age(now) == 0
         assert utils.get_date_age(now, "seconds") >= 1
+
+    def test_get_date_age_without_timezone(self):
+        two_days_ago = (datetime.utcnow() - timedelta(days=2, hours=1)).strftime("%Y-%m-%d %H:%M")
+        assert utils.get_date_age(two_days_ago) == 2
 
     def test_get_message_subject(self):
         subject = utils.get_message_subject(SQS_MESSAGE_1)

@@ -172,7 +172,11 @@ def get_date_time_delta(delta):
 
 
 def get_date_age(date, unit="days"):
-    delta = datetime.now(tz=tzutc()) - parser.parse(date)
+    date = parser.parse(date)
+    # resource dates without a timezone are UTC
+    if date.tzinfo is None:
+        date = date.replace(tzinfo=tzutc())
+    delta = datetime.now(tz=tzutc()) - date
     if unit == "seconds":
         return delta.seconds
     return delta.days
