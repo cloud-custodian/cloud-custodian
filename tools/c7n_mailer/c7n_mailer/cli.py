@@ -60,6 +60,8 @@ CONFIG_SCHEMA = {
         "lambda_description": {"type": "string"},
         "lambda_tags": {"type": "object"},
         "lambda_schedule": {"type": "string"},
+        "lambda_trigger": {"type": "string", "enum": ["schedule", "sqs"]},
+        "lambda_sqs_batch_size": {"type": "integer", "minimum": 1, "maximum": 10},
         # Azure Function Config
         "function_properties": {
             "type": "object",
