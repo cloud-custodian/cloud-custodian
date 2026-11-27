@@ -3,12 +3,14 @@
 
 import logging
 
-from azure.keyvault.keys import KeyProperties
+from azure.keyvault.keys import (
+    KeyProperties, KeyRotationLifetimeAction, KeyRotationPolicyAction)
 
 from c7n.filters import Filter
 from c7n.utils import type_schema
 
 from c7n_azure import constants
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
 from c7n_azure.resources.key_vault import KeyVaultPropertiesUpdateAction
@@ -16,6 +18,10 @@ from c7n_azure.utils import ThreadHelper, ResourceIdParser
 
 
 log = logging.getLogger('custodian.azure.keyvault.keys')
+
+# ISO 8601 duration, e.g. P90D, P1Y2M, PT48H, P1W
+DURATION_PATTERN = (
+    r'^P(?!$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)?$')
 
 
 @resources.register('keyvault-key', aliases=['keyvault-keys'])
@@ -177,10 +183,27 @@ class KeyVaultKeyRotationFilter(Filter):
              filters:
                 - type: rotation-policy
                   state: Disabled
+
+    By default a key counts as enabled when it has a saved rotation policy, even if
+    that policy only notifies. With ``auto-rotation: true`` the policy must also have
+    a ``Rotate`` lifetime action.
+
+    Find all keyvault keys that are not rotated automatically
+
+    .. code-block:: yaml
+
+        policies:
+           - name: key-vault-keys-auto-rotation-is-disabled
+             resource: azure.keyvault-keys
+             filters:
+                - type: rotation-policy
+                  state: Disabled
+                  auto-rotation: true
     """
     schema = type_schema(
         'rotation-policy', required=['state'],
-        state={'type': 'string', 'enum': ['Enabled', 'Disabled']}
+        state={'type': 'string', 'enum': ['Enabled', 'Disabled']},
+        **{'auto-rotation': {'type': 'boolean'}}
     )
 
     def process(self, resources, event=None):
@@ -189,8 +212,12 @@ class KeyVaultKeyRotationFilter(Filter):
             id = KeyProperties(key_id=key['id'])
             client = self.manager.get_client(vault_url=id.vault_url)
             rotation = client.get_key_rotation_policy(id.name)
-            if (self.data.get('state') == 'Disabled' and not rotation.id) or \
-               (self.data.get('state') == 'Enabled' and rotation.id):
+            enabled = bool(rotation.id)
+            if enabled and self.data.get('auto-rotation'):
+                enabled = any(
+                    a.action == KeyRotationPolicyAction.rotate
+                    for a in rotation.lifetime_actions or [])
+            if (self.data.get('state') == 'Enabled') == enabled:
                 matched.append(key)
         return matched
 
@@ -253,4 +280,90 @@ class KeyVaultKeyUpdateAction(KeyVaultPropertiesUpdateAction):
             tags=self.data.get("tags"),
             not_before=self.not_before,
             expires_on=self.expires_on,
+        )
+
+
+@KeyVaultKeys.action_registry.register("set-rotation-policy")
+class KeyVaultKeySetRotationPolicyAction(AzureBaseAction):
+    """
+    Configure the rotation policy of a key, which enables automatic key rotation.
+
+    ``expires_in`` and the ``time_after_create`` / ``time_before_expiry`` triggers
+    are ISO 8601 durations (for example ``P90D``). Each lifetime action needs exactly
+    one trigger. At least one of ``expires_in`` or ``lifetime_actions`` is required.
+    Settings that are not specified keep the value of the key's current rotation policy.
+
+    :example:
+
+    Rotate keys that have no rotation policy 30 days before they expire
+
+    .. code-block:: yaml
+
+        policies:
+          - name: key-vault-keys-enable-rotation
+            resource: azure.keyvault-key
+            filters:
+              - type: rotation-policy
+                state: Disabled
+            actions:
+              - type: set-rotation-policy
+                expires_in: P1Y
+                lifetime_actions:
+                  - action: Rotate
+                    trigger:
+                      time_before_expiry: P30D
+    """
+
+    schema = type_schema(
+        "set-rotation-policy",
+        expires_in={"type": "string", "pattern": DURATION_PATTERN},
+        lifetime_actions={
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["action", "trigger"],
+                "properties": {
+                    "action": {"enum": ["Rotate", "Notify"]},
+                    "trigger": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "oneOf": [
+                            {"required": ["time_after_create"]},
+                            {"required": ["time_before_expiry"]},
+                        ],
+                        "properties": {
+                            "time_after_create": {"type": "string", "pattern": DURATION_PATTERN},
+                            "time_before_expiry": {"type": "string", "pattern": DURATION_PATTERN},
+                        },
+                    },
+                },
+            },
+        },
+    )
+    schema['anyOf'] = [
+        {"required": ["expires_in"]},
+        {"required": ["lifetime_actions"]},
+    ]
+
+    def _process_resource(self, resource):
+        id = KeyProperties(key_id=resource['id'])
+        client = self.manager.get_client(vault_url=id.vault_url)
+        current = client.get_key_rotation_policy(id.name)
+
+        lifetime_actions = [
+            KeyRotationLifetimeAction(
+                KeyRotationPolicyAction(a['action']),
+                time_after_create=a['trigger'].get('time_after_create'),
+                time_before_expiry=a['trigger'].get('time_before_expiry'),
+            )
+            for a in self.data.get('lifetime_actions', [])
+        ]
+
+        client.update_key_rotation_policy(
+            id.name,
+            current,
+            expires_in=self.data.get('expires_in'),
+            lifetime_actions=lifetime_actions or None,
         )
