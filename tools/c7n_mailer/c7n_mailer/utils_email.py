@@ -61,10 +61,17 @@ def is_email(target):
     if target.startswith("slack://"):
         logger.debug("Slack payload, not an email.")
         return False
-    if parseaddr(target)[1] and "@" in target and "." in target:
-        return True
-    else:
+    target = target.strip()
+    addr = parseaddr(target)[1]
+    # Accept a bare address or one with a display name, "Jane <jane@example.com>",
+    # but not a string that parseaddr only partly understood.
+    if not addr or (target != addr and not target.endswith(f"<{addr}>")):
         return False
+    local, sep, domain = addr.rpartition("@")
+    if not sep or not local or any(c.isspace() for c in addr):
+        return False
+    labels = domain.split(".")
+    return len(labels) > 1 and all(labels)
 
 
 def priority_header_is_valid(priority_header, logger):
