@@ -729,7 +729,7 @@ def get_ldap_lookup(cache_engine=None, uid_regex=None):
 
 class MockLdapLookup(LdapLookup):
     # allows us to instantiate this object and not need a redis daemon
-    def get_redis_connection(self, redis_host, redis_port):
+    def get_redis_connection(self, redis_host, redis_port, redis_url=None):
         return MockRedisLookup()
 
     # us to instantiate this object and not have ldap3 try to connect

@@ -146,6 +146,7 @@ CONFIG_SCHEMA = {
         "ses_role": {"type": "string"},
         "redis_host": {"type": "string"},
         "redis_port": {"type": "integer"},
+        "redis_url": {"type": "string"},
         "datadog_api_key": {"type": "string"},  # TODO: encrypt with KMS?
         "datadog_application_key": {"type": "string"},  # TODO: encrypt with KMS?
         "slack_token": {"type": "string"},

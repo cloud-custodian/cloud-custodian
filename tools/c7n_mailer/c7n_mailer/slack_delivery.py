@@ -22,6 +22,7 @@ class SlackDelivery:
                 redis_host=config.get("redis_host"),
                 redis_port=int(config.get("redis_port", 6379)),
                 db=0,
+                redis_url=config.get("redis_url"),
             )
         else:
             return None
