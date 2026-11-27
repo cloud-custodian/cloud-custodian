@@ -86,6 +86,69 @@ class TestSlackDelivery(unittest.TestCase):
         assert result == {}
         self.logger.debug.assert_called_with("No SlackChannel tag found in resource.")
 
+    def _tagged_resources(self, *values):
+        resources = []
+        for i, value in enumerate(values):
+            resource = copy.deepcopy(RESOURCE_3)
+            resource["VolumeId"] = "vol-%d" % i
+            resource["Tags"].append({"Key": "SlackChannel", "Value": value})
+            resources.append(resource)
+        message_destination = ["slack://tag/SlackChannel"]
+        self.message["resources"] = resources
+        self.message["action"]["to"] = message_destination
+        self.message["policy"]["actions"][1]["to"] = message_destination
+
+    def test_map_sending_to_tag_channel_groups_resources_by_tag_value(self):
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        # "team-a" and "#team-a" resolve to the same channel and share one message.
+        self._tagged_resources("team-a", "#team-b", "#team-a")
+
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+
+        assert sorted(result) == ["#team-a", "#team-b"]
+        assert "vol-0" in result["#team-a"] and "vol-2" in result["#team-a"]
+        assert "vol-1" not in result["#team-a"]
+        assert "vol-1" in result["#team-b"]
+        assert "vol-0" not in result["#team-b"] and "vol-2" not in result["#team-b"]
+
+    def test_map_sending_to_tag_skips_resources_without_tag(self):
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        self._tagged_resources("#team-a")
+        self.message["resources"].append(copy.deepcopy(RESOURCE_3))
+
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+
+        assert list(result) == ["#team-a"]
+        assert "vol-0" in result["#team-a"]
+        assert "vol-21a0e7ea9b19f0043" not in result["#team-a"]
+
+    @patch("c7n_mailer.slack_delivery.SlackDelivery.retrieve_user_im")
+    def test_map_sending_to_tag_email_owners(self, mock_retrieve_user_im):
+        mock_retrieve_user_im.side_effect = lambda emails: {
+            e: "U-" + e.split("@")[0] for e in emails if e != "unknown@initech.com"
+        }
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        self._tagged_resources(
+            "milton@initech.com", "peter@initech.com", "unknown@initech.com", "milton@initech.com"
+        )
+
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+
+        # One lookup for all owners, with each email only once.
+        mock_retrieve_user_im.assert_called_once()
+        assert sorted(mock_retrieve_user_im.call_args[0][0]) == [
+            "milton@initech.com",
+            "peter@initech.com",
+            "unknown@initech.com",
+        ]
+        assert "vol-3" in result["milton@initech.com"]
+
+        assert sorted(result) == ["milton@initech.com", "peter@initech.com"]
+        assert json.loads(result["milton@initech.com"])["channel"] == "U-milton"
+        assert "vol-0" in result["milton@initech.com"]
+        assert "vol-1" not in result["milton@initech.com"]
+        assert "vol-1" in result["peter@initech.com"]
+
     def test_map_sending_to_webhook(self):
         webhook = "https://hooks.slack.com/this-is-a-webhook"
 
