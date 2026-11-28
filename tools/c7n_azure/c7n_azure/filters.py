@@ -155,8 +155,8 @@ class MetricFilter(Filter):
     ``aggregation`` again over the whole window. ``aggregation`` still picks the
     value Azure Monitor returns for each point. Points with no value are left
     out unless ``no_data_action`` is ``to_zero``, and a resource with no points
-    at all follows ``no_data_action``. Chain one filter per percentile to
-    require several of them.
+    at all follows ``no_data_action`` (``to_zero`` reads it as 0). Chain one
+    filter per percentile to require several of them.
 
     :example:
 
@@ -253,7 +253,7 @@ class MetricFilter(Filter):
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
-            'percentile': {'type': 'number', 'exclusiveMinimum': 0, 'maximum': 100},
+            'percentile': {'type': 'number', 'minimum': 0, 'maximum': 100},
             'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
             'filter': {'type': 'string'},
             'dimensions': {
@@ -415,7 +415,10 @@ class MetricFilter(Filter):
         else:
             aggregate_value = Math.percentile(m_data, self.percentile)
             if aggregate_value is None:
-                return self.no_data_action == 'include'
+                # Azure returned a series with no points; to_zero reads it as 0, like the mean does
+                if self.no_data_action != 'to_zero':
+                    return self.no_data_action == 'include'
+                aggregate_value = 0
         return self.op(aggregate_value, self.threshold)
 
     def process_resource(self, resource):

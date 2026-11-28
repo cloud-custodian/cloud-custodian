@@ -71,6 +71,7 @@ class UtilsMathTest(BaseTest):
         self.assertEqual(2.5, Math.percentile(data, 50))
         self.assertAlmostEqual(3.85, Math.percentile(data, 95))
         self.assertEqual(4, Math.percentile(data, 100))
+        self.assertEqual(1, Math.percentile(data, 0))
 
     def test_percentile_single_value(self):
         self.assertEqual(7, Math.percentile([7], 99))
