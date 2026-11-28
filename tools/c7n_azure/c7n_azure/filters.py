@@ -150,6 +150,44 @@ class MetricFilter(Filter):
                 timeframe: 24
                 period_start: start-of-day
 
+    The ``percentile`` key reduces the points Azure Monitor returns for each
+    ``interval`` to that percentile, computed by Custodian, instead of applying
+    ``aggregation`` again over the whole window. ``aggregation`` still picks the
+    value Azure Monitor returns for each point. Points with no value are left
+    out unless ``no_data_action`` is ``to_zero``, and a resource with no points
+    at all follows ``no_data_action`` (``to_zero`` reads it as 0). Chain one
+    filter per percentile to require several of them.
+
+    :example:
+
+    Find PostgreSQL flexible servers whose one-minute average CPU stayed under
+    35% at the median and under 75% at the 99th percentile over the last 30 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: underused-postgresql-servers
+            resource: azure.postgresql-flexibleserver
+            filters:
+              - type: metric
+                metric: cpu_percent
+                aggregation: average
+                interval: PT1M
+                timeframe: 720
+                period_start: start-of-day
+                percentile: 50
+                op: lt
+                threshold: 35
+              - type: metric
+                metric: cpu_percent
+                aggregation: average
+                interval: PT1M
+                timeframe: 720
+                period_start: start-of-day
+                percentile: 99
+                op: lt
+                threshold: 75
+
     The ``dimensions`` key lets a policy filter a resource by a metric of that
     resource's parent, restricted back to the resource itself with an OData
     filter clause. When ``dimensions`` is set, the filter queries the parent
@@ -215,6 +253,7 @@ class MetricFilter(Filter):
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
             'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
+            'percentile': {'type': 'number', 'minimum': 0, 'maximum': 100},
             'no_data_action': {'enum': ['include', 'exclude', 'to_zero']},
             'filter': {'type': 'string'},
             'dimensions': {
@@ -249,6 +288,8 @@ class MetricFilter(Filter):
         self.aggregation = self.data.get('aggregation', self.DEFAULT_AGGREGATION)
         # Aggregation function to be used locally
         self.func = self.aggregation_funcs[self.aggregation]
+        # Percentile of the aggregated points, used in place of self.func when set
+        self.percentile = self.data.get('percentile')
         # Used to reduce the set of metric data returned
         self.filter = self.data.get('filter', None)
         # Include or exclude resources if there is no metric data available
@@ -369,7 +410,15 @@ class MetricFilter(Filter):
         m_data = self.get_metric_data(resource)
         if m_data is None:
             return self.no_data_action == 'include'
-        aggregate_value = self.func(m_data)
+        if self.percentile is None:
+            aggregate_value = self.func(m_data)
+        else:
+            aggregate_value = Math.percentile(m_data, self.percentile)
+            if aggregate_value is None:
+                # Azure returned a series with no points; to_zero reads it as 0, like the mean does
+                if self.no_data_action != 'to_zero':
+                    return self.no_data_action == 'include'
+                aggregate_value = 0
         return self.op(aggregate_value, self.threshold)
 
     def process_resource(self, resource):

@@ -86,3 +86,80 @@ class MetricFilterDimensionsTest(BaseTest):
         f1 = self._get_filter(dimensions=[{'name': 'ModelDeploymentName', 'value': 'dep-a'}])
         f2 = self._get_filter(dimensions=[{'name': 'ModelDeploymentName', 'value': 'dep-b'}])
         self.assertNotEqual(f1._get_metrics_cache_key(), f2._get_metrics_cache_key())
+
+
+class MetricFilterPercentileTest(BaseTest):
+
+    def test_schema_accepts_percentile(self):
+        p = self.load_policy({
+            'name': 'test-metric-percentile',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'metric',
+                 'metric': 'Percentage CPU',
+                 'aggregation': 'average',
+                 'interval': 'PT1M',
+                 'percentile': 95,
+                 'op': 'lt',
+                 'threshold': 45}]
+        }, validate=True)
+        self.assertTrue(p)
+
+    def test_schema_rejects_percentile_out_of_range(self):
+        for percentile in (-1, 101):
+            with self.assertRaises(Exception):
+                self.load_policy({
+                    'name': 'test-metric-percentile-range',
+                    'resource': 'azure.vm',
+                    'filters': [
+                        {'type': 'metric',
+                         'metric': 'Percentage CPU',
+                         'percentile': percentile,
+                         'op': 'lt',
+                         'threshold': 45}]
+                }, validate=True)
+
+    def _get_filter(self, percentile, op, threshold, **extra):
+        data = {'type': 'metric', 'metric': 'Percentage CPU', 'aggregation': 'average',
+                'percentile': percentile, 'op': op, 'threshold': threshold}
+        data.update(extra)
+        f = MetricFilter(data=data, manager=Mock())
+        f.get_metric_data = Mock()
+        return f
+
+    def test_percentile_replaces_window_aggregation(self):
+        # The mean of these points is 26.25, p50 is 2.5 and p99 is 96.12.
+        points = [1, 2, 3, 99, None]
+        f = self._get_filter(50, 'lt', 3)
+        f.get_metric_data.return_value = points
+        self.assertTrue(f.passes_op_filter({'id': 'vm'}))
+        f = self._get_filter(99, 'lt', 75)
+        f.get_metric_data.return_value = points
+        self.assertFalse(f.passes_op_filter({'id': 'vm'}))
+
+    def test_schema_accepts_percentile_bounds(self):
+        for percentile in (0, 100):
+            self.assertTrue(self.load_policy({
+                'name': 'test-metric-percentile-bounds',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'metric',
+                     'metric': 'Percentage CPU',
+                     'percentile': percentile,
+                     'op': 'lt',
+                     'threshold': 45}]
+            }, validate=True))
+
+    def test_percentile_of_an_empty_series_with_to_zero_is_zero(self):
+        f = self._get_filter(95, 'lt', 45, no_data_action='to_zero')
+        f.get_metric_data.return_value = []
+        self.assertTrue(f.passes_op_filter({'id': 'vm'}))
+        f = self._get_filter(95, 'gt', 0, no_data_action='to_zero')
+        f.get_metric_data.return_value = []
+        self.assertFalse(f.passes_op_filter({'id': 'vm'}))
+
+    def test_percentile_without_values_follows_no_data_action(self):
+        for action, expected in (('exclude', False), ('include', True)):
+            f = self._get_filter(95, 'lt', 45, no_data_action=action)
+            f.get_metric_data.return_value = [None, None]
+            self.assertEqual(f.passes_op_filter({'id': 'vm'}), expected)

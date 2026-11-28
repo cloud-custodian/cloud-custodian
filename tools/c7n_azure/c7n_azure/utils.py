@@ -235,6 +235,18 @@ class Math:
         clean_numbers = [e for e in numbers if e is not None]
         return float(min(clean_numbers))
 
+    @staticmethod
+    def percentile(numbers, percent):
+        """Linear interpolation between the closest ranks, or None without values."""
+        clean_numbers = sorted(e for e in numbers if e is not None)
+        if not clean_numbers:
+            return None
+        rank = (len(clean_numbers) - 1) * percent / 100.0
+        low = int(rank)
+        high = min(low + 1, len(clean_numbers) - 1)
+        return float(
+            clean_numbers[low] + (clean_numbers[high] - clean_numbers[low]) * (rank - low))
+
 
 class GraphHelper:
     log = logging.getLogger('custodian.azure.utils.GraphHelper')
