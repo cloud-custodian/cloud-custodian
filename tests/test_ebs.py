@@ -17,9 +17,11 @@ from c7n.resources.ebs import (
     CopySnapshot,
     Delete,
     ErrorHandler,
+    SnapshotDelete,
     SnapshotQueryParser as QueryParser,
     VolumeQueryParser
 )
+from c7n.resources.ami import AMI
 from .common import BaseTest
 from pytest_terraform import terraform
 from c7n.testing import mock_datetime_now
@@ -479,6 +481,112 @@ class SnapshotUnusedTest(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 2)
+
+
+class SnapshotAmiLifecycleTest(BaseTest):
+    """Regression tests for orphan detection across AMI lifecycle states.
+
+    Disabled AMIs are excluded from DescribeImages unless IncludeDisabled is
+    requested, and deprecated AMIs are only returned for their owner unless
+    IncludeDeprecated is requested. Their snapshots must not be classified as
+    orphans, while available AMIs continue to be protected as before.
+    """
+
+    def _get_ami_resources(self):
+        def ami(image_id, state, snapshot_id, deprecated=False):
+            resource = {
+                "ImageId": image_id,
+                "State": state,
+                "BlockDeviceMappings": [
+                    {"DeviceName": "/dev/sda1", "Ebs": {"SnapshotId": snapshot_id}}
+                ],
+            }
+            if deprecated:
+                resource["DeprecationTime"] = "2024-01-01T00:00:00.000Z"
+            return resource
+
+        return [
+            ami("ami-available", "available", "snap-available"),
+            ami("ami-disabled", "disabled", "snap-disabled"),
+            ami("ami-deprecated", "available", "snap-deprecated", deprecated=True),
+        ]
+
+    def _get_snapshots(self):
+        return [
+            {"SnapshotId": "snap-available"},
+            {"SnapshotId": "snap-disabled"},
+            {"SnapshotId": "snap-deprecated"},
+            {"SnapshotId": "snap-orphan"},
+        ]
+
+    def test_skip_ami_snapshots_ami_lifecycle_states(self):
+        policy = self.load_policy(
+            {
+                "name": "ami-snap-filter",
+                "resource": "ebs-snapshot",
+                "filters": [{"type": "skip-ami-snapshots"}],
+            }
+        )
+        ami_filter = policy.resource_manager.filters[0]
+        with mock.patch.object(
+            AMI, "resources", return_value=self._get_ami_resources()
+        ) as ami_resources:
+            resources = ami_filter.process(self._get_snapshots())
+
+        ami_resources.assert_called_once_with(
+            {"IncludeDisabled": True, "IncludeDeprecated": True}
+        )
+        self.assertEqual([r["SnapshotId"] for r in resources], ["snap-orphan"])
+
+    def test_unused_ami_lifecycle_states(self):
+        policy = self.load_policy(
+            {
+                "name": "snap-unused",
+                "resource": "ebs-snapshot",
+                "filters": [{"type": "unused", "value": True}],
+            }
+        )
+        unused_filter = policy.resource_manager.filters[0]
+        with mock.patch.object(
+            AMI, "resources", return_value=self._get_ami_resources()
+        ) as ami_resources, mock.patch.object(
+            unused_filter, "_pull_asg_snapshots", return_value=set()
+        ):
+            resources = unused_filter.process(self._get_snapshots())
+
+        ami_resources.assert_called_once_with(
+            {"IncludeDisabled": True, "IncludeDeprecated": True}
+        )
+        self.assertEqual([r["SnapshotId"] for r in resources], ["snap-orphan"])
+
+    def test_delete_ami_lifecycle_states(self):
+        policy = self.load_policy(
+            {
+                "name": "snapshot-delete",
+                "resource": "ebs-snapshot",
+                "actions": [{"type": "delete"}],
+            }
+        )
+        delete_action = policy.resource_manager.actions[0]
+        client = mock.MagicMock()
+        with mock.patch.object(
+            AMI, "resources", return_value=self._get_ami_resources()
+        ) as ami_resources, mock.patch(
+            "c7n.resources.ebs.local_session"
+        ) as local_session, mock.patch.object(
+            SnapshotDelete, "executor_factory", MainThreadExecutor
+        ):
+            local_session.return_value.client.return_value = client
+            resources = delete_action.process(self._get_snapshots())
+
+        ami_resources.assert_called_once_with(
+            {"IncludeDisabled": True, "IncludeDeprecated": True}
+        )
+        self.assertEqual([r["SnapshotId"] for r in resources], ["snap-orphan"])
+        client.delete_snapshot.assert_called_once()
+        self.assertEqual(
+            client.delete_snapshot.call_args.kwargs["SnapshotId"], "snap-orphan"
+        )
 
 
 class SnapshotTrimTest(BaseTest):
