@@ -166,7 +166,7 @@ and if not specified, the mailer will use the default value `slack_default`.
 The unique template field `slack_msg_color` can be used to specify a color
 border for the Slack message. This accepts the Slack presets of `danger` (red),
 `warning` (yellow) and `good` (green). It can also accept an HTML hex code. See
-the [Slack documentation](https://api.slack.com/reference/messaging/attachments#fields)
+the [Slack documentation](https://docs.slack.dev/legacy/legacy-messaging/legacy-secondary-message-attachments/#fields)
 for details.
 
 **Note:** if you are using a hex color code, it will need to be wrapped in quotes
